@@ -2513,7 +2513,7 @@ export function calculateWilcoxonSignedRank(
 export function calculateFriedmanTest(
   sessions: Session[],
   alpha = 0.05,
-  includeProposed = true,
+  includeProposed = false,
 ): FriedmanResult {
   const activeMissions = missions.filter((m) => includeProposed || !m.proposed);
   const k = activeMissions.length;

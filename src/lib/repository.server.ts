@@ -50,6 +50,7 @@ async function getOrCreateParticipantId(): Promise<string> {
 }
 
 export async function saveDemoSubmission(session: Session) {
+  if (session.mode === "practice") return;
   const subPath = ".demo-data/submissions.json";
   try {
     await mkdir(".demo-data", { recursive: true });
@@ -173,10 +174,10 @@ export async function startSession(input: {
   token: string;
 }) {
   const existing = await getSession();
-  if (existing && !(input.practice && existing.mode === "practice")) {
+  if (existing && !input.practice) {
     if (existing.status === "draft") {
       throw new Error(
-        "A session draft already exists. Continue it or discard the draft before starting again.",
+        "A session draft already exists. Continue your profile or discard the draft before starting again.",
       );
     }
     // Repeat submissions: participants can submit multiple responses without restrictions
@@ -186,11 +187,10 @@ export async function startSession(input: {
     const now = new Date();
     const sessionId = randomUUID();
     const moduleOrders = [
-      ["phishing", "pretexting", "impersonation", "links", "deepfake"],
-      ["pretexting", "impersonation", "links", "deepfake", "phishing"],
-      ["impersonation", "links", "deepfake", "phishing", "pretexting"],
-      ["links", "deepfake", "phishing", "pretexting", "impersonation"],
-      ["deepfake", "phishing", "pretexting", "impersonation", "links"],
+      ["phishing", "pretexting", "impersonation", "links"],
+      ["pretexting", "impersonation", "links", "phishing"],
+      ["impersonation", "links", "phishing", "pretexting"],
+      ["links", "phishing", "pretexting", "impersonation"],
     ];
     const assignedModuleOrder = moduleOrders[Math.floor(Math.random() * moduleOrders.length)];
     const session: Session = {
@@ -251,7 +251,7 @@ export async function startSession(input: {
 export async function saveDraft(answers: Answers) {
   const s = await getSession();
   if (!s) throw new Error("Session not found. Please begin with consent.");
-  if (s.status !== "draft") throw new Error("Baseline is locked.");
+  if (s.status !== "draft") return s;
   if (isResearch() && s.mode === "research")
     return rpc<Session>("save_draft", { p_answers: answers });
   const local = (await readLocal())!;
@@ -265,6 +265,9 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
   if (s.mode === "practice")
     throw new Error("Practice sessions cannot submit research answers.");
   if (isResearch()) {
+    if (s.status !== "draft") {
+      return s;
+    }
     const submitted = await rpc<Session>("submit_baseline", {
       p_answers: answers,
       p_key: idempotencyKey,
@@ -277,13 +280,13 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
   }
   const local = (await readLocal())!;
   if (local.session.status !== "draft") {
-    if (local.submitKey === idempotencyKey) return local.session;
-    throw new Error("Baseline is locked.");
+    return local.session;
   }
+  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4", "Q5"].every(
+    (qid) => answers[qid]?.status === "answered" && answers[qid]?.value !== null,
+  );
   local.session.answers = answers;
-  local.session.status = Object.values(answers).every(
-    (a) => a.status === "answered",
-  )
+  local.session.status = isProfileComplete
     ? "submitted_complete"
     : "submitted_with_missing";
   local.session.submittedAt = new Date().toISOString();
@@ -305,7 +308,7 @@ export async function recordAttempt(input: {
   const s = await getSession();
   if (!s || s.status === "draft")
     throw new Error(
-      "Baseline required. Submit your questionnaire first, or choose practice-only participation.",
+      "Research profile required. Complete and submit your student profile before recording challenge attempts, or choose practice mode.",
     );
   const scenario =
     scenarios.find((x) => x.id === input.scenarioId) ??

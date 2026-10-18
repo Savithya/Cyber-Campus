@@ -17,78 +17,137 @@ import {
   Clock,
   Database,
 } from "lucide-react";
-import { ResearchCyberIllustration } from "@/components/research-cyber-illustration";
 import { CyberChallengeZone } from "@/components/cyber-challenge-zone";
 
 export default function Home() {
   return (
     <div className="home">
       {/* =========================================================================
-          1. HERO SECTION (RESEARCH-FIRST)
+          1. HERO SECTION (RESEARCH-FIRST & CYBERSECURITY LABORATORY)
           ========================================================================= */}
-      <section id="home" className="hero container" aria-label="Academic Research Introduction">
-        <div className="hero-copy">
-          <div className="eyebrow">
-            <span className="live-pulse-dot" aria-hidden="true" />
-            ACADEMIC RESEARCH STUDY · SRI LANKA
+      <section id="home" className="hero-section container" aria-label="Academic Research Introduction">
+        <div className="hero-two-col-grid">
+          {/* Left Column: Hero Content */}
+          <div className="hero-content-col">
+            <div className="eyebrow">
+              <span className="live-pulse-dot" aria-hidden="true" />
+              <span>INTERACTIVE CYBERSECURITY RESEARCH PLATFORM</span>
+            </div>
+
+            <h1 className="hero-main-heading">
+              Explore Cyber Threats.
+              <br />
+              Protect Your <span>Digital Privacy</span>.
+            </h1>
+
+            <p className="hero-subtitle-text">
+              Participate in interactive social engineering simulations and contribute to academic research on user privacy among university students in Sri Lanka.
+            </p>
+
+            <p className="hero-body-description">
+              Investigating how deceptive social engineering manipulation vectors, including phishing,
+              pretexting, impersonation, and online link scams, affect digital autonomy, credential
+              confidentiality, and personal data exposure. Your voluntary participation provides
+              essential academic evidence for cybersecurity education and privacy policy.
+            </p>
+
+            {/* Research Highlights Metrics Bar */}
+            <div className="hero-research-highlights" aria-label="Research Highlights">
+              <div className="highlight-metric-item">
+                <span className="highlight-metric-value">4</span>
+                <span className="highlight-metric-label">Social Engineering Threat Categories</span>
+              </div>
+              <div className="highlight-metric-divider" aria-hidden="true" />
+              <div className="highlight-metric-item">
+                <span className="highlight-metric-value">20</span>
+                <span className="highlight-metric-label">Interactive Challenges</span>
+              </div>
+              <div className="highlight-metric-divider" aria-hidden="true" />
+              <div className="highlight-metric-item">
+                <span className="highlight-metric-value">15–20 Min</span>
+                <span className="highlight-metric-label">Estimated Participation Time</span>
+              </div>
+            </div>
+
+            {/* Hero CTAs */}
+            <div className="hero-actions-row">
+              <Link
+                className="button primary large hero-cta-btn"
+                href="/consent"
+                aria-label="Start Research (Participate in Research · Join the Research)"
+              >
+                <span>Start Research</span>
+                <ClipboardList size={19} aria-hidden="true" />
+              </Link>
+
+              <a
+                className="button secondary large hero-cta-btn"
+                href="#challenges"
+                aria-label="Explore Cyber Challenges"
+              >
+                <span>Explore Cyber Challenges</span>
+                <Gamepad2 size={19} aria-hidden="true" />
+              </a>
+            </div>
+
+            {/* Reassurance Chips */}
+            <div className="hero-reassurance-row">
+              <span className="reassurance-pill">
+                <Check size={15} aria-hidden="true" /> 100% Voluntary Participation
+              </span>
+              <span className="reassurance-pill">
+                <Clock size={15} aria-hidden="true" /> 15–20 Min · 20 Interactive Challenges
+              </span>
+              <span className="reassurance-pill">
+                <LockKeyhole size={15} aria-hidden="true" /> Anonymous Research Session · No Credentials Collected
+              </span>
+              <span className="reassurance-pill">
+                <ShieldCheck size={15} aria-hidden="true" /> 4 Threat Modules (IV1–IV4) · Simulated Privacy Risk (DV)
+              </span>
+            </div>
           </div>
 
-          <h1 className="hero-research-heading">
-            Impact of Social Engineering Threats
-            <br />
-            on <span>User Privacy</span>
-          </h1>
+          {/* Right Column: Hero Visual Image */}
+          <div className="hero-visual-col">
+            <div className="hero-image-frame">
+              <picture>
+                <source srcSet="/images/cyber-research-lab.webp" type="image/webp" />
+                <img
+                  src="/images/cyber-research-lab.jpg"
+                  alt="Interactive Cybersecurity Research Laboratory — Digital Workstation with Threat Telemetry and Privacy Shields"
+                  className="hero-cybersecurity-image"
+                  width={1376}
+                  height={768}
+                  loading="eager"
+                  decoding="async"
+                />
+              </picture>
 
-          <p className="hero-study-subheading">
-            An Investigation among University Undergraduates in Sri Lanka
-          </p>
+              <div className="hero-image-overlay-glow" aria-hidden="true" />
 
-          <p className="hero-description">
-            Investigating how deceptive social engineering manipulation vectors, including phishing,
-            pretexting, impersonation, and online link scams, affect digital autonomy, credential
-            confidentiality, and personal data exposure. Your voluntary participation provides
-            essential academic evidence for cybersecurity education and privacy policy.
-          </p>
+              {/* Floating Live Telemetry Badge */}
+              <div className="hero-floating-badge top-right">
+                <div className="floating-badge-icon cyan-glow">
+                  <ShieldCheck size={18} aria-hidden="true" />
+                </div>
+                <div className="floating-badge-text">
+                  <span className="floating-badge-title">Interactive Simulation Lab</span>
+                  <span className="floating-badge-subtitle">4 Active Threat Vectors · 20 Challenges</span>
+                </div>
+              </div>
 
-          <div className="hero-actions">
-            <Link
-              className="button primary large"
-              href="/consent"
-              aria-label="Participate in Research (Join the Research)"
-            >
-              <span>Participate in Research</span>
-              <ClipboardList size={19} aria-hidden="true" />
-            </Link>
-
-            <a
-              className="button secondary large"
-              href="#challenges"
-              aria-label="Explore Cyber Games (Explore Cyber Challenges)"
-            >
-              <span>Explore Cyber Games</span>
-              <Gamepad2 size={19} aria-hidden="true" />
-            </a>
+              {/* Floating Privacy Metric Badge */}
+              <div className="hero-floating-badge bottom-left">
+                <div className="floating-badge-icon purple-glow">
+                  <LockKeyhole size={18} aria-hidden="true" />
+                </div>
+                <div className="floating-badge-text">
+                  <span className="floating-badge-title">Digital Privacy Research</span>
+                  <span className="floating-badge-subtitle">Anonymous Participant Telemetry</span>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div className="reassurance">
-            <span>
-              <Check size={16} aria-hidden="true" /> 100% Voluntary Participation
-            </span>
-            <span>
-              <Clock size={16} aria-hidden="true" /> ~15–20 Min (25 Interactive Challenges)
-            </span>
-            <span>
-              <LockKeyhole size={16} aria-hidden="true" /> Anonymous Research Session · No Credentials Collected
-            </span>
-            <span>
-              <ShieldCheck size={16} aria-hidden="true" /> 5 Threat Modules (IV1–IV5) · Simulated Privacy Risk (DV)
-            </span>
-          </div>
-        </div>
-
-        {/* 3D-style Cybersecurity Illustration */}
-        <div className="hero-illustration-col">
-          <ResearchCyberIllustration />
         </div>
       </section>
 
@@ -160,20 +219,6 @@ export default function Home() {
               fake payment gateways, and event badge phishing links.
             </p>
             <span className="variable-survey-ref">Challenges SC01–SC05 · IV4</span>
-          </article>
-
-          {/* Proposed IV5 */}
-          <article className="variable-card">
-            <div className="variable-icon-box cyan-glow">
-              <Sparkles size={22} aria-hidden="true" />
-            </div>
-            <span className="variable-code">PROPOSED VARIABLE 5</span>
-            <h3>AI Deepfake Deception</h3>
-            <p>
-              Investigates synthetic vice-chancellor video announcements, cloned lecturer voice memos,
-              fake administrative circulars, and conversational AI phone agents.
-            </p>
-            <span className="variable-survey-ref">Challenges DF01–DF05 · Proposed IV5</span>
           </article>
 
           {/* DV */}
@@ -310,7 +355,7 @@ export default function Home() {
                     <Gamepad2 size={18} className="text-primary" aria-hidden="true" />
                   </div>
                   <p>
-                    Enter the optional Cyber Challenge Zone. Inspect 12 realistic scenarios,
+                    Enter the Cyber Challenge Zone. Inspect 20 realistic scenarios across 4 threat categories,
                     earn XP points, unlock achievement badges, and review privacy debriefs.
                   </p>
                   <a href="#challenges" className="step-link">

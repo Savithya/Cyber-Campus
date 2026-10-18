@@ -94,7 +94,7 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     await page.waitForURL(/\/(#home)?$/);
     const heroSection = page.locator("#home");
     await expect(heroSection).toBeVisible();
-    await expect(heroSection.locator("h1")).toContainText("Impact of Social Engineering Threats");
+    await expect(heroSection.locator("h1")).toContainText(/Explore Cyber Threats|Impact of Social Engineering Threats/);
 
     // Scroll down and test Logo click returns to hero
     await page.evaluate(() => window.scrollTo(0, 800));

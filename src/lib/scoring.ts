@@ -1,5 +1,5 @@
 import type { Attempt, ThreatMetric, ScenarioChoice } from "./types";
-import { missions } from "@/content/missions";
+import { missions, getActiveMissions } from "@/content/missions";
 
 export function scoreDecision(
   action: string | null,
@@ -10,7 +10,7 @@ export function scoreDecision(
   const correctAction =
     typeof correctActionOrKey === "string"
       ? correctActionOrKey
-      : correctActionOrKey.action;
+    : correctActionOrKey.action;
 
   const correct = action === null ? null : action === correctAction;
   const points = first && action === correctAction ? 10 : 0;
@@ -68,28 +68,30 @@ export function scoreSummary(attempts: Attempt[]) {
 
 /**
  * Operative Rank based on educational XP points.
+ * Scaled for 200 Max XP across 20 active research challenges (10 XP per challenge).
  * XP is awarded for completing research scenarios without biasing privacy-risk measurement.
  */
 export function getOperativeRank(xp: number) {
-  if (xp >= 200) return { title: "Master Privacy Architect", level: 4, badge: "Master Sentinel" };
-  if (xp >= 140) return { title: "Cyber Defense Specialist", level: 3, badge: "Defense Specialist" };
-  if (xp >= 70) return { title: "Threat Investigator", level: 2, badge: "Investigator" };
+  if (xp >= 160) return { title: "Master Privacy Architect", level: 4, badge: "Master Sentinel" };
+  if (xp >= 110) return { title: "Cyber Defense Specialist", level: 3, badge: "Defense Specialist" };
+  if (xp >= 50) return { title: "Threat Investigator", level: 2, badge: "Investigator" };
   return { title: "Cyber Recruit", level: 1, badge: "Recruit" };
 }
 
 /**
- * Computes threat-level metrics for all 5 threat categories:
+ * Computes threat-level metrics for the 4 active research threat categories (or 5 if includeProposed is true):
  * Threat Privacy Risk Score = (Total Risk Points Obtained / Total Applicable Maximum Risk Points) * 100
  * Higher score = Greater observed simulated privacy-risk behavior.
  */
-export function computeThreatMetrics(attempts: Attempt[]): {
+export function computeThreatMetrics(attempts: Attempt[], includeProposed = false): {
   metrics: ThreatMetric[];
   overallPrivacyRiskScore: number;
   highestThreat: ThreatMetric | null;
 } {
   const firstAttempts = attempts.filter((a) => a.attemptNumber === 1);
+  const targetMissions = getActiveMissions(includeProposed);
 
-  const metrics: ThreatMetric[] = missions.map((m) => {
+  const metrics: ThreatMetric[] = targetMissions.map((m) => {
     const missionAttempts = firstAttempts.filter((a) => a.primaryIV === m.iv);
     const attemptedOnly = missionAttempts.filter((a) => a.selectedAction !== null);
 

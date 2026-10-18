@@ -92,9 +92,10 @@ describe("descriptive statistics and filters", () => {
   });
 });
 describe("game integrity", () => {
-  it("authors exactly 5 scenarios per IV across all 5 missions (25 total active scenarios)", () => {
-    expect(scenarios).toHaveLength(25);
-    for (const m of missions) {
+  it("authors exactly 5 scenarios per IV across the 4 active missions (20 total active scenarios)", () => {
+    expect(scenarios).toHaveLength(20);
+    const activeMissions = missions.filter((m) => !m.proposed);
+    for (const m of activeMissions) {
       const ss = scenarios.filter((s) => s.primaryIV === m.iv);
       expect(ss).toHaveLength(5);
     }
@@ -121,7 +122,7 @@ describe("game integrity", () => {
       points: 0,
     });
   });
-  it("has a 240 maximum and excludes skipped first decisions from accuracy", () => {
+  it("has a 190 maximum for 20 scenarios (1 skipped) and excludes skipped first decisions from accuracy", () => {
     const a = syntheticSessions()[1].attempts.map((x, i) => ({
       ...x,
       correct: i === 0 ? null : true,
@@ -130,9 +131,9 @@ describe("game integrity", () => {
     }));
     const sum = scoreSummary(a);
     expect(sum).toMatchObject({
-      points: 240,
-      completed: 25,
-      attempted: 24,
+      points: 190,
+      completed: 20,
+      attempted: 19,
       skipped: 1,
       accuracy: 100,
     });

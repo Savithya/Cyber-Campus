@@ -2221,7 +2221,7 @@ function FriedmanTab({
   triggerDownload: (content: string, filename: string, mime: string) => void;
 }) {
   const [alpha, setAlpha] = useState<number>(0.05);
-  const [includeProposed, setIncludeProposed] = useState<boolean>(true);
+  const [includeProposed, setIncludeProposed] = useState<boolean>(false);
 
   const friedmanResult: FriedmanResult = useMemo(() => {
     return calculateFriedmanTest(sessions, alpha, includeProposed);
@@ -2295,7 +2295,7 @@ function FriedmanTab({
               checked={includeProposed}
               onChange={(e) => setIncludeProposed(e.target.checked)}
             />
-            <span>Include Proposed IV5 (Deepfakes)</span>
+            <span>Include Archived IV5 (Deepfakes)</span>
           </label>
           <button
             type="button"

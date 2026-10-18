@@ -6,11 +6,10 @@ import { scenarios } from "@/content/scenarios.server";
 
 export function syntheticSessions(): Session[] {
   const moduleOrders = [
-    ["phishing", "pretexting", "impersonation", "links", "deepfake"],
-    ["pretexting", "impersonation", "links", "deepfake", "phishing"],
-    ["impersonation", "links", "deepfake", "phishing", "pretexting"],
-    ["links", "deepfake", "phishing", "pretexting", "impersonation"],
-    ["deepfake", "phishing", "pretexting", "impersonation", "links"],
+    ["phishing", "pretexting", "impersonation", "links"],
+    ["pretexting", "impersonation", "links", "phishing"],
+    ["impersonation", "links", "phishing", "pretexting"],
+    ["links", "phishing", "pretexting", "impersonation"],
   ];
 
   return Array.from({ length: 48 }, (_, i) => {
@@ -35,12 +34,12 @@ export function syntheticSessions(): Session[] {
 
     const created = new Date(Date.UTC(2026, 8, 1 + (i % 28), 4, i));
     const scenarioCount = complete
-      ? 25
+      ? 20
       : i % 4 === 0
-        ? 10
+        ? 8
         : i % 3 === 0
-          ? 15
-          : 20;
+          ? 12
+          : 16;
 
     const attempts: Attempt[] =
       i < 44

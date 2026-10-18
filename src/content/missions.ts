@@ -38,7 +38,7 @@ export const missions: readonly Mission[] = [
     id: "impersonation",
     code: "M03",
     iv: "IV3",
-    name: "Identity Verification",
+    name: "Impersonation Investigation",
     topic: "Impersonation",
     description: "Verify faculty profiles, classmate accounts, and official university representatives.",
     color: "peach",
@@ -73,10 +73,13 @@ export const missions: readonly Mission[] = [
 export const SCENARIO_VERSION = "2.0.0";
 export const SCORING_VERSION = "2.0.0";
 
+export const activeMissions = missions.filter((m) => !m.proposed);
+
 /**
  * Returns missions configured for the platform.
- * If includeProposed is false, returns only the primary 4 IVs.
+ * By default returns the 4 active research IVs.
+ * If includeProposed is true, includes archived/proposed IV5.
  */
-export function getActiveMissions(includeProposed = true): readonly Mission[] {
-  return includeProposed ? missions : missions.filter((m) => !m.proposed);
+export function getActiveMissions(includeProposed = false): readonly Mission[] {
+  return includeProposed ? missions : activeMissions;
 }

@@ -74,27 +74,15 @@ const BADGES = [
     dvTakeaway: "Prevents financial disclosure and malicious code execution on personal devices.",
   },
   {
-    id: "deepfake-analyst",
-    title: "Deepfake Analyst",
-    mission: "deepfake",
-    icon: Sparkles,
-    color: "cyan",
-    pointsRequired: 50,
-    requirement: "Complete all 5 AI Deepfake scenarios (Proposed IV5)",
-    description:
-      "Analyze synthetic video announcements, cloned audio memos, and automated AI phone agents.",
-    dvTakeaway: "Defends against biometric harvesting and synthetic authority manipulation.",
-  },
-  {
     id: "cyber-analyst",
     title: "Campus Cyber Sentinel",
     mission: "all",
     icon: Award,
     color: "rainbow",
-    pointsRequired: 250,
-    requirement: "Complete all 25 scenarios across all 5 research modules",
+    pointsRequired: 200,
+    requirement: "Complete all 20 scenarios across all 4 research modules",
     description:
-      "Comprehensive evaluation across Phishing, Pretexting, Impersonation, Scams, and AI Deepfakes.",
+      "Comprehensive evaluation across Phishing, Pretexting, Impersonation, and Online Scams.",
     dvTakeaway: "Demonstrates complete threat awareness and rigorous privacy defense.",
   },
 ];
@@ -121,14 +109,19 @@ export function CyberChallengeZone() {
     setError("");
     try {
       const token = randomToken();
-      await api("session/start", {
+      const res = await api<{ session: typeof session }>("session/start", {
         consented: false,
         eligible: false,
         priorExposure: false,
         practice: true,
         token,
       });
-      localStorage.setItem("cc-practice-exposure", "yes");
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cc-practice-exposure", "yes");
+      }
+      if (res.session) {
+        state.setSession(res.session);
+      }
       router.push("/play");
     } catch (e) {
       setError((e as Error).message);
@@ -188,7 +181,7 @@ export function CyberChallengeZone() {
               <div className="hud-xp-box">
                 <strong className="hud-xp-value">
                   {stats.completed * 10}
-                  <small className="hud-xp-max"> / 250 XP</small>
+                  <small className="hud-xp-max"> / 200 XP</small>
                 </strong>
                 <span className="hud-xp-tag">10 XP / completed challenge</span>
               </div>
@@ -200,7 +193,7 @@ export function CyberChallengeZone() {
               <div className="hud-scenarios-box">
                 <strong className="hud-scenarios-value">
                   {stats.completed}
-                  <small className="hud-scenarios-max"> / 25</small>
+                  <small className="hud-scenarios-max"> / 20</small>
                 </strong>
                 <span className="hud-scenarios-tag">{stats.attempted} attempted</span>
               </div>
@@ -224,12 +217,12 @@ export function CyberChallengeZone() {
           <div className="hud-progress-wrapper">
             <div className="hud-progress-labels">
               <span>Overall Evaluation Progress</span>
-              <strong>{Math.round((stats.completed / 25) * 100)}% Complete</strong>
+              <strong>{Math.round((stats.completed / 20) * 100)}% Complete</strong>
             </div>
             <div className="hud-progress-track">
               <div
                 className="hud-progress-fill"
-                style={{ width: `${Math.max(4, (stats.completed / 25) * 100)}%` }}
+                style={{ width: `${Math.max(4, (stats.completed / 20) * 100)}%` }}
               />
             </div>
           </div>
@@ -247,7 +240,7 @@ export function CyberChallengeZone() {
             onClick={() => setActiveTab("challenges")}
           >
             <Crosshair size={16} aria-hidden="true" />
-            <span>5 Threat Modules</span>
+            <span>4 Threat Modules</span>
           </button>
           <button
             type="button"
@@ -257,7 +250,7 @@ export function CyberChallengeZone() {
             onClick={() => setActiveTab("badges")}
           >
             <Award size={16} aria-hidden="true" />
-            <span>6 Research Badges</span>
+            <span>5 Research Badges</span>
           </button>
           <button
             type="button"
@@ -411,7 +404,7 @@ export function CyberChallengeZone() {
               const Icon = badge.icon;
               const isComplete =
                 badge.mission === "all"
-                  ? stats.completed === 12
+                  ? stats.completed === 20
                   : (() => {
                       const m = missions.find((x) => x.id === badge.mission);
                       if (!m) return false;

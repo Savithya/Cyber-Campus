@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { useSession } from "@/lib/client";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -125,11 +126,32 @@ export function SiteHeader() {
     [pathname]
   );
 
-  // Smooth scroll to Cyber Challenges Section
+  const state = useSession();
+  const session = state.session;
+
+  // Determine dynamic target URLs based on participant research progress
+  const joinHref = !session
+    ? "/consent"
+    : session.status === "draft"
+    ? "/demographics"
+    : (session.attempts?.filter((a) => a.attemptNumber === 1).length ?? 0) >= 20
+    ? "/results"
+    : "/play";
+
+  const hasAuthorizedPlaySession =
+    !!session && (session.status !== "draft" || session.mode === "practice");
+
+  const challengesHref = hasAuthorizedPlaySession
+    ? "/play"
+    : pathname === "/"
+    ? "/#challenges"
+    : "/play";
+
+  // Smooth scroll to Cyber Challenges Section on home page if unauthenticated
   const handleChallengesClick = useCallback(
     (e: React.MouseEvent) => {
       setMobileMenuOpen(false);
-      if (pathname === "/") {
+      if (challengesHref === "/#challenges" && pathname === "/") {
         e.preventDefault();
         const prefersReducedMotion =
           typeof window !== "undefined" &&
@@ -146,7 +168,7 @@ export function SiteHeader() {
         }
       }
     },
-    [pathname]
+    [pathname, challengesHref]
   );
 
   // Determine active states accurately based on route and section
@@ -156,6 +178,7 @@ export function SiteHeader() {
     (pathname === "/" && activeSection === "challenges");
   const isJoinActive =
     pathname === "/consent" ||
+    pathname === "/demographics" ||
     pathname?.startsWith("/survey") ||
     pathname === "/results";
   const isAboutActive = pathname === "/privacy";
@@ -198,7 +221,7 @@ export function SiteHeader() {
           </Link>
 
           <Link
-            href="/#challenges"
+            href={challengesHref}
             onClick={handleChallengesClick}
             className={`nav-pill ${isChallengesActive ? "active" : ""}`}
             aria-current={isChallengesActive ? "page" : undefined}
@@ -208,7 +231,7 @@ export function SiteHeader() {
           </Link>
 
           <Link
-            href="/consent"
+            href={joinHref}
             className={`nav-pill ${isJoinActive ? "active" : ""}`}
             aria-current={isJoinActive ? "page" : undefined}
           >
@@ -321,7 +344,7 @@ export function SiteHeader() {
 
               {/* 2. Trophy — Cyber Challenges */}
               <Link
-                href="/#challenges"
+                href={challengesHref}
                 onClick={handleChallengesClick}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isChallengesActive ? "active" : ""
@@ -334,7 +357,7 @@ export function SiteHeader() {
 
               {/* 3. ListChecks — Join Research */}
               <Link
-                href="/consent"
+                href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isJoinActive ? "active" : ""

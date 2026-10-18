@@ -411,14 +411,18 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               <Link
                 href={
                   sessionData?.status === "draft"
-                    ? "/survey"
-                    : sessionData?.mode === "practice"
-                    ? "/play"
-                    : "/survey/complete"
+                    ? "/demographics"
+                    : (sessionData?.attempts?.filter((a) => a.attemptNumber === 1).length ?? 0) >= 20
+                    ? "/survey/complete"
+                    : "/play"
                 }
                 className="button primary small"
               >
-                <span>Continue Draft</span>
+                <span>
+                  {sessionData?.status === "draft"
+                    ? "Continue Profile"
+                    : "Continue Missions"}
+                </span>
                 <ArrowRight size={14} aria-hidden="true" />
               </Link>
               <button

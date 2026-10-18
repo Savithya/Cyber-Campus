@@ -34,7 +34,7 @@ import {
   Check,
 } from "lucide-react";
 import { api, useSession, loadDraft, clearDraft } from "@/lib/client";
-import { missions } from "@/content/missions";
+import { missions, getActiveMissions } from "@/content/missions";
 import { scoreSummary, getOperativeRank } from "@/lib/scoring";
 import type { Scenario, Attempt, AnswerKey, Session } from "@/lib/types";
 import { InteractiveChallengeRunner } from "./interactive-challenge-runner";
@@ -133,7 +133,7 @@ export function ResearchCompletion() {
   const attempts = s.attempts ?? [];
   const firstAttempts = attempts.filter((a) => a.attemptNumber === 1);
   const completedCount = firstAttempts.length;
-  const totalScenariosCount = scenarios.length || 25;
+  const totalScenariosCount = scenarios.length || 20;
   const scoreStats = scoreSummary(attempts);
   const operativeXP = completedCount * 10;
   const rank = getOperativeRank(operativeXP);
@@ -169,18 +169,11 @@ export function ResearchCompletion() {
       unlocked: missions[3].ids.every((id) => firstAttempts.some((a) => a.scenarioId === id)),
     },
     {
-      id: "b_deepfakes",
-      title: "Deepfake Analyst",
-      description: "Analyzed synthetic video announcements, cloned audio, and AI agent deception (IV5).",
-      icon: "sparkles",
-      unlocked: missions[4]?.ids.every((id) => firstAttempts.some((a) => a.scenarioId === id)) ?? false,
-    },
-    {
       id: "b_sentinel",
       title: "Campus Cyber Sentinel",
-      description: "Completed all 25 interactive simulation scenarios across every research module.",
+      description: "Completed all 20 interactive simulation scenarios across all four research threat categories.",
       icon: "award",
-      unlocked: completedCount >= 25,
+      unlocked: completedCount >= 20,
     },
   ];
 
@@ -496,7 +489,7 @@ export function ResearchCompletion() {
             <div>
               <h2 className="text-2xl font-bold">Educational Debrief &amp; Threat Forensics</h2>
               <p className="text-muted text-sm mt-0.5">
-                Review attacker tactics, forensic indicators, and privacy implications for all 25 research scenarios.
+                Review attacker tactics, forensic indicators, and privacy implications for all 20 research scenarios.
                 Test alternative decisions in the interactive sandbox without affecting your recorded research data.
               </p>
             </div>
@@ -511,7 +504,7 @@ export function ResearchCompletion() {
             >
               All Scenarios ({scenarios.length})
             </button>
-            {missions.map((m) => (
+            {getActiveMissions(false).map((m) => (
               <button
                 key={m.id}
                 type="button"

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { api, useSession, loadDraft, putDraft } from "@/lib/client";
 import { questions } from "@/content/questionnaire";
-import type { Answers } from "@/lib/types";
+import type { Answers, Session } from "@/lib/types";
 
 export function DemographicsForm() {
   const router = useRouter();
@@ -46,6 +46,10 @@ export function DemographicsForm() {
   const q5 = questions.find((q) => q.id === "Q5")!;
 
   useEffect(() => {
+    if (!state.loading && !state.session) {
+      router.replace("/consent");
+      return;
+    }
     if (state.session) {
       const local = loadDraft(state.session.code);
       const sessionAnswers = local?.answers ?? state.session.answers;
@@ -56,8 +60,11 @@ export function DemographicsForm() {
         Q4: sessionAnswers.Q4?.value ?? null,
         Q5: sessionAnswers.Q5?.value ?? null,
       });
+      if (state.session.status !== "draft") {
+        setSaveStatus("Profile validated and submitted");
+      }
     }
-  }, [state.session]);
+  }, [state.loading, state.session, router]);
 
   const handleSelect = async (questionId: string, code: number | null) => {
     const updated = { ...answers, [questionId]: code };
@@ -86,16 +93,18 @@ export function DemographicsForm() {
       answers: draftAnswers,
     });
 
-    // Save to server
-    setSaving(true);
-    setSaveStatus("Saving to secure session…");
-    try {
-      await api("session/draft", { answers: draftAnswers });
-      setSaveStatus("Saved securely to anonymous session");
-    } catch {
-      setSaveStatus("Saved on this browser");
-    } finally {
-      setSaving(false);
+    // If session is still draft, persist draft to server
+    if (state.session.status === "draft") {
+      setSaving(true);
+      setSaveStatus("Saving to secure session…");
+      try {
+        await api("session/draft", { answers: draftAnswers });
+        setSaveStatus("Saved securely to anonymous session");
+      } catch {
+        setSaveStatus("Saved on this browser");
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -126,20 +135,54 @@ export function DemographicsForm() {
       return;
     }
 
+    // If already validated and submitted, navigate directly
+    if (state.session.status !== "draft") {
+      router.push("/play");
+      return;
+    }
+
     setSaving(true);
     setValidationError("");
     try {
-      const draftAnswers: Answers = { ...state.session.answers };
+      // Assemble full answers structure with Q1..Q5 as answered, Q6..Q25 as not_answered
+      const fullAnswers: Answers = { ...state.session.answers };
       for (const [k, v] of Object.entries(answers)) {
-        draftAnswers[k] = {
+        fullAnswers[k] = {
           value: v,
-          status: v !== null ? "answered" : "skipped",
+          status: v !== null ? "answered" : "not_answered",
         };
       }
-      await api("session/draft", { answers: draftAnswers });
+      for (const q of questions) {
+        if (!fullAnswers[q.id]) {
+          fullAnswers[q.id] = { value: null, status: "not_answered" };
+        }
+      }
+
+      // Authoritative idempotency key
+      const local = loadDraft(state.session.code);
+      const submitKey = local?.submitKey ?? crypto.randomUUID();
+
+      // Submit demographic profile to backend authoritative repository
+      const res = await api<{ session: Session }>("session/submit", {
+        answers: fullAnswers,
+        idempotencyKey: submitKey,
+      });
+
+      if (res.session) {
+        state.setSession(res.session);
+        putDraft({
+          code: res.session.code,
+          expires: res.session.draftExpiresAt,
+          answers: fullAnswers,
+          token: local?.token,
+          submitKey,
+        });
+      }
+
+      setSaveStatus("Profile validated and submitted securely");
       router.push("/play");
     } catch (e) {
-      setError((e as Error).message || "Failed to proceed. Please retry.");
+      setError((e as Error).message || "Failed to submit profile. Please retry.");
       setSaving(false);
     }
   };
@@ -446,7 +489,11 @@ export function DemographicsForm() {
               </>
             ) : (
               <>
-                <span>Save & Continue to Cyber Missions</span>
+                <span>
+                  {state.session?.status !== "draft"
+                    ? "Enter Cyber Mission Control"
+                    : "Save Profile & Enter Cyber Missions"}
+                </span>
                 <ArrowRight size={18} aria-hidden="true" />
               </>
             )}

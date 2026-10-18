@@ -68,9 +68,20 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     if (path === "session") return json({ session: await getSession() });
     if (path === "scenarios") {
       const s = await getSession();
-      if (!s || s.status === "draft")
+      if (!s)
         return json(
-          { error: "Submit your baseline or choose practice mode first." },
+          {
+            error:
+              "Research consent required before accessing cyber missions, or choose practice mode.",
+          },
+          403,
+        );
+      if (s.mode !== "practice" && s.status === "draft")
+        return json(
+          {
+            error:
+              "Complete and submit your demographic profile before accessing research missions, or choose practice mode.",
+          },
           403,
         );
       return json({ scenarios });

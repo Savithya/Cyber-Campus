@@ -47,7 +47,7 @@ import StatisticalAnalysis from "./statistical-analysis";
 const navs = [
   ["", "Overview", LayoutDashboard],
   ["threats", "Threat Impact Comparison", ShieldAlert],
-  ["iv-analysis", "Threat Variables (IV1–IV5)", Layers],
+  ["iv-analysis", "Threat Variables (IV1–IV4)", Layers],
   ["privacy-dv", "User Privacy (DV)", ShieldCheck],
   ["statistics", "Statistical Analysis", Sigma],
   ["questions", "Question explorer", ChartNoAxesCombined],
@@ -460,7 +460,7 @@ export default function Admin({
                 <div>
                   <h2>Threat Impact Comparison: Simulated Privacy Risk &amp; Unsafe Rate</h2>
                   <p className="small-copy">
-                    Horizontal comparative analysis of all five threat modules (IV1 to IV5) across filtered participant sessions.
+                    Horizontal comparative analysis of the four active threat modules (IV1 to IV4) across filtered participant sessions.
                   </p>
                 </div>
               </div>

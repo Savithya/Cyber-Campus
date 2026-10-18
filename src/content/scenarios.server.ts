@@ -1791,8 +1791,11 @@ export const allScenarios: Scenario[] = scenarioDefinitions.map((def) => {
   };
 });
 
-// All 25 scenarios active across all 5 research modules
-export const scenarios: Scenario[] = allScenarios;
+// Exactly 20 active scenarios across the 4 independent research variables (IV1–IV4)
+export const scenarios: Scenario[] = allScenarios.filter((s) => !s.id.startsWith("DF"));
+
+// Retain all 25 for historical data compatibility
+export const archivedScenarios: Scenario[] = allScenarios;
 
 export const answerKeys: Record<string, AnswerKey> = Object.fromEntries(
   scenarioDefinitions.map((def) => [

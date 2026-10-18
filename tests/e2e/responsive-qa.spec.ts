@@ -80,7 +80,11 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
 
   test("Verify Demographic Profile page UI, Stepper, 5 Cards, and Actions", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto("/demographics");
+    await page.goto("/consent");
+    await page.locator("#eligibility-checkbox").check();
+    await page.locator("#consent-checkbox").check();
+    await page.getByRole("button", { name: /Continue to Student Profile/i }).click();
+    await page.waitForURL(/\/demographics/);
 
     // Stepper checks
     const stepper = page.locator(".research-progress-stepper");
@@ -120,7 +124,7 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
     await expect(backBtn).toBeVisible();
     await expect(backBtn).toHaveAttribute("href", "/consent");
 
-    const continueBtn = page.getByRole("button", { name: /Save & Continue to Cyber Missions/i });
+    const continueBtn = page.getByRole("button", { name: /Save Profile & Enter Cyber Missions|Enter Cyber Mission Control/i });
     await expect(continueBtn).toBeVisible();
 
     // Incomplete submission validation check
