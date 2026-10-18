@@ -73,7 +73,7 @@ export function InteractiveChallengeRunner({
   educationalMode = false,
 }: InteractiveChallengeRunnerProps) {
   const state = useSession();
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
 
   // Interactive UI State
   const [activeEvidenceTab, setActiveEvidenceTab] = useState<number>(0);
@@ -144,7 +144,10 @@ export function InteractiveChallengeRunner({
 
     setIsSubmitting(true);
     setError("");
-    const elapsedMs = Math.min(86400000, Math.max(1000, Date.now() - startTimeRef.current));
+    const elapsedMs = Math.min(
+      86400000,
+      Math.max(1000, Date.now() - (startTimeRef.current || Date.now())),
+    );
 
     try {
       const idempotencyKey = crypto.randomUUID();
@@ -575,21 +578,21 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                       className="branch-chip"
                       onClick={() => setActiveChatBranch("Can you verify your staff ID and ticket number from the IT directory?")}
                     >
-                      "Can you verify your staff ID and ticket reference?"
+                      &ldquo;Can you verify your staff ID and ticket reference?&rdquo;
                     </button>
                     <button
                       type="button"
                       className="branch-chip"
                       onClick={() => setActiveChatBranch("Our campus policy says IT staff never ask students for passwords or codes.")}
                     >
-                      "Campus policy states IT never requests passwords or codes."
+                      &ldquo;Campus policy states IT never requests passwords or codes.&rdquo;
                     </button>
                     <button
                       type="button"
                       className="branch-chip"
                       onClick={() => setActiveChatBranch("I will check with the faculty IT center in person before doing this.")}
                     >
-                      "I will visit the faculty IT center in person."
+                      &ldquo;I will visit the faculty IT center in person.&rdquo;
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import "server-only";
-import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { cookies } from "next/headers";
@@ -10,6 +10,9 @@ const cookieName = "cc_local";
 async function secret() {
   const raw = process.env.LOCAL_SESSION_SECRET;
   if (raw && /^[a-f0-9]{64}$/i.test(raw)) return Buffer.from(raw, "hex");
+  if (raw && raw.trim().length > 0) {
+    return createHash("sha256").update(raw.trim()).digest();
+  }
   if (isResearch() || process.env.VERCEL)
     throw new Error(
       "Set LOCAL_SESSION_SECRET to 64 random hex characters for local practice sessions.",

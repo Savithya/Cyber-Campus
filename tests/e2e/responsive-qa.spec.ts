@@ -1,7 +1,15 @@
 import { test, expect } from "@playwright/test";
-
 const BREAKPOINTS = [320, 375, 430, 768, 1024, 1280, 1440, 1920];
-const CORE_PAGES = ["/", "/privacy", "/consent", "/demographics", "/admin/login"];
+const CORE_PAGES = [
+  "/",
+  "/privacy",
+  "/consent",
+  "/demographics",
+  "/admin/login",
+  "/withdraw",
+  "/play",
+  "/results",
+];
 
 test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoints", () => {
   for (const width of BREAKPOINTS) {
