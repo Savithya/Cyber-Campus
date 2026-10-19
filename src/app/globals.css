@@ -4255,6 +4255,8 @@ tfoot {
     gap: 30px;
     grid-template-columns: 220px minmax(0, 1fr);
   }
+}
+
 /* Medium Laptops & Tablets in Landscape (1024px to 1240px) */
 @media (min-width: 1024px) and (max-width: 1240px) {
   .site-header-inner {
@@ -4362,23 +4364,6 @@ tfoot {
   }
   .brand small {
     font-size: 9px;
-  }
-  
-  @media (max-width: 520px) {
-    .site-header-inner {
-      padding: 10px 16px;
-      gap: 10px;
-    }
-    .brand small {
-      display: none;
-    }
-    .brand {
-      font-size: 18px;
-    }
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-    }
   }
   
   .hero {
@@ -14431,6 +14416,24 @@ img, svg {
   }
   .modal-dialog {
     padding: 18px 16px !important;
+  }
+}
+
+/* Mobile Screens (<= 520px) */
+@media (max-width: 520px) {
+  .site-header-inner {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .brand small {
+    display: none;
+  }
+  .brand {
+    font-size: 18px;
+  }
+  .brand-icon {
+    width: 36px;
+    height: 36px;
   }
 }
 
