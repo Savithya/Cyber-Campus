@@ -201,7 +201,7 @@ export function SiteHeader() {
             <span className="brand-title">
               cyber<span className="brand-light">campus</span>
             </span>
-            <small>Cybersecurity Gaming &amp; Research Platform</small>
+            <small>Cybersecurity Research Platform</small>
           </span>
         </Link>
 

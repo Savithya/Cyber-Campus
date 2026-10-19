@@ -32,12 +32,16 @@ import {
   Building,
   KeyRound,
   Check,
+  Home,
+  Gamepad2,
+  Info,
 } from "lucide-react";
 import { api, useSession, loadDraft, clearDraft } from "@/lib/client";
 import { missions, getActiveMissions } from "@/content/missions";
 import { scoreSummary, getOperativeRank } from "@/lib/scoring";
 import type { Scenario, Attempt, AnswerKey, Session } from "@/lib/types";
 import { InteractiveChallengeRunner } from "./interactive-challenge-runner";
+import { ResearchProgressStepper } from "./research-progress-stepper";
 import { Loading, ErrorBox, PageHeading, Reveal } from "./ui";
 
 const missionIcons: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -222,70 +226,71 @@ export function ResearchCompletion() {
         });
 
   return (
-    <div className="container page-space">
-      {/* Step Progress Tracker */}
-      <div className="research-journey-tracker" role="navigation" aria-label="Research Journey Progress">
-        <div className="tracker-step completed">
-          <div className="tracker-dot">
-            <Check size={14} aria-hidden="true" />
-          </div>
-          <div className="tracker-info">
-            <span className="tracker-step-num">STEP 01</span>
-            <span className="tracker-step-name">Consent</span>
-          </div>
-        </div>
-
-        <div className="tracker-connector completed" />
-
-        <div className="tracker-step completed">
-          <div className="tracker-dot">
-            <Check size={14} aria-hidden="true" />
-          </div>
-          <div className="tracker-info">
-            <span className="tracker-step-num">STEP 02</span>
-            <span className="tracker-step-name">Profile</span>
-          </div>
-        </div>
-
-        <div className="tracker-connector completed" />
-
-        <div className="tracker-step completed">
-          <div className="tracker-dot">
-            <Check size={14} aria-hidden="true" />
-          </div>
-          <div className="tracker-info">
-            <span className="tracker-step-num">STEP 03</span>
-            <span className="tracker-step-name">Cyber Missions</span>
-          </div>
-        </div>
-
-        <div className="tracker-connector active" />
-
-        <div className="tracker-step active" aria-current="step">
-          <div className="tracker-dot">04</div>
-          <div className="tracker-info">
-            <span className="tracker-step-num">STEP 04</span>
-            <span className="tracker-step-name">Completion &amp; Debrief</span>
-          </div>
-        </div>
-      </div>
+    <div className="completion-page-container container page-space">
+      {/* 4-Stage Reusable Progress Stepper */}
+      <ResearchProgressStepper currentStep={4} />
 
       {/* Completion Header */}
-      <div className="game-heading mt-6">
-        <div>
-          <div className="eyebrow">
-            <ShieldCheck size={16} className="text-emerald" aria-hidden="true" />
-            <span>RESEARCH PARTICIPATION COMPLETE · SRI LANKA</span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight mt-1">
-            Mission Debrief &amp; Completion Certificate
-          </h1>
-          <p className="text-muted mt-2 max-w-2xl">
-            Your experimental decisions have been safely recorded for academic analysis.
-            Thank you for contributing to research on cybersecurity threats and student privacy in Sri Lanka.
-          </p>
+      <header className="completion-main-header">
+        <div className="eyebrow">
+          <ShieldCheck size={16} className="text-emerald" aria-hidden="true" />
+          <span>STEP 04 OF 04 · RESEARCH PARTICIPATION COMPLETE</span>
         </div>
-      </div>
+        <h1 className="completion-title">
+          Thank You for Participating!
+        </h1>
+        <p className="completion-subtitle">
+          Your participation contributes to academic research on social engineering threats and user privacy among university students in Sri Lanka.
+        </p>
+
+        {s.mode === "demo" && (
+          <div className="demo-mode-compact-banner mt-4" role="status">
+            <Info size={16} className="text-cyan" aria-hidden="true" />
+            <span>Demonstration Mode — This was an interactive preview; responses were not submitted to the live research dataset.</span>
+          </div>
+        )}
+
+        {/* 4-Item Simple Completion Summary Card */}
+        <div className="completion-summary-card" role="region" aria-label="Participation Summary">
+          <div className="summary-item">
+            <span className="summary-label">Scenarios Completed</span>
+            <strong className="summary-value text-primary">{completedCount} of {totalScenariosCount} Scenarios</strong>
+          </div>
+          <div className="summary-divider" aria-hidden="true" />
+          <div className="summary-item">
+            <span className="summary-label">Research Status</span>
+            <strong className="summary-value text-emerald">
+              {s.mode === "demo" ? "Demo Session Saved" : "Confirmed & Recorded"}
+            </strong>
+          </div>
+          <div className="summary-divider" aria-hidden="true" />
+          <div className="summary-item">
+            <span className="summary-label">Anonymous Reference</span>
+            <strong className="summary-value font-mono text-cyan">{s.code}</strong>
+          </div>
+          <div className="summary-divider" aria-hidden="true" />
+          <div className="summary-item">
+            <span className="summary-label">Threat Categories</span>
+            <strong className="summary-value">4 / 4 Threat Vectors</strong>
+          </div>
+        </div>
+
+        {/* Action Buttons Row */}
+        <div className="completion-nav-actions">
+          <Link href="/" className="button primary large">
+            <Home size={18} aria-hidden="true" />
+            <span>Return Home</span>
+          </Link>
+          <a href="/#challenges" className="button secondary large">
+            <Gamepad2 size={18} aria-hidden="true" />
+            <span>Explore Cyber Challenges</span>
+          </a>
+          <button type="button" className="button ghost large" onClick={downloadReceipt}>
+            <Download size={18} aria-hidden="true" />
+            <span>Download Participation Receipt</span>
+          </button>
+        </div>
+      </header>
 
       {/* Official Research Completion Certificate Card */}
       <div className="card research-certificate-card my-6">

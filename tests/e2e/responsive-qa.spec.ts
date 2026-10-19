@@ -77,7 +77,7 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
 
-    const challengeBtn = page.getByRole("link", { name: /Explore Cyber Games|Explore Cyber Challenges/i });
+    const challengeBtn = page.getByRole("link", { name: /Explore Cyber Games|Explore Cyber Challenges/i }).first();
     await expect(challengeBtn).toBeVisible();
     const challengeBox = await challengeBtn.boundingBox();
     expect(challengeBox).not.toBeNull();
@@ -91,7 +91,7 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
     await page.goto("/consent");
     await page.locator("#eligibility-checkbox").check();
     await page.locator("#consent-checkbox").check();
-    await page.getByRole("button", { name: /Continue to Student Profile/i }).click();
+    await page.getByRole("button", { name: /Continue to Student Profile|Agree & Continue/i }).click();
     await page.waitForURL(/\/demographics/);
 
     // Stepper checks
@@ -103,12 +103,12 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
     await expect(stepper.getByText("Completion")).toBeVisible();
 
     // Header & Info Bar
-    await expect(page.getByRole("heading", { name: "Student Demographic Profile" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Student Demographic Profile|Tell Us a Little About Your Studies/i })).toBeVisible();
     await expect(page.locator(".demographics-info-bar")).toBeVisible();
 
     // 5 Demographic Questions
     for (let i = 1; i <= 5; i++) {
-      await expect(page.getByText(`DEMOGRAPHIC 0${i} / 05`)).toBeVisible();
+      await expect(page.getByText(new RegExp(`(DEMOGRAPHIC 0${i}|QUESTION 0${i})`, "i")).first()).toBeVisible();
     }
 
     // Touch targets >= 44px
@@ -132,7 +132,7 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
     await expect(backBtn).toBeVisible();
     await expect(backBtn).toHaveAttribute("href", "/consent");
 
-    const continueBtn = page.getByRole("button", { name: /Save Profile & Enter Cyber Missions|Enter Cyber Mission Control/i });
+    const continueBtn = page.getByRole("button", { name: /Save Profile & Enter Cyber Missions|Enter Cyber Mission Control|Continue to Cyber Missions/i });
     await expect(continueBtn).toBeVisible();
 
     // Incomplete submission validation check

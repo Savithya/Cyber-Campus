@@ -141,12 +141,12 @@ export function CyberChallengeZone() {
           </div>
 
           <h2 id="challenge-zone-heading" className="challenge-title">
-            Level Up Your Threat Awareness
+            Learn Cybersecurity Through Interactive Challenges
           </h2>
 
           <p className="challenge-subtitle">
-            Hone your threat detection instincts in an inert, gamified cybersecurity sandbox.
-            Practice spotting phishing, fake websites, pretexting stories, and impersonation traps.
+            Develop your ability to recognize online threats through realistic and engaging activities.
+            Practice spotting phishing, deceptive links, pretexting stories, and impersonation attempts in an inert learning sandbox.
           </p>
 
           {/* Academic Isolation Disclaimer */}
@@ -156,8 +156,8 @@ export function CyberChallengeZone() {
               <strong>Strict Academic Research Separation:</strong>
               <span>
                 {" "}
-                Research survey data is kept completely separate from gaming scores.
-                Playing challenges is 100% voluntary and never required to take part in the study.
+                Optional educational challenge activities are kept completely separate from the academic research dataset.
+                Participating in learning challenges never alters or influences your research responses.
               </span>
             </div>
           </div>
@@ -271,7 +271,7 @@ export function CyberChallengeZone() {
             <div className="challenge-game-card card-phishing">
               <div className="card-top-header">
                 <span className="card-category-tag">IV1 · EMAIL INBOX</span>
-                <span className="card-xp-badge">+30 XP</span>
+                <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon purple-glow">
                 <Mail size={28} aria-hidden="true" />
@@ -287,63 +287,31 @@ export function CyberChallengeZone() {
                 <span className="skill-chip">Sender Spoofing</span>
               </div>
               <div className="card-footer">
-                <span className="card-scenarios-count">3 Scenarios (PH01–PH03)</span>
+                <span className="card-scenarios-count">5 Scenarios (PH01–PH05)</span>
                 <button
                   type="button"
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Play Mission</span>
+                  <span>Start Learning</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {/* 2. Fake Website Identification */}
-            <div className="challenge-game-card card-links">
-              <div className="card-top-header">
-                <span className="card-category-tag">IV4 · LINK LAB</span>
-                <span className="card-xp-badge">+30 XP</span>
-              </div>
-              <div className="card-main-icon cyan-glow">
-                <Link2 size={28} aria-hidden="true" />
-              </div>
-              <h3 className="card-title">Fake Website Identification</h3>
-              <p className="card-desc">
-                Inspect dangerous URLs before clicking. Spot typo-squatted domains,
-                deceptive subdomains, misleading HTTPS certificates, and inert mock destinations.
-              </p>
-              <div className="card-skills-list">
-                <span className="skill-chip">Domain Inspection</span>
-                <span className="skill-chip">Typo-squatting</span>
-                <span className="skill-chip">Subdomain Traps</span>
-              </div>
-              <div className="card-footer">
-                <span className="card-scenarios-count">3 Scenarios (SC01–SC03)</span>
-                <button
-                  type="button"
-                  className="button secondary card-play-btn"
-                  onClick={launchPractice}
-                >
-                  <span>Play Mission</span>
-                  <ChevronRight size={16} aria-hidden="true" />
-                </button>
-              </div>
-            </div>
-
-            {/* 3. Social Engineering Awareness */}
+            {/* 2. Pretexting Awareness */}
             <div className="challenge-game-card card-pretexting">
               <div className="card-top-header">
                 <span className="card-category-tag">IV2 · PRETEXTING</span>
-                <span className="card-xp-badge">+30 XP</span>
+                <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon emerald-glow">
                 <MessagesSquare size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Social Engineering Awareness Quizzes</h3>
+              <h3 className="card-title">Pretexting Detection Quizzes</h3>
               <p className="card-desc">
                 Dissect psychological manipulation. Detect fabricated emergency stories,
-                bogus campus research requests, and coercive emotional pressure.
+                bogus campus IT support requests, and coercive emotional pressure.
               </p>
               <div className="card-skills-list">
                 <span className="skill-chip">Psychological Analysis</span>
@@ -351,28 +319,28 @@ export function CyberChallengeZone() {
                 <span className="skill-chip">Independent Channels</span>
               </div>
               <div className="card-footer">
-                <span className="card-scenarios-count">3 Scenarios (PT01–PT03)</span>
+                <span className="card-scenarios-count">5 Scenarios (PT01–PT05)</span>
                 <button
                   type="button"
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Play Mission</span>
+                  <span>Start Learning</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {/* 4. Privacy Protection Missions */}
+            {/* 3. Impersonation Investigation */}
             <div className="challenge-game-card card-impersonation">
               <div className="card-top-header">
                 <span className="card-category-tag">IV3 · IDENTITY</span>
-                <span className="card-xp-badge">+30 XP</span>
+                <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon amber-glow">
                 <UserRoundSearch size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Privacy Protection Missions</h3>
+              <h3 className="card-title">Impersonation Defense Missions</h3>
               <p className="card-desc">
                 Defend personal credentials and privacy. Identify spoofed student representatives,
                 unverified Telegram/WhatsApp profiles, and enforce data withholding.
@@ -383,13 +351,45 @@ export function CyberChallengeZone() {
                 <span className="skill-chip">Anti-Impersonation</span>
               </div>
               <div className="card-footer">
-                <span className="card-scenarios-count">3 Scenarios (IM01–IM03)</span>
+                <span className="card-scenarios-count">5 Scenarios (IM01–IM05)</span>
                 <button
                   type="button"
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Play Mission</span>
+                  <span>Start Learning</span>
+                  <ChevronRight size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            {/* 4. Scam & Malicious Links */}
+            <div className="challenge-game-card card-links">
+              <div className="card-top-header">
+                <span className="card-category-tag">IV4 · LINK LAB</span>
+                <span className="card-xp-badge">+50 XP</span>
+              </div>
+              <div className="card-main-icon cyan-glow">
+                <Link2 size={28} aria-hidden="true" />
+              </div>
+              <h3 className="card-title">Scams &amp; Malicious Links</h3>
+              <p className="card-desc">
+                Inspect dangerous URLs before clicking. Spot typo-squatted domains,
+                deceptive subdomains, misleading HTTPS certificates, and fake checkout forms.
+              </p>
+              <div className="card-skills-list">
+                <span className="skill-chip">Domain Inspection</span>
+                <span className="skill-chip">Typo-squatting</span>
+                <span className="skill-chip">Subdomain Traps</span>
+              </div>
+              <div className="card-footer">
+                <span className="card-scenarios-count">5 Scenarios (SC01–SC05)</span>
+                <button
+                  type="button"
+                  className="button secondary card-play-btn"
+                  onClick={launchPractice}
+                >
+                  <span>Start Learning</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>

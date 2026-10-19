@@ -45,6 +45,7 @@ import {
   AlertCircle,
   RefreshCw,
   Award,
+  Check,
 } from "lucide-react";
 import { api, useSession } from "@/lib/client";
 import { missions } from "@/content/missions";
@@ -57,6 +58,7 @@ interface InteractiveChallengeRunnerProps {
   scenarioIndex: number; // 0..4
   totalInMission: number; // 5
   onCompleteScenario: (attempt: Attempt) => void;
+  onNextScenario?: () => void;
   onReturnToHub: () => void;
   previousAttempt?: Attempt;
   educationalMode?: boolean;
@@ -68,6 +70,7 @@ export function InteractiveChallengeRunner({
   scenarioIndex,
   totalInMission,
   onCompleteScenario,
+  onNextScenario,
   onReturnToHub,
   previousAttempt,
   educationalMode = false,
@@ -196,6 +199,15 @@ export function InteractiveChallengeRunner({
         </div>
 
         <div className="challenge-badge-cluster">
+          <div className="runner-progress-inline">
+            <span className="runner-progress-text">Scenario {scenarioIndex + 1} of {totalInMission}</span>
+            <div className="runner-progress-track" role="progressbar" aria-valuenow={scenarioIndex + 1} aria-valuemin={1} aria-valuemax={totalInMission}>
+              <div
+                className="runner-progress-fill"
+                style={{ width: `${((scenarioIndex + (hasDecided ? 1 : 0.5)) / totalInMission) * 100}%` }}
+              />
+            </div>
+          </div>
           <span className="challenge-code-pill">{scenario.id}</span>
           <span className="challenge-threat-pill">
             <ShieldAlert size={14} aria-hidden="true" />
@@ -937,8 +949,9 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
 
             {/* Action Choices */}
             <div className="decision-options-group" role="radiogroup" aria-label="Available participant decisions">
-              {scenario.choices.map((choice) => {
+              {scenario.choices.map((choice, choiceIdx) => {
                 const isSelected = selectedChoiceId === choice.id;
+                const letter = ["A", "B", "C", "D"][choiceIdx] ?? `${choiceIdx + 1}`;
                 return (
                   <button
                     key={choice.id}
@@ -949,10 +962,15 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                     className={`decision-option-card ${isSelected ? "selected" : ""}`}
                     onClick={() => setSelectedChoiceId(choice.id)}
                   >
-                    <span className="decision-radio-circle" aria-hidden="true">
-                      {isSelected && <span className="decision-radio-dot" />}
-                    </span>
+                    <span className="choice-letter-badge" aria-hidden="true">{letter}</span>
                     <span className="decision-label-text">{choice.label}</span>
+                    <span className="decision-radio-circle" aria-hidden="true">
+                      {isSelected ? (
+                        <Check size={13} strokeWidth={3} className="text-white" />
+                      ) : (
+                        <span className="decision-radio-dot" />
+                      )}
+                    </span>
                   </button>
                 );
               })}
@@ -977,7 +995,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
             ) : (
               <div className="decision-confirmed-state">
                 <div className="neutral-confirmation-banner">
-                  <CheckCircle2 size={20} className="text-emerald" aria-hidden="true" />
+                  <CheckCircle2 size={20} className="text-emerald flex-shrink-0" aria-hidden="true" />
                   <div>
                     <strong>Decision Recorded Securely</strong>
                     <p>Your response has been saved to your anonymous research session.</p>
@@ -1004,14 +1022,38 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                 )}
 
                 <div className="next-scenario-actions">
-                  <button
-                    type="button"
-                    className="button primary large full-width"
-                    onClick={onReturnToHub}
-                  >
-                    <span>Return to Mission Control</span>
-                    <ArrowRight size={18} aria-hidden="true" />
-                  </button>
+                  {onNextScenario && scenarioIndex < totalInMission - 1 ? (
+                    <>
+                      <button
+                        type="button"
+                        className="button primary large full-width"
+                        onClick={onNextScenario}
+                      >
+                        <span>Continue to Scenario {scenarioIndex + 2} of {totalInMission}</span>
+                        <ArrowRight size={18} aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        className="button secondary full-width mt-2.5"
+                        onClick={onReturnToHub}
+                      >
+                        <span>Return to Mission Control</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="button primary large full-width"
+                      onClick={onReturnToHub}
+                    >
+                      <span>
+                        {scenarioIndex === totalInMission - 1
+                          ? "Module Complete — Return to Mission Control"
+                          : "Return to Mission Control"}
+                      </span>
+                      <ArrowRight size={18} aria-hidden="true" />
+                    </button>
+                  )}
                 </div>
               </div>
             )}

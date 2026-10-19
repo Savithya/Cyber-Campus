@@ -21,6 +21,7 @@ import {
 import { api, useSession, loadDraft, putDraft } from "@/lib/client";
 import { questions } from "@/content/questionnaire";
 import type { Answers, Session } from "@/lib/types";
+import { ResearchProgressStepper } from "./research-progress-stepper";
 
 export function DemographicsForm() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export function DemographicsForm() {
     Q5: null,
   });
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string>("Draft stored locally");
+  const [saveStatus, setSaveStatus] = useState<string>("Draft stored in session");
   const [error, setError] = useState<string>("");
   const [validationError, setValidationError] = useState<string>("");
   const [missingQuestionIds, setMissingQuestionIds] = useState<string[]>([]);
@@ -191,64 +192,27 @@ export function DemographicsForm() {
 
   return (
     <div className="demographics-page-wrapper">
-      {/* 1. Four-Step Progress Stepper */}
-      <nav
-        className="research-progress-stepper"
-        aria-label="Research Participation Progress"
-      >
-        <div className="stepper-step completed">
-          <div className="stepper-dot">
-            <Check size={16} aria-hidden="true" />
-          </div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 01</span>
-            <span className="stepper-step-name">Research Consent</span>
-          </div>
-        </div>
-
-        <div className="stepper-connector completed" />
-
-        <div className="stepper-step active" aria-current="step">
-          <div className="stepper-dot">02</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 02</span>
-            <span className="stepper-step-name">Student Profile</span>
-          </div>
-        </div>
-
-        <div className="stepper-connector" />
-
-        <div className="stepper-step">
-          <div className="stepper-dot">03</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 03</span>
-            <span className="stepper-step-name">Cyber Missions</span>
-          </div>
-        </div>
-
-        <div className="stepper-connector" />
-
-        <div className="stepper-step">
-          <div className="stepper-dot">04</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 04</span>
-            <span className="stepper-step-name">Completion</span>
-          </div>
-        </div>
-      </nav>
+      {/* 1. Four-Stage Reusable Progress Stepper */}
+      <ResearchProgressStepper currentStep={2} />
 
       {/* 2. Main Header & Participation Information Bar */}
       <header className="demographics-header">
-        <h1 className="demographics-title">Student Demographic Profile</h1>
+        <div className="eyebrow">
+          <span className="live-pulse-dot" aria-hidden="true" />
+          <span>STEP 02 OF 04 · PARTICIPANT BACKGROUND</span>
+        </div>
+        <h1 className="demographics-title">
+          Tell Us a Little About Your Studies <span className="sr-only">(Student Demographic Profile)</span>
+        </h1>
         <p className="demographics-subtitle">
-          Please provide basic background information. Your responses will support anonymous academic research.
+          These questions help us understand the backgrounds of participating university students.
         </p>
 
         <div className="demographics-info-bar" role="status" aria-label="Participation Information">
           <div className="info-bar-pill">
             <Lock size={13} className="text-muted" aria-hidden="true" />
             <span className="info-pill-label">Anonymous ID:</span>
-            <strong className="info-pill-value">{participantCode}</strong>
+            <strong className="info-pill-value font-mono">{participantCode}</strong>
           </div>
           <div className="info-bar-divider" aria-hidden="true" />
           <div className="info-bar-pill">
@@ -259,8 +223,8 @@ export function DemographicsForm() {
           <div className="info-bar-divider" aria-hidden="true" />
           <div className="info-bar-pill">
             <Layers size={14} className="text-primary" aria-hidden="true" />
-            <span className="info-pill-label">Research Step:</span>
-            <strong className="info-pill-value">Step 02 of 04</strong>
+            <span className="info-pill-label">Research Stage:</span>
+            <strong className="info-pill-value">Stage 02 of 04</strong>
           </div>
         </div>
       </header>
@@ -285,7 +249,7 @@ export function DemographicsForm() {
               <Calendar size={20} aria-hidden="true" />
             </span>
             <div>
-              <span className="demo-question-tag">DEMOGRAPHIC 01 / 05</span>
+              <span className="demo-question-tag">QUESTION 01 — AGE GROUP</span>
               <h2 id="q1-title" className="demo-question-heading">{q1.text}</h2>
             </div>
           </div>
@@ -302,7 +266,11 @@ export function DemographicsForm() {
                   onClick={() => handleSelect("Q1", opt.code)}
                 >
                   <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected && <span className="demo-radio-dot" />}
+                    {isSelected ? (
+                      <Check size={13} strokeWidth={3} className="text-white" />
+                    ) : (
+                      <span className="demo-radio-dot" />
+                    )}
                   </span>
                   <span className="demo-option-label">{opt.label}</span>
                 </button>
@@ -321,7 +289,7 @@ export function DemographicsForm() {
               <User size={20} aria-hidden="true" />
             </span>
             <div>
-              <span className="demo-question-tag">DEMOGRAPHIC 02 / 05</span>
+              <span className="demo-question-tag">QUESTION 02 — GENDER</span>
               <h2 id="q2-title" className="demo-question-heading">{q2.text}</h2>
             </div>
           </div>
@@ -338,7 +306,11 @@ export function DemographicsForm() {
                   onClick={() => handleSelect("Q2", opt.code)}
                 >
                   <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected && <span className="demo-radio-dot" />}
+                    {isSelected ? (
+                      <Check size={13} strokeWidth={3} className="text-white" />
+                    ) : (
+                      <span className="demo-radio-dot" />
+                    )}
                   </span>
                   <span className="demo-option-label">{opt.label}</span>
                 </button>
@@ -357,7 +329,7 @@ export function DemographicsForm() {
               <GraduationCap size={20} aria-hidden="true" />
             </span>
             <div>
-              <span className="demo-question-tag">DEMOGRAPHIC 03 / 05</span>
+              <span className="demo-question-tag">QUESTION 03 — YEAR OF STUDY</span>
               <h2 id="q3-title" className="demo-question-heading">{q3.text}</h2>
             </div>
           </div>
@@ -374,7 +346,11 @@ export function DemographicsForm() {
                   onClick={() => handleSelect("Q3", opt.code)}
                 >
                   <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected && <span className="demo-radio-dot" />}
+                    {isSelected ? (
+                      <Check size={13} strokeWidth={3} className="text-white" />
+                    ) : (
+                      <span className="demo-radio-dot" />
+                    )}
                   </span>
                   <span className="demo-option-label">{opt.label}</span>
                 </button>
@@ -393,7 +369,7 @@ export function DemographicsForm() {
               <BookOpen size={20} aria-hidden="true" />
             </span>
             <div>
-              <span className="demo-question-tag">DEMOGRAPHIC 04 / 05</span>
+              <span className="demo-question-tag">QUESTION 04 — MAIN FIELD OF STUDY</span>
               <h2 id="q4-title" className="demo-question-heading">{q4.text}</h2>
             </div>
           </div>
@@ -410,7 +386,11 @@ export function DemographicsForm() {
                   onClick={() => handleSelect("Q4", opt.code)}
                 >
                   <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected && <span className="demo-radio-dot" />}
+                    {isSelected ? (
+                      <Check size={13} strokeWidth={3} className="text-white" />
+                    ) : (
+                      <span className="demo-radio-dot" />
+                    )}
                   </span>
                   <span className="demo-option-label">{opt.label}</span>
                 </button>
@@ -419,7 +399,7 @@ export function DemographicsForm() {
           </div>
         </section>
 
-        {/* Question 05: University Type (Full width on desktop for long sentences) */}
+        {/* Question 05: University Type */}
         <section
           className={`demo-card full-width ${missingQuestionIds.includes("Q5") ? "validation-error" : ""}`}
           aria-labelledby="q5-title"
@@ -429,7 +409,7 @@ export function DemographicsForm() {
               <Building2 size={20} aria-hidden="true" />
             </span>
             <div>
-              <span className="demo-question-tag">DEMOGRAPHIC 05 / 05</span>
+              <span className="demo-question-tag">QUESTION 05 — UNIVERSITY TYPE</span>
               <h2 id="q5-title" className="demo-question-heading">{q5.text}</h2>
             </div>
           </div>
@@ -446,7 +426,11 @@ export function DemographicsForm() {
                   onClick={() => handleSelect("Q5", opt.code)}
                 >
                   <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected && <span className="demo-radio-dot" />}
+                    {isSelected ? (
+                      <Check size={13} strokeWidth={3} className="text-white" />
+                    ) : (
+                      <span className="demo-radio-dot" />
+                    )}
                   </span>
                   <span className="demo-option-label">{opt.label}</span>
                 </button>
@@ -489,11 +473,7 @@ export function DemographicsForm() {
               </>
             ) : (
               <>
-                <span>
-                  {state.session?.status !== "draft"
-                    ? "Enter Cyber Mission Control"
-                    : "Save Profile & Enter Cyber Missions"}
-                </span>
+                <span>Continue to Cyber Missions</span>
                 <ArrowRight size={18} aria-hidden="true" />
               </>
             )}
