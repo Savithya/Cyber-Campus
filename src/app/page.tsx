@@ -42,36 +42,35 @@ export default function Home() {
             <h1 className="hero-main-heading">
               Explore Cyber Threats.
               <br />
-              Make Smarter Decisions.
-              <br />
-              Protect Your <span>Privacy</span>.
+              Protect Your <span>Digital Privacy</span>.
             </h1>
 
             <p className="hero-subtitle-text">
-              Discover how social engineering threats influence online privacy through realistic cybersecurity scenarios. Take part in academic research involving university students in Sri Lanka.
+              Participate in interactive social engineering simulations and contribute to academic research on user privacy among university students in Sri Lanka.
             </p>
 
             <p className="hero-body-description">
-              Investigating how deceptive manipulation vectors—including phishing, pretexting, impersonation,
-              and online link scams—affect personal data protection and digital privacy.
-              Your voluntary participation provides valuable empirical evidence for cybersecurity science and higher education.
+              Investigating how deceptive social engineering manipulation vectors, including phishing,
+              pretexting, impersonation, and online link scams, affect digital autonomy, credential
+              confidentiality, and personal data exposure. Your voluntary participation provides
+              essential academic evidence for cybersecurity education and privacy policy.
             </p>
 
             {/* Research Highlights Metrics Bar */}
             <div className="hero-research-highlights" aria-label="Research Highlights">
               <div className="highlight-metric-item">
                 <span className="highlight-metric-value">4</span>
-                <span className="highlight-metric-label">Threat Categories</span>
+                <span className="highlight-metric-label">Social Engineering Threat Categories</span>
               </div>
               <div className="highlight-metric-divider" aria-hidden="true" />
               <div className="highlight-metric-item">
                 <span className="highlight-metric-value">20</span>
-                <span className="highlight-metric-label">Interactive Scenarios</span>
+                <span className="highlight-metric-label">Interactive Challenges</span>
               </div>
               <div className="highlight-metric-divider" aria-hidden="true" />
               <div className="highlight-metric-item">
                 <span className="highlight-metric-value">15–20 Min</span>
-                <span className="highlight-metric-label">Estimated Participation</span>
+                <span className="highlight-metric-label">Estimated Participation Time</span>
               </div>
             </div>
 
@@ -80,9 +79,9 @@ export default function Home() {
               <Link
                 className="button primary large hero-cta-btn"
                 href="/consent"
-                aria-label="Join the Research"
+                aria-label="Start Research (Participate in Research · Join the Research)"
               >
-                <span>Join the Research</span>
+                <span>Start Research</span>
                 <ClipboardList size={19} aria-hidden="true" />
               </Link>
 
@@ -99,20 +98,35 @@ export default function Home() {
             {/* Reassurance Chips */}
             <div className="hero-reassurance-row">
               <span className="reassurance-pill">
-                <Check size={14} className="text-emerald" aria-hidden="true" /> 100% Voluntary Participation
+                <Check size={15} aria-hidden="true" /> 100% Voluntary Participation
               </span>
               <span className="reassurance-pill">
-                <LockKeyhole size={14} className="text-primary" aria-hidden="true" /> Anonymous Session · No Credentials Collected
+                <Clock size={15} aria-hidden="true" /> 15–20 Min · 20 Interactive Challenges
               </span>
               <span className="reassurance-pill">
-                <GraduationCap size={14} className="text-cyan" aria-hidden="true" /> University Students in Sri Lanka (18+)
+                <LockKeyhole size={15} aria-hidden="true" /> Anonymous Research Session · No Credentials Collected
+              </span>
+              <span className="reassurance-pill">
+                <ShieldCheck size={15} aria-hidden="true" /> 4 Threat Modules (IV1–IV4) · Simulated Privacy Risk (DV)
               </span>
             </div>
           </div>
 
-          {/* Right Column: Hero Visual Composition */}
+          {/* Right Column: Hero Visual Image */}
           <div className="hero-visual-col">
-            <HeroCyberVisual />
+            <div className="hero-image-frame">
+              <picture>
+                <source srcSet="/images/cyber-research-lab.webp" type="image/webp" />
+                <img
+                  src="/images/cyber-research-lab.jpg"
+                  alt="Interactive Cybersecurity Research Laboratory — Digital Workstation with Threat Telemetry and Privacy Shields"
+                  className="hero-cybersecurity-image"
+                  width={1376}
+                  height={768}
+                  loading="eager"
+                />
+              </picture>
+            </div>
           </div>
         </div>
       </section>

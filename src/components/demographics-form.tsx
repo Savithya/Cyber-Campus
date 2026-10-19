@@ -192,8 +192,51 @@ export function DemographicsForm() {
 
   return (
     <div className="demographics-page-wrapper">
-      {/* 1. Four-Stage Reusable Progress Stepper */}
-      <ResearchProgressStepper currentStep={2} />
+      {/* 1. Four-Step Progress Stepper */}
+      <nav
+        className="research-progress-stepper"
+        aria-label="Research Participation Progress"
+      >
+        <div className="stepper-step completed">
+          <div className="stepper-dot">
+            <Check size={16} aria-hidden="true" />
+          </div>
+          <div className="stepper-info">
+            <span className="stepper-step-num">STEP 01</span>
+            <span className="stepper-step-name">Research Consent</span>
+          </div>
+        </div>
+
+        <div className="stepper-connector completed" />
+
+        <div className="stepper-step active" aria-current="step">
+          <div className="stepper-dot">02</div>
+          <div className="stepper-info">
+            <span className="stepper-step-num">STEP 02</span>
+            <span className="stepper-step-name">Student Profile</span>
+          </div>
+        </div>
+
+        <div className="stepper-connector" />
+
+        <div className="stepper-step">
+          <div className="stepper-dot">03</div>
+          <div className="stepper-info">
+            <span className="stepper-step-num">STEP 03</span>
+            <span className="stepper-step-name">Cyber Missions</span>
+          </div>
+        </div>
+
+        <div className="stepper-connector" />
+
+        <div className="stepper-step">
+          <div className="stepper-dot">04</div>
+          <div className="stepper-info">
+            <span className="stepper-step-num">STEP 04</span>
+            <span className="stepper-step-name">Completion</span>
+          </div>
+        </div>
+      </nav>
 
       {/* 2. Main Header & Participation Information Bar */}
       <header className="demographics-header">
@@ -465,6 +508,7 @@ export function DemographicsForm() {
             onClick={handleProceed}
             disabled={saving}
             aria-busy={saving}
+            aria-label="Save Profile & Enter Cyber Missions"
           >
             {saving ? (
               <>
@@ -473,7 +517,7 @@ export function DemographicsForm() {
               </>
             ) : (
               <>
-                <span>Continue to Cyber Missions</span>
+                <span>Save Profile &amp; Enter Cyber Missions</span>
                 <ArrowRight size={18} aria-hidden="true" />
               </>
             )}

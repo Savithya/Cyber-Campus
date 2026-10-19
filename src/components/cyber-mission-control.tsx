@@ -26,9 +26,12 @@ import {
   Inbox,
   UserCheck,
   Globe,
+  Trophy,
+  Award,
 } from "lucide-react";
 import { api, useSession, randomToken } from "@/lib/client";
 import { missions, getActiveMissions } from "@/content/missions";
+import { getOperativeRank } from "@/lib/scoring";
 import type { Scenario, Session, Attempt } from "@/lib/types";
 import { InteractiveChallengeRunner } from "./interactive-challenge-runner";
 import { ResearchProgressStepper } from "./research-progress-stepper";
@@ -42,7 +45,11 @@ const missionIcons: Record<string, typeof Mail> = {
   sparkles: Sparkles,
 };
 
-export function CyberMissionControl() {
+interface CyberMissionControlProps {
+  initialMissionId?: string;
+}
+
+export function CyberMissionControl({ initialMissionId }: CyberMissionControlProps = {}) {
   const router = useRouter();
   const state = useSession();
 
@@ -52,11 +59,18 @@ export function CyberMissionControl() {
   const [startingPractice, setStartingPractice] = useState<boolean>(false);
 
   // Active Challenge Runner State
-  const [activeMissionId, setActiveMissionId] = useState<string | null>(null);
+  const [activeMissionId, setActiveMissionId] = useState<string | null>(initialMissionId ?? null);
   const [activeScenarioIndex, setActiveScenarioIndex] = useState<number>(0);
 
   const session = state.session;
   const isAuthorized = !!session && (session.status !== "draft" || session.mode === "practice");
+
+  // Scroll to top on challenge change or view switch
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeMissionId, activeScenarioIndex]);
 
   const fetchScenarios = useCallback(async () => {
     setLoadingScenarios(true);
@@ -79,6 +93,21 @@ export function CyberMissionControl() {
       setLoadingScenarios(false);
     }
   }, [state.loading, isAuthorized, fetchScenarios]);
+
+  useEffect(() => {
+    if (initialMissionId && scenarios.length > 0 && activeMissionId === initialMissionId && session) {
+      const currentMission = missions.find((m) => m.id === initialMissionId);
+      if (currentMission) {
+        const mScenarios = scenarios.filter((s) => currentMission.ids.includes(s.id));
+        const firstUncompleted = mScenarios.findIndex(
+          (sc) => !session.attempts.some((a) => a.scenarioId === sc.id && a.attemptNumber === 1),
+        );
+        if (firstUncompleted > 0) {
+          setActiveScenarioIndex(firstUncompleted);
+        }
+      }
+    }
+  }, [initialMissionId, scenarios, activeMissionId, session]);
 
   const handleLaunchPractice = async () => {
     setStartingPractice(true);
@@ -226,6 +255,8 @@ export function CyberMissionControl() {
   const firstAttempts = attempts.filter((a) => a.attemptNumber === 1);
   const completedCount = firstAttempts.length;
   const totalScenariosCount = scenarios.length || 20;
+  const completionXP = completedCount * 10;
+  const rank = getOperativeRank(completionXP);
 
   // Active missions list with counterbalanced order if assigned
   const activeMissions = getActiveMissions(false);
@@ -258,6 +289,9 @@ export function CyberMissionControl() {
           missionId={activeMissionId}
           scenarioIndex={activeScenarioIndex}
           totalInMission={missionScenarios.length}
+          overallCompleted={completedCount}
+          totalOverall={totalScenariosCount}
+          overallXp={completedCount * 10}
           previousAttempt={currentAttempt}
           educationalMode={session.mode === "practice"}
           onCompleteScenario={(newAttempt) => {
@@ -268,8 +302,28 @@ export function CyberMissionControl() {
             if (activeScenarioIndex < missionScenarios.length - 1) {
               setActiveScenarioIndex((prev) => prev + 1);
             } else {
-              setActiveMissionId(null);
-              setActiveScenarioIndex(0);
+              // Current module complete! Find the next module in orderedMissions with uncompleted scenarios
+              const currentMissionIdx = orderedMissions.findIndex((m) => m.id === activeMissionId);
+              let nextMissionToLoad: { missionId: string; index: number } | null = null;
+              for (let i = 1; i <= orderedMissions.length; i++) {
+                const candidate = orderedMissions[(currentMissionIdx + i) % orderedMissions.length];
+                const candScenarios = scenarios.filter((s) => candidate.ids.includes(s.id));
+                const candUncompleted = candScenarios.findIndex(
+                  (sc) => !firstAttempts.some((a) => a.scenarioId === sc.id) && sc.id !== activeScenario?.id,
+                );
+                if (candUncompleted !== -1) {
+                  nextMissionToLoad = { missionId: candidate.id, index: candUncompleted };
+                  break;
+                }
+              }
+
+              if (nextMissionToLoad) {
+                setActiveMissionId(nextMissionToLoad.missionId);
+                setActiveScenarioIndex(nextMissionToLoad.index);
+              } else {
+                // All 20 scenarios complete across all modules!
+                router.push("/results");
+              }
             }
           }}
           onReturnToHub={() => {
@@ -304,98 +358,224 @@ export function CyberMissionControl() {
         </div>
       )}
 
-      {/* 1. Four-Stage Reusable Progress Stepper */}
-      <ResearchProgressStepper
-        currentStep={3}
-        stepDetail={`${completedCount}/${totalScenariosCount} completed`}
-      />
+      {/* 1. Four-Step Progress Tracker */}
+      <nav className="research-journey-tracker" aria-label="Research Participation Progress">
+        <div className="tracker-step completed">
+          <div className="tracker-dot">
+            <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+          </div>
+          <div className="tracker-info">
+            <span className="tracker-step-num">STEP 01</span>
+            <span className="tracker-step-name">Research Consent</span>
+          </div>
+        </div>
 
-      {/* 2. Page Header */}
+        <div className="tracker-connector completed" />
+
+        <div className="tracker-step completed">
+          <div className="tracker-dot">
+            <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+          </div>
+          <div className="tracker-info">
+            <span className="tracker-step-num">STEP 02</span>
+            <span className="tracker-step-name">Student Profile</span>
+          </div>
+        </div>
+
+        <div className={`tracker-connector ${completedCount >= totalScenariosCount ? "completed" : "active"}`} />
+
+        <div
+          className={`tracker-step ${completedCount >= totalScenariosCount ? "completed" : "active"}`}
+          aria-current={completedCount < totalScenariosCount ? "step" : undefined}
+        >
+          <div className="tracker-dot">
+            {completedCount >= totalScenariosCount ? (
+              <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+            ) : (
+              "03"
+            )}
+          </div>
+          <div className="tracker-info">
+            <span className="tracker-step-num">STEP 03</span>
+            <span className="tracker-step-name">Cyber Missions ({completedCount}/{totalScenariosCount})</span>
+          </div>
+        </div>
+
+        <div className={`tracker-connector ${completedCount >= totalScenariosCount ? "active" : ""}`} />
+
+        <div
+          className={`tracker-step ${completedCount >= totalScenariosCount ? "active" : ""}`}
+          aria-current={completedCount >= totalScenariosCount ? "step" : undefined}
+        >
+          <div className="tracker-dot">04</div>
+          <div className="tracker-info">
+            <span className="tracker-step-num">STEP 04</span>
+            <span className="tracker-step-name">Completion</span>
+          </div>
+        </div>
+      </nav>
+
+      {/* 2. Redesigned Page Header (Centered) */}
       <header className="cmc-header-centered">
         <div className="eyebrow">
           <span className="live-pulse-dot" aria-hidden="true" />
-          <span>CYBER MISSION HUB · INTERACTIVE INVESTIGATION EXPERIENCE</span>
+          <span>CYBER SIMULATION LABORATORY · SRI LANKA</span>
         </div>
-        <h1 className="cmc-main-heading">Your Cyber Investigation Begins Here</h1>
+        <h1 className="cmc-main-heading">Cyber Mission Control</h1>
         <p className="cmc-description">
-          Explore realistic situations, identify suspicious activity and choose how you would respond.
-          Your decisions provide empirical evidence on social engineering threats and student privacy.
+          Investigate four social engineering threat categories through realistic interactive cybersecurity scenarios. Examine evidence, identify suspicious behaviour, and make decisions that contribute to privacy research.
         </p>
       </header>
 
-      {/* 3. Overall Research Progress Component */}
-      <div className="cmc-overall-progress-panel" role="region" aria-label="Investigation Progress">
-        <div className="progress-panel-top">
-          <div className="progress-headline-wrap">
-            <span className="progress-eyebrow">OVERALL RESEARCH PROGRESS</span>
-            <h2 className="progress-title">
-              {completedCount} of {totalScenariosCount} Scenarios Completed
-            </h2>
+      {/* 3. Redesigned Research Session Information Bar */}
+      <div className="cmc-session-bar" role="region" aria-label="Research Session Telemetry">
+        <div className="cmc-session-pill">
+          <span className="cmc-pill-icon cyan-glow">
+            <Lock size={14} aria-hidden="true" />
+          </span>
+          <div className="cmc-pill-content">
+            <span className="cmc-pill-label">ANONYMOUS RESEARCH ID</span>
+            <strong className="cmc-pill-value font-mono">{session.code}</strong>
           </div>
+        </div>
 
-          <div className="progress-status-badge">
-            <span className="status-dot green" aria-hidden="true" />
-            <span>
-              {completedCount >= totalScenariosCount
-                ? "All 20 Completed · Ready for Step 04"
-                : `${totalScenariosCount - completedCount} Scenarios Remaining`}
+        <div className="cmc-session-divider" aria-hidden="true" />
+
+        <div className="cmc-session-pill">
+          <span className="cmc-pill-icon emerald-glow">
+            <span className="live-pulse-dot" aria-hidden="true" />
+          </span>
+          <div className="cmc-pill-content">
+            <span className="cmc-pill-label">SESSION STATUS</span>
+            <strong className="cmc-pill-value">
+              {session.mode === "practice" ? "Practice Sandbox" : "Active Research Study"}
+            </strong>
+          </div>
+        </div>
+
+        <div className="cmc-session-divider" aria-hidden="true" />
+
+        <div className="cmc-session-pill">
+          <span className="cmc-pill-icon purple-glow">
+            <Layers size={14} aria-hidden="true" />
+          </span>
+          <div className="cmc-pill-content">
+            <span className="cmc-pill-label">CURRENT RESEARCH STEP</span>
+            <strong className="cmc-pill-value">
+              {completedCount >= totalScenariosCount ? "Step 03 Complete · Ready for Step 04" : "Step 03 of 04 · Threat Missions"}
+            </strong>
+          </div>
+        </div>
+
+        <div className="cmc-session-divider" aria-hidden="true" />
+
+        <div className="cmc-session-pill">
+          <span className="cmc-pill-icon amber-glow">
+            <ShieldCheck size={14} aria-hidden="true" />
+          </span>
+          <div className="cmc-pill-content">
+            <span className="cmc-pill-label">SECURITY &amp; PRIVACY</span>
+            <strong className="cmc-pill-value">Isolated · No Credentials Collected</strong>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Redesigned Research Statistics Panel (4-column layout) */}
+      <section className="cmc-stats-panel" aria-label="Research Statistics Panel">
+        <div className="cmc-stat-card">
+          <div className="cmc-stat-header">
+            <span className="cmc-stat-label">INVESTIGATOR RANK</span>
+            <Award size={18} className="cmc-stat-icon text-cyan" aria-hidden="true" />
+          </div>
+          <div className="cmc-stat-body">
+            <div className="cmc-rank-badge-wrap">
+              <span className="cmc-rank-level-badge">LVL {rank.level}</span>
+              <strong className="cmc-rank-title">{rank.title}</strong>
+            </div>
+            <span className="cmc-stat-sub">Badge: {rank.badge}</span>
+          </div>
+        </div>
+
+        <div className="cmc-stat-card">
+          <div className="cmc-stat-header">
+            <span className="cmc-stat-label">RESEARCH XP EARNED</span>
+            <Trophy size={18} className="cmc-stat-icon text-amber" aria-hidden="true" />
+          </div>
+          <div className="cmc-stat-body">
+            <div className="cmc-xp-value-wrap">
+              <strong className="cmc-xp-current">{completionXP}</strong>
+              <span className="cmc-xp-max">{" "}/ 200 XP</span>
+            </div>
+            <span className="cmc-stat-sub">10 XP per completed challenge</span>
+          </div>
+        </div>
+
+        <div className="cmc-stat-card">
+          <div className="cmc-stat-header">
+            <span className="cmc-stat-label">CHALLENGES EVALUATED</span>
+            <CheckCircle2 size={18} className="cmc-stat-icon text-emerald" aria-hidden="true" />
+          </div>
+          <div className="cmc-stat-body">
+            <div className="cmc-challenges-value-wrap">
+              <strong className="cmc-challenges-current">{completedCount}</strong>
+              <span className="cmc-challenges-max">{" "}/ {totalScenariosCount}</span>
+            </div>
+            <div className="cmc-mini-progress-track">
+              <div
+                className="cmc-mini-progress-fill"
+                style={{ width: `${(completedCount / totalScenariosCount) * 100}%` }}
+              />
+            </div>
+            <span className="cmc-stat-sub">
+              {totalScenariosCount - completedCount === 0
+                ? "All scenarios evaluated"
+                : `${totalScenariosCount - completedCount} challenges remaining`}
             </span>
           </div>
         </div>
 
-        {/* Clean Animated Progress Bar */}
-        <div
-          className="cmc-master-progress-track"
-          role="progressbar"
-          aria-valuenow={completedCount}
-          aria-valuemin={0}
-          aria-valuemax={totalScenariosCount}
-          aria-label="Overall research scenario completion"
-        >
-          <div
-            className="cmc-master-progress-fill"
-            style={{ width: `${(completedCount / totalScenariosCount) * 100}%` }}
-          />
-        </div>
-
-        {/* Telemetry info chips */}
-        <div className="cmc-telemetry-chips-row">
-          <div className="telemetry-chip">
-            <Lock size={13} className="text-muted" aria-hidden="true" />
-            <span className="chip-label">ANONYMOUS ID:</span>
-            <strong className="chip-val font-mono">{session.code}</strong>
+        <div className="cmc-stat-card">
+          <div className="cmc-stat-header">
+            <span className="cmc-stat-label">OVERALL RESEARCH STATUS</span>
+            <Play size={18} className="cmc-stat-icon text-purple" aria-hidden="true" />
           </div>
-          <div className="telemetry-chip">
-            <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
-            <span className="chip-label">DATA RECORDING:</span>
-            <strong className="chip-val">
-              {session.mode === "practice" ? "Practice Sandbox" : "Standardized Empirical Capture"}
-            </strong>
-          </div>
-          <div className="telemetry-chip">
-            <FileCheck2 size={13} className="text-cyan" aria-hidden="true" />
-            <span className="chip-label">CREDENTIAL SECURITY:</span>
-            <strong className="chip-val">Simulated Safe Environment</strong>
+          <div className="cmc-stat-body">
+            <div className="cmc-status-badge-wrap">
+              {completedCount >= totalScenariosCount ? (
+                <span className="cmc-status-badge complete">
+                  <CheckCircle2 size={14} aria-hidden="true" /> All Missions Complete
+                </span>
+              ) : (
+                <span className="cmc-status-badge active">
+                  <Play size={12} aria-hidden="true" /> Investigation Active
+                </span>
+              )}
+            </div>
+            <span className="cmc-stat-sub">
+              {completedCount >= totalScenariosCount
+                ? "Step 04 unlocked — certificate ready"
+                : `${completedCount} of ${totalScenariosCount} completed`}
+            </span>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Completion Banner if all 20 challenges finished */}
       {completedCount >= totalScenariosCount && (
         <div className="mission-complete-banner" role="status">
           <div className="banner-content">
             <div className="banner-icon-box">
-              <CheckCircle2 size={36} className="text-emerald" aria-hidden="true" />
+              <Trophy size={36} className="text-amber" aria-hidden="true" />
             </div>
             <div>
-              <h3>All 20 Cyber Investigation Scenarios Complete!</h3>
+              <h3>All 20 Cyber Research Challenges Complete!</h3>
               <p>
-                You have evaluated all four social engineering threat categories. Proceed to Step 04 to view your participation summary, completion certificate, and empirical debrief.
+                You have evaluated all four social engineering threat categories. View your research completion certificate, empirical debrief, and findings.
               </p>
             </div>
           </div>
           <Link href="/results" className="button primary large banner-cta-btn">
-            <span>Proceed to Step 04 — Completion</span>
+            <span>View Research Certificate</span>
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>
@@ -506,10 +686,10 @@ export function CyberMissionControl() {
                   >
                     <span>
                       {isMissionComplete
-                        ? "Review Scenarios"
+                        ? "Review Mission"
                         : completedInMission > 0
-                        ? "Continue Investigation"
-                        : "Start Investigation"}
+                        ? "Continue Mission"
+                        : "Start Mission"}
                     </span>
                     <ArrowRight size={15} aria-hidden="true" />
                   </button>

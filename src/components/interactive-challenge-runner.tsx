@@ -21,11 +21,9 @@ import {
   Clock,
   Eye,
   Search,
-  Maximize2,
   FileText,
   Smartphone,
   QrCode,
-  Download,
   ExternalLink,
   ChevronDown,
   ChevronRight,
@@ -34,11 +32,9 @@ import {
   Play,
   Pause,
   Volume2,
-  VolumeX,
   Phone,
-  PhoneOff,
+  PhoneCall,
   Video,
-  VideoOff,
   CreditCard,
   Building,
   GraduationCap,
@@ -46,10 +42,15 @@ import {
   RefreshCw,
   Award,
   Check,
+  Loader2,
+  MessageSquare,
+  Calendar,
+  DollarSign,
+  MapPin,
+  Send,
 } from "lucide-react";
 import { api, useSession } from "@/lib/client";
 import { missions } from "@/content/missions";
-import { scoreDecision } from "@/lib/scoring";
 import type { Scenario, Attempt, ScenarioChoice, AnswerKey } from "@/lib/types";
 
 interface InteractiveChallengeRunnerProps {
@@ -57,6 +58,9 @@ interface InteractiveChallengeRunnerProps {
   missionId: string;
   scenarioIndex: number; // 0..4
   totalInMission: number; // 5
+  overallCompleted?: number; // 0..20
+  totalOverall?: number; // 20
+  overallXp?: number; // 0..200
   onCompleteScenario: (attempt: Attempt) => void;
   onNextScenario?: () => void;
   onReturnToHub: () => void;
@@ -69,6 +73,9 @@ export function InteractiveChallengeRunner({
   missionId,
   scenarioIndex,
   totalInMission,
+  overallCompleted = 0,
+  totalOverall = 20,
+  overallXp = 0,
   onCompleteScenario,
   onNextScenario,
   onReturnToHub,
@@ -77,11 +84,13 @@ export function InteractiveChallengeRunner({
 }: InteractiveChallengeRunnerProps) {
   const state = useSession();
   const startTimeRef = useRef<number>(0);
+  const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Interactive UI State
+  // Investigation Tool State
   const [activeEvidenceTab, setActiveEvidenceTab] = useState<number>(0);
   const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
   const [qrScanned, setQrScanned] = useState<boolean>(false);
+  const [qrLaserActive, setQrLaserActive] = useState<boolean>(false);
   const [attachmentInspected, setAttachmentInspected] = useState<boolean>(false);
   const [directorySearchQuery, setDirectorySearchQuery] = useState<string>("");
   const [directorySearchResults, setDirectorySearchResults] = useState<Array<{ name: string; title: string; dept: string; email: string }> | null>(null);
@@ -92,30 +101,74 @@ export function InteractiveChallengeRunner({
   const [activeChatBranch, setActiveChatBranch] = useState<string | null>(null);
   const [linkHovered, setLinkHovered] = useState<boolean>(false);
 
-  // Decision State
+  // IM02 Dedicated WhatsApp / Classmate Simulation State
+  const [classmateProfileOpen, setClassmateProfileOpen] = useState<boolean>(false);
+  const [classmateCallActive, setClassmateCallActive] = useState<boolean>(false);
+  const [classmateCallPhase, setClassmateCallPhase] = useState<"ringing" | "connected" | "ended">("ringing");
+  const [im02ChatLog, setIm02ChatLog] = useState<Array<{ sender: "user" | "dilshan"; text: string; time: string }>>([]);
+  const [im02Typing, setIm02Typing] = useState<boolean>(false);
+
+  // E-Commerce, Accommodation, & Other Mini-Game Tools
+  const [sc01Tab, setSc01Tab] = useState<"whois" | "reviews" | "checkout">("whois");
+  const [sc02Tab, setSc02Tab] = useState<"photos" | "chat" | "reverseImage">("photos");
+  const [libraryFineTab, setLibraryFineTab] = useState<"notice" | "account" | "policy">("notice");
+  const [censusTab, setCensusTab] = useState<"form" | "calendar" | "policy">("form");
+  const [twoFaSmsOpen, setTwoFaSmsOpen] = useState<boolean>(true);
+
+  // Decision & Automatic Transition State
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(
     previousAttempt?.selectedAction ?? null,
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [hasConfirmedSaved, setHasConfirmedSaved] = useState<boolean>(Boolean(previousAttempt));
   const [recordedAttempt, setRecordedAttempt] = useState<Attempt | null>(
     previousAttempt ?? null,
   );
   const [feedback, setFeedback] = useState<AnswerKey | null>(null);
   const [error, setError] = useState<string>("");
 
+  // Reset state when scenario changes
   useEffect(() => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
     startTimeRef.current = Date.now();
     setSelectedChoiceId(previousAttempt?.selectedAction ?? null);
     setRecordedAttempt(previousAttempt ?? null);
+    setHasConfirmedSaved(Boolean(previousAttempt));
     setFeedback(null);
     setError("");
     setHeadersExpanded(false);
     setQrScanned(false);
+    setQrLaserActive(false);
     setAttachmentInspected(false);
     setVideoPlaying(false);
     setAudioPlaying(false);
     setActiveEvidenceTab(0);
+    setActiveChatBranch(null);
+    setClassmateProfileOpen(false);
+    setClassmateCallActive(false);
+    setClassmateCallPhase("ringing");
+    setIm02ChatLog([]);
+    setIm02Typing(false);
+    setDirectorySearchQuery("");
+    setDirectorySearchResults(null);
+    setSc01Tab("whois");
+    setSc02Tab("photos");
+    setLibraryFineTab("notice");
+    setCensusTab("form");
+    setTwoFaSmsOpen(true);
   }, [scenario.id, previousAttempt]);
+
+  // Clean up auto-advance timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+      }
+    };
+  }, []);
 
   const currentMission = missions.find((m) => m.id === missionId) ?? missions[0];
 
@@ -141,12 +194,44 @@ export function InteractiveChallengeRunner({
     setDirectorySearchResults(filtered);
   };
 
-  // Submit Decision
-  const handleConfirmDecision = async () => {
-    if (!selectedChoiceId || isSubmitting || !state.session) return;
+  // QR scanner animation helper
+  const handleScanQr = () => {
+    setQrLaserActive(true);
+    setTimeout(() => {
+      setQrLaserActive(false);
+      setQrScanned(true);
+    }, 600);
+  };
 
+  // IM02 Inquiry helper
+  const handleIm02Inquiry = (questionText: string, replyText: string) => {
+    if (im02Typing) return;
+    setIm02ChatLog((prev) => [...prev, { sender: "user", text: questionText, time: "Just now" }]);
+    setIm02Typing(true);
+    setTimeout(() => {
+      setIm02Typing(false);
+      setIm02ChatLog((prev) => [...prev, { sender: "dilshan", text: replyText, time: "Just now" }]);
+    }, 700);
+  };
+
+  // IM02 Simulated Phone Call
+  const handleStartClassmateCall = () => {
+    setClassmateCallActive(true);
+    setClassmateCallPhase("ringing");
+    setTimeout(() => {
+      setClassmateCallPhase("connected");
+    }, 1200);
+  };
+
+  // One-Click Submission & Automatic Next Challenge
+  const handleSelectChoice = async (choiceId: string) => {
+    // If already submitting or already recorded in this session, prevent duplicate clicks
+    if (isSubmitting || hasConfirmedSaved || recordedAttempt || !state.session) return;
+
+    setSelectedChoiceId(choiceId);
     setIsSubmitting(true);
     setError("");
+
     const elapsedMs = Math.min(
       86400000,
       Math.max(1000, Date.now() - (startTimeRef.current || Date.now())),
@@ -158,17 +243,25 @@ export function InteractiveChallengeRunner({
         "game/attempt",
         {
           scenarioId: scenario.id,
-          action: selectedChoiceId,
+          action: choiceId,
           elapsedMs,
           idempotencyKey,
         },
       );
 
       setRecordedAttempt(res.attempt);
+      setHasConfirmedSaved(true);
       if (educationalMode && res.feedback) {
         setFeedback(res.feedback);
       }
       onCompleteScenario(res.attempt);
+
+      // Desired transition:
+      // SELECT ACTION -> SAVING DECISION -> RESPONSE SAVED -> AUTOMATICALLY OPEN NEXT CHALLENGE
+      // Smooth transition lasting ~0.8 second after confirmed saving
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        onNextScenario?.();
+      }, 800);
     } catch (e) {
       setError((e as Error).message || "Failed to record response. Please retry.");
     } finally {
@@ -176,82 +269,124 @@ export function InteractiveChallengeRunner({
     }
   };
 
-  const hasDecided = Boolean(recordedAttempt);
+  // Retry action for failed saves: resubmits the exact same decision
+  const handleRetryDecision = async () => {
+    if (!selectedChoiceId) return;
+    await handleSelectChoice(selectedChoiceId);
+  };
+
+  const hasDecided = Boolean(recordedAttempt) || hasConfirmedSaved;
 
   return (
-    <div className="interactive-challenge-runner">
-      {/* Top Navigation & Status Bar */}
-      <div className="challenge-top-bar">
+    <div className="interactive-challenge-runner" role="region" aria-label={`Cyber Investigation Challenge ${scenario.id}`}>
+      {/* =========================================================================
+          AREA A — MISSION HEADER
+          ========================================================================= */}
+      <header className="challenge-top-bar" aria-label="Investigation Mission Header">
         <div className="challenge-breadcrumbs">
           <button
             type="button"
             className="back-to-hub-btn"
             onClick={onReturnToHub}
-            aria-label="Return to Cyber Mission Control Hub"
+            aria-label="Back to Mission Control Hub"
           >
             <ArrowLeft size={16} aria-hidden="true" />
-            <span>Mission Control</span>
+            <span>Back to Mission Control</span>
           </button>
-          <span className="crumb-separator">/</span>
-          <span className="crumb-mission">{currentMission.name}</span>
-          <span className="crumb-separator">/</span>
-          <span className="crumb-scenario">Challenge {scenarioIndex + 1} of {totalInMission} ({scenario.id})</span>
+          <span className="crumb-separator" aria-hidden="true">/</span>
+          <span className="crumb-threat-cat">{currentMission.name.toUpperCase()} · {currentMission.iv}</span>
+          <span className="crumb-separator" aria-hidden="true">/</span>
+          <span className="crumb-challenge-num">Challenge {scenarioIndex + 1} of {totalInMission}</span>
         </div>
 
-        <div className="challenge-badge-cluster">
-          <div className="runner-progress-inline">
-            <span className="runner-progress-text">Scenario {scenarioIndex + 1} of {totalInMission}</span>
-            <div className="runner-progress-track" role="progressbar" aria-valuenow={scenarioIndex + 1} aria-valuemin={1} aria-valuemax={totalInMission}>
+        <div className="challenge-header-right">
+          {/* Overall Research Progress & XP */}
+          <div className="runner-overall-telemetry">
+            <div className="runner-overall-labels">
+              <span className="runner-overall-title">Overall Progress:</span>
+              <strong className="runner-overall-count">{overallCompleted} / {totalOverall}</strong>
+              <span className="runner-overall-xp">({overallXp} XP)</span>
+            </div>
+            <div
+              className="runner-overall-track"
+              role="progressbar"
+              aria-valuenow={overallCompleted}
+              aria-valuemin={0}
+              aria-valuemax={totalOverall}
+              aria-label="Overall research progress"
+            >
               <div
-                className="runner-progress-fill"
-                style={{ width: `${((scenarioIndex + (hasDecided ? 1 : 0.5)) / totalInMission) * 100}%` }}
+                className="runner-overall-fill"
+                style={{ width: `${Math.max(4, (overallCompleted / Math.max(1, totalOverall)) * 100)}%` }}
               />
             </div>
           </div>
-          <span className="challenge-code-pill">{scenario.id}</span>
-          <span className="challenge-threat-pill">
-            <ShieldAlert size={14} aria-hidden="true" />
-            <span>{currentMission.topic}</span>
-          </span>
-          {educationalMode && (
-            <span className="educational-mode-pill">
-              <Award size={14} aria-hidden="true" />
-              <span>Educational Review</span>
-            </span>
-          )}
-        </div>
-      </div>
 
-      {error && (
-        <div className="error-banner" role="alert">
-          <AlertCircle size={18} aria-hidden="true" />
-          <span>{error}</span>
+          {/* Subtle Metadata Pill */}
+          <span className="challenge-id-subtle" title={`Scenario Code: ${scenario.id}`}>
+            {scenario.id}
+          </span>
+        </div>
+      </header>
+
+      {/* Saving and Error Banners */}
+      {isSubmitting && (
+        <div className="subtle-saving-banner" role="status" aria-live="polite">
+          <Loader2 size={16} className="animate-spin text-cyan" aria-hidden="true" />
+          <span>Saving decision securely to research session…</span>
         </div>
       )}
 
-      {/* Main Investigation Split Container */}
+      {hasConfirmedSaved && !isSubmitting && (
+        <div className="subtle-saved-banner" role="status" aria-live="polite">
+          <CheckCircle2 size={16} className="text-emerald" aria-hidden="true" />
+          <span>Response saved · Automatically opening next challenge…</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="error-banner" role="alert">
+          <div className="error-banner-content">
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            className="button secondary small retry-save-btn"
+            onClick={handleRetryDecision}
+            disabled={isSubmitting}
+          >
+            <RefreshCw size={14} className={isSubmitting ? "animate-spin" : ""} aria-hidden="true" />
+            <span>Retry Recording Decision</span>
+          </button>
+        </div>
+      )}
+
+      {/* Main Responsive Investigation Grid */}
       <div className="challenge-main-grid">
-        {/* Left Column: Briefing & Authentic Simulation Environment */}
+        {/* =========================================================================
+            AREA B — INTERACTIVE INVESTIGATION WORKSPACE (LEFT COLUMN)
+            ========================================================================= */}
         <div className="challenge-simulation-col">
           {/* Mission Briefing Card */}
           <div className="briefing-box">
             <div className="briefing-header">
-              <span className="briefing-label">MISSION BRIEFING</span>
+              <span className="briefing-label">MISSION BRIEFING · CHALLENGE {scenarioIndex + 1} OF {totalInMission}</span>
               <h2>{scenario.title}</h2>
             </div>
             <p className="briefing-situation">{scenario.situation}</p>
           </div>
 
           {/* SIMULATION CONTAINER BY INTERACTION TYPE */}
-          <div className="simulation-viewport" aria-label="Interactive Cybersecurity Simulation Environment">
-            {/* 1. EMAIL INBOX INTERFACE (PH01, PH04, IM03) */}
+          <div className="simulation-viewport" aria-label="Interactive Cyber Simulation Workspace">
+            {/* 1. EMAIL INBOX INTERFACE (PH01, PH04) */}
             {(scenario.interaction === "email" || scenario.interaction === "attachment") && (
               <div className="sim-email-client">
                 <div className="email-client-header">
                   <div className="email-controls">
-                    <span className="window-dot red" />
-                    <span className="window-dot yellow" />
-                    <span className="window-dot green" />
+                    <span className="window-dot red" aria-hidden="true" />
+                    <span className="window-dot yellow" aria-hidden="true" />
+                    <span className="window-dot green" aria-hidden="true" />
                     <span className="email-client-title">Campus Webmail Client · Student Inbox</span>
                   </div>
                   <button
@@ -261,7 +396,7 @@ export function InteractiveChallengeRunner({
                     aria-expanded={headersExpanded}
                   >
                     <Info size={14} aria-hidden="true" />
-                    <span>{headersExpanded ? "Hide Headers" : "Inspect RFC Headers"}</span>
+                    <span>{headersExpanded ? "Hide RFC Headers" : "Inspect RFC Headers"}</span>
                     <ChevronDown size={14} className={`transition-transform ${headersExpanded ? "rotate-180" : ""}`} />
                   </button>
                 </div>
@@ -275,7 +410,7 @@ export function InteractiveChallengeRunner({
                   </div>
                   <div className="meta-row">
                     <span className="meta-key">To:</span>
-                    <span className="meta-val">student-id@campus.example</span>
+                    <span className="meta-val">student-id@serendib.campus.example</span>
                   </div>
                   <div className="meta-row">
                     <span className="meta-key">Subject:</span>
@@ -284,20 +419,15 @@ export function InteractiveChallengeRunner({
 
                   {/* Expandable RFC Header Details */}
                   {headersExpanded && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="email-raw-headers"
-                    >
+                    <div className="email-raw-headers">
                       <pre>
                         {`Return-Path: <bounce@${scenario.senderAddress.split("@")[1] || "unknown.example"}>
-Authentication-Results: spf=softfail (sender IP not in authorized SPF record)
+Authentication-Results: spf=softfail (sender IP 198.51.100.42 not in authorized SPF record)
 DKIM-Signature: v=1; d=${scenario.senderAddress.split("@")[1] || "external.example"}; s=mail;
 X-Originating-IP: [198.51.100.42] (External Non-Campus Gateway)
 Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                       </pre>
-                    </motion.div>
+                    </div>
                   )}
                 </div>
 
@@ -305,7 +435,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                 <div className="email-body-content">
                   <p className="email-text">{scenario.message}</p>
 
-                  {/* Attachment Card if applicable */}
+                  {/* Attachment Card if applicable (PH04) */}
                   {scenario.mediaDetails?.attachmentName && (
                     <div className="email-attachment-box">
                       <div className="attachment-icon">
@@ -319,18 +449,18 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                         type="button"
                         className="button secondary small"
                         onClick={() => setAttachmentInspected(true)}
-                        aria-label="Inspect attachment properties safely"
+                        aria-label="Inspect attachment properties in safe sandbox"
                       >
                         <Search size={14} aria-hidden="true" />
-                        <span>Inspect Properties</span>
+                        <span>Inspect in Safe Sandbox</span>
                       </button>
                     </div>
                   )}
 
-                  {/* Simulated Embedded Link if applicable */}
+                  {/* Simulated Embedded Link if applicable (PH01) */}
                   {scenario.mediaDetails?.destinationUrl && (
                     <div className="email-embedded-link-wrapper">
-                      <span className="link-action-label">Action required:</span>
+                      <span className="link-action-label">Action required in email:</span>
                       <a
                         href="#preview"
                         className="simulated-link-button"
@@ -363,13 +493,13 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
             {scenario.interaction === "sms" && (
               <div className="sim-smartphone-frame">
                 <div className="phone-notch">
-                  <span className="phone-speaker" />
-                  <span className="phone-cam" />
+                  <span className="phone-speaker" aria-hidden="true" />
+                  <span className="phone-cam" aria-hidden="true" />
                 </div>
                 <div className="phone-status-bar">
                   <span>9:41 AM</span>
                   <div className="phone-status-icons">
-                    <span>4G · Mobitel</span>
+                    <span>Mobitel 4G</span>
                     <span>100%</span>
                   </div>
                 </div>
@@ -384,7 +514,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                 </div>
 
                 <div className="phone-message-thread">
-                  <div className="sms-timestamp">Today · SMS Message</div>
+                  <div className="sms-timestamp">Today · SMS Notification</div>
                   <div className="sms-bubble incoming">
                     <p>{scenario.message}</p>
                     {scenario.mediaDetails?.destinationUrl && (
@@ -395,6 +525,19 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                     )}
                     <span className="sms-time">9:41 AM · Delivered</span>
                   </div>
+
+                  {/* 2FA System Code Simulator for PT04 */}
+                  {scenario.id === "PT04" && twoFaSmsOpen && (
+                    <div className="sms-bubble system-auth-bubble">
+                      <div className="auth-alert-badge">
+                        <ShieldAlert size={14} aria-hidden="true" />
+                        <span>SYSTEM TWO-FACTOR AUTHENTICATION SMS</span>
+                      </div>
+                      <p className="auth-code-text">Campus SSO Security Code: <strong>849-204</strong></p>
+                      <p className="auth-warning-text">WARNING: NEVER share this code with anyone, including university staff. IT personnel will NEVER ask for your code.</p>
+                      <span className="sms-time">Just now · System Gateway</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -404,8 +547,8 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
               <div className="sim-qr-investigation">
                 <div className="qr-poster-preview">
                   <div className="poster-header">
-                    <span className="poster-pin" />
-                    <strong>Campus Cafeteria Noticeboard</strong>
+                    <span className="poster-pin" aria-hidden="true" />
+                    <strong>Campus Cafeteria Noticeboard Poster</strong>
                   </div>
                   <div className="poster-content">
                     <div className="poster-badge">TECH SYMPOSIUM 2026</div>
@@ -413,35 +556,32 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                     <p>Scan with smartphone to register instantly!</p>
 
                     <div className="qr-code-interactive-target">
-                      <div className="qr-box">
+                      <div className="qr-box relative">
                         <QrCode size={110} aria-hidden="true" />
+                        {qrLaserActive && <div className="qr-laser-scanner-line" aria-hidden="true" />}
                       </div>
                       <button
                         type="button"
                         className="button secondary small"
-                        onClick={() => setQrScanned(true)}
+                        onClick={handleScanQr}
                         aria-label="Scan QR Code with Safe Decoder"
                       >
                         <Search size={14} aria-hidden="true" />
-                        <span>{qrScanned ? "Re-scan QR Code" : "Scan with Safe Decoder"}</span>
+                        <span>{qrScanned ? "Re-scan with Safe Decoder" : "Scan with Safe Decoder"}</span>
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {qrScanned && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="qr-decoded-panel"
-                  >
+                  <div className="qr-decoded-panel">
                     <div className="decoded-header">
                       <CheckCircle2 size={16} className="text-emerald" aria-hidden="true" />
-                      <strong>Decoded QR Target Analysis</strong>
+                      <strong>Decoded Safe Target Analysis</strong>
                     </div>
                     <div className="decoded-detail">
                       <span className="decoded-label">Decoded Destination URL:</span>
-                      <code>{scenario.mediaDetails?.destinationUrl}</code>
+                      <code>{scenario.mediaDetails?.destinationUrl ?? "https://event-ticket-claim.example/student-voucher?ref=campus"}</code>
                     </div>
                     <div className="decoded-meta-grid">
                       <div>
@@ -453,7 +593,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                         <strong>{scenario.mediaDetails?.legitDomain ?? "soc.campus.example"}</strong>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </div>
             )}
@@ -491,14 +631,14 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                       scenario.interaction === "payment_gateway" ? (
                         <>
                           <span className="ssl-badge unencrypted">
-                            <AlertCircle size={13} aria-hidden="true" /> Not Secure (HTTP)
+                            <AlertCircle size={13} aria-hidden="true" /> Not Secure (HTTP Plaintext)
                           </span>
                           <span className="address-url">http://pay-secure.campus-billing.example/checkout</span>
                         </>
                       ) : (
                         <>
                           <span className="ssl-badge generic">
-                            <Lock size={13} aria-hidden="true" /> Valid SSL
+                            <Lock size={13} aria-hidden="true" /> Valid SSL (Generic DV)
                           </span>
                           <span className="address-url">https://portal-campus.account-auth.example/exam-login</span>
                         </>
@@ -506,7 +646,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                     ) : (
                       <>
                         <span className="ssl-badge official">
-                          <ShieldCheck size={13} aria-hidden="true" /> Verified Campus Org
+                          <ShieldCheck size={13} aria-hidden="true" /> Verified Campus Org EV
                         </span>
                         <span className="address-url">https://portal.campus.example/exams/schedule</span>
                       </>
@@ -517,23 +657,42 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                 <div className="browser-viewport-content">
                   {activeBrowserTab === "replica" ? (
                     <div className="replica-portal-form">
-                      <div className="form-watermark">Simulated Exam Portal Login</div>
+                      <div className="form-watermark">
+                        {scenario.interaction === "payment_gateway" ? "Simulated Examination Fee Gateway" : "Simulated Exam Portal Login"}
+                      </div>
                       <h3>{scenario.title}</h3>
                       <p>{scenario.message}</p>
                       <div className="simulated-input-fields">
-                        <div className="sim-input">
-                          <label>University Student ID</label>
-                          <input type="text" placeholder="e.g. SE/2023/048" disabled readOnly />
-                        </div>
-                        <div className="sim-input">
-                          <label>Portal Password</label>
-                          <input type="password" value="••••••••••••" disabled readOnly />
-                        </div>
-                        {scenario.interaction !== "payment_gateway" && (
-                          <div className="sim-input warning-field">
-                            <label>National Identity Card (NIC) Number *Extra field</label>
-                            <input type="text" placeholder="200201234567" disabled readOnly />
-                          </div>
+                        {scenario.interaction === "payment_gateway" ? (
+                          <>
+                            <div className="sim-input">
+                              <label>Cardholder Name</label>
+                              <input type="text" placeholder="e.g. K. Perera" disabled readOnly />
+                            </div>
+                            <div className="sim-input">
+                              <label>Card Number (16 Digits)</label>
+                              <input type="text" placeholder="4111 •••• •••• 1234" disabled readOnly />
+                            </div>
+                            <div className="sim-input warning-field">
+                              <label>ATM Card PIN / Banking Password *High Risk Plaintext</label>
+                              <input type="password" value="••••" disabled readOnly />
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="sim-input">
+                              <label>University Student ID</label>
+                              <input type="text" placeholder="e.g. SE/2023/048" disabled readOnly />
+                            </div>
+                            <div className="sim-input">
+                              <label>Portal Password</label>
+                              <input type="password" value="••••••••••••" disabled readOnly />
+                            </div>
+                            <div className="sim-input warning-field">
+                              <label>National Identity Card (NIC) Number *Extra field not on real SSO</label>
+                              <input type="text" placeholder="200201234567" disabled readOnly />
+                            </div>
+                          </>
                         )}
                       </div>
                     </div>
@@ -546,31 +705,211 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                           <small>Central Student Single Sign-On Gateway</small>
                         </div>
                       </div>
-                      <p>Authentic bookmarked portal displays official notifications with standard student credentials only.</p>
+                      <p>The authentic bookmarked portal uses EV SSL encryption and standard student credentials only. Fines and administrative fees are never routed through unencrypted HTTP endpoints.</p>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* 5. LIVE BRANCHING CHAT (PT01, PT02, PT04, IM02) */}
-            {(scenario.interaction === "chat" || scenario.interaction === "tech_support" || scenario.interaction === "compromised_chat") && (
+            {/* 5. DEDICATED CLASSMATE CHAT SIMULATION (IM02) */}
+            {scenario.interaction === "compromised_chat" && (
+              <div className="sim-classmate-chat-app" role="region" aria-label="Simulated Classmate Chat Interface">
+                {/* WhatsApp / Messenger Style Header */}
+                <div className="classmate-chat-top-header">
+                  <div className="classmate-user-cluster">
+                    <div className="classmate-avatar-tile">
+                      <span>DP</span>
+                      <span className="classmate-online-dot" aria-label="Online" />
+                    </div>
+                    <div className="classmate-meta-col">
+                      <div className="classmate-name-row">
+                        <strong>Dilshan (Classmate)</strong>
+                        <span className="classmate-relation-tag">Batchmate</span>
+                      </div>
+                      <small className="classmate-online-text">Online · +94 71 234 5678</small>
+                    </div>
+                  </div>
+
+                  <div className="classmate-header-actions">
+                    <button
+                      type="button"
+                      className="button secondary small call-action-btn"
+                      onClick={handleStartClassmateCall}
+                      aria-label="Call Dilshan on his regular mobile phone"
+                    >
+                      <PhoneCall size={14} aria-hidden="true" />
+                      <span>Call Known Mobile</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="button ghost small profile-drawer-btn"
+                      onClick={() => setClassmateProfileOpen(!classmateProfileOpen)}
+                      aria-label="View Classmate Contact Info"
+                    >
+                      <Info size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Simulated Phone Call Overlay for IM02 */}
+                {classmateCallActive && (
+                  <div className="simulated-call-overlay">
+                    <div className="call-overlay-card">
+                      <div className="call-pulse-avatar">
+                        <PhoneCall size={28} className="text-cyan animate-pulse" aria-hidden="true" />
+                      </div>
+                      <h4>Out-of-Band Call to Dilshan (+94 71 234 5678)</h4>
+                      {classmateCallPhase === "ringing" ? (
+                        <p className="call-status-ringing">Ringing Dilshan&apos;s personal mobile phone…</p>
+                      ) : (
+                        <div className="call-connected-transcript">
+                          <span className="transcript-speaker">Dilshan (Voice Answer):</span>
+                          <p>&ldquo;Hello? Bro! Good thing you called! My chat account got hijacked an hour ago! Someone is messaging my whole contact list asking for LMS passwords and emergency money! Do NOT send anything!&rdquo;</p>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        className="button secondary small end-call-btn"
+                        onClick={() => setClassmateCallActive(false)}
+                      >
+                        <span>Hang Up Call</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Classmate Contact Drawer Modal */}
+                {classmateProfileOpen && (
+                  <div className="classmate-drawer-panel">
+                    <div className="drawer-header">
+                      <strong>Contact Info: Dilshan Perera</strong>
+                      <button
+                        type="button"
+                        className="drawer-close"
+                        onClick={() => setClassmateProfileOpen(false)}
+                        aria-label="Close contact info"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="drawer-body">
+                      <div><span>Student ID:</span> <strong>CS/2023/048</strong></div>
+                      <div><span>Registered Mobile:</span> <strong>+94 71 234 5678</strong></div>
+                      <div><span>Faculty:</span> <strong>Computing &amp; Cyber Systems</strong></div>
+                      <div><span>Status:</span> <em>&ldquo;Studying for Computer Architecture lab final&rdquo;</em></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Chat History Log */}
+                <div className="classmate-chat-scroll-viewport">
+                  {/* Earlier Authentic Conversation */}
+                  <div className="chat-date-separator">Yesterday</div>
+                  <div className="chat-msg incoming">
+                    <p>Machan, did you finish the Computer Architecture lab sheet?</p>
+                    <span className="msg-time">4:12 PM</span>
+                  </div>
+                  <div className="chat-msg outgoing">
+                    <p>Yeah sent you the notes yesterday afternoon. Did you get them?</p>
+                    <span className="msg-time">4:15 PM</span>
+                  </div>
+                  <div className="chat-msg incoming">
+                    <p>Got them bro thanks! Almost done with my lab conclusion.</p>
+                    <span className="msg-time">4:18 PM</span>
+                  </div>
+
+                  {/* Today's Urgent Request */}
+                  <div className="chat-date-separator">Today · 10:14 PM</div>
+                  <div className="chat-msg incoming suspicious-urgent-bubble">
+                    <div className="urgent-badge-micro">
+                      <AlertTriangle size={12} aria-hidden="true" />
+                      <span>ABRUPT TONE CHANGE</span>
+                    </div>
+                    <p>{scenario.message}</p>
+                    <span className="msg-time">10:14 PM</span>
+                  </div>
+
+                  {/* Dynamic Conversation Inquiry Log */}
+                  {im02ChatLog.map((item, idx) => (
+                    <div key={idx} className={`chat-msg ${item.sender === "user" ? "outgoing" : "incoming"}`}>
+                      <p>{item.text}</p>
+                      <span className="msg-time">{item.time}</span>
+                    </div>
+                  ))}
+
+                  {im02Typing && (
+                    <div className="chat-msg incoming typing-bubble">
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Natural Dialogue Response Options for Classmates */}
+                <div className="classmate-quick-inquiries">
+                  <span className="inquiries-label">Inquire with natural classmate replies:</span>
+                  <div className="inquiries-buttons-wrap">
+                    <button
+                      type="button"
+                      className="inquiry-chip"
+                      onClick={() =>
+                        handleIm02Inquiry(
+                          "Wait, Dr. Perera extended the LMS deadline to next Monday, didn't you see the announcement?",
+                          "Oh really? But my group partner said it's tonight! Please machan just give me your login quickly so I don't risk missing it, only 15 minutes left!"
+                        )
+                      }
+                    >
+                      &ldquo;Wait, the lecturer extended the deadline to Monday, didn&apos;t you see?&rdquo;
+                    </button>
+                    <button
+                      type="button"
+                      className="inquiry-chip"
+                      onClick={() =>
+                        handleIm02Inquiry(
+                          "I can submit the PDF for you from my own portal if you email the file to me.",
+                          "My phone is totally wiped so I can't access my email either! I just need to log in directly. Please help me out, I'll log off right after!"
+                        )
+                      }
+                    >
+                      &ldquo;I can submit the PDF for you from my own portal if you email it to me.&rdquo;
+                    </button>
+                    <button
+                      type="button"
+                      className="inquiry-chip"
+                      onClick={() =>
+                        handleIm02Inquiry(
+                          "Why don't you use your backup SMS 2FA code or click 'Forgot Password' on the campus portal?",
+                          "SMS verification isn't working with my SIM right now. Just need your username and password quickly!"
+                        )
+                      }
+                    >
+                      &ldquo;Why don&apos;t you use your backup SMS 2FA or click Forgot Password?&rdquo;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 6. TECHNICAL SUPPORT CHAT (PT01) */}
+            {scenario.interaction === "tech_support" && (
               <div className="sim-live-chat">
                 <div className="chat-window-top">
                   <div className="chat-contact-info">
-                    <span className="contact-status-dot online" />
+                    <span className="contact-status-dot online" aria-hidden="true" />
                     <div>
                       <strong>{scenario.senderName}</strong>
                       <small>{scenario.senderAddress}</small>
                     </div>
                   </div>
-                  <span className="chat-network-tag">Campus Live Protocol</span>
+                  <span className="chat-network-tag">Campus IT Support Chat</span>
                 </div>
 
                 <div className="chat-message-log">
                   <div className="chat-bubble received">
                     <p>{scenario.message}</p>
-                    <span className="bubble-meta">Just now · System Urgent</span>
+                    <span className="bubble-meta">Just now · Priority Support</span>
                   </div>
 
                   {activeChatBranch && (
@@ -581,28 +920,27 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                   )}
                 </div>
 
-                {/* Pre-selectable chat inquiry branches */}
                 <div className="chat-branch-options">
-                  <span className="branch-label">Selectable investigation questions:</span>
+                  <span className="branch-label">Investigation inquiry responses:</span>
                   <div className="branch-buttons">
                     <button
                       type="button"
                       className="branch-chip"
-                      onClick={() => setActiveChatBranch("Can you verify your staff ID and ticket number from the IT directory?")}
+                      onClick={() => setActiveChatBranch("Campus policy states IT staff never request student passwords or authentication codes.")}
                     >
-                      &ldquo;Can you verify your staff ID and ticket reference?&rdquo;
+                      &ldquo;Campus policy states IT never requests student passwords.&rdquo;
                     </button>
                     <button
                       type="button"
                       className="branch-chip"
-                      onClick={() => setActiveChatBranch("Our campus policy says IT staff never ask students for passwords or codes.")}
+                      onClick={() => setActiveChatBranch("Can you verify your staff ID and ticket reference with the campus directory?")}
                     >
-                      &ldquo;Campus policy states IT never requests passwords or codes.&rdquo;
+                      &ldquo;Can you verify your staff ID and official ticket reference?&rdquo;
                     </button>
                     <button
                       type="button"
                       className="branch-chip"
-                      onClick={() => setActiveChatBranch("I will check with the faculty IT center in person before doing this.")}
+                      onClick={() => setActiveChatBranch("I will walk over to the faculty IT center in person with my student ID.")}
                     >
                       &ldquo;I will visit the faculty IT center in person.&rdquo;
                     </button>
@@ -611,7 +949,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
               </div>
             )}
 
-            {/* 6. NOTIFICATION BANNER & ADMINISTRATIVE CENSUS (PT02, PT03, PT05) */}
+            {/* 7. NOTIFICATION & CENSUS PORTAL (PT02, PT03, PT05) */}
             {(scenario.interaction === "notification" || scenario.interaction === "admin_portal" || scenario.interaction === "emergency_story") && (
               <div className="sim-admin-portal">
                 <div className="admin-portal-header">
@@ -626,11 +964,95 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                   <div className="notice-stamp">OFFICIAL NOTICE</div>
                   <h3>{scenario.title}</h3>
                   <p>{scenario.message}</p>
+
+                  {/* PT02 Library Fine Tabs */}
+                  {scenario.id === "PT02" && (
+                    <div className="admin-sub-tabs">
+                      <div className="sub-tab-nav">
+                        <button
+                          type="button"
+                          className={`sub-tab-btn ${libraryFineTab === "notice" ? "active" : ""}`}
+                          onClick={() => setLibraryFineTab("notice")}
+                        >
+                          Payment Instructions
+                        </button>
+                        <button
+                          type="button"
+                          className={`sub-tab-btn ${libraryFineTab === "account" ? "active" : ""}`}
+                          onClick={() => setLibraryFineTab("account")}
+                        >
+                          My Library Loans (0)
+                        </button>
+                        <button
+                          type="button"
+                          className={`sub-tab-btn ${libraryFineTab === "policy" ? "active" : ""}`}
+                          onClick={() => setLibraryFineTab("policy")}
+                        >
+                          Fee Policy
+                        </button>
+                      </div>
+                      <div className="sub-tab-content">
+                        {libraryFineTab === "notice" && (
+                          <div className="sim-payment-details-box">
+                            <span className="text-red font-semibold">Payment Destination in Claim:</span>
+                            <p>Direct Wire Transfer to Personal Bank Account (Bank of Ceylon · Account # 8492019401)</p>
+                            <small className="text-muted">Notice: University never requests wire transfers to private personal accounts.</small>
+                          </div>
+                        )}
+                        {libraryFineTab === "account" && (
+                          <div className="sim-account-records">
+                            <p><strong>Active Loans:</strong> 0 Books Overdue</p>
+                            <p><strong>Outstanding Balance:</strong> LKR 0.00 (Good Standing)</p>
+                          </div>
+                        )}
+                        {libraryFineTab === "policy" && (
+                          <p className="text-xs text-muted">Official University Library Policy: All library fines must be settled in person at the Faculty Cashier or via the official student banking portal.</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PT03 Census Tabs */}
+                  {scenario.id === "PT03" && (
+                    <div className="admin-sub-tabs">
+                      <div className="sub-tab-nav">
+                        <button
+                          type="button"
+                          className={`sub-tab-btn ${censusTab === "form" ? "active" : ""}`}
+                          onClick={() => setCensusTab("form")}
+                        >
+                          Examine Data Requested
+                        </button>
+                        <button
+                          type="button"
+                          className={`sub-tab-btn ${censusTab === "calendar" ? "active" : ""}`}
+                          onClick={() => setCensusTab("calendar")}
+                        >
+                          Academic Calendar
+                        </button>
+                      </div>
+                      <div className="sub-tab-content">
+                        {censusTab === "form" && (
+                          <div className="sim-input-audit">
+                            <span className="text-red font-semibold">Demanded Input Fields:</span>
+                            <ul>
+                              <li>• Mother&apos;s maiden name</li>
+                              <li>• Annual household family income</li>
+                              <li>• Student Single Sign-On password</li>
+                            </ul>
+                          </div>
+                        )}
+                        {censusTab === "calendar" && (
+                          <p className="text-xs text-muted">Official Academic Calendar: Undergraduate census re-registration is scheduled for December, not mid-semester.</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* 7. SOCIAL PROFILE COMPARISON (IM01, IM04) */}
+            {/* 8. SOCIAL PROFILE COMPARISON (IM01, IM04) */}
             {(scenario.interaction === "profile_compare" || scenario.interaction === "society_profile") && (
               <div className="sim-profile-compare">
                 <div className="compare-tabs-row" role="tablist">
@@ -690,18 +1112,18 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
               </div>
             )}
 
-            {/* 8. CAMPUS STAFF DIRECTORY LOOKUP (IM03, IM05) */}
+            {/* 9. CAMPUS STAFF DIRECTORY LOOKUP (IM03, IM05) */}
             {(scenario.interaction === "staff_directory" || scenario.interaction === "vendor_verify") && (
               <div className="sim-staff-directory">
                 <div className="directory-header">
                   <UserRoundSearch size={20} className="text-primary" aria-hidden="true" />
-                  <strong>In-Simulation Campus Staff &amp; Partner Directory</strong>
+                  <strong>Campus Staff &amp; Faculty Directory Search</strong>
                 </div>
                 <div className="directory-search-bar">
                   <Search size={16} aria-hidden="true" />
                   <input
                     type="text"
-                    placeholder="Search staff name or department (e.g. Fernando, Proctor, IT)..."
+                    placeholder="Search staff name or department (e.g. Bandara, Proctor, Fernando)..."
                     value={directorySearchQuery}
                     onChange={(e) => handleDirectorySearch(e.target.value)}
                     aria-label="Search campus directory"
@@ -729,18 +1151,20 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                   ) : (
                     <div className="directory-hint">
                       <Info size={14} aria-hidden="true" />
-                      <span>Type a staff member&apos;s name above to check if their claimed identity and role exist in the official directory.</span>
+                      <span>Search for staff members to verify if their claimed role and email address exist in the official directory.</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* 9. E-COMMERCE & ACCOMMODATION LISTINGS (SC01, SC02, SC05) */}
+            {/* 10. E-COMMERCE & ACCOMMODATION LISTINGS (SC01, SC02, SC05) */}
             {(scenario.interaction === "ecommerce" || scenario.interaction === "accommodation" || scenario.interaction === "internship_fee") && (
               <div className="sim-ecommerce-view">
                 <div className="shop-header">
-                  <span className="shop-badge">SPECIAL STUDENT CLEARANCE</span>
+                  <span className="shop-badge">
+                    {scenario.interaction === "accommodation" ? "CAMPUS HOUSING LISTING" : scenario.interaction === "internship_fee" ? "INTERNSHIP RECRUITMENT" : "SPECIAL STUDENT CLEARANCE"}
+                  </span>
                   <h3>{scenario.title}</h3>
                 </div>
                 <div className="shop-offer-row">
@@ -754,10 +1178,40 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                   </div>
                 </div>
                 <p className="shop-description">{scenario.message}</p>
+
+                {/* SC01 Extra Tools */}
+                {scenario.id === "SC01" && (
+                  <div className="admin-sub-tabs">
+                    <div className="sub-tab-nav">
+                      <button
+                        type="button"
+                        className={`sub-tab-btn ${sc01Tab === "whois" ? "active" : ""}`}
+                        onClick={() => setSc01Tab("whois")}
+                      >
+                        Domain WHOIS Check
+                      </button>
+                      <button
+                        type="button"
+                        className={`sub-tab-btn ${sc01Tab === "reviews" ? "active" : ""}`}
+                        onClick={() => setSc01Tab("reviews")}
+                      >
+                        Customer Reviews (4)
+                      </button>
+                    </div>
+                    <div className="sub-tab-content">
+                      {sc01Tab === "whois" && (
+                        <p className="text-xs font-mono">Domain registered: 2 days ago · Registrant: Privacy Redacted · Hosted on offshore VPS</p>
+                      )}
+                      {sc01Tab === "reviews" && (
+                        <p className="text-xs text-muted">All 4 reviews are 5-star ratings posted at the exact same minute with identical wording.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* 10. OAUTH AUTHORIZATION PROMPT (SC04) */}
+            {/* 11. OAUTH AUTHORIZATION PROMPT (SC04) */}
             {scenario.interaction === "event_link" && (
               <div className="sim-oauth-prompt">
                 <div className="oauth-window-header">
@@ -787,7 +1241,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
               </div>
             )}
 
-            {/* 11. DEEPFAKE VIDEO PLAYER (DF01) */}
+            {/* 12. PROPOSED IV5 DEEPFAKE INTERACTION (DF01 - DF05) */}
             {scenario.interaction === "deepfake_video" && (
               <div className="sim-video-player">
                 <div className="video-viewport">
@@ -797,7 +1251,7 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                       type="button"
                       className="play-btn-circle"
                       onClick={() => setVideoPlaying(!videoPlaying)}
-                      aria-label={videoPlaying ? "Pause simulated video" : "Play simulated video"}
+                      aria-label={videoPlaying ? "Pause video" : "Play video"}
                     >
                       {videoPlaying ? <Pause size={28} /> : <Play size={28} className="translate-x-0.5" />}
                     </button>
@@ -820,7 +1274,6 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
               </div>
             )}
 
-            {/* 12. AI VOICE MEMO & AUDIO (DF02, DF05) */}
             {(scenario.interaction === "voice_memo" || scenario.interaction === "ai_support_bot") && (
               <div className="sim-audio-player">
                 <div className="audio-memo-header">
@@ -860,49 +1313,9 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                 </div>
               </div>
             )}
-
-            {/* 13. SYNTHETIC VIDEO CALL (DF04) */}
-            {scenario.interaction === "video_call" && (
-              <div className="sim-video-call">
-                <div className="call-header">
-                  <Video size={18} className="text-emerald" aria-hidden="true" />
-                  <span>Fellowship Video Interview · Live Stream</span>
-                </div>
-                <div className="call-streams-container">
-                  <div className="remote-interviewer-stream">
-                    <div className="stream-badge">Recruiter: Dr. Robert Vance (AI Avatar)</div>
-                    <div className="stream-avatar-placeholder">
-                      <User size={60} aria-hidden="true" />
-                    </div>
-                    <p className="stream-subtitles">&ldquo;Please hold your National Identity Card up to the camera and read your number aloud.&rdquo;</p>
-                  </div>
-                  <div className="local-self-stream">
-                    <span>Your Camera (Preview)</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 14. SYNTHETIC NOTICE (DF03) */}
-            {scenario.interaction === "synthetic_notice" && (
-              <div className="sim-formal-circular">
-                <div className="circular-crest-row">
-                  <GraduationCap size={32} aria-hidden="true" />
-                  <div>
-                    <strong>UNIVERSITY SENATE ADMINISTRATIVE SECRETARIAT</strong>
-                    <small>Official Circular Gazette · Sri Lanka</small>
-                  </div>
-                </div>
-                <div className="circular-content-box">
-                  <span className="circular-ref">REF: SEN/CIR/2026/08</span>
-                  <h4>{scenario.title}</h4>
-                  <p>{scenario.message}</p>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Evidence Inspector Tabs */}
+          {/* Investigation Clues & Evidence Inspector */}
           <div className="evidence-inspector-box">
             <div className="evidence-header">
               <span className="evidence-label">INVESTIGATION CLUES &amp; EVIDENCE</span>
@@ -936,79 +1349,79 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
           </div>
         </div>
 
-        {/* Right Column: Meaningful Decision Point & Submission */}
+        {/* =========================================================================
+            AREA C — CHOOSE YOUR ACTION (RIGHT COLUMN)
+            ========================================================================= */}
         <aside className="challenge-decision-col">
           <div className="decision-panel-card">
             <div className="decision-header">
-              <span className="decision-badge">REQUIRED RESEARCH DECISION</span>
-              <h3>Choose Your Action</h3>
+              <span className="decision-badge">YOUR DECISION</span>
+              <h3>What would you do?</h3>
               <p className="decision-prompt">
-                Based on your investigation, what action would you take in this situation?
+                Select the action you would take. Your decision will be recorded automatically.
               </p>
             </div>
 
-            {/* Action Choices */}
-            <div className="decision-options-group" role="radiogroup" aria-label="Available participant decisions">
-              {scenario.choices.map((choice, choiceIdx) => {
+            {/* Interactive One-Click Decision Cards */}
+            <div className="decision-options-group" role="group" aria-label="Available participant decisions">
+              {scenario.choices.map((choice) => {
                 const isSelected = selectedChoiceId === choice.id;
-                const letter = ["A", "B", "C", "D"][choiceIdx] ?? `${choiceIdx + 1}`;
+                const isThisSubmitting = isSubmitting && isSelected;
                 return (
                   <button
                     key={choice.id}
                     type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    disabled={hasDecided}
-                    className={`decision-option-card ${isSelected ? "selected" : ""}`}
-                    onClick={() => setSelectedChoiceId(choice.id)}
+                    disabled={isSubmitting || hasDecided}
+                    className={`decision-option-card ${isSelected ? "selected" : ""} ${isThisSubmitting ? "submitting" : ""}`}
+                    onClick={() => handleSelectChoice(choice.id)}
+                    aria-label={choice.label}
                   >
-                    <span className="choice-letter-badge" aria-hidden="true">{letter}</span>
-                    <span className="decision-label-text">{choice.label}</span>
-                    <span className="decision-radio-circle" aria-hidden="true">
-                      {isSelected ? (
-                        <Check size={13} strokeWidth={3} className="text-white" />
-                      ) : (
-                        <span className="decision-radio-dot" />
+                    <div className="decision-card-left">
+                      <span className="decision-label-text">{choice.label}</span>
+                      {choice.reply && (
+                        <small className="decision-reply-preview">&ldquo;{choice.reply}&rdquo;</small>
                       )}
-                    </span>
+                    </div>
+
+                    <div className="decision-card-right">
+                      {isThisSubmitting ? (
+                        <Loader2 size={18} className="animate-spin text-primary" aria-hidden="true" />
+                      ) : isSelected && hasConfirmedSaved ? (
+                        <span className="saved-check-badge">
+                          <Check size={14} strokeWidth={3} aria-hidden="true" />
+                        </span>
+                      ) : (
+                        <span className="decision-card-arrow" aria-hidden="true">
+                          <ArrowRight size={14} />
+                        </span>
+                      )}
+                    </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* Action Buttons */}
-            {!hasDecided ? (
-              <div className="decision-submit-actions">
-                <button
-                  type="button"
-                  className="button primary large full-width"
-                  disabled={!selectedChoiceId || isSubmitting}
-                  onClick={handleConfirmDecision}
-                >
-                  <span>{isSubmitting ? "Recording Decision…" : "Confirm & Submit Decision"}</span>
-                  <ArrowRight size={18} aria-hidden="true" />
-                </button>
-                <p className="decision-note">
-                  Your first decision is permanently recorded for research analysis. Take your time to review the evidence.
-                </p>
+            {/* In-Flight & Saved Confirmation Feedback */}
+            {isSubmitting && (
+              <div className="decision-submitting-state">
+                <Loader2 size={16} className="animate-spin text-cyan" aria-hidden="true" />
+                <span>Recording decision to research session…</span>
               </div>
-            ) : (
+            )}
+
+            {hasConfirmedSaved && !isSubmitting && (
               <div className="decision-confirmed-state">
                 <div className="neutral-confirmation-banner">
                   <CheckCircle2 size={20} className="text-emerald flex-shrink-0" aria-hidden="true" />
                   <div>
-                    <strong>Decision Recorded Securely</strong>
-                    <p>Your response has been saved to your anonymous research session.</p>
+                    <strong>Decision Recorded</strong>
+                    <p>Moving automatically to the next challenge…</p>
                   </div>
                 </div>
 
                 {/* Educational debrief if active */}
                 {educationalMode && feedback && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="educational-debrief-box"
-                  >
+                  <div className="educational-debrief-box">
                     <div className="debrief-header">
                       <Award size={18} className="text-amber" aria-hidden="true" />
                       <strong>Educational Scenario Analysis</strong>
@@ -1018,50 +1431,46 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
                       <span className="consequence-label">Privacy Impact:</span>
                       <p>{feedback.consequence}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
+                {/* Manual fallback actions if auto-advance is delayed or for review */}
                 <div className="next-scenario-actions">
-                  {onNextScenario && scenarioIndex < totalInMission - 1 ? (
-                    <>
-                      <button
-                        type="button"
-                        className="button primary large full-width"
-                        onClick={onNextScenario}
-                      >
-                        <span>Continue to Scenario {scenarioIndex + 2} of {totalInMission}</span>
-                        <ArrowRight size={18} aria-hidden="true" />
-                      </button>
-                      <button
-                        type="button"
-                        className="button secondary full-width mt-2.5"
-                        onClick={onReturnToHub}
-                      >
-                        <span>Return to Mission Control</span>
-                      </button>
-                    </>
-                  ) : (
+                  {onNextScenario && (
                     <button
                       type="button"
-                      className="button primary large full-width"
-                      onClick={onReturnToHub}
+                      className="button primary small full-width"
+                      onClick={onNextScenario}
                     >
                       <span>
-                        {scenarioIndex === totalInMission - 1
-                          ? "Module Complete — Return to Mission Control"
-                          : "Return to Mission Control"}
+                        {scenarioIndex < totalInMission - 1
+                          ? `Continue to Scenario ${scenarioIndex + 2}`
+                          : "Continue to Next Mission"}
                       </span>
-                      <ArrowRight size={18} aria-hidden="true" />
+                      <ArrowRight size={14} aria-hidden="true" />
                     </button>
                   )}
+                  <button
+                    type="button"
+                    className="button ghost small full-width mt-2"
+                    onClick={onReturnToHub}
+                  >
+                    <span>Return to Mission Control</span>
+                  </button>
                 </div>
               </div>
+            )}
+
+            {!hasDecided && (
+              <p className="decision-note">
+                Your first research decision is authoritative and stored securely.
+              </p>
             )}
           </div>
         </aside>
       </div>
 
-      {/* Attachment Inspection Modal */}
+      {/* Static File Inspection Modal (PH04) */}
       {attachmentInspected && (
         <div className="modal-backdrop" onClick={() => setAttachmentInspected(false)}>
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
