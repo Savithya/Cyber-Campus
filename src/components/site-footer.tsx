@@ -8,13 +8,11 @@ import {
   ShieldAlert,
   GraduationCap,
   Lock,
-  ExternalLink,
   ChevronRight,
-  Mail,
-  Layers,
-  HeartHandshake,
   FileText,
-  RotateCcw,
+  Shield,
+  HelpCircle,
+  Database,
 } from "lucide-react";
 
 interface SiteFooterProps {
@@ -28,23 +26,30 @@ export function SiteFooter({ compact }: SiteFooterProps) {
 
   if (showCompact) {
     return (
-      <footer className="site-footer site-footer-compact" role="contentinfo" aria-label="Cyber Campus Research Footer">
-        <div className="container footer-compact-inner">
+      <footer
+        className="cyber-site-footer site-footer-compact"
+        role="contentinfo"
+        aria-label="Cyber Campus Research Footer"
+      >
+        <div className="footer-compact-container">
           <div className="footer-compact-brand">
-            <ShieldCheck size={18} className="text-cyan" aria-hidden="true" />
-            <span className="font-semibold text-sm">Cyber Campus</span>
-            <span className="text-muted text-xs">· Academic Research in Sri Lanka</span>
+            <ShieldCheck size={18} className="text-cyan shrink-0" aria-hidden="true" />
+            <span className="footer-compact-title">Cyber Campus</span>
+            <span className="footer-compact-sub">· Academic Cybersecurity Study (Sri Lanka)</span>
           </div>
 
           <nav className="footer-compact-links" aria-label="Footer Quick Links">
-            <Link href="/" className="footer-link-compact">Home</Link>
-            <Link href="/play" className="footer-link-compact">Cyber Missions</Link>
-            <Link href="/privacy" className="footer-link-compact">Privacy &amp; Rights</Link>
-            <Link href="/withdraw" className="footer-link-compact">Withdrawal</Link>
+            <Link href="/" className="footer-compact-link">Home</Link>
+            <Link href="/play" className="footer-compact-link">Cyber Missions</Link>
+            <Link href="/privacy" className="footer-compact-link">Privacy &amp; Rights</Link>
+            <Link href="/withdraw" className="footer-compact-link">Withdrawal Protocol</Link>
           </nav>
 
-          <div className="footer-compact-copy text-xs text-muted">
-            Voluntary Academic Research · Confidential &amp; Anonymized
+          <div className="footer-compact-admin">
+            <Link href="/admin/login" className="footer-compact-admin-link">
+              <Lock size={12} aria-hidden="true" />
+              <span>Researcher Access</span>
+            </Link>
           </div>
         </div>
       </footer>
@@ -52,25 +57,29 @@ export function SiteFooter({ compact }: SiteFooterProps) {
   }
 
   return (
-    <footer className="site-footer site-footer-full" role="contentinfo" aria-label="Cyber Campus Platform Footer">
-      <div className="container footer-grid-container">
+    <footer
+      className="cyber-site-footer site-footer-full"
+      role="contentinfo"
+      aria-label="Cyber Campus Platform Footer"
+    >
+      <div className="footer-grid-container">
         {/* Column 1 — Cyber Campus Brand & Overview */}
         <div className="footer-col brand-col">
           <div className="footer-brand-header">
             <div className="footer-brand-icon-box">
-              <ShieldCheck size={22} className="text-cyan" aria-hidden="true" />
+              <ShieldCheck size={24} className="text-cyan" aria-hidden="true" />
             </div>
-            <div>
-              <span className="footer-brand-title">Cyber Campus</span>
+            <div className="footer-brand-title-group">
+              <div className="footer-brand-title">Cyber Campus</div>
               <span className="footer-brand-tag">RESEARCH PLATFORM</span>
             </div>
           </div>
           <p className="footer-brand-description">
-            An interactive academic cybersecurity research platform exploring social engineering
-            threats and user privacy among university students in Sri Lanka.
+            An interactive academic cybersecurity research platform investigating social engineering
+            threats and user privacy risks among university students in Sri Lanka.
           </p>
           <div className="footer-meta-pill">
-            <GraduationCap size={15} className="text-primary" aria-hidden="true" />
+            <GraduationCap size={16} className="text-primary shrink-0" aria-hidden="true" />
             <span>Empirical Cybersecurity Study · Sri Lanka</span>
           </div>
         </div>
@@ -82,7 +91,7 @@ export function SiteFooter({ compact }: SiteFooterProps) {
             <li>
               <Link href="/" className="footer-nav-link">
                 <ChevronRight size={14} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Home</span>
+                <span>Home Overview</span>
               </Link>
             </li>
             <li>
@@ -113,17 +122,17 @@ export function SiteFooter({ compact }: SiteFooterProps) {
             <li>
               <Link href="/consent" className="footer-nav-link">
                 <ChevronRight size={14} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Study Information</span>
+                <span>Study Information &amp; Ethics</span>
               </Link>
             </li>
             <li>
               <Link href="/privacy" className="footer-nav-link">
                 <ChevronRight size={14} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Privacy Information</span>
+                <span>Privacy &amp; Data Protection</span>
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="footer-nav-link">
+              <Link href="/privacy#rights" className="footer-nav-link">
                 <ChevronRight size={14} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Participant Rights</span>
               </Link>
@@ -137,36 +146,45 @@ export function SiteFooter({ compact }: SiteFooterProps) {
           </ul>
         </div>
 
-        {/* Column 4 — Platform Information */}
-        <div className="footer-col">
-          <h3 className="footer-col-heading">Platform Information</h3>
-          <ul className="footer-nav-list" role="list">
-            <li className="footer-platform-item">
-              <span className="footer-bullet-dot" aria-hidden="true" />
-              <span><strong>4 Threat Categories:</strong> Phishing, Pretexting, Impersonation, Scams</span>
-            </li>
-            <li className="footer-platform-item">
-              <span className="footer-bullet-dot" aria-hidden="true" />
-              <span><strong>Academic Platform:</strong> Designed for scientific inquiry, not commercial marketing</span>
-            </li>
-            <li className="footer-platform-item">
-              <span className="footer-bullet-dot" aria-hidden="true" />
-              <span><strong>Data Integrity:</strong> Anonymized participant records and secure token hashing</span>
-            </li>
-          </ul>
+        {/* Column 4 — Platform & Data Governance */}
+        <div className="footer-col platform-col">
+          <h3 className="footer-col-heading">Platform Governance</h3>
+          <div className="footer-governance-cards">
+            <div className="footer-gov-item">
+              <span className="footer-gov-dot" aria-hidden="true" />
+              <div>
+                <strong className="footer-gov-label">4 Threat Variables:</strong>
+                <p className="footer-gov-text">Phishing, Pretexting, Impersonation &amp; Scams</p>
+              </div>
+            </div>
+            <div className="footer-gov-item">
+              <span className="footer-gov-dot" aria-hidden="true" />
+              <div>
+                <strong className="footer-gov-label">Academic Inquiry:</strong>
+                <p className="footer-gov-text">Dedicated to scientific research, not commercial tracking</p>
+              </div>
+            </div>
+            <div className="footer-gov-item">
+              <span className="footer-gov-dot" aria-hidden="true" />
+              <div>
+                <strong className="footer-gov-label">Data Protection:</strong>
+                <p className="footer-gov-text">Anonymized records governed under strict ethical protocols</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
       <div className="footer-bottom-bar">
-        <div className="container footer-bottom-inner">
-          <div className="footer-bottom-copy">
-            &copy; {new Date().getFullYear()} Cyber Campus Research Initiative · Sri Lanka.
-            All research data governed under strict academic confidentiality protocols.
-          </div>
+        <div className="footer-bottom-inner">
+          <p className="footer-bottom-copy">
+            &copy; {new Date().getFullYear()} Cyber Campus Research Initiative · Sri Lanka. All research data
+            governed under academic ethics and confidentiality protocols.
+          </p>
           <div className="footer-bottom-links">
             <Link href="/admin/login" className="footer-admin-link">
-              <Lock size={12} aria-hidden="true" />
+              <Lock size={13} aria-hidden="true" />
               <span>Researcher Access</span>
             </Link>
           </div>
