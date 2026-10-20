@@ -41,12 +41,12 @@ const THREAT_CARDS: ThreatCardData[] = [
     id: "phishing",
     iv: "IV1",
     title: "Phishing",
-    badge: "5 Scenarios · IV1",
+    badge: "5 Challenges · IV1",
     icon: Mail,
     colorClass: "purple",
     glowClass: "purple-glow",
     summary:
-      "Deceptive emails and messages that imitate legitimate university or administrative services to trick you into revealing login passwords or clicking unsafe links.",
+      "Investigate suspicious emails and messages designed to steal personal information.",
     exampleSnippet: {
       type: "Simulated Email",
       sender: "IT Helpdesk <security@campus-portal-verify.example>",
@@ -62,12 +62,12 @@ const THREAT_CARDS: ThreatCardData[] = [
     id: "pretexting",
     iv: "IV2",
     title: "Pretexting",
-    badge: "5 Scenarios · IV2",
+    badge: "5 Challenges · IV2",
     icon: MessagesSquare,
     colorClass: "teal",
     glowClass: "emerald-glow",
     summary:
-      "When someone invents a convincing story, emergency or fake official role to gain your trust and manipulate you into sharing private personal records or codes.",
+      "Identify fabricated stories and requests used to persuade people to reveal private information.",
     exampleSnippet: {
       type: "Simulated Chat",
       sender: "Campus IT Support Assistant",
@@ -83,12 +83,12 @@ const THREAT_CARDS: ThreatCardData[] = [
     id: "impersonation",
     iv: "IV3",
     title: "Impersonation",
-    badge: "5 Scenarios · IV3",
+    badge: "5 Challenges · IV3",
     icon: UserRoundSearch,
     colorClass: "amber",
     glowClass: "amber-glow",
     summary:
-      "Attempts to copy the identity of lecturers, department heads, student union representatives or trusted batchmates to request sensitive files or money.",
+      "Recognise suspicious accounts and individuals pretending to be trusted people or organisations.",
     exampleSnippet: {
       type: "Social Profile",
       sender: "Prof. K. L. Wickramasinghe (Duplicate)",
@@ -104,12 +104,12 @@ const THREAT_CARDS: ThreatCardData[] = [
     id: "links",
     iv: "IV4",
     title: "Online Scams & Malicious Links",
-    badge: "5 Scenarios · IV4",
+    badge: "5 Challenges · IV4",
     icon: Link2,
     colorClass: "cyan",
     glowClass: "cyan-glow",
     summary:
-      "Misleading advertisements, fake student discounts, rental deposit scams and deceitful links designed to harvest personal information or credit details.",
+      "Examine fraudulent offers, misleading websites, and potentially dangerous links.",
     exampleSnippet: {
       type: "Online Offer",
       sender: "Campus Student Laptop Scheme",
@@ -212,9 +212,9 @@ export function HomeThreatCards() {
               <Link
                 href="/consent"
                 className="threat-investigate-link"
-                title={`Participate in ${card.title} scenarios`}
+                title={`Participate in ${card.title} challenges`}
               >
-                <span>Investigate Scenarios</span>
+                <span>Investigate Challenges</span>
                 <ArrowRight size={14} aria-hidden="true" />
               </Link>
             </div>

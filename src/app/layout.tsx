@@ -6,6 +6,8 @@ import DraftLifecycle from "@/components/draft-lifecycle";
 import { ThemeProvider, ThemeScript } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
 
+import { SiteFooter } from "@/components/site-footer";
+
 export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
@@ -44,17 +46,7 @@ export default function RootLayout({
 
           <main id="main">{children}</main>
 
-          <footer className="site-footer">
-            <span>
-              <ShieldCheck size={17} aria-hidden="true" /> Thoughtfully designed for student
-              cybersecurity research.
-            </span>
-            <div>
-              <Link href="/privacy">Privacy & participation</Link>
-              <Link href="/withdraw">Withdraw a response</Link>
-              <span>Made for Sri Lanka</span>
-            </div>
-          </footer>
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>

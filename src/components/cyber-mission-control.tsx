@@ -35,6 +35,7 @@ import { getOperativeRank } from "@/lib/scoring";
 import type { Scenario, Session, Attempt } from "@/lib/types";
 import { InteractiveChallengeRunner } from "./interactive-challenge-runner";
 import { ResearchProgressStepper } from "./research-progress-stepper";
+import { GlobalResearchProgressTracker } from "./global-research-progress-tracker";
 import { Loading, ErrorBox } from "./ui";
 
 const missionIcons: Record<string, typeof Mail> = {
@@ -297,6 +298,12 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
           onCompleteScenario={(newAttempt) => {
             void state.reload();
           }}
+          onPreviousScenario={() => {
+            void state.reload();
+            if (activeScenarioIndex > 0) {
+              setActiveScenarioIndex((prev) => prev - 1);
+            }
+          }}
           onNextScenario={() => {
             void state.reload();
             if (activeScenarioIndex < missionScenarios.length - 1) {
@@ -325,6 +332,10 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
                 router.push("/results");
               }
             }
+          }}
+          onSelectScenarioIndex={(idx) => {
+            void state.reload();
+            setActiveScenarioIndex(idx);
           }}
           onReturnToHub={() => {
             void state.reload();
@@ -570,16 +581,25 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
             <div>
               <h3>All 20 Cyber Research Challenges Complete!</h3>
               <p>
-                You have evaluated all four social engineering threat categories. View your research completion certificate, empirical debrief, and findings.
+                You have evaluated all four social engineering threat categories. Review your answers and discover the safest responses to each cybersecurity scenario.
               </p>
             </div>
           </div>
           <Link href="/results" className="button primary large banner-cta-btn">
-            <span>View Research Certificate</span>
+            <span>Complete &amp; Review My Answers</span>
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>
       )}
+
+      {/* Global Research Progress Tracker */}
+      <GlobalResearchProgressTracker
+        attempts={session.attempts ?? []}
+        onSelectMission={(id) => {
+          setActiveMissionId(id);
+          setActiveScenarioIndex(0);
+        }}
+      />
 
       {/* 4. Four Large Professional Mission Cards */}
       <section className="threat-modules-grid" aria-label="Four Social Engineering Threat Modules">

@@ -4,6 +4,7 @@ import Admin from "@/components/admin";
 import { syntheticSessions } from "@/lib/fixtures.server";
 import { getDemoSubmissions } from "@/lib/repository.server";
 import { isResearch } from "@/lib/config.server";
+import { scenarios } from "@/content/scenarios.server";
 import { Loading } from "@/components/ui";
 export const dynamic = "force-dynamic";
 export default async function Page({
@@ -20,6 +21,7 @@ export default async function Page({
         sessions={allSessions}
         demo
         path={(await params).path ?? []}
+        scenarios={scenarios}
       />
     </Suspense>
   );

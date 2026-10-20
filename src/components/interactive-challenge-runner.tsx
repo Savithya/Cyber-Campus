@@ -62,7 +62,9 @@ interface InteractiveChallengeRunnerProps {
   totalOverall?: number; // 20
   overallXp?: number; // 0..200
   onCompleteScenario: (attempt: Attempt) => void;
+  onPreviousScenario?: () => void;
   onNextScenario?: () => void;
+  onSelectScenarioIndex?: (index: number) => void;
   onReturnToHub: () => void;
   previousAttempt?: Attempt;
   educationalMode?: boolean;
@@ -77,7 +79,9 @@ export function InteractiveChallengeRunner({
   totalOverall = 20,
   overallXp = 0,
   onCompleteScenario,
+  onPreviousScenario,
   onNextScenario,
+  onSelectScenarioIndex,
   onReturnToHub,
   previousAttempt,
   educationalMode = false,
@@ -223,12 +227,17 @@ export function InteractiveChallengeRunner({
     }, 1200);
   };
 
-  // One-Click Submission & Automatic Next Challenge
-  const handleSelectChoice = async (choiceId: string) => {
-    // If already submitting or already recorded in this session, prevent duplicate clicks
-    if (isSubmitting || hasConfirmedSaved || recordedAttempt || !state.session) return;
-
+  // Choice selection - highlights the option without immediately locking
+  const handleSelectChoice = (choiceId: string) => {
+    if (isSubmitting) return;
     setSelectedChoiceId(choiceId);
+    setError("");
+  };
+
+  // Action Button: Confirm My Answer
+  const handleConfirmAnswer = async () => {
+    if (!selectedChoiceId || isSubmitting || !state.session) return;
+
     setIsSubmitting(true);
     setError("");
 
@@ -243,7 +252,7 @@ export function InteractiveChallengeRunner({
         "game/attempt",
         {
           scenarioId: scenario.id,
-          action: choiceId,
+          action: selectedChoiceId,
           elapsedMs,
           idempotencyKey,
         },
@@ -251,17 +260,7 @@ export function InteractiveChallengeRunner({
 
       setRecordedAttempt(res.attempt);
       setHasConfirmedSaved(true);
-      if (educationalMode && res.feedback) {
-        setFeedback(res.feedback);
-      }
       onCompleteScenario(res.attempt);
-
-      // Desired transition:
-      // SELECT ACTION -> SAVING DECISION -> RESPONSE SAVED -> AUTOMATICALLY OPEN NEXT CHALLENGE
-      // Smooth transition lasting ~0.8 second after confirmed saving
-      autoAdvanceTimerRef.current = setTimeout(() => {
-        onNextScenario?.();
-      }, 800);
     } catch (e) {
       setError((e as Error).message || "Failed to record response. Please retry.");
     } finally {
@@ -269,12 +268,14 @@ export function InteractiveChallengeRunner({
     }
   };
 
-  // Retry action for failed saves: resubmits the exact same decision
+  // Retry action for failed saves: resubmits the chosen action
   const handleRetryDecision = async () => {
     if (!selectedChoiceId) return;
-    await handleSelectChoice(selectedChoiceId);
+    await handleConfirmAnswer();
   };
 
+  const missionIndex = missions.findIndex((m) => m.id === missionId);
+  const globalQuestionNumber = (missionIndex >= 0 ? missionIndex : 0) * 5 + scenarioIndex + 1;
   const hasDecided = Boolean(recordedAttempt) || hasConfirmedSaved;
 
   return (
@@ -291,21 +292,26 @@ export function InteractiveChallengeRunner({
             aria-label="Back to Mission Control Hub"
           >
             <ArrowLeft size={16} aria-hidden="true" />
-            <span>Back to Mission Control</span>
+            <span>Mission Control</span>
           </button>
           <span className="crumb-separator" aria-hidden="true">/</span>
-          <span className="crumb-threat-cat">{currentMission.name.toUpperCase()} · {currentMission.iv}</span>
+          <span className="crumb-threat-cat">
+            MISSION 0{missionIndex + 1} — {currentMission.name.toUpperCase()} · {currentMission.iv}
+          </span>
           <span className="crumb-separator" aria-hidden="true">/</span>
-          <span className="crumb-challenge-num">Challenge {scenarioIndex + 1} of {totalInMission}</span>
+          <span className="crumb-challenge-num">Challenge 0{scenarioIndex + 1} of 05</span>
         </div>
 
-        <div className="challenge-header-right">
-          {/* Overall Research Progress & XP */}
+        <div className="challenge-header-right flex items-center gap-4">
+          <span className="global-q-pill-header font-mono text-xs">
+            Question {globalQuestionNumber < 10 ? `0${globalQuestionNumber}` : globalQuestionNumber} of 20
+          </span>
+          {/* Overall Research Progress */}
           <div className="runner-overall-telemetry">
             <div className="runner-overall-labels">
-              <span className="runner-overall-title">Overall Progress:</span>
-              <strong className="runner-overall-count">{overallCompleted} / {totalOverall}</strong>
-              <span className="runner-overall-xp">({overallXp} XP)</span>
+              <span className="runner-overall-title">Overall:</span>
+              <strong className="runner-overall-count font-mono">{overallCompleted} / {totalOverall}</strong>
+              <span className="runner-overall-xp">({Math.round((overallCompleted / Math.max(1, totalOverall)) * 100)}%)</span>
             </div>
             <div
               className="runner-overall-track"
@@ -321,13 +327,31 @@ export function InteractiveChallengeRunner({
               />
             </div>
           </div>
-
-          {/* Subtle Metadata Pill */}
-          <span className="challenge-id-subtle" title={`Scenario Code: ${scenario.id}`}>
-            {scenario.id}
-          </span>
         </div>
       </header>
+
+      {/* Challenge Jump Selector Bar */}
+      <div className="challenge-pills-selector-bar flex items-center gap-2 mb-4" role="tablist" aria-label="Mission Challenges Selector">
+        <span className="text-xs font-semibold text-muted mr-1">Challenges:</span>
+        {Array.from({ length: totalInMission }, (_, idx) => {
+          const isCurrent = idx === scenarioIndex;
+          const isDone = Boolean(state.session?.attempts.some((a) => a.scenarioId === currentMission.ids[idx] && a.attemptNumber === 1 && a.selectedAction !== null));
+          return (
+            <button
+              key={idx}
+              type="button"
+              role="tab"
+              aria-selected={isCurrent}
+              className={`challenge-jump-pill ${isCurrent ? "active" : ""} ${isDone ? "done" : ""}`}
+              onClick={() => onSelectScenarioIndex?.(idx)}
+              title={`Jump to Challenge 0${idx + 1}`}
+            >
+              <span>0{idx + 1}</span>
+              {isDone && <Check size={11} strokeWidth={3} className="ml-1 text-emerald" aria-hidden="true" />}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Saving and Error Banners */}
       {isSubmitting && (
@@ -340,7 +364,7 @@ export function InteractiveChallengeRunner({
       {hasConfirmedSaved && !isSubmitting && (
         <div className="subtle-saved-banner" role="status" aria-live="polite">
           <CheckCircle2 size={16} className="text-emerald" aria-hidden="true" />
-          <span>Response saved · Automatically opening next challenge…</span>
+          <span>Answer confirmed &amp; saved to research session. Click Next Challenge to proceed.</span>
         </div>
       )}
 
@@ -371,10 +395,20 @@ export function InteractiveChallengeRunner({
           {/* Mission Briefing Card */}
           <div className="briefing-box">
             <div className="briefing-header">
-              <span className="briefing-label">MISSION BRIEFING · CHALLENGE {scenarioIndex + 1} OF {totalInMission}</span>
-              <h2>{scenario.title}</h2>
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="mission-tag-pill font-mono text-xs text-primary font-semibold">
+                  MISSION 0{missionIndex + 1} — {currentMission.name.toUpperCase()} ({currentMission.iv})
+                </span>
+                <span className="challenge-tag-pill font-mono text-xs text-muted">
+                  · Challenge 0{scenarioIndex + 1} of 05
+                </span>
+              </div>
+              <h2 className="text-xl font-bold">{scenario.title}</h2>
             </div>
-            <p className="briefing-situation">{scenario.situation}</p>
+            <div className="briefing-situation-box mt-3 p-3.5 rounded-lg border bg-card/60">
+              <span className="text-xs uppercase font-semibold text-cyan tracking-wider block mb-1">Scenario:</span>
+              <p className="briefing-situation text-sm leading-relaxed">&ldquo;{scenario.situation}&rdquo;</p>
+            </div>
           </div>
 
           {/* SIMULATION CONTAINER BY INTERACTION TYPE */}
@@ -1354,118 +1388,122 @@ Message-ID: <${scenario.id.toLowerCase()}-audit@gateway-relay.example>`}
             ========================================================================= */}
         <aside className="challenge-decision-col">
           <div className="decision-panel-card">
+            {/* Standard Question Header */}
             <div className="decision-header">
-              <span className="decision-badge">YOUR DECISION</span>
-              <h3>What would you do?</h3>
+              <span className="decision-badge">YOUR TASK</span>
+              <h3 className="task-heading">What would you do first?</h3>
               <p className="decision-prompt">
-                Select the action you would take. Your decision will be recorded automatically.
+                Carefully examine the scenario and interactive evidence above. Select the safest action you would take, then click <strong>Confirm My Answer</strong>.
               </p>
             </div>
 
-            {/* Interactive One-Click Decision Cards */}
-            <div className="decision-options-group" role="group" aria-label="Available participant decisions">
-              {scenario.choices.map((choice) => {
+            {/* Interactive Answer Options: Large Accessible Selection Cards (A, B, C, D) */}
+            <div className="decision-options-group" role="radiogroup" aria-label="Interactive answer options">
+              {scenario.choices.map((choice, cIndex) => {
+                const letter = String.fromCharCode(65 + cIndex);
                 const isSelected = selectedChoiceId === choice.id;
-                const isThisSubmitting = isSubmitting && isSelected;
                 return (
                   <button
                     key={choice.id}
                     type="button"
-                    disabled={isSubmitting || hasDecided}
-                    className={`decision-option-card ${isSelected ? "selected" : ""} ${isThisSubmitting ? "submitting" : ""}`}
+                    role="radio"
+                    aria-checked={isSelected}
+                    disabled={isSubmitting}
+                    className={`decision-option-card ${isSelected ? "selected" : ""}`}
                     onClick={() => handleSelectChoice(choice.id)}
-                    aria-label={choice.label}
                   >
-                    <div className="decision-card-left">
-                      <span className="decision-label-text">{choice.label}</span>
+                    <div className="option-letter-badge" aria-hidden="true">
+                      {letter}
+                    </div>
+
+                    <div className="decision-card-left flex-1 text-left">
+                      <span className="decision-label-text block font-medium text-sm leading-snug">{choice.label}</span>
                       {choice.reply && (
-                        <small className="decision-reply-preview">&ldquo;{choice.reply}&rdquo;</small>
+                        <small className="decision-reply-preview text-xs text-muted block mt-1">&ldquo;{choice.reply}&rdquo;</small>
                       )}
                     </div>
 
-                    <div className="decision-card-right">
-                      {isThisSubmitting ? (
-                        <Loader2 size={18} className="animate-spin text-primary" aria-hidden="true" />
-                      ) : isSelected && hasConfirmedSaved ? (
-                        <span className="saved-check-badge">
-                          <Check size={14} strokeWidth={3} aria-hidden="true" />
-                        </span>
-                      ) : (
-                        <span className="decision-card-arrow" aria-hidden="true">
-                          <ArrowRight size={14} />
-                        </span>
-                      )}
+                    <div className="option-selection-indicator ml-2 flex-shrink-0" aria-hidden="true">
+                      <div className={`radio-outer ${isSelected ? "active" : ""}`}>
+                        {isSelected && <div className="radio-inner" />}
+                      </div>
                     </div>
                   </button>
                 );
               })}
             </div>
 
-            {/* In-Flight & Saved Confirmation Feedback */}
-            {isSubmitting && (
-              <div className="decision-submitting-state">
-                <Loader2 size={16} className="animate-spin text-cyan" aria-hidden="true" />
-                <span>Recording decision to research session…</span>
-              </div>
-            )}
-
-            {hasConfirmedSaved && !isSubmitting && (
-              <div className="decision-confirmed-state">
-                <div className="neutral-confirmation-banner">
-                  <CheckCircle2 size={20} className="text-emerald flex-shrink-0" aria-hidden="true" />
-                  <div>
-                    <strong>Decision Recorded</strong>
-                    <p>Moving automatically to the next challenge…</p>
-                  </div>
-                </div>
-
-                {/* Educational debrief if active */}
-                {educationalMode && feedback && (
-                  <div className="educational-debrief-box">
-                    <div className="debrief-header">
-                      <Award size={18} className="text-amber" aria-hidden="true" />
-                      <strong>Educational Scenario Analysis</strong>
-                    </div>
-                    <p className="debrief-explanation">{feedback.explanation}</p>
-                    <div className="debrief-consequence">
-                      <span className="consequence-label">Privacy Impact:</span>
-                      <p>{feedback.consequence}</p>
-                    </div>
-                  </div>
+            {/* Action Button: Confirm My Answer */}
+            <div className="decision-action-section mt-5">
+              <button
+                type="button"
+                className={`button primary large w-full confirm-answer-btn ${hasConfirmedSaved ? "confirmed" : ""}`}
+                disabled={!selectedChoiceId || isSubmitting || hasConfirmedSaved}
+                onClick={handleConfirmAnswer}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                    <span>Saving Answer…</span>
+                  </>
+                ) : hasConfirmedSaved ? (
+                  <>
+                    <CheckCircle2 size={18} className="text-emerald" aria-hidden="true" />
+                    <span>Answer Confirmed &amp; Saved</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <span>Confirm My Answer</span>
+                  </>
                 )}
+              </button>
 
-                {/* Manual fallback actions if auto-advance is delayed or for review */}
-                <div className="next-scenario-actions">
-                  {onNextScenario && (
-                    <button
-                      type="button"
-                      className="button primary small full-width"
-                      onClick={onNextScenario}
-                    >
-                      <span>
-                        {scenarioIndex < totalInMission - 1
-                          ? `Continue to Scenario ${scenarioIndex + 2}`
-                          : "Continue to Next Mission"}
-                      </span>
-                      <ArrowRight size={14} aria-hidden="true" />
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="button ghost small full-width mt-2"
-                    onClick={onReturnToHub}
-                  >
-                    <span>Return to Mission Control</span>
-                  </button>
+              {hasConfirmedSaved && !isSubmitting && (
+                <div className="save-success-note mt-2 text-center text-xs text-emerald flex items-center justify-center gap-1.5">
+                  <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                  <span>Answer saved to research session. Click Next Challenge to proceed.</span>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {!hasDecided && (
-              <p className="decision-note">
-                Your first research decision is authoritative and stored securely.
-              </p>
-            )}
+            {/* Navigation Controls: Previous / Next */}
+            <div className="challenge-nav-buttons mt-6 pt-4 border-t flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="button secondary small flex-1 flex items-center justify-center gap-1.5"
+                disabled={scenarioIndex === 0 && !onPreviousScenario}
+                onClick={onPreviousScenario}
+              >
+                <ArrowLeft size={15} aria-hidden="true" />
+                <span>Previous Challenge</span>
+              </button>
+
+              <button
+                type="button"
+                className="button primary small flex-1 flex items-center justify-center gap-1.5"
+                onClick={onNextScenario}
+              >
+                <span>
+                  {scenarioIndex < totalInMission - 1
+                    ? "Next Challenge"
+                    : overallCompleted >= 19
+                      ? "Finish & Review"
+                      : "Next Mission"}
+                </span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="text-center mt-3">
+              <button
+                type="button"
+                className="button ghost text-xs text-muted"
+                onClick={onReturnToHub}
+              >
+                Return to Mission Control Hub
+              </button>
+            </div>
           </div>
         </aside>
       </div>

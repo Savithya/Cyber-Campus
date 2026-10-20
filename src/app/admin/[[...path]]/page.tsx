@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import Admin from "@/components/admin";
 import { requireResearcher } from "@/lib/supabase.server";
+import { scenarios } from "@/content/scenarios.server";
 import { Loading } from "@/components/ui";
 import type { Session } from "@/lib/types";
 export const dynamic = "force-dynamic";
@@ -36,6 +37,7 @@ export default async function Page({
         sessions={sessions}
         demo={false}
         path={(await params).path ?? []}
+        scenarios={scenarios}
       />
     </Suspense>
   );
