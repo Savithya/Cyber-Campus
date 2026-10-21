@@ -20218,26 +20218,80 @@ img, svg {
 
 
 /* ==========================================================================
-   02. PROFESSIONAL ANIMATED CYBER VISUAL (STAGE, LASER SCAN, BEACONS, CHIPS)
+   02. FULL-IMAGE PROFESSIONAL ANIMATED CYBER VISUAL
    ========================================================================== */
 
-.hero-lab-animation-stage {
+.hero-full-visual-container {
   position: relative;
   width: 100%;
-  border-radius: 0 0 20px 20px;
-  overflow: hidden;
-  background: #020617;
+  max-width: 660px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.hero-lab-image-wrapper {
+.hero-cyber-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(54px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+.hero-cyber-glow.glow-primary {
+  width: 280px;
+  height: 280px;
+  background: #7c6cfc;
+  top: -24px;
+  right: -24px;
+}
+
+.hero-cyber-glow.glow-secondary {
+  width: 260px;
+  height: 260px;
+  background: #00f2fe;
+  bottom: -24px;
+  left: -24px;
+  opacity: 0.35;
+}
+
+.hero-cyber-glow.glow-accent {
+  width: 200px;
+  height: 200px;
+  background: #10b981;
+  bottom: 30%;
+  right: 20%;
+  opacity: 0.2;
+}
+
+.hero-full-image-frame {
   position: relative;
+  z-index: 1;
   width: 100%;
   aspect-ratio: 16 / 9;
+  border-radius: 22px;
   overflow: hidden;
-  background: #0b0f19;
+  background: #020617;
+  border: 1.5px solid rgba(0, 242, 254, 0.3);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.4),
+              0 0 24px -4px rgba(0, 242, 254, 0.25),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
 }
 
-.hero-lab-img {
+.hero-full-image-frame:hover {
+  transform: translateY(-4px) scale(1.015);
+  border-color: rgba(0, 242, 254, 0.6);
+  box-shadow: 0 28px 65px -12px rgba(0, 0, 0, 0.5),
+              0 0 35px 2px rgba(0, 242, 254, 0.35),
+              0 0 45px 0 rgba(124, 108, 252, 0.25);
+}
+
+.hero-full-cyber-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -20245,8 +20299,125 @@ img, svg {
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hero-lab-animation-stage:hover .hero-lab-img {
-  transform: scale(1.02);
+.hero-full-image-frame:hover .hero-full-cyber-image {
+  transform: scale(1.03);
+}
+
+/* Discreet Top-Left Live Status Badge */
+.hero-live-beacon-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  color: #f8fafc;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.live-pulse-emerald {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseBeacon 2s ease-in-out infinite;
+}
+
+/* Floating Holographic Glass Badges */
+.hero-floating-glass-chip {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: rgba(15, 23, 42, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  animation: floatSlow 6s ease-in-out infinite;
+  pointer-events: auto;
+}
+
+.hero-floating-glass-chip.top-right {
+  top: 14px;
+  right: 14px;
+  animation-delay: 0s;
+}
+
+.hero-floating-glass-chip.bottom-left {
+  bottom: 14px;
+  left: 14px;
+  animation-delay: 3s;
+}
+
+.hero-floating-glass-chip.bottom-right {
+  bottom: 14px;
+  right: 14px;
+  animation-delay: 1.5s;
+}
+
+.chip-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chip-icon-circle.cyan {
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  color: #00f2fe;
+}
+
+.chip-icon-circle.purple {
+  background: rgba(124, 108, 252, 0.15);
+  border: 1px solid rgba(124, 108, 252, 0.35);
+  color: #7c6cfc;
+}
+
+.chip-icon-circle.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.chip-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5px;
+}
+
+.chip-sup {
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.chip-main {
+  font-size: 12px;
+  font-weight: 750;
+  color: #f8fafc;
+  line-height: 1.2;
 }
 
 /* Animated Laser Scanner Line */
@@ -20266,18 +20437,18 @@ img, svg {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.2) 15%, #00f2fe 50%, #10b981 85%, transparent 100%);
-  box-shadow: 0 0 14px 2px rgba(0, 242, 254, 0.8), 0 0 4px #10b981;
-  animation: cyberLaserScan 4.5s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.25) 15%, #00f2fe 50%, #10b981 85%, transparent 100%);
+  box-shadow: 0 0 16px 3px rgba(0, 242, 254, 0.85), 0 0 6px #10b981;
+  animation: cyberLaserScan 5s ease-in-out infinite;
 }
 
 .laser-beam-glow {
   position: absolute;
   left: 0;
   right: 0;
-  height: 48px;
-  background: linear-gradient(180deg, rgba(0, 242, 254, 0.15) 0%, transparent 100%);
-  animation: cyberLaserScanGlow 4.5s ease-in-out infinite;
+  height: 52px;
+  background: linear-gradient(180deg, rgba(0, 242, 254, 0.16) 0%, transparent 100%);
+  animation: cyberLaserScanGlow 5s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -20320,318 +20491,8 @@ img, svg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.08) 0%, transparent 70%),
-              linear-gradient(rgba(15, 23, 42, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(15, 23, 42, 0.1) 1px, transparent 1px);
-  background-size: 100% 100%, 24px 24px, 24px 24px;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.06) 0%, transparent 70%);
   z-index: 1;
-}
-
-/* Interactive Threat Beacon Pins on 3D Scene */
-.scene-threat-pin {
-  position: absolute;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.scene-threat-pin:hover {
-  transform: scale(1.1);
-}
-
-.pin-pulse {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  position: relative;
-}
-
-.pin-pulse::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  animation: pinPulseEffect 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.pin-pulse.purple {
-  background: #7c6cfc;
-  box-shadow: 0 0 10px #7c6cfc;
-}
-.pin-pulse.purple::after {
-  border: 1.5px solid #7c6cfc;
-}
-
-.pin-pulse.cyan {
-  background: #00f2fe;
-  box-shadow: 0 0 10px #00f2fe;
-}
-.pin-pulse.cyan::after {
-  border: 1.5px solid #00f2fe;
-}
-
-.pin-pulse.amber {
-  background: #f59e0b;
-  box-shadow: 0 0 10px #f59e0b;
-}
-.pin-pulse.amber::after {
-  border: 1.5px solid #f59e0b;
-}
-
-.pin-pulse.emerald {
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
-}
-.pin-pulse.emerald::after {
-  border: 1.5px solid #10b981;
-}
-
-@keyframes pinPulseEffect {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
-
-.pin-badge {
-  font-size: 10px;
-  font-weight: 750;
-  color: #fff;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 2px 7px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  white-space: nowrap;
-  letter-spacing: 0.03em;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-.pin-phishing { top: 22%; left: 16%; }
-.pin-pretext { top: 38%; right: 14%; }
-.pin-imperson { bottom: 26%; left: 24%; }
-.pin-scam { bottom: 20%; right: 20%; }
-
-/* Center Shield HUD Reticle */
-.center-shield-reticle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.reticle-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px dashed rgba(0, 242, 254, 0.4);
-}
-
-.reticle-ring.ring-outer {
-  width: 90px;
-  height: 90px;
-  animation: rotateSlow 20s linear infinite;
-}
-
-.reticle-ring.ring-inner {
-  width: 64px;
-  height: 64px;
-  border: 1px solid rgba(124, 108, 252, 0.35);
-  animation: rotateReverse 14s linear infinite;
-}
-
-@keyframes rotateReverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
-}
-
-.reticle-center {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 242, 254, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4);
-}
-
-.reticle-status-tag {
-  margin-top: 58px;
-  font-size: 9.5px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #00f2fe;
-  background: rgba(15, 23, 42, 0.85);
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 242, 254, 0.3);
-  text-transform: uppercase;
-}
-
-/* Floating Holographic Glass Badges */
-.hero-floating-glass-chip {
-  position: absolute;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  animation: floatSlow 6s ease-in-out infinite;
-  pointer-events: auto;
-}
-
-.hero-floating-glass-chip.top-right {
-  top: 14px;
-  right: 14px;
-  animation-delay: 0s;
-}
-
-.hero-floating-glass-chip.bottom-left {
-  bottom: 14px;
-  left: 14px;
-  animation-delay: 3s;
-}
-
-.chip-icon-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.chip-icon-circle.cyan {
-  background: rgba(0, 242, 254, 0.15);
-  border: 1px solid rgba(0, 242, 254, 0.35);
-  color: #00f2fe;
-}
-
-.chip-icon-circle.purple {
-  background: rgba(124, 108, 252, 0.15);
-  border: 1px solid rgba(124, 108, 252, 0.35);
-  color: #7c6cfc;
-}
-
-.chip-text-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5px;
-}
-
-.chip-sup {
-  font-size: 9.5px;
-  font-weight: 750;
-  letter-spacing: 0.06em;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
-
-.chip-main {
-  font-size: 12px;
-  font-weight: 750;
-  color: #f8fafc;
-  line-height: 1.2;
-}
-
-/* Bottom Real-time Telemetry Strip */
-.lab-telemetry-status-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 16px;
-  background: rgba(2, 6, 23, 0.95);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 11px;
-  font-weight: 650;
-  color: #94a3b8;
-}
-
-.telemetry-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  letter-spacing: 0.03em;
-}
-
-.telemetry-live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulseBeacon 1.8s ease-in-out infinite;
-}
-
-/* View Switcher in Window Bar */
-.window-view-switcher {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(2, 6, 23, 0.6);
-  padding: 3px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.view-switch-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 650;
-  color: #94a3b8;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.view-switch-btn:hover {
-  color: #f8fafc;
-}
-
-.view-switch-btn.active {
-  color: #fff;
-  background: var(--primary);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
-}
-
-.live-simulation-beacon {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulseBeacon 2s ease-in-out infinite;
 }
 
 @keyframes pulseBeacon {
@@ -20645,72 +20506,22 @@ img, svg {
   }
 }
 
-/* Conic Radar Sweep Beam */
-.radar-sweep-beam {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, rgba(0, 242, 254, 0.5) 0deg, rgba(0, 242, 254, 0.1) 40deg, transparent 70deg);
-  animation: radarSweep 4s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes radarSweep {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Progress bar inside active threat signal tab */
-.signal-tab-progress-bar {
-  width: 100%;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--primary);
-  margin-top: 4px;
-  animation: tabProgress 4.5s linear infinite;
-}
-
-@keyframes tabProgress {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-.signal-brief-text {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.45;
-  margin: 0 0 10px 0;
-}
-
-.shield-orbital-node.highlighted {
-  border-color: #00f2fe;
-  color: #00f2fe;
-  box-shadow: 0 0 12px #00f2fe;
-  transform: scale(1.2);
-}
-
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .laser-beam-line,
   .laser-beam-glow,
-  .pin-pulse::after,
-  .reticle-ring,
   .hero-floating-glass-chip,
-  .radar-sweep-beam,
-  .signal-tab-progress-bar {
+  .live-pulse-emerald {
     animation: none !important;
   }
 }
 
 @media (max-width: 640px) {
-  .hidden-xs {
-    display: none !important;
-  }
-  .scene-threat-pin .pin-badge {
-    display: none;
-  }
   .hero-floating-glass-chip {
     padding: 6px 10px;
+  }
+  .hero-floating-glass-chip.bottom-right {
+    display: none;
   }
   .chip-main {
     font-size: 11px;

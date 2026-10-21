@@ -92,6 +92,36 @@ export function ResearchCompletion() {
 
   const activeModules = useMemo(() => getActiveMissions(false), []);
 
+  const s = state.session;
+  const attempts = useMemo(() => s?.attempts ?? [], [s?.attempts]);
+  const firstAttempts = useMemo(() => attempts.filter((a) => a.attemptNumber === 1), [attempts]);
+
+  // Pre-calculate review statistics for filter chips (MUST be declared before early returns)
+  const reviewStats = useMemo(() => {
+    let safe = 0;
+    let unsafe = 0;
+    let skipped = 0;
+
+    activeModules.forEach((m) => {
+      m.ids.forEach((id) => {
+        const sc = scenarios.find((s) => s.id === id);
+        if (!sc) return;
+        const attempt = firstAttempts.find((a) => a.scenarioId === sc.id);
+        const debrief = debriefKeys[sc.id];
+        const correctActionId = debrief?.action ?? sc.choices.find((c) => !c.unsafe && c.privacyRiskScore === 0)?.id;
+        const isAnswered = Boolean(attempt && attempt.selectedAction !== null);
+        const isCorrect = attempt?.correct === true || (isAnswered && attempt?.selectedAction === correctActionId);
+
+        if (!isAnswered) skipped++;
+        else if (isCorrect) safe++;
+        else unsafe++;
+      });
+    });
+
+    const total = safe + unsafe + skipped || 20;
+    return { safe, unsafe, skipped, needsReview: unsafe + skipped, total };
+  }, [activeModules, scenarios, firstAttempts, debriefKeys]);
+
   if (state.loading || loadingContent) return <Loading />;
   if (state.error) {
     return (
@@ -101,7 +131,6 @@ export function ResearchCompletion() {
     );
   }
 
-  const s = state.session;
   if (!s || s.status === "draft") {
     return (
       <div className="container page-space narrow text-center">
@@ -115,8 +144,6 @@ export function ResearchCompletion() {
     );
   }
 
-  const attempts = s.attempts ?? [];
-  const firstAttempts = attempts.filter((a) => a.attemptNumber === 1);
   const completedCount = firstAttempts.length;
   const totalScenariosCount = 20;
   const completionPercentage = Math.min(100, Math.round((completedCount / totalScenariosCount) * 100));
@@ -158,32 +185,6 @@ export function ResearchCompletion() {
       }
     }, 120);
   };
-
-  // Pre-calculate review statistics for filter chips
-  const reviewStats = useMemo(() => {
-    let safe = 0;
-    let unsafe = 0;
-    let skipped = 0;
-
-    activeModules.forEach((m) => {
-      m.ids.forEach((id) => {
-        const sc = scenarios.find((s) => s.id === id);
-        if (!sc) return;
-        const attempt = firstAttempts.find((a) => a.scenarioId === sc.id);
-        const debrief = debriefKeys[sc.id];
-        const correctActionId = debrief?.action ?? sc.choices.find((c) => !c.unsafe && c.privacyRiskScore === 0)?.id;
-        const isAnswered = Boolean(attempt && attempt.selectedAction !== null);
-        const isCorrect = attempt?.correct === true || (isAnswered && attempt?.selectedAction === correctActionId);
-
-        if (!isAnswered) skipped++;
-        else if (isCorrect) safe++;
-        else unsafe++;
-      });
-    });
-
-    const total = safe + unsafe + skipped || 20;
-    return { safe, unsafe, skipped, needsReview: unsafe + skipped, total };
-  }, [activeModules, scenarios, firstAttempts, debriefKeys]);
 
   const handleCopyCode = () => {
     if (s?.code) {

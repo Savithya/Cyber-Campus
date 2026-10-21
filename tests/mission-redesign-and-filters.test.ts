@@ -264,4 +264,10 @@ describe("Review My Answers — Professional Educational Debrief Data Integrity"
       expect(warningSigns.length, `Scenario ${id} must have warning indicators`).toBeGreaterThan(0);
     }
   });
+
+  it("should export a valid React ErrorBoundary component", async () => {
+    const errorModule = await import("@/app/error");
+    expect(errorModule.default).toBeDefined();
+    expect(typeof errorModule.default).toBe("function");
+  });
 });
