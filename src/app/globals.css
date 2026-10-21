@@ -3,6 +3,11 @@
 @theme {
   --color-ink: var(--ink);
   --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --color-teal: var(--teal);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+  --color-emerald: #10b981;
 }
 
 /* ==========================================================================
@@ -13711,7 +13716,1072 @@ tfoot {
    INTERACTIVE CHALLENGE RUNNER — FULL RESPONSIVE SIMULATION STYLES
    ========================================================================== */
 
+/* ==========================================================================
+   CYBER MISSION CHALLENGE RUNNER — FOCUSED SINGLE-COLUMN INVESTIGATION FLOW
+   ========================================================================== */
+
 .interactive-challenge-runner {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.challenge-standard-flow-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 1. Cyber Mission Header Card */
+.cyber-mission-header-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.mission-header-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mission-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.mission-return-link:hover {
+  border-color: var(--primary);
+  background: var(--card-hover);
+  color: var(--primary);
+}
+
+.mission-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mission-iv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--lavender);
+  border: 1px solid var(--lavender-border);
+  color: var(--primary);
+  font-size: 11.5px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  font-family: monospace;
+}
+
+.mission-overall-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.mission-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mission-icon-tile {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--lavender);
+  border: 1px solid var(--lavender-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mission-title-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.challenge-step-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.challenge-main-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.mission-progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.mission-progress-bar-wrap {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.mission-progress-track {
+  height: 8px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #00f2fe);
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.challenge-jump-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.challenge-jump-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--muted);
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.challenge-jump-pill:hover {
+  border-color: var(--primary);
+  color: var(--ink);
+  background: var(--card-hover);
+}
+
+.challenge-jump-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-glow);
+}
+
+.challenge-jump-pill.done {
+  border-color: var(--teal-border, #10b981);
+  color: var(--teal, #10b981);
+  background: var(--teal-bg);
+}
+
+.challenge-jump-pill.active.done {
+  background: var(--teal, #10b981);
+  border-color: var(--teal, #10b981);
+  color: #ffffff;
+}
+
+/* 2. Scenario Introduction Card */
+.scenario-intro-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-left: 4px solid var(--primary);
+  border-radius: 14px;
+  padding: 18px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scenario-intro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+
+.scenario-intro-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-style: italic;
+}
+
+/* 3. University Email Simulator Card */
+.university-email-simulator-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.email-sim-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--window-bar-bg);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.email-sim-window-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.email-sim-window-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.email-sim-window-dots .dot.red { background: #ef4444; }
+.email-sim-window-dots .dot.yellow { background: #f59e0b; }
+.email-sim-window-dots .dot.green { background: #10b981; }
+
+.email-sim-client-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.email-sim-meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.email-sim-folder-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.email-sim-timestamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.email-sim-sender-header {
+  padding: 18px 24px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.email-sender-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.email-sender-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5 0%, #00f2fe 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.email-sender-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.sender-primary-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sender-display-name {
+  font-size: 14.5px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.sender-address-code {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--code-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.sender-recipient-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.recipient-label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.recipient-address {
+  color: var(--ink);
+  font-family: monospace;
+}
+
+.dept-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.email-inspect-headers-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.email-inspect-headers-btn:hover {
+  border-color: var(--primary);
+  color: var(--ink);
+  background: var(--card-hover);
+}
+
+.email-rfc-headers-drawer {
+  margin-top: 10px;
+  padding: 14px 18px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+.rfc-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.rfc-code-block {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--code-color);
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.email-sim-subject-bar {
+  padding: 14px 24px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.subject-prefix {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.subject-text {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 750;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.email-sim-body {
+  padding: 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.email-body-p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+
+.email-sim-attachment-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.attachment-icon-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--amber-bg);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.attachment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.attachment-filename {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.attachment-size {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.email-sim-link-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0;
+  position: relative;
+  align-items: flex-start;
+}
+
+.link-intro-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.link-button-wrapper {
+  display: flex;
+}
+
+.simulated-safe-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  border: none;
+  width: fit-content;
+  max-width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+.simulated-safe-link-btn:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+
+.safe-link-inspection-tooltip {
+  margin-top: 10px;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  word-break: break-all;
+  width: 100%;
+  animation: fadeIn 0.2s ease;
+}
+
+.tooltip-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--primary);
+  font-weight: 750;
+  margin-bottom: 2px;
+}
+
+.tooltip-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+
+.tooltip-key {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 11.5px;
+}
+
+.tooltip-url {
+  font-family: monospace;
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.tooltip-host {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.tooltip-legit {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.tooltip-disclaimer {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.email-sim-signoff {
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.signoff-line {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.signoff-name {
+  font-size: 14.5px;
+  color: var(--ink);
+  margin: 0;
+}
+
+.signoff-dept {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.signoff-disclaimer {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* 4. Action Selection Group & Cards */
+.action-selection-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.action-selection-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-selection-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.action-selection-sub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.interactive-action-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .interactive-action-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.interactive-action-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  text-align: left;
+  cursor: pointer;
+  min-height: 84px;
+  width: 100%;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  position: relative;
+  font: inherit;
+  color: var(--ink);
+}
+
+.interactive-action-card:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.12);
+}
+
+.interactive-action-card:hover:not(:disabled) .action-letter-badge {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.interactive-action-card:hover:not(:disabled) .radio-outer {
+  border-color: var(--primary);
+}
+
+.interactive-action-card.selected {
+  border-color: var(--primary);
+  background: var(--lavender);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow-glow);
+  opacity: 1 !important;
+}
+
+.interactive-action-card:focus-visible {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.action-letter-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  margin-top: 1px;
+}
+
+.interactive-action-card.selected .action-letter-badge {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+.action-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.action-label-text {
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.action-reply-preview {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.action-radio-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.radio-outer {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.radio-outer.active {
+  border-color: var(--primary);
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* 5. Primary Navigation Controls */
+.next-challenge-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.challenge-error-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  color: var(--red);
+  font-size: 13.5px;
+}
+
+.error-alert-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.challenge-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.prev-challenge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primary-next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.primary-next-btn.btn-disabled,
+.primary-next-btn:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* 6. Modal & Animations */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-dialog {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--window-bar-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--ink);
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--ink);
+}
+
+.modal-body {
+  padding: 20px 24px;
+}
+
+.modal-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 520px) {
+  .modal-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-dialog-footer {
+  margin-top: 20px;
+}
+
+/* Responsive Overrides for Cyber Mission Runner */
+@media (max-width: 640px) {
+  .cyber-mission-header-card {
+    padding: 18px 16px;
+    border-radius: 14px;
+  }
+  .mission-header-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .mission-title-row {
+    align-items: flex-start;
+  }
+  .challenge-main-title {
+    font-size: 19px;
+  }
+  .mission-progress-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .email-sim-top-bar {
+    padding: 10px 14px;
+  }
+  .email-sim-sender-header,
+  .email-sim-subject-bar,
+  .email-sim-body {
+    padding: 16px 14px;
+  }
+  .email-sender-profile-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .email-inspect-headers-btn {
+    align-self: flex-start;
+  }
+  .interactive-action-card {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .action-label-text {
+    font-size: 13.5px;
+  }
+  .challenge-nav-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .primary-next-btn,
+  .prev-challenge-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.interactive-challenge-runner-legacy {
   width: 100%;
   margin: 0 auto;
 }
