@@ -76,7 +76,9 @@ export function ResearchProgressStepper({
             const completed = isCompleted(step.number);
             const active = step.number === currentStep;
             const stateClass = completed
-              ? "completed"
+              ? active
+                ? "completed active"
+                : "completed"
               : active
               ? "active"
               : "upcoming";

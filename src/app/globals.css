@@ -14014,6 +14014,10 @@ tfoot {
 .email-sim-window-dots .dot.green { background: #10b981; }
 
 .email-sim-client-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
@@ -14095,12 +14099,15 @@ tfoot {
 }
 
 .sender-display-name {
+  overflow-wrap: break-word;
   font-size: 14.5px;
   font-weight: 750;
   color: var(--ink);
 }
 
 .sender-address-code {
+  overflow-wrap: anywhere;
+  max-width: 100%;
   font-size: 12px;
   color: var(--muted);
   background: var(--code-bg);
@@ -14451,6 +14458,8 @@ tfoot {
 }
 
 .interactive-action-card {
+  height: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -14725,61 +14734,347 @@ tfoot {
   margin-top: 20px;
 }
 
-/* Responsive Overrides for Cyber Mission Runner */
-@media (max-width: 640px) {
-  .cyber-mission-header-card {
-    padding: 18px 16px;
-    border-radius: 14px;
+/* ==========================================================================
+   MULTI-TIER RESPONSIVE SYSTEM FOR CYBER MISSION CHALLENGE RUNNER
+   Optimized for: Desktop, Laptops, Tablets, Phablets, Phones, Small Devices
+   ========================================================================== */
+
+/* 1. Medium Tablets & Small Laptops (<= 960px) */
+@media (max-width: 960px) {
+  .interactive-challenge-runner {
+    max-width: 100%;
+    gap: 20px;
   }
-  .mission-header-top-row {
-    flex-direction: column;
-    align-items: flex-start;
+  .challenge-standard-flow-container {
+    gap: 20px;
+  }
+  .cyber-mission-header-card {
+    padding: 20px 22px;
+  }
+  .interactive-action-cards-grid {
+    grid-template-columns: 1fr;
     gap: 12px;
   }
+}
+
+/* 2. Standard Tablets & Large Phones (<= 768px) */
+@media (max-width: 768px) {
   .mission-title-row {
-    align-items: flex-start;
+    gap: 12px;
   }
   .challenge-main-title {
-    font-size: 19px;
+    font-size: 20px;
   }
   .mission-progress-container {
     flex-direction: column;
     align-items: stretch;
     gap: 14px;
   }
-  .email-sim-top-bar {
-    padding: 10px 14px;
+  .challenge-jump-pills {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+  .challenge-jump-pill {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 12px;
   }
   .email-sim-sender-header,
   .email-sim-subject-bar,
   .email-sim-body {
+    padding: 18px 18px;
+  }
+  .simulated-safe-link-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* 3. Phablets & Standard Mobile (<= 640px) */
+@media (max-width: 640px) {
+  .page-space {
+    padding-top: 18px !important;
+    padding-bottom: 36px !important;
+  }
+  .cyber-mission-header-card {
     padding: 16px 14px;
+    border-radius: 14px;
+    gap: 14px;
+  }
+  .mission-header-top-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .mission-return-link {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 8px 12px;
+  }
+  .mission-header-badges {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .mission-iv-badge {
+    font-size: 10.5px;
+    padding: 4px 10px;
+    white-space: normal;
+    text-align: left;
+    max-width: 65%;
+    line-height: 1.3;
+  }
+  .mission-overall-badge {
+    font-size: 10.5px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .mission-icon-tile {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+  .challenge-step-label {
+    font-size: 11px;
+  }
+  .challenge-main-title {
+    font-size: 18.5px;
+    line-height: 1.3;
+  }
+  .scenario-intro-card {
+    padding: 14px 16px;
+    border-radius: 12px;
+    gap: 6px;
+  }
+  .scenario-intro-text {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .university-email-simulator-card {
+    border-radius: 14px;
+  }
+  .email-sim-top-bar {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .email-sim-client-name {
+    max-width: 150px;
+    font-size: 11px;
+  }
+  .email-sim-folder-tag {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+  .email-sim-timestamp {
+    font-size: 11px;
   }
   .email-sender-profile-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 10px 12px;
+  }
+  .email-sender-avatar {
+    grid-column: 1;
+    grid-row: 1;
+    width: 40px;
+    height: 40px;
+    font-size: 13px;
+  }
+  .email-sender-info {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .sender-primary-line {
+    gap: 4px 8px;
+  }
+  .sender-display-name {
+    font-size: 14px;
+  }
+  .sender-address-code {
+    font-size: 11px;
+    padding: 2px 6px;
   }
   .email-inspect-headers-btn {
-    align-self: flex-start;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    justify-content: center;
+    padding: 8px 12px;
+    min-height: 38px;
+    font-size: 11.5px;
+  }
+  .email-rfc-headers-drawer {
+    padding: 12px 14px;
+    overflow-x: auto;
+  }
+  .rfc-code-block {
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+  .email-sim-subject-bar {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .subject-prefix {
+    font-size: 11.5px;
+  }
+  .subject-text {
+    font-size: 16px;
+  }
+  .email-sim-body {
+    padding: 16px 14px;
+    gap: 14px;
+  }
+  .email-body-p {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .email-sim-attachment-box {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 14px;
+    gap: 12px;
+  }
+  .attachment-details {
+    width: 100%;
+    min-width: 0;
+  }
+  .email-sim-attachment-box .button {
+    width: 100%;
+    justify-content: center;
+  }
+  .safe-link-inspection-tooltip {
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+  .tooltip-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .tooltip-url {
+    font-size: 11px;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    width: 100%;
+  }
+  .action-selection-section {
+    gap: 12px;
+  }
+  .action-selection-title {
+    font-size: 17.5px;
+  }
+  .action-selection-sub {
+    font-size: 13px;
   }
   .interactive-action-card {
-    padding: 14px 16px;
+    padding: 14px 14px;
     gap: 12px;
+    border-radius: 12px;
+    min-height: 64px;
+  }
+  .action-letter-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
   .action-label-text {
     font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .action-reply-preview {
+    font-size: 11.5px;
+  }
+  .radio-outer {
+    width: 18px;
+    height: 18px;
+  }
+  .radio-inner {
+    width: 8px;
+    height: 8px;
   }
   .challenge-nav-row {
     flex-direction: column-reverse;
     align-items: stretch;
+    gap: 10px;
   }
   .primary-next-btn,
   .prev-challenge-btn {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    min-height: 48px;
+  }
+  .modal-dialog {
+    margin: 12px;
+    max-height: 90vh;
+    border-radius: 14px;
+  }
+  .modal-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .modal-body {
+    padding: 16px 14px;
   }
 }
+
+/* 4. Small Phones & Narrow Viewports (<= 400px) */
+@media (max-width: 400px) {
+  .mission-header-badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .mission-iv-badge,
+  .mission-overall-badge {
+    max-width: 100%;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .challenge-main-title {
+    font-size: 17px;
+  }
+  .email-sim-client-name {
+    max-width: 110px;
+    font-size: 10px;
+  }
+  .email-sender-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+  .sender-display-name {
+    font-size: 13.5px;
+  }
+  .sender-address-code {
+    font-size: 10.5px;
+  }
+  .action-label-text {
+    font-size: 13px;
+  }
+  .action-reply-preview {
+    font-size: 11px;
+  }
+  .challenge-jump-pill {
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+}
+
 
 .interactive-challenge-runner-legacy {
   width: 100%;

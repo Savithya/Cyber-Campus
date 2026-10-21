@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ShieldCheck,
   CheckCircle2,
+  Check,
   XCircle,
   HelpCircle,
   ChevronDown,
@@ -19,6 +20,13 @@ import {
   UserRoundSearch,
   Link2,
   ChevronsUpDown,
+  Award,
+  Target,
+  Database,
+  Download,
+  Copy,
+  FileCheck2,
+  BookOpen,
 } from "lucide-react";
 import { api, useSession, clearDraft } from "@/lib/client";
 import { missions, getActiveMissions } from "@/content/missions";
@@ -40,6 +48,7 @@ export function ResearchCompletion() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [debriefKeys, setDebriefKeys] = useState<Record<string, AnswerKey>>({});
   const [loadingContent, setLoadingContent] = useState<boolean>(true);
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
   // Accordion state for the 4 mission sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -128,92 +137,270 @@ export function ResearchCompletion() {
 
   const allAreOpen = activeModules.every((m) => !!openSections[m.id]);
 
+  const handleCopyCode = () => {
+    if (s?.code) {
+      navigator.clipboard.writeText(s.code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
+
+  const handleDownloadReceipt = () => {
+    if (!s) return;
+    const accuracyPct = completedCount > 0 ? Math.round((correctCount / completedCount) * 100) : 0;
+    const text =
+      `========================================================================\n` +
+      `       CYBER CAMPUS RESEARCH STUDY — PARTICIPATION RECEIPT\n` +
+      `========================================================================\n\n` +
+      `Participant Research Code: ${s.code}\n` +
+      `Submission ID:             ${s.submissionId ?? s.id}\n` +
+      `Study Mode:                ${s.mode === "practice" ? "Practice Sandbox" : "Academic Research Protocol"}\n` +
+      `Status:                    Session Verified & Recorded\n` +
+      `Missions Evaluated:        ${completedCount} / ${totalScenariosCount}\n` +
+      `Completion Rate:           ${completionPercentage}%\n` +
+      `Safest Decisions:          ${correctCount} / ${completedCount || 20} (${accuracyPct}% Optimal Defenses)\n` +
+      `Submission Timestamp:      ${s.submittedAt ? new Date(s.submittedAt).toISOString() : new Date().toISOString()}\n` +
+      `Withdrawal Deadline:       ${s.withdrawDeadline ?? "Not applicable"}\n\n` +
+      `This receipt serves as personal confirmation of your participation in the\n` +
+      `academic cybersecurity research study on social engineering vulnerability\n` +
+      `and privacy preservation among university students in Sri Lanka.\n\n` +
+      `Thank you for contributing to academic cyber research!\n` +
+      `========================================================================\n`;
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `cyber-campus-receipt-${s.code}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="completion-redesign-container container page-space" role="region" aria-label="Research Participation Complete">
       {/* 4-Stage Progress Stepper */}
-      <ResearchProgressStepper currentStep={4} />
+      <ResearchProgressStepper currentStep={4} completedSteps={[1, 2, 3, 4]} />
 
       {/* Main Completion Confirmation Header */}
       <header className="completion-minimal-header text-center my-8">
         <div className="success-icon-animation-wrapper" aria-hidden="true">
           <div className="success-pulse-ring" />
           <div className="success-icon-circle">
-            <ShieldCheck size={52} className="success-shield-icon" />
+            <ShieldCheck size={48} className="success-shield-icon" />
           </div>
         </div>
 
-        <div className="eyebrow mt-4">
+        <div className="completion-eyebrow-pill mt-4">
           <span className="live-pulse-dot" aria-hidden="true" />
           <span>STEP 04 OF 04 · COMPLETED &amp; RECORDED</span>
         </div>
 
-        <h1 className="completion-redesign-title mt-2">
+        <h1 className="completion-redesign-title mt-3">
           Research Participation Completed
         </h1>
 
         <p className="completion-redesign-subtitle mt-3 max-w-2xl mx-auto">
           You have successfully completed the Cyber Campus research missions. Review your answers
-          and discover the safest responses to each cybersecurity scenario.
+          and discover the safest responses to each cybersecurity scenario below.
         </p>
 
-        {/* Minimal Metrics Bar */}
-        <div className="completion-kpi-bar mt-8" role="region" aria-label="Participation Summary Metrics">
-          <div className="kpi-metric-block">
-            <span className="kpi-metric-label">Research Missions</span>
-            <strong className="kpi-metric-value text-primary">
-              {completedCount} / {totalScenariosCount}
-            </strong>
-            <span className="kpi-metric-subtext">Challenges Evaluated</span>
+        {/* Professional 4-Metric Grid */}
+        <div className="completion-stats-grid mt-8" role="region" aria-label="Participation Summary Metrics">
+          {/* Tile 1: Research Missions */}
+          <div className="completion-stat-card card-missions">
+            <div className="completion-stat-top">
+              <span className="completion-stat-label">Research Missions</span>
+              <div className="completion-stat-icon-wrap icon-missions">
+                <Target size={18} aria-hidden="true" />
+              </div>
+            </div>
+            <div className="completion-stat-main">
+              <div className="completion-stat-metric">
+                <span className="stat-number">{completedCount}</span>
+                <span className="stat-denom">/ {totalScenariosCount}</span>
+              </div>
+              <div className="completion-stat-progress-track">
+                <div
+                  className="completion-stat-progress-fill fill-missions"
+                  style={{ width: `${(completedCount / totalScenariosCount) * 100}%` }}
+                />
+              </div>
+            </div>
+            <div className="completion-stat-footer">
+              <span className="completion-stat-subtext">Challenges Evaluated</span>
+              <span className="stat-badge badge-blue">Complete</span>
+            </div>
           </div>
 
-          <div className="kpi-divider" aria-hidden="true" />
-
-          <div className="kpi-metric-block">
-            <span className="kpi-metric-label">Mission Completion</span>
-            <strong className="kpi-metric-value text-emerald">
-              {completionPercentage}%
-            </strong>
-            <span className="kpi-metric-subtext">Complete</span>
+          {/* Tile 2: Mission Completion */}
+          <div className="completion-stat-card card-progress">
+            <div className="completion-stat-top">
+              <span className="completion-stat-label">Mission Completion</span>
+              <div className="completion-stat-icon-wrap icon-progress">
+                <Award size={18} aria-hidden="true" />
+              </div>
+            </div>
+            <div className="completion-stat-main">
+              <div className="completion-stat-metric text-emerald">
+                <span className="stat-number">{completionPercentage}%</span>
+              </div>
+              <div className="completion-stat-progress-track">
+                <div
+                  className="completion-stat-progress-fill fill-emerald"
+                  style={{ width: `${completionPercentage}%` }}
+                />
+              </div>
+            </div>
+            <div className="completion-stat-footer">
+              <span className="completion-stat-subtext">Protocol Finished</span>
+              <span className="stat-badge badge-emerald">100% Complete</span>
+            </div>
           </div>
 
-          <div className="kpi-divider" aria-hidden="true" />
-
-          <div className="kpi-metric-block">
-            <span className="kpi-metric-label">Safest Decisions</span>
-            <strong className="kpi-metric-value text-cyan">
-              {correctCount} / {completedCount || 20}
-            </strong>
-            <span className="kpi-metric-subtext">Optimal Defenses</span>
+          {/* Tile 3: Safest Decisions */}
+          <div className="completion-stat-card card-safest">
+            <div className="completion-stat-top">
+              <span className="completion-stat-label">Safest Decisions</span>
+              <div className="completion-stat-icon-wrap icon-safest">
+                <ShieldCheck size={18} aria-hidden="true" />
+              </div>
+            </div>
+            <div className="completion-stat-main">
+              <div className="completion-stat-metric text-cyan">
+                <span className="stat-number">{correctCount}</span>
+                <span className="stat-denom">/ {completedCount || 20}</span>
+              </div>
+              <div className="completion-stat-progress-track">
+                <div
+                  className="completion-stat-progress-fill fill-cyan"
+                  style={{ width: `${Math.round((correctCount / (completedCount || 20)) * 100)}%` }}
+                />
+              </div>
+            </div>
+            <div className="completion-stat-footer">
+              <span className="completion-stat-subtext">Optimal Defenses</span>
+              <span className="stat-badge badge-cyan">{Math.round((correctCount / (completedCount || 20)) * 100)}% Optimal</span>
+            </div>
           </div>
 
-          <div className="kpi-divider" aria-hidden="true" />
-
-          <div className="kpi-metric-block">
-            <span className="kpi-metric-label">Research Status</span>
-            <strong className="kpi-metric-value text-purple font-mono">
-              {s.mode === "practice" ? "Practice Sandbox" : "Recorded"}
-            </strong>
-            <span className="kpi-metric-subtext">Session Verified</span>
+          {/* Tile 4: Research Status */}
+          <div className="completion-stat-card card-status">
+            <div className="completion-stat-top">
+              <span className="completion-stat-label">Research Status</span>
+              <div className="completion-stat-icon-wrap icon-status">
+                <Database size={18} aria-hidden="true" />
+              </div>
+            </div>
+            <div className="completion-stat-main">
+              <div className="completion-stat-metric text-purple">
+                <span className="stat-status-text font-mono">
+                  {s.mode === "practice" ? "Practice Sandbox" : "Recorded"}
+                </span>
+              </div>
+              <div className="completion-stat-status-badge">
+                <span className="live-pulse-dot" aria-hidden="true" />
+                <span>Session Verified</span>
+              </div>
+            </div>
+            <div className="completion-stat-footer">
+              <span className="completion-stat-subtext font-mono">Code: {s.code}</span>
+              <span className="stat-badge badge-purple">Logged</span>
+            </div>
           </div>
         </div>
 
-        {/* Simple encouraging message */}
-        <div className="completion-encouraging-message mt-6 p-4 rounded-xl max-w-2xl mx-auto">
-          <p className="text-sm leading-relaxed text-muted">
-            Thank you for your valuable contribution to academic cybersecurity research. Your responses
-            help identify which social engineering tactics pose the greatest risks to user privacy
-            among university students in Sri Lanka.
-          </p>
+        {/* Academic Session Verification Banner */}
+        <div className="completion-verification-banner mt-6" role="region" aria-label="Session Verification Details">
+          <div className="verification-banner-inner">
+            <div className="verification-code-group">
+              <div className="verification-icon-box">
+                <FileCheck2 size={22} className="text-primary" />
+              </div>
+              <div className="verification-details">
+                <span className="verification-label">Participant Research Code</span>
+                <div className="verification-code-display">
+                  <code className="verification-code">{s.code}</code>
+                  <button
+                    type="button"
+                    onClick={handleCopyCode}
+                    className="verification-copy-btn"
+                    title="Copy Participant Code"
+                    aria-label="Copy Participant Code"
+                  >
+                    {copiedCode ? (
+                      <span className="copied-text"><Check size={13} /> Copied</span>
+                    ) : (
+                      <span className="copy-action"><Copy size={13} /> Copy</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="verification-meta-group">
+              <div className="meta-item">
+                <span className="meta-label">Submission ID</span>
+                <span className="meta-value font-mono">
+                  {s.submissionId ? `${s.submissionId.slice(0, 14)}...` : `${s.id.slice(0, 14)}...`}
+                </span>
+              </div>
+              <div className="meta-divider" aria-hidden="true" />
+              <div className="meta-item">
+                <span className="meta-label">Session Status</span>
+                <span className="meta-value text-emerald flex items-center gap-1 font-semibold">
+                  <CheckCircle2 size={13} /> Verified &amp; Recorded
+                </span>
+              </div>
+            </div>
+
+            <div className="verification-receipt-action">
+              <button
+                type="button"
+                onClick={handleDownloadReceipt}
+                className="button secondary small"
+              >
+                <Download size={14} />
+                <span>Save Receipt</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Academic Research Contribution Callout */}
+        <div className="completion-academic-callout mt-6">
+          <div className="callout-icon-wrapper">
+            <BookOpen size={20} className="text-primary" />
+          </div>
+          <div className="callout-content">
+            <h3 className="callout-heading">Academic Cybersecurity Research Contribution</h3>
+            <p className="callout-text">
+              Thank you for your valuable contribution to academic cybersecurity research. Your responses help
+              identify which social engineering tactics pose the greatest risks to user privacy among university
+              students in Sri Lanka. All research responses are securely stored and analyzed in accordance with
+              strict research ethics protocols.
+            </p>
+          </div>
         </div>
 
         {/* Navigation Action Buttons */}
-        <div className="completion-header-actions mt-6 flex items-center justify-center gap-3">
-          <Link href="/" className="button primary">
-            <Home size={17} aria-hidden="true" />
+        <div className="completion-header-actions mt-8">
+          <Link href="/" className="button primary large flex items-center gap-2">
+            <Home size={18} aria-hidden="true" />
             <span>Return to Home</span>
           </Link>
-          <Link href="/play" className="button secondary">
-            <RotateCcw size={17} aria-hidden="true" />
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById("review-answers-heading");
+              el?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="button secondary large flex items-center gap-2"
+          >
+            <Sparkles size={18} className="text-cyan" aria-hidden="true" />
+            <span>Review My Answers</span>
+            <ChevronDown size={16} aria-hidden="true" />
+          </button>
+          <Link href="/play" className="button ghost large flex items-center gap-2">
+            <RotateCcw size={18} aria-hidden="true" />
             <span>Practice Missions</span>
           </Link>
         </div>
