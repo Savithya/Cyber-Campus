@@ -467,18 +467,36 @@ export function ResearchCompletion() {
       </header>
 
       {/* =========================================================================
-          SECTION B: REVIEW MY ANSWERS & DEFENSE DEBRIEF
+          SECTION B: REVIEW MY ANSWERS & DEFENSE DEBRIEF (HIGHLIGHTED)
           ========================================================================= */}
       <section className="review-my-answers-section mt-12" aria-labelledby="review-answers-heading">
-        <div className="review-section-header pb-4 border-b">
+        <div className="review-section-header-highlight">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h2 id="review-answers-heading" className="text-2xl font-bold">
+              <div className="review-header-eyebrow">
+                <span className="live-pulse-dot" aria-hidden="true" />
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Educational Debrief &amp; Defense Analysis
+                </span>
+              </div>
+              <h2 id="review-answers-heading" className="review-highlight-title text-2xl md:text-3xl font-extrabold">
                 Review My Answers
               </h2>
-              <p className="text-muted text-sm mt-1">
+              <p className="review-highlight-subtitle text-sm md:text-base mt-1.5 max-w-2xl">
                 Examine your recorded choices alongside validated defense protocols and key warning signs.
               </p>
+            </div>
+
+            <div className="review-header-stats-pill hidden sm:flex items-center gap-4">
+              <div className="text-left">
+                <span className="text-xs text-muted block font-medium">Evaluated</span>
+                <strong className="text-ink text-sm font-bold">{reviewStats.total} Scenarios</strong>
+              </div>
+              <div className="h-7 w-px bg-border" aria-hidden="true" />
+              <div className="text-left">
+                <span className="text-xs text-muted block font-medium">Optimal Defenses</span>
+                <strong className="text-emerald text-sm font-bold">{reviewStats.safe} / {reviewStats.total}</strong>
+              </div>
             </div>
           </div>
         </div>
