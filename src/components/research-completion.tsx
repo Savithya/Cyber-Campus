@@ -459,18 +459,6 @@ export function ResearchCompletion() {
             <Home size={18} aria-hidden="true" />
             <span>Return to Home</span>
           </Link>
-          <button
-            type="button"
-            onClick={() => {
-              const el = document.getElementById("review-answers-heading");
-              el?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="button secondary large flex items-center gap-2"
-          >
-            <Sparkles size={18} className="text-cyan" aria-hidden="true" />
-            <span>Review My Answers</span>
-            <ChevronDown size={16} aria-hidden="true" />
-          </button>
           <Link href="/play" className="button ghost large flex items-center gap-2">
             <RotateCcw size={18} aria-hidden="true" />
             <span>Practice Missions</span>
@@ -485,9 +473,8 @@ export function ResearchCompletion() {
         <div className="review-section-header pb-4 border-b">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h2 id="review-answers-heading" className="text-2xl font-bold flex items-center gap-2">
-                <Sparkles size={22} className="text-cyan" aria-hidden="true" />
-                <span>Review My Answers</span>
+              <h2 id="review-answers-heading" className="text-2xl font-bold">
+                Review My Answers
               </h2>
               <p className="text-muted text-sm mt-1">
                 Examine your recorded choices alongside validated defense protocols and key warning signs.
