@@ -17729,10 +17729,522 @@ img, svg {
    REDESIGNED STEP 04 — COMPLETION PAGE
    ========================================================================== */
 
-.completion-page-container {
-  max-width: 1040px;
+.completion-redesign-container {
+  max-width: 1060px;
   margin: 0 auto;
-  padding: 36px 20px 80px;
+  padding: 24px 20px 80px;
+}
+
+.completion-minimal-header {
+  text-align: center;
+  max-width: 980px;
+  margin: 24px auto 36px;
+}
+
+/* Success Celebration Hero Badge */
+.success-icon-animation-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  margin: 0 auto;
+}
+
+.success-pulse-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(6, 182, 212, 0.08) 60%, transparent 100%);
+  animation: success-pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes success-pulse-ring {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.95;
+  }
+}
+
+.success-icon-circle {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 182, 212, 0.18) 100%);
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.25), inset 0 0 14px rgba(16, 185, 129, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.success-shield-icon {
+  color: #10b981;
+  filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.4));
+}
+
+/* Completion Eyebrow Pill */
+.completion-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  font-size: 11.5px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.completion-redesign-title {
+  font-size: clamp(26px, 3.8vw, 40px);
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.completion-redesign-subtitle {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* --- Completion 4-Metric Grid --- */
+.completion-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1040px;
+  margin: 28px auto 0;
+  text-align: left;
+}
+
+.completion-stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.completion-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.completion-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.completion-stat-label {
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.completion-stat-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.completion-stat-icon-wrap.icon-missions {
+  background: rgba(79, 70, 229, 0.12);
+  color: #6366f1;
+}
+
+.completion-stat-icon-wrap.icon-progress {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.completion-stat-icon-wrap.icon-safest {
+  background: rgba(6, 182, 212, 0.12);
+  color: #06b6d4;
+}
+
+.completion-stat-icon-wrap.icon-status {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
+}
+
+.completion-stat-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.completion-stat-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.completion-stat-metric .stat-number {
+  font-size: 28px;
+  font-weight: 850;
+  font-family: var(--font-mono, monospace);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.completion-stat-metric .stat-denom {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.completion-stat-metric .stat-status-text {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.completion-stat-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2, rgba(0, 0, 0, 0.06));
+  overflow: hidden;
+}
+
+.completion-stat-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.fill-missions {
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+}
+
+.fill-emerald {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.fill-cyan {
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+}
+
+.completion-stat-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.completion-stat-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.completion-stat-subtext {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.stat-badge {
+  font-size: 10.5px;
+  font-weight: 750;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.badge-blue {
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.badge-cyan {
+  background: rgba(6, 182, 212, 0.12);
+  color: #06b6d4;
+}
+
+.badge-purple {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
+}
+
+/* --- Academic Verification Banner --- */
+.completion-verification-banner {
+  max-width: 1040px;
+  margin: 24px auto 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  text-align: left;
+}
+
+.verification-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.verification-code-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.verification-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(79, 70, 229, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.verification-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.verification-label {
+  font-size: 10.5px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.verification-code-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.verification-code {
+  font-family: var(--font-mono, monospace);
+  font-size: 16px;
+  font-weight: 750;
+  color: var(--ink);
+  background: var(--surface-2, rgba(0, 0, 0, 0.04));
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.verification-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.verification-copy-btn:hover {
+  background: var(--surface-2, rgba(0, 0, 0, 0.05));
+  border-color: var(--primary);
+}
+
+.copied-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #10b981;
+  font-weight: 650;
+}
+
+.copy-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.verification-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-label {
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.meta-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.meta-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+}
+
+/* --- Academic Contribution Callout --- */
+.completion-academic-callout {
+  max-width: 1040px;
+  margin: 20px auto 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: rgba(79, 70, 229, 0.04);
+  border: 1px solid rgba(79, 70, 229, 0.16);
+  text-align: left;
+}
+
+.callout-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(79, 70, 229, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.callout-heading {
+  font-size: 14px;
+  font-weight: 750;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.callout-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* --- Completion Header Action Buttons --- */
+.completion-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.completion-header-actions .button {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 650;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+/* Stepper: active + completed celebratory state */
+.stepper-item.completed.active .stepper-circle {
+  background: var(--teal, #10b981) !important;
+  border-color: var(--teal, #10b981) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4) !important;
+}
+
+@media (max-width: 960px) {
+  .completion-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .verification-banner-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .verification-meta-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .verification-receipt-action {
+    width: 100%;
+  }
+  .verification-receipt-action .button {
+    width: 100%;
+    justify-content: center;
+  }
+  .completion-academic-callout {
+    flex-direction: column;
+  }
+  .completion-header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .completion-header-actions .button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .completion-stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .completion-main-header {
@@ -18213,6 +18725,93 @@ img, svg {
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--muted);
+}
+
+.module-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-2, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--border);
+  color: var(--primary);
+  letter-spacing: 0.04em;
+}
+
+.module-number-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.module-review-title {
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  font-weight: 750;
+}
+
+.module-summary-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--surface-2, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.accordion-chevron-icon {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.q-number-pill {
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--surface-2, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+
+.q-id-code {
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+}
+
+.review-scenario-text {
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.answer-card-content {
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.explanation-title {
+  color: var(--primary);
+  letter-spacing: 0.06em;
+}
+
+.explanation-body {
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.review-q-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
 }
 
 /* --- Reusable Cyber Campus Site Footer --- */
