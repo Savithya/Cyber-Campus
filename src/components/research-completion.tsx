@@ -32,6 +32,8 @@ import {
   AlertOctagon,
   Lightbulb,
   FileText,
+  ArrowLeft,
+  ListChecks,
 } from "lucide-react";
 import { api, useSession, clearDraft } from "@/lib/client";
 import { missions, getActiveMissions } from "@/content/missions";
@@ -62,6 +64,9 @@ export function ResearchCompletion() {
     impersonation: true,
     links: true,
   });
+
+  // Active mission tab for simplified browsing: 'phishing' | 'pretexting' | 'impersonation' | 'links' | 'all'
+  const [activeMissionTab, setActiveMissionTab] = useState<string>("phishing");
 
   // Filter state for reviewing answers
   const [activeFilter, setActiveFilter] = useState<"all" | "unsafe" | "safe">("all");
@@ -122,6 +127,21 @@ export function ResearchCompletion() {
     return { safe, unsafe, skipped, needsReview: unsafe + skipped, total };
   }, [activeModules, scenarios, firstAttempts, debriefKeys]);
 
+  // Per-module statistics for mission tab cards
+  const moduleStats = useMemo(() => {
+    const stats: Record<string, { correct: number; total: number; unsafe: number }> = {};
+    activeModules.forEach((m) => {
+      const mAttempts = m.ids.map((id) => firstAttempts.find((a) => a.scenarioId === id)).filter(Boolean);
+      const mCorrect = mAttempts.filter((a) => a?.correct === true).length;
+      stats[m.id] = {
+        correct: mCorrect,
+        total: m.ids.length,
+        unsafe: m.ids.length - mCorrect,
+      };
+    });
+    return stats;
+  }, [activeModules, firstAttempts]);
+
   if (state.loading || loadingContent) return <Loading />;
   if (state.error) {
     return (
@@ -175,6 +195,9 @@ export function ResearchCompletion() {
 
   // Smooth scroll to a specific scenario card and briefly pulse-highlight it
   const scrollToScenario = (moduleId: string, scenarioId: string) => {
+    if (activeMissionTab !== "all" && activeMissionTab !== moduleId) {
+      setActiveMissionTab(moduleId);
+    }
     setOpenSections((prev) => ({ ...prev, [moduleId]: true }));
     setTimeout(() => {
       const el = document.getElementById(`scenario-card-${scenarioId}`);
@@ -183,7 +206,7 @@ export function ResearchCompletion() {
         el.classList.add("review-card-highlight");
         setTimeout(() => el.classList.remove("review-card-highlight"), 2100);
       }
-    }, 120);
+    }, 150);
   };
 
   const handleCopyCode = () => {
@@ -506,46 +529,99 @@ export function ResearchCompletion() {
             </button>
           </div>
 
-          {/* Search Box & Accordion Controls */}
+          {/* Search Box */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-            <div className="review-search-wrap relative flex-1 md:w-56">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" aria-hidden="true" />
+            <div className="review-search-wrap relative flex-1 md:w-64">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
-                placeholder="Search scenarios..."
+                placeholder="Search scenarios or threats..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="review-search-input pl-8 pr-7 py-1.5 text-xs rounded-lg w-full bg-surface"
+                className="review-search-input w-full bg-surface"
                 aria-label="Filter scenarios by text"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="search-clear-btn absolute right-2 top-1/2 -translate-y-1/2"
+                  className="search-clear-btn absolute right-2.5 top-1/2 -translate-y-1/2"
                   aria-label="Clear search query"
                 >
                   &times;
                 </button>
               )}
             </div>
-
-            <button
-              type="button"
-              className="button ghost small text-cyan flex items-center gap-1.5 shrink-0"
-              onClick={allAreOpen ? handleCollapseAll : handleExpandAll}
-              aria-label={allAreOpen ? "Collapse All Mission Sections" : "Expand All Mission Sections"}
-            >
-              <ChevronsUpDown size={15} aria-hidden="true" />
-              <span>{allAreOpen ? "Collapse All" : "Expand All"}</span>
-            </button>
           </div>
         </div>
 
-        {/* Four Expandable Review Sections */}
-        <div className="review-mission-accordions mt-6 space-y-6">
-          {activeModules.map((module, moduleIdx) => {
-            const isOpen = !!openSections[module.id];
+        {/* Easy Mission Navigation Selector Cards */}
+        <div className="review-mission-selector-section mt-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted">
+              Select a Mission to Review:
+            </span>
+            <button
+              type="button"
+              onClick={() => setActiveMissionTab("all")}
+              className={`filter-pill-btn ${activeMissionTab === "all" ? "is-active" : ""}`}
+            >
+              <ListChecks size={14} aria-hidden="true" />
+              <span>View All 4 Missions (20)</span>
+            </button>
+          </div>
+
+          <div className="review-mission-nav-bar" role="tablist" aria-label="Select Mission to Inspect">
+            {activeModules.map((m, idx) => {
+              const Icon = missionIcons[m.icon] || Mail;
+              const stats = moduleStats[m.id] || { correct: 0, total: 5, unsafe: 5 };
+              const isActive = activeMissionTab === m.id;
+              const isPerfect = stats.correct === stats.total;
+
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => {
+                    setActiveMissionTab(m.id);
+                    setOpenSections((prev) => ({ ...prev, [m.id]: true }));
+                  }}
+                  className={`mission-tab-card ${isActive ? "is-active" : ""}`}
+                >
+                  <div className="mission-tab-card-top">
+                    <div className={`mission-tab-icon-wrap ${m.color}`}>
+                      <Icon size={18} aria-hidden="true" />
+                    </div>
+                    <span className="mission-tab-badge">Mission 0{idx + 1}</span>
+                  </div>
+
+                  <div>
+                    <h3 className="mission-tab-title">{m.name}</h3>
+                    <span className="text-xs text-muted block mt-0.5">{m.topic}</span>
+                  </div>
+
+                  <div className="mission-tab-footer">
+                    <span className="text-xs text-muted">Safest Actions:</span>
+                    <span className={`mission-tab-score-pill ${
+                      isPerfect ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" :
+                      stats.correct > 0 ? "bg-cyan/10 text-cyan font-bold" :
+                      "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"
+                    }`}>
+                      {stats.correct} / {stats.total} Safe
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Displayed Missions & Question Cards */}
+        <div className="review-missions-content mt-8 space-y-8">
+          {(activeMissionTab === "all" ? activeModules : activeModules.filter((m) => m.id === activeMissionTab)).map((module) => {
+            const moduleIdx = activeModules.findIndex((m) => m.id === module.id);
             const Icon = missionIcons[module.icon] || Mail;
 
             // Get scenarios for this module in deterministic order
@@ -558,6 +634,7 @@ export function ResearchCompletion() {
               .map((id) => firstAttempts.find((a) => a.scenarioId === id))
               .filter(Boolean);
             const moduleCorrect = moduleAttempts.filter((a) => a?.correct === true).length;
+            const stats = moduleStats[module.id] || { correct: moduleCorrect, total: module.ids.length, unsafe: module.ids.length - moduleCorrect };
 
             // Apply active filters & search to module scenarios
             const filteredModuleScenarios = moduleScenarios.filter((sc) => {
@@ -588,43 +665,33 @@ export function ResearchCompletion() {
               return true;
             });
 
+            // Navigation indexes
+            const prevModule = moduleIdx > 0 ? activeModules[moduleIdx - 1] : null;
+            const nextModule = moduleIdx < activeModules.length - 1 ? activeModules[moduleIdx + 1] : null;
+
             return (
-              <div
-                key={module.id}
-                className={`review-accordion-card card ${isOpen ? "is-expanded" : "is-collapsed"}`}
-              >
-                {/* Accordion Header */}
-                <button
-                  type="button"
-                  className="review-accordion-header w-full text-left"
-                  onClick={() => toggleSection(module.id)}
-                  aria-expanded={isOpen}
-                  aria-controls={`panel-${module.id}`}
-                >
+              <div key={module.id} className="active-mission-view">
+                {/* Active Mission Header Banner (Clean & Easy to scan) */}
+                <div className="active-mission-banner p-5 rounded-2xl border mb-6">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div className="flex items-center gap-3">
-                      <div className={`mission-icon-box ${module.color}`}>
+                    <div className="flex items-center gap-3.5">
+                      <div className={`mission-tab-icon-wrap ${module.color}`}>
                         <Icon size={22} aria-hidden="true" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="module-badge-tag">Mission 0{moduleIdx + 1}</span>
-                          <span className="module-number-label">{module.topic}</span>
+                          <span className="text-xs text-muted font-bold uppercase">{module.topic}</span>
                         </div>
-                        <h3 className="module-review-title text-lg font-bold mt-0.5">
-                          {module.name}
-                        </h3>
+                        <h3 className="text-xl font-extrabold text-ink mt-0.5">{module.name}</h3>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 flex-wrap">
-                      {/* Interactive Question Status Jump Strip */}
-                      <div
-                        className="module-header-quick-strip hidden sm:flex items-center gap-1.5"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label="Quick jump to question"
-                      >
-                        {module.ids.map((id, idx) => {
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {/* Jump-to-question pills */}
+                      <div className="flex items-center gap-1.5 flex-wrap" aria-label="Jump to Question">
+                        <span className="text-xs text-muted font-semibold mr-1 hidden sm:inline">Jump to:</span>
+                        {module.ids.map((id, qIdx) => {
                           const sc = scenarios.find((s) => s.id === id);
                           const attempt = firstAttempts.find((a) => a.scenarioId === id);
                           const debrief = debriefKeys[id];
@@ -640,10 +707,10 @@ export function ResearchCompletion() {
                               key={id}
                               type="button"
                               className={`q-nav-chip ${statusClass}`}
-                              title={`Question 0${idx + 1} (${id}): ${statusLabel} — Click to view`}
+                              title={`Question 0${qIdx + 1}: ${statusLabel}`}
                               onClick={() => scrollToScenario(module.id, id)}
                             >
-                              <span>Q{idx + 1}</span>
+                              <span>Q{qIdx + 1}</span>
                               {isCorrect ? (
                                 <Check size={11} className="shrink-0" aria-hidden="true" />
                               ) : !isAnswered ? (
@@ -658,236 +725,270 @@ export function ResearchCompletion() {
 
                       <div className="module-summary-pill text-xs">
                         <span className="text-muted">Safest Actions: </span>
-                        <strong className="text-primary font-semibold">{moduleCorrect} / {module.ids.length}</strong>
-                      </div>
-
-                      <div className="accordion-chevron-icon" aria-hidden="true">
-                        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        <strong className="text-primary font-semibold">{stats.correct} / {stats.total}</strong>
                       </div>
                     </div>
                   </div>
-                </button>
+                </div>
 
-                {/* Accordion Body */}
-                {isOpen && (
-                  <div
-                    id={`panel-${module.id}`}
-                    className="review-accordion-panel pt-4 pb-2"
-                    role="region"
-                    aria-label={`${module.name} Answers`}
-                  >
-                    {filteredModuleScenarios.length === 0 ? (
-                      <div className="review-all-safe-empty-state text-center py-8 px-4 rounded-xl border border-dashed my-2">
-                        <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2">
-                          <CheckCircle2 size={22} aria-hidden="true" />
-                        </div>
-                        <h4 className="font-bold text-ink">
-                          {activeFilter === "unsafe" ? `Flawless Defense in ${module.name}!` : "No Scenarios Match"}
-                        </h4>
-                        <p className="text-sm text-muted mt-1 max-w-md mx-auto">
-                          {activeFilter === "unsafe"
-                            ? "All 5 scenarios in this mission were resolved with the safest defensive action. No unsafe choices to review!"
-                            : searchQuery
-                            ? `No scenarios in this module match "${searchQuery}".`
-                            : "No scenarios match the selected filter."}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="challenges-review-list space-y-6">
-                        {filteredModuleScenarios.map((sc) => {
-                          const attempt = firstAttempts.find((a) => a.scenarioId === sc.id);
-                          const debrief = debriefKeys[sc.id];
+                {/* Scenarios List for this Mission */}
+                {filteredModuleScenarios.length === 0 ? (
+                  <div className="review-all-safe-empty-state text-center py-10 px-4 rounded-2xl border border-dashed my-4">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
+                      <CheckCircle2 size={26} aria-hidden="true" />
+                    </div>
+                    <h4 className="font-bold text-ink text-lg">
+                      {activeFilter === "unsafe" ? `Flawless Defense in ${module.name}!` : "No Scenarios Match Filter"}
+                    </h4>
+                    <p className="text-sm text-muted mt-1 max-w-md mx-auto">
+                      {activeFilter === "unsafe"
+                        ? "All 5 scenarios in this mission were resolved with the safest defensive action. No unsafe choices to review!"
+                        : searchQuery
+                        ? `No scenarios in this mission match "${searchQuery}".`
+                        : "No scenarios match the selected filter."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="challenges-review-list space-y-6">
+                    {filteredModuleScenarios.map((sc) => {
+                      const attempt = firstAttempts.find((a) => a.scenarioId === sc.id);
+                      const debrief = debriefKeys[sc.id];
 
-                          // Determine selected choice and correct choice
-                          const selectedChoice = sc.choices.find((c) => c.id === attempt?.selectedAction);
-                          const correctActionId = debrief?.action ?? sc.choices.find((c) => !c.unsafe && c.privacyRiskScore === 0)?.id;
-                          const correctChoice = sc.choices.find((c) => c.id === correctActionId);
+                      // Determine selected choice and correct choice
+                      const selectedChoice = sc.choices.find((c) => c.id === attempt?.selectedAction);
+                      const correctActionId = debrief?.action ?? sc.choices.find((c) => !c.unsafe && c.privacyRiskScore === 0)?.id;
+                      const correctChoice = sc.choices.find((c) => c.id === correctActionId);
 
-                          const isAnswered = Boolean(attempt && attempt.selectedAction !== null);
-                          const isCorrect = attempt?.correct === true || (isAnswered && attempt?.selectedAction === correctActionId);
+                      const isAnswered = Boolean(attempt && attempt.selectedAction !== null);
+                      const isCorrect = attempt?.correct === true || (isAnswered && attempt?.selectedAction === correctActionId);
 
-                          // Original question index within this mission (1 to 5)
-                          const originalIndex = module.ids.indexOf(sc.id) + 1;
+                      // Original question index within this mission (1 to 5)
+                      const originalIndex = module.ids.indexOf(sc.id) + 1;
 
-                          // Warning signs list
-                          const warningSigns = sc.mediaDetails?.warningIndicators && sc.mediaDetails.warningIndicators.length > 0
-                            ? sc.mediaDetails.warningIndicators
-                            : sc.evidence.map((e) => e.label);
+                      // Warning signs list
+                      const warningSigns = sc.mediaDetails?.warningIndicators && sc.mediaDetails.warningIndicators.length > 0
+                        ? sc.mediaDetails.warningIndicators
+                        : sc.evidence.map((e) => e.label);
 
-                          return (
-                            <article
-                              key={sc.id}
-                              id={`scenario-card-${sc.id}`}
-                              className={`review-question-card ${
-                                !isAnswered ? "status-skipped" : isCorrect ? "status-correct" : "status-incorrect"
-                              }`}
-                              aria-labelledby={`q-title-${sc.id}`}
-                            >
-                              {/* Question Header */}
-                              <div className="review-q-header flex items-center justify-between flex-wrap gap-2 pb-3 border-b">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="q-number-pill">Challenge 0{originalIndex} of 05</span>
-                                  <span className="q-id-code font-mono text-xs">#{sc.id}</span>
-                                  <span className="text-xs text-muted font-medium">· {module.name}</span>
-                                </div>
+                      return (
+                        <article
+                          key={sc.id}
+                          id={`scenario-card-${sc.id}`}
+                          className={`review-question-card ${
+                            !isAnswered ? "status-skipped" : isCorrect ? "status-correct" : "status-incorrect"
+                          }`}
+                          aria-labelledby={`q-title-${sc.id}`}
+                        >
+                          {/* Question Header */}
+                          <div className="review-q-header flex items-center justify-between flex-wrap gap-2 pb-3 border-b">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="q-number-pill">Challenge 0{originalIndex} of 05</span>
+                              <span className="q-id-code font-mono text-xs">#{sc.id}</span>
+                              <span className="text-xs text-muted font-medium">· {module.name}</span>
+                            </div>
 
-                                {/* Correct / Incorrect Status Badge */}
-                                <div className="q-status-badge-wrap">
-                                  {!isAnswered ? (
-                                    <span className="q-status-badge skipped">
-                                      <HelpCircle size={14} aria-hidden="true" />
-                                      <span>Skipped / Unanswered</span>
-                                    </span>
-                                  ) : isCorrect ? (
-                                    <span className="q-status-badge safe">
-                                      <CheckCircle2 size={14} aria-hidden="true" />
-                                      <span>Correct · Safest Action</span>
-                                    </span>
-                                  ) : (
-                                    <span className="q-status-badge unsafe">
-                                      <AlertOctagon size={14} aria-hidden="true" />
-                                      <span>Unsafe Action Selected</span>
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Mission Title & Scenario Briefing */}
-                              <div className="scenario-briefing-wrapper mt-3">
-                                <h4 id={`q-title-${sc.id}`} className="scenario-title text-base font-bold">
-                                  {sc.title}
-                                </h4>
-                                <div className="scenario-situation-box mt-2">
-                                  <div className="scenario-situation-label flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1">
-                                    <FileText size={13} className="text-muted" aria-hidden="true" />
-                                    <span>Scenario Briefing</span>
-                                  </div>
-                                  <p className="scenario-situation-text text-sm leading-relaxed">
-                                    {sc.situation}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Answer Resolution — Single Card for Safe, Comparative Grid for Unsafe */}
-                              {isCorrect ? (
-                                /* Single Unified Verified Safe Banner (NO DUPLICATE BOX!) */
-                                <div className="review-answer-unified-safe">
-                                  <div className="safe-card-badge-row">
-                                    <div className="safe-card-badge">
-                                      <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
-                                      <span>Your Choice · Safest Defense Selected</span>
-                                    </div>
-                                    <span className="safe-card-points">+10 XP · Protected</span>
-                                  </div>
-                                  <p className="safe-card-choice-text">
-                                    {selectedChoice ? selectedChoice.label : "Safest defense chosen"}
-                                  </p>
-                                  <div className="safe-card-note">
-                                    <ShieldCheck size={14} className="text-emerald shrink-0" aria-hidden="true" />
-                                    <span>Optimal cybersecurity protocol followed — zero sensitive data or credentials compromised.</span>
-                                  </div>
-                                </div>
+                            {/* Status Badge */}
+                            <div className="q-status-badge-wrap">
+                              {!isAnswered ? (
+                                <span className="q-status-badge skipped">
+                                  <HelpCircle size={14} aria-hidden="true" />
+                                  <span>Skipped / Unanswered</span>
+                                </span>
+                              ) : isCorrect ? (
+                                <span className="q-status-badge safe">
+                                  <CheckCircle2 size={14} aria-hidden="true" />
+                                  <span>Correct · Safest Action</span>
+                                </span>
                               ) : (
-                                /* Side-by-side Comparative View for Unsafe or Skipped decisions */
-                                <div className="review-answers-grid">
-                                  {/* Participant Selected Answer */}
-                                  <div className={`answer-card participant-answer ${!isAnswered ? "was-skipped" : "was-unsafe"}`}>
-                                    <div>
-                                      <div className="answer-card-header mb-1.5">
-                                        {!isAnswered ? (
-                                          <>
-                                            <HelpCircle size={15} className="text-muted shrink-0" aria-hidden="true" />
-                                            <span className="answer-card-label text-muted">Your Action: Skipped</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <XCircle size={15} className="text-red shrink-0" aria-hidden="true" />
-                                            <span className="answer-card-label text-red">Your Action: Unsafe Decision</span>
-                                          </>
-                                        )}
-                                      </div>
-                                      <p className="answer-card-content mt-1">
-                                        {selectedChoice ? selectedChoice.label : "No action was recorded for this scenario"}
-                                      </p>
-                                    </div>
-                                    {attempt?.disclosedInfoCategory && attempt.disclosedInfoCategory !== "None" && (
-                                      <div className="risk-exposure-tag mt-2.5">
-                                        <span>⚠️ Sensitive Data Exposed: <strong>{attempt.disclosedInfoCategory}</strong></span>
-                                      </div>
+                                <span className="q-status-badge unsafe">
+                                  <AlertOctagon size={14} aria-hidden="true" />
+                                  <span>Unsafe Action Selected</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Scenario Title & Scenario Briefing */}
+                          <div className="scenario-briefing-wrapper mt-3">
+                            <h4 id={`q-title-${sc.id}`} className="scenario-title text-base font-bold">
+                              {sc.title}
+                            </h4>
+                            <div className="scenario-situation-box mt-2">
+                              <div className="scenario-situation-label flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-1">
+                                <FileText size={13} className="text-muted" aria-hidden="true" />
+                                <span>Scenario Briefing</span>
+                              </div>
+                              <p className="scenario-situation-text text-sm leading-relaxed">
+                                {sc.situation}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Answer Resolution — Single Card for Safe, Comparative Grid for Unsafe */}
+                          {isCorrect ? (
+                            /* Single Unified Verified Safe Banner (NO DUPLICATE BOX!) */
+                            <div className="review-answer-unified-safe">
+                              <div className="safe-card-badge-row">
+                                <div className="safe-card-badge">
+                                  <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
+                                  <span>Your Choice · Safest Defense Selected</span>
+                                </div>
+                                <span className="safe-card-points">+10 XP · Protected</span>
+                              </div>
+                              <p className="safe-card-choice-text">
+                                {selectedChoice ? selectedChoice.label : "Safest defense chosen"}
+                              </p>
+                              <div className="safe-card-note">
+                                <ShieldCheck size={14} className="text-emerald shrink-0" aria-hidden="true" />
+                                <span>Optimal cybersecurity protocol followed — zero sensitive data or credentials compromised.</span>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Side-by-side Comparative View for Unsafe or Skipped decisions */
+                            <div className="review-answers-grid">
+                              {/* Participant Selected Answer */}
+                              <div className={`answer-card participant-answer ${!isAnswered ? "was-skipped" : "was-unsafe"}`}>
+                                <div>
+                                  <div className="answer-card-header mb-1.5">
+                                    {!isAnswered ? (
+                                      <>
+                                        <HelpCircle size={15} className="text-muted shrink-0" aria-hidden="true" />
+                                        <span className="answer-card-label text-muted">Your Action: Skipped</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <XCircle size={15} className="text-red shrink-0" aria-hidden="true" />
+                                        <span className="answer-card-label text-red">Your Action: Unsafe Decision</span>
+                                      </>
                                     )}
                                   </div>
-
-                                  {/* Correct / Safest Action */}
-                                  <div className="answer-card correct-answer">
-                                    <div>
-                                      <div className="answer-card-header mb-1.5">
-                                        <ShieldCheck size={15} className="text-emerald shrink-0" aria-hidden="true" />
-                                        <span className="answer-card-label text-emerald">Recommended Safest Action</span>
-                                      </div>
-                                      <p className="answer-card-content mt-1">
-                                        {correctChoice ? correctChoice.label : "Verify via official independent channels"}
-                                      </p>
-                                    </div>
-                                    <div className="safe-defense-tag mt-2.5">
-                                      <span>✓ Validated Institutional Defense Protocol</span>
-                                    </div>
-                                  </div>
+                                  <p className="answer-card-content mt-1">
+                                    {selectedChoice ? selectedChoice.label : "No action was recorded for this scenario"}
+                                  </p>
                                 </div>
-                              )}
-
-                              {/* Security Analysis & Defense Protocol Box */}
-                              <div className="review-security-insight-box mt-3.5">
-                                <div className="insight-header">
-                                  <div className="insight-icon-pill">
-                                    <Lightbulb size={15} className="text-primary shrink-0" aria-hidden="true" />
-                                  </div>
-                                  <span className="insight-title">Security Analysis &amp; Defense Protocol</span>
-                                </div>
-                                <p className="insight-explanation mt-2">
-                                  {debrief?.explanation ||
-                                    "Verifying directly through official institutional channels prevents credential theft and personal data exposure."}
-                                </p>
-                                {debrief?.consequence && (
-                                  <div className="insight-consequence mt-2.5">
-                                    <AlertTriangle size={14} className="text-amber shrink-0" aria-hidden="true" />
-                                    <div>
-                                      <strong className="text-amber">Potential Real-World Hazard: </strong>
-                                      <span>{debrief.consequence}</span>
-                                    </div>
+                                {attempt?.disclosedInfoCategory && attempt.disclosedInfoCategory !== "None" && (
+                                  <div className="risk-exposure-tag mt-2.5">
+                                    <span>⚠️ Sensitive Data Exposed: <strong>{attempt.disclosedInfoCategory}</strong></span>
                                   </div>
                                 )}
                               </div>
 
-                              {/* Threat Identified & Warning Signs Footer */}
-                              <div className="review-q-footer flex items-center justify-between flex-wrap gap-3 pt-3 mt-3.5 border-t text-xs text-muted">
-                                <div className="threat-tag-wrap flex items-center gap-1.5">
-                                  <span className="threat-category-badge">
-                                    <Target size={12} className="text-primary shrink-0" aria-hidden="true" />
-                                    <span className="text-muted font-medium">Threat Category:</span>
-                                    <strong className="text-ink">{module.topic}</strong>
-                                  </span>
+                              {/* Correct / Safest Action */}
+                              <div className="answer-card correct-answer">
+                                <div>
+                                  <div className="answer-card-header mb-1.5">
+                                    <ShieldCheck size={15} className="text-emerald shrink-0" aria-hidden="true" />
+                                    <span className="answer-card-label text-emerald">Recommended Safest Action</span>
+                                  </div>
+                                  <p className="answer-card-content mt-1">
+                                    {correctChoice ? correctChoice.label : "Verify via official independent channels"}
+                                  </p>
                                 </div>
+                                <div className="safe-defense-tag mt-2.5">
+                                  <span>✓ Validated Institutional Defense Protocol</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
 
-                                {warningSigns && warningSigns.length > 0 && (
-                                  <div className="warning-signs-wrap flex items-center gap-1.5 flex-wrap">
-                                    <span className="warning-signs-heading flex items-center gap-1 font-semibold text-amber">
-                                      <AlertTriangle size={13} aria-hidden="true" />
-                                      <span>Warning Signs:</span>
+                          {/* Security Analysis & Defense Protocol Box */}
+                          <div className="review-security-insight-box mt-3.5">
+                            <div className="insight-header">
+                              <div className="insight-icon-pill">
+                                <Lightbulb size={15} className="text-primary shrink-0" aria-hidden="true" />
+                              </div>
+                              <span className="insight-title">Security Analysis &amp; Defense Protocol</span>
+                            </div>
+                            <p className="insight-explanation mt-2">
+                              {debrief?.explanation ||
+                                "Verifying directly through official institutional channels prevents credential theft and personal data exposure."}
+                            </p>
+                            {debrief?.consequence && (
+                              <div className="insight-consequence mt-2.5">
+                                <AlertTriangle size={14} className="text-amber shrink-0" aria-hidden="true" />
+                                <div>
+                                  <strong className="text-amber">Potential Real-World Hazard: </strong>
+                                  <span>{debrief.consequence}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Threat Identified & Warning Signs Footer */}
+                          <div className="review-q-footer flex items-center justify-between flex-wrap gap-3 pt-3 mt-3.5 border-t text-xs text-muted">
+                            <div className="threat-tag-wrap flex items-center gap-1.5">
+                              <span className="threat-category-badge">
+                                <Target size={12} className="text-primary shrink-0" aria-hidden="true" />
+                                <span className="text-muted font-medium">Threat Category:</span>
+                                <strong className="text-ink">{module.topic}</strong>
+                              </span>
+                            </div>
+
+                            {warningSigns && warningSigns.length > 0 && (
+                              <div className="warning-signs-wrap flex items-center gap-1.5 flex-wrap">
+                                <span className="warning-signs-heading flex items-center gap-1 font-semibold text-amber">
+                                  <AlertTriangle size={13} aria-hidden="true" />
+                                  <span>Warning Signs:</span>
+                                </span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {warningSigns.slice(0, 4).map((sign, sIdx) => (
+                                    <span key={sIdx} className="warning-chip">
+                                      {sign}
                                     </span>
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      {warningSigns.slice(0, 4).map((sign, sIdx) => (
-                                        <span key={sIdx} className="warning-chip">
-                                          {sign}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
+                                  ))}
+                                </div>
                               </div>
-                            </article>
-                          );
-                        })}
-                      </div>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Step-by-step Previous & Next Mission Buttons (when in single mission view) */}
+                {activeMissionTab !== "all" && (
+                  <div className="mission-review-navigation-footer flex items-center justify-between flex-wrap gap-4">
+                    {prevModule ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveMissionTab(prevModule.id);
+                          const el = document.getElementById("review-answers-heading");
+                          el?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="button secondary flex items-center gap-2"
+                      >
+                        <ArrowLeft size={16} aria-hidden="true" />
+                        <span>Previous: Mission 0{moduleIdx} ({prevModule.name})</span>
+                      </button>
+                    ) : <div />}
+
+                    {nextModule ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveMissionTab(nextModule.id);
+                          const el = document.getElementById("review-answers-heading");
+                          el?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="button primary flex items-center gap-2"
+                      >
+                        <span>Next: Mission 0{moduleIdx + 2} ({nextModule.name})</span>
+                        <ArrowRight size={16} aria-hidden="true" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = document.getElementById("review-answers-heading");
+                          el?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="button primary flex items-center gap-2"
+                      >
+                        <span>Back to Top of Review</span>
+                        <ChevronUp size={16} aria-hidden="true" />
+                      </button>
                     )}
                   </div>
                 )}
