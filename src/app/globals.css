@@ -20218,13 +20218,105 @@ img, svg {
 
 
 /* ==========================================================================
-   02. FULL-IMAGE PROFESSIONAL ANIMATED CYBER VISUAL
+   02. FULL-IMAGE PROFESSIONAL ANIMATED CYBER VISUAL (PANORAMIC LAYOUT)
    ========================================================================== */
+
+.hero-panoramic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 60px;
+  position: relative;
+}
+
+.hero-header-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-header-block .eyebrow {
+  margin-bottom: 16px;
+}
+
+.hero-panoramic-visual-wrapper {
+  width: 100%;
+  max-width: 1140px;
+  margin: 36px auto 40px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-panoramic-visual-wrapper .hero-full-visual-container {
+  max-width: 1140px;
+  width: 100%;
+}
+
+.hero-panoramic-visual-wrapper .hero-full-image-frame {
+  aspect-ratio: 16 / 9;
+  max-height: 580px;
+  border-radius: 24px;
+}
+
+@media (min-width: 1024px) {
+  .hero-panoramic-visual-wrapper .hero-full-image-frame {
+    aspect-ratio: 21 / 10;
+    max-height: 560px;
+  }
+}
+
+.hero-panoramic-visual-wrapper .hero-cyber-glow.glow-primary {
+  width: 480px;
+  height: 480px;
+  top: -60px;
+  right: 5%;
+}
+
+.hero-panoramic-visual-wrapper .hero-cyber-glow.glow-secondary {
+  width: 440px;
+  height: 440px;
+  bottom: -60px;
+  left: 5%;
+}
+
+.hero-panoramic-visual-wrapper .hero-cyber-glow.glow-accent {
+  width: 320px;
+  height: 320px;
+  bottom: 20%;
+  right: 35%;
+}
+
+.hero-panoramic-metrics-deck {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.hero-panoramic-metrics-deck .hero-scope-metrics-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 0;
+}
+
+.hero-panoramic-metrics-deck .hero-scope-card {
+  padding: 22px 24px 20px;
+  border-radius: 18px;
+}
+
+@media (max-width: 900px) {
+  .hero-panoramic-metrics-deck .hero-scope-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
 
 .hero-full-visual-container {
   position: relative;
   width: 100%;
-  max-width: 660px;
+  max-width: 1140px;
   margin: 0 auto;
   display: flex;
   justify-content: center;

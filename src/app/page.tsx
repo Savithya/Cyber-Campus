@@ -24,76 +24,80 @@ export default function Home() {
   return (
     <div className="home-page-container">
       {/* =========================================================================
-          04 — HERO SECTION (CYBER INVESTIGATION PLATFORM STYLE)
+          04 — HERO SECTION (FULL-WIDTH PANORAMIC CYBER RESEARCH PLATFORM)
           ========================================================================= */}
-      <section id="home" className="hero-section container" aria-label="Interactive Cybersecurity Research Platform">
-        <div className="hero-two-col-grid">
-          {/* Left Column: Hero Content */}
-          <div className="hero-content-col">
-            <div className="eyebrow">
-              <span className="live-pulse-dot" aria-hidden="true" />
-              <span>ACADEMIC CYBERSECURITY RESEARCH PLATFORM · SRI LANKA</span>
-            </div>
-
-            <h1 className="hero-main-heading">
-              Explore Cyber Threats.
-              <br />
-              Protect Your <span>Digital Privacy</span>.
-            </h1>
-
-            <p className="hero-subtitle-text">
-              Participate in interactive cybersecurity scenarios investigating the impact of social
-              engineering threats on user privacy among university students in Sri Lanka.
-            </p>
-
-            <p className="hero-body-description">
-              Investigate realistic digital threats across four independent categories: phishing,
-              pretexting, impersonation, and malicious links. Make informed decisions in a safe,
-              controlled simulation environment to contribute essential data for student privacy research.
-            </p>
-
-            {/* 04.A — THREE USER-FRIENDLY UI/UX HERO STATISTIC CARDS */}
-            <HeroScopeMetrics />
-
-            {/* Hero CTAs */}
-            <div className="hero-actions-row mt-8">
-              <Link
-                className="button primary large hero-cta-btn"
-                href="/consent"
-                aria-label="Start Research Participation"
-              >
-                <span>Start Research</span>
-                <ClipboardList size={19} aria-hidden="true" />
-              </Link>
-
-              <a
-                className="button secondary large hero-cta-btn"
-                href="#challenges"
-                aria-label="Explore Cyber Challenges"
-              >
-                <span>Explore Cyber Challenges</span>
-                <Gamepad2 size={19} aria-hidden="true" />
-              </a>
-            </div>
-
-            {/* Reassurance Chips */}
-            <div className="hero-reassurance-row mt-6">
-              <span className="reassurance-pill">
-                <Check size={14} className="text-emerald" aria-hidden="true" /> 100% Voluntary Participation
-              </span>
-              <span className="reassurance-pill">
-                <LockKeyhole size={14} className="text-cyan" aria-hidden="true" /> Anonymous Research ID · No Real Passwords
-              </span>
-              <span className="reassurance-pill">
-                <ShieldCheck size={14} className="text-purple" aria-hidden="true" /> 4 Threat Vectors · User Privacy (DV)
-              </span>
-            </div>
+      <section
+        id="home"
+        className="hero-section hero-panoramic-section container"
+        aria-label="Interactive Cybersecurity Research Platform"
+      >
+        {/* Top Header Block (Centered & High-Impact) */}
+        <div className="hero-header-block max-w-4xl mx-auto">
+          <div className="eyebrow inline-flex items-center gap-2 justify-center mb-4">
+            <span className="live-pulse-dot" aria-hidden="true" />
+            <span>ACADEMIC CYBERSECURITY RESEARCH PLATFORM · SRI LANKA</span>
           </div>
 
-          {/* Right Column: Professional Animated Cyber Visual */}
-          <div className="hero-visual-col">
-            <HeroCyberVisual />
+          <h1 className="hero-main-heading">
+            Explore Cyber Threats.
+            <br />
+            Protect Your <span>Digital Privacy</span>.
+          </h1>
+
+          <p className="hero-subtitle-text max-w-3xl mx-auto">
+            Participate in interactive cybersecurity scenarios investigating the impact of social
+            engineering threats on user privacy among university students in Sri Lanka.
+          </p>
+
+          <p className="hero-body-description max-w-3xl mx-auto">
+            Investigate realistic digital threats across four independent categories: phishing,
+            pretexting, impersonation, and malicious links. Make informed decisions in a safe,
+            controlled simulation environment to contribute essential data for student privacy research.
+          </p>
+
+          {/* Hero CTAs */}
+          <div className="hero-actions-row justify-center mt-6">
+            <Link
+              className="button primary large hero-cta-btn"
+              href="/consent"
+              aria-label="Start Research Participation"
+            >
+              <span>Start Research</span>
+              <ClipboardList size={19} aria-hidden="true" />
+            </Link>
+
+            <a
+              className="button secondary large hero-cta-btn"
+              href="#challenges"
+              aria-label="Explore Cyber Challenges"
+            >
+              <span>Explore Cyber Challenges</span>
+              <Gamepad2 size={19} aria-hidden="true" />
+            </a>
           </div>
+
+          {/* Reassurance Chips */}
+          <div className="hero-reassurance-row justify-center mt-4">
+            <span className="reassurance-pill">
+              <Check size={14} className="text-emerald" aria-hidden="true" /> 100% Voluntary Participation
+            </span>
+            <span className="reassurance-pill">
+              <LockKeyhole size={14} className="text-cyan" aria-hidden="true" /> Anonymous Research ID · No Real Passwords
+            </span>
+            <span className="reassurance-pill">
+              <ShieldCheck size={14} className="text-purple" aria-hidden="true" /> 4 Threat Vectors · User Privacy (DV)
+            </span>
+          </div>
+        </div>
+
+        {/* Center: Full-Width Panoramic Animated Cyber Visual */}
+        <div className="hero-panoramic-visual-wrapper">
+          <HeroCyberVisual />
+        </div>
+
+        {/* Bottom: 3 UI/UX Metric Cards in a Wide, Spacious Full-Width Grid */}
+        <div className="hero-panoramic-metrics-deck">
+          <HeroScopeMetrics />
         </div>
       </section>
 
