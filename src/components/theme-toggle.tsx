@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Moon, Sun, CircuitBoard, Check, ChevronDown } from "lucide-react";
+import { Moon, Sun, Check, ChevronDown } from "lucide-react";
 import { useTheme, Theme, THEMES } from "./theme-provider";
 
 export function ThemeToggle({
@@ -50,8 +50,6 @@ export function ThemeToggle({
         return <Moon size={size} strokeWidth={1.9} aria-hidden="true" />;
       case "light":
         return <Sun size={size} strokeWidth={1.9} aria-hidden="true" />;
-      case "cyber":
-        return <CircuitBoard size={size} strokeWidth={1.9} aria-hidden="true" />;
       default:
         return <Moon size={size} strokeWidth={1.9} aria-hidden="true" />;
     }
@@ -63,8 +61,6 @@ export function ThemeToggle({
         return "Dark";
       case "light":
         return "Light";
-      case "cyber":
-        return "Cyber";
       default:
         return "Dark";
     }
@@ -159,7 +155,7 @@ export function ThemeToggle({
     );
   }
 
-  // Segmented Capsule Appearance Switcher (Dark | Light | Cyber)
+  // Segmented Capsule Appearance Switcher (Dark | Light)
   return (
     <div
       className={`appearance-switcher theme-segmented-pill ${className}`}

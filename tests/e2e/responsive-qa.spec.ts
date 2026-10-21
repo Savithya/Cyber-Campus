@@ -31,33 +31,24 @@ test.describe("Comprehensive Responsive Quality Assurance across all 8 breakpoin
     });
   }
 
-  test("Verify theme switching between Light, Dark, and Cyber at 375px and 1280px", async ({ page }) => {
+  test("Verify theme switching between Light and Dark at 375px and 1280px", async ({ page }) => {
     for (const width of [375, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/");
 
-      // Test Cyber theme
-      await page.evaluate(() => {
-        document.documentElement.setAttribute("data-theme", "cyber");
-        document.documentElement.classList.remove("light", "dark");
-        document.documentElement.classList.add("cyber");
-      });
-      let overflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-      expect(overflow, `Overflow in cyber theme at ${width}px`).toBe(true);
-
       // Test Light theme
       await page.evaluate(() => {
         document.documentElement.setAttribute("data-theme", "light");
-        document.documentElement.classList.remove("cyber", "dark");
+        document.documentElement.classList.remove("dark");
         document.documentElement.classList.add("light");
       });
-      overflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+      let overflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
       expect(overflow, `Overflow in light theme at ${width}px`).toBe(true);
 
       // Test Dark theme
       await page.evaluate(() => {
         document.documentElement.setAttribute("data-theme", "dark");
-        document.documentElement.classList.remove("cyber", "light");
+        document.documentElement.classList.remove("light");
         document.documentElement.classList.add("dark");
       });
       overflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);

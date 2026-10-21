@@ -47,14 +47,13 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     await expect(researcherPill).toContainText("Researcher Access");
     await expect(researcherPill).toHaveAttribute("href", "/admin/login");
 
-    // Verify Appearance Switcher with 3 options
+    // Verify Appearance Switcher with 2 options
     const switcher = page.locator("header.site-header .appearance-switcher");
     await expect(switcher).toBeVisible();
     const segments = switcher.locator("button[role='radio']");
-    await expect(segments).toHaveCount(3);
+    await expect(segments).toHaveCount(2);
     await expect(segments.nth(0)).toContainText("Dark");
     await expect(segments.nth(1)).toContainText("Light");
-    await expect(segments.nth(2)).toContainText("Cyber");
   });
 
   test("Active route styling based on route (not hardcoded Home)", async ({ page }) => {
@@ -105,7 +104,7 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     expect(scrollY).toBeLessThan(100);
   });
 
-  test("Three-mode Appearance Switcher: Dark, Light, Cyber functionality & persistence", async ({
+  test("Two-mode Appearance Switcher: Dark, Light functionality & persistence", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -114,7 +113,6 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     const switcher = page.locator("header.site-header .appearance-switcher");
     const darkBtn = switcher.locator("button[role='radio']").nth(0);
     const lightBtn = switcher.locator("button[role='radio']").nth(1);
-    const cyberBtn = switcher.locator("button[role='radio']").nth(2);
 
     // Switch to Light
     await lightBtn.click();
@@ -124,15 +122,6 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     expect(themeAttr).toBe("light");
     let stored = await page.evaluate(() => localStorage.getItem("cc-theme"));
     expect(stored).toBe("light");
-
-    // Switch to Cyber
-    await cyberBtn.click();
-    await expect(cyberBtn).toHaveClass(/selected/);
-    await expect(cyberBtn).toHaveAttribute("aria-checked", "true");
-    themeAttr = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
-    expect(themeAttr).toBe("cyber");
-    stored = await page.evaluate(() => localStorage.getItem("cc-theme"));
-    expect(stored).toBe("cyber");
 
     // Switch to Dark
     await darkBtn.click();
@@ -144,10 +133,10 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     expect(stored).toBe("dark");
 
     // Verify persistence across page navigation
-    await cyberBtn.click();
+    await lightBtn.click();
     await page.goto("/privacy");
     themeAttr = await page.evaluate(() => document.documentElement.getAttribute("data-theme"));
-    expect(themeAttr).toBe("cyber");
+    expect(themeAttr).toBe("light");
   });
 
   test("Mobile navigation drawer: open, ordered links, appearance switcher, and close", async ({
@@ -190,10 +179,9 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     const mobileSwitcher = drawer.locator(".mobile-appearance-toggle");
     await expect(mobileSwitcher).toBeVisible();
     const mobileSegments = mobileSwitcher.locator("button[role='radio']");
-    await expect(mobileSegments).toHaveCount(3);
+    await expect(mobileSegments).toHaveCount(2);
     await expect(mobileSegments.nth(0)).toContainText("Dark");
     await expect(mobileSegments.nth(1)).toContainText("Light");
-    await expect(mobileSegments.nth(2)).toContainText("Cyber");
 
     // Test theme change from mobile drawer
     await mobileSegments.nth(1).click();

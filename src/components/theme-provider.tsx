@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 
-export type Theme = "dark" | "light" | "cyber";
+export type Theme = "dark" | "light";
 
 interface ThemeContextType {
   theme: Theme;
@@ -24,7 +24,6 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const THEMES: { id: Theme; label: string; icon: string }[] = [
   { id: "dark", label: "Dark", icon: "moon" },
   { id: "light", label: "Light", icon: "sun" },
-  { id: "cyber", label: "Cyber", icon: "circuit-board" },
 ];
 
 export function ThemeScript() {
@@ -32,7 +31,7 @@ export function ThemeScript() {
     try {
       var stored = localStorage.getItem("${THEME_STORAGE_KEY}");
       var theme = stored;
-      if (!theme || (theme !== "dark" && theme !== "light" && theme !== "cyber")) {
+      if (!theme || (theme !== "dark" && theme !== "light")) {
         var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         theme = prefersDark ? "dark" : "light";
       }
@@ -64,7 +63,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (stored && (stored === "dark" || stored === "light" || stored === "cyber")) {
+      if (stored && (stored === "dark" || stored === "light")) {
         setThemeState(stored);
         applyTheme(stored);
       } else {
@@ -91,10 +90,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     setThemeState((current) => {
-      let next: Theme = "dark";
-      if (current === "dark") next = "light";
-      else if (current === "light") next = "cyber";
-      else next = "dark";
+      const next: Theme = current === "dark" ? "light" : "dark";
 
       applyTheme(next);
       try {
