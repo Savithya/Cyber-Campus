@@ -193,4 +193,5 @@ export type Filters = {
   Q5?: string;
   exposure?: string;
   status?: string;
+  mission?: string;
 };

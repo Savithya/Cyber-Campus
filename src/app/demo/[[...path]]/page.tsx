@@ -15,12 +15,14 @@ export default async function Page({
   if (isResearch()) notFound();
   const demoSubmissions = await getDemoSubmissions();
   const allSessions = [...demoSubmissions, ...syntheticSessions()];
+  const resolvedPath = (await params).path ?? [];
+  const safePath = resolvedPath[0] === "statistics" ? [] : resolvedPath;
   return (
     <Suspense fallback={<Loading />}>
       <Admin
         sessions={allSessions}
         demo
-        path={(await params).path ?? []}
+        path={safePath}
         scenarios={scenarios}
       />
     </Suspense>

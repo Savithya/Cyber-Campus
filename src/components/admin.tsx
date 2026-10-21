@@ -23,7 +23,6 @@ import {
   Printer,
   ShieldCheck,
   ShieldAlert,
-  Sigma,
   Layers,
   AlertTriangle,
   CheckCircle2,
@@ -56,7 +55,7 @@ import { scoreSummary, computeThreatMetrics } from "@/lib/scoring";
 import { api } from "@/lib/client";
 import type { Session, Filters, Question, Scenario } from "@/lib/types";
 import { PageHeading, ErrorBox } from "./ui";
-import StatisticalAnalysis from "./statistical-analysis";
+import { GlobalResearchFilters } from "./global-research-filters";
 
 const navs = [
   ["", "Overview", LayoutDashboard],
@@ -71,7 +70,6 @@ const navs = [
   ["responses", "Original Responses", Database],
   ["exports", "Export Research Data", Download],
   ["history", "Submission History", History],
-  ["statistics", "Statistical Analysis", Sigma],
 ] as const;
 
 const SCENARIO_TITLES: Record<string, string> = {
@@ -429,9 +427,7 @@ export default function Admin({
                                   ? "Participant Submission History"
                                   : active === "exports"
                                     ? "Secure Research Data Export Centre"
-                                    : active === "statistics"
-                                      ? "Advanced Statistical Analysis"
-                                      : active === "threats"
+                                    : active === "threats"
                                         ? "Threat Impact Comparison"
                                         : active === "iv-analysis"
                                           ? "Threat Variables (IV1–IV4)"
@@ -444,8 +440,6 @@ export default function Admin({
         >
           {demo
             ? "Synthetic demonstration data · no actual participant findings."
-            : active === "statistics"
-              ? "Comprehensive statistical inference, hypothesis testing, and regression analysis."
               : active === "links-mission"
                 ? "Dedicated mission definition and question overview for SC01–SC05."
                 : active === "links-analysis"
@@ -476,93 +470,25 @@ export default function Admin({
         )}
 
         {/* Global Filter Bar */}
-        <details className="filter-panel" open>
-          <summary>
-            <SlidersHorizontal size={17} /> Filter this view
-            <span>{filtered.length} submitted responses</span>
-          </summary>
-          <div className="filter-grid">
-            <label>
-              Submitted from (Colombo)
-              <input
-                type="date"
-                value={filters.from ?? ""}
-                onChange={(e) => change("from", e.target.value)}
-              />
-            </label>
-            <label>
-              Submitted through (Colombo)
-              <input
-                type="date"
-                value={filters.to ?? ""}
-                onChange={(e) => change("to", e.target.value)}
-              />
-            </label>
-            <label>
-              Participant code or Submission ID
-              <input
-                placeholder="Search participant code or submission ID"
-                value={filters.code ?? ""}
-                onChange={(e) => change("code", e.target.value)}
-              />
-            </label>
-            {questions.slice(0, 5).map((q) => (
-              <label key={q.id}>
-                {q.variable}
-                <select
-                  value={filters[q.id as keyof Filters] ?? ""}
-                  onChange={(e) => change(q.id, e.target.value)}
-                >
-                  <option value="">All categories</option>
-                  {q.options.map((o) => (
-                    <option key={o.code} value={o.code}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ))}
-            <label>
-              Known prior practice
-              <select
-                value={filters.exposure ?? ""}
-                onChange={(e) => change("exposure", e.target.value)}
-              >
-                <option value="">All exposure statuses</option>
-                <option value="true">Known prior exposure</option>
-                <option value="false">No known prior exposure</option>
-              </select>
-            </label>
-            <label>
-              Questionnaire status
-              <select
-                value={filters.status ?? ""}
-                onChange={(e) => change("status", e.target.value)}
-              >
-                <option value="">All statuses</option>
-                <option value="submitted_complete">Submitted complete</option>
-                <option value="submitted_with_missing">
-                  Submitted with missing
-                </option>
-                <option value="draft">Drafts</option>
-              </select>
-            </label>
-          </div>
-          <button
-            className="button ghost"
-            onClick={() => {
-              setFilters({});
-              history.replaceState(null, "", location.pathname);
-              setPage(0);
-            }}
-          >
-            Clear filters
-          </button>
-          <p className="small-copy">
-            Active filters: {filterText}. Date filters apply to submission
-            dates; for drafts they use consent dates.
-          </p>
-        </details>
+        {/* Simplified Global Research Filters */}
+        <GlobalResearchFilters
+          filters={filters}
+          onChange={(next) => {
+            setFilters(next);
+            setPage(0);
+            const q = new URLSearchParams(
+              Object.entries(next).filter(([, v]) => v) as [string, string][],
+            );
+            history.replaceState(
+              null,
+              "",
+              location.pathname + (q.toString() ? "?" + q.toString() : ""),
+            );
+          }}
+          filteredCount={all.length}
+          totalCount={sessions.filter((s) => s.mode !== "practice").length}
+          activeSection={active}
+        />
 
         {/* =====================================================================
             1. OVERVIEW
@@ -1561,15 +1487,7 @@ export default function Admin({
         {/* =====================================================================
             13. STATISTICAL ANALYSIS
             ===================================================================== */}
-        {active === "statistics" && (
-          <StatisticalAnalysis
-            sessions={filtered}
-            allSessions={all}
-            demo={demo}
-            filters={filters}
-            filterText={filterText}
-          />
-        )}
+        {/* Statistical Analysis removed */}
 
         {/* =====================================================================
             LEGACY / BOOKMARK ROUTES: THREATS & IV-ANALYSIS

@@ -17474,3 +17474,338 @@ img, svg {
     font-size: 22px;
   }
 }
+
+
+/* ==========================================================================
+   RESEARCH DATA FILTERS — COMPACT GLOBAL FILTER SYSTEM
+   ========================================================================== */
+
+.global-research-filters-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-panel-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.filter-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-panel-heading {
+  font-size: 17px;
+  font-weight: 750;
+  color: var(--ink);
+  margin: 0;
+}
+
+.filter-panel-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.filter-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-result-counter {
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+}
+
+.reset-filters-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.filter-essential-controls-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .filter-essential-controls-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-control-label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.filter-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.filter-input-wrap .input-icon {
+  position: absolute;
+  left: 11px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.filter-text-input {
+  width: 100%;
+  height: 38px;
+  padding-left: 34px;
+  padding-right: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  font-size: 13px;
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+
+.filter-text-input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search-btn:hover {
+  color: var(--ink);
+}
+
+.filter-select-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-select-input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.filter-control-item.date-control .filter-select-input {
+  padding-left: 34px;
+}
+
+.custom-date-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.date-sub-input {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sub-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.filter-date-field {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.filter-date-field:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.filter-advanced-toggle-bar {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.advanced-filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.advanced-filter-toggle-btn:hover {
+  background: var(--paper);
+}
+
+.advanced-filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.advanced-group-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.advanced-group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.advanced-group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.advanced-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.advanced-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.active-filter-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.chips-label {
+  white-space: nowrap;
+}
+
+.chips-flex-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--lavender);
+  border: 1px solid var(--lavender-border);
+  color: var(--primary);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.chip-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s ease;
+}
+
+.chip-remove-btn:hover {
+  opacity: 0.7;
+}
