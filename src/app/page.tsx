@@ -6,27 +6,19 @@ import {
   LockKeyhole,
   Check,
   GraduationCap,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   ShieldAlert,
   BookOpen,
-  Mail,
-  MessagesSquare,
-  UserRoundSearch,
-  Link2,
-  Clock,
   Database,
   CheckCircle2,
-  Layers,
-  ChevronDown,
-  ChevronRight,
-  HelpCircle,
   FileText,
   UserCheck,
 } from "lucide-react";
 import { HomeThreatCards } from "@/components/home-threat-cards";
 import { CyberInvestigatorShowcase } from "@/components/cyber-investigator-showcase";
+import { HeroScopeMetrics } from "@/components/hero-scope-metrics";
+import { HeroCyberVisual } from "@/components/hero-cyber-visual";
 
 export default function Home() {
   return (
@@ -60,50 +52,8 @@ export default function Home() {
               controlled simulation environment to contribute essential data for student privacy research.
             </p>
 
-            {/* 04.A — THREE PREMIUM HERO STATISTIC CARDS */}
-            <div className="hero-stats-premium-grid mt-6" role="region" aria-label="Research Scope Statistics">
-              {/* Card 1: 4 Threat Categories */}
-              <div className="stat-card-premium">
-                <div className="stat-card-icon-box purple">
-                  <Layers size={22} className="text-primary" aria-hidden="true" />
-                </div>
-                <div className="stat-card-content">
-                  <div className="stat-card-number">4</div>
-                  <div className="stat-card-label">Threat Categories</div>
-                  <p className="stat-card-support">
-                    Explore four common social engineering techniques (IV1–IV4).
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 2: 20 Interactive Challenges */}
-              <div className="stat-card-premium">
-                <div className="stat-card-icon-box cyan">
-                  <ShieldAlert size={22} className="text-cyan" aria-hidden="true" />
-                </div>
-                <div className="stat-card-content">
-                  <div className="stat-card-number">20</div>
-                  <div className="stat-card-label">Interactive Challenges</div>
-                  <p className="stat-card-support">
-                    Investigate realistic cybersecurity situations and make safe choices.
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 3: 15–20 Min Estimated Time */}
-              <div className="stat-card-premium">
-                <div className="stat-card-icon-box emerald">
-                  <Clock size={22} className="text-emerald" aria-hidden="true" />
-                </div>
-                <div className="stat-card-content">
-                  <div className="stat-card-number">15–20 Min</div>
-                  <div className="stat-card-label">Estimated Time</div>
-                  <p className="stat-card-support">
-                    Expected time to complete your voluntary research participation.
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* 04.A — THREE USER-FRIENDLY UI/UX HERO STATISTIC CARDS */}
+            <HeroScopeMetrics />
 
             {/* Hero CTAs */}
             <div className="hero-actions-row mt-8">
@@ -140,21 +90,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column: Hero Visual Image */}
+          {/* Right Column: Professional Animated Cyber Visual */}
           <div className="hero-visual-col">
-            <div className="hero-image-frame">
-              <picture>
-                <source srcSet="/images/cyber-research-lab.webp" type="image/webp" />
-                <img
-                  src="/images/cyber-research-lab.jpg"
-                  alt="Interactive Cybersecurity Research Laboratory — Digital Workstation with Threat Telemetry and Privacy Shields"
-                  className="hero-cybersecurity-image"
-                  width={1376}
-                  height={768}
-                  loading="eager"
-                />
-              </picture>
-            </div>
+            <HeroCyberVisual />
           </div>
         </div>
       </section>

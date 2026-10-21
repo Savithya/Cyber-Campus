@@ -226,3 +226,42 @@ describe("Simplified Global Research Filters", () => {
     expect(res[0].code).toBe("PART-102");
   });
 });
+
+describe("Review My Answers — Professional Educational Debrief Data Integrity", () => {
+  it("should have comprehensive debrief explanations and consequences for all 20 challenges", async () => {
+    const { answerKeys } = await import("@/content/scenarios.server");
+    const activeIds = [
+      "PH01", "PH02", "PH03", "PH04", "PH05",
+      "PT01", "PT02", "PT03", "PT04", "PT05",
+      "IM01", "IM02", "IM03", "IM04", "IM05",
+      "SC01", "SC02", "SC03", "SC04", "SC05",
+    ];
+
+    for (const id of activeIds) {
+      const debrief = answerKeys[id];
+      expect(debrief, `Debrief key for ${id} must exist`).toBeDefined();
+      expect(debrief.action, `Debrief ${id} must specify safe action ID`).toBeTruthy();
+      expect(debrief.explanation, `Debrief ${id} must have explanation`).toBeTruthy();
+      expect(debrief.explanation.length).toBeGreaterThanOrEqual(20);
+      expect(debrief.consequence, `Debrief ${id} must provide real-world consequence`).toBeTruthy();
+    }
+  });
+
+  it("should provide warning signs and situational briefings for all 20 challenges", () => {
+    const activeIds = [
+      "PH01", "PH02", "PH03", "PH04", "PH05",
+      "PT01", "PT02", "PT03", "PT04", "PT05",
+      "IM01", "IM02", "IM03", "IM04", "IM05",
+      "SC01", "SC02", "SC03", "SC04", "SC05",
+    ];
+
+    for (const id of activeIds) {
+      const sc = scenarios.find((s) => s.id === id)!;
+      expect(sc.situation, `Scenario ${id} situation must be defined`).toBeTruthy();
+      const warningSigns = sc.mediaDetails?.warningIndicators && sc.mediaDetails.warningIndicators.length > 0
+        ? sc.mediaDetails.warningIndicators
+        : sc.evidence.map((e) => e.label);
+      expect(warningSigns.length, `Scenario ${id} must have warning indicators`).toBeGreaterThan(0);
+    }
+  });
+});
