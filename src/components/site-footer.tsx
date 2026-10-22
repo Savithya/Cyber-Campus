@@ -5,15 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ShieldCheck,
-  ShieldAlert,
+  Shield,
   GraduationCap,
   Lock,
-  ChevronRight,
   ArrowUp,
-  Compass,
-  FileText,
-  CheckCircle2,
-  Sparkles,
 } from "lucide-react";
 
 interface SiteFooterProps {
@@ -42,14 +37,13 @@ export function SiteFooter({ compact }: SiteFooterProps) {
         role="contentinfo"
         aria-label="Cyber Campus Research Footer"
       >
-        <div className="footer-top-accent" aria-hidden="true" />
         <div className="footer-compact-container">
           <div className="footer-compact-brand">
             <div className="footer-compact-icon-box">
-              <ShieldCheck size={18} className="text-cyan shrink-0" aria-hidden="true" />
+              <ShieldCheck size={16} aria-hidden="true" />
             </div>
             <div className="footer-compact-title-group">
-              <span className="footer-compact-title">Cyber Campus</span>
+              <span className="footer-compact-title">CyberCampus</span>
               <span className="footer-compact-sub">· Academic Cybersecurity Study (Sri Lanka)</span>
             </div>
           </div>
@@ -87,27 +81,16 @@ export function SiteFooter({ compact }: SiteFooterProps) {
       role="contentinfo"
       aria-label="Cyber Campus Platform Footer"
     >
-      {/* Sleek top glowing border line */}
-      <div className="footer-top-accent" aria-hidden="true" />
-
       <div className="footer-grid-container">
-        {/* Column 1 — Cyber Campus Brand & Overview */}
+        {/* Column 1 — Brand & Research Overview */}
         <div className="footer-col brand-col">
           <div className="footer-brand-header">
             <div className="footer-brand-icon-box">
-              <ShieldCheck size={24} className="footer-brand-icon" aria-hidden="true" />
+              <ShieldCheck size={20} aria-hidden="true" />
             </div>
             <div className="footer-brand-title-group">
-              <div className="footer-brand-title">
-                Cyber<span>Campus</span>
-              </div>
-              <div className="footer-brand-badge-row">
-                <span className="footer-brand-tag">RESEARCH PLATFORM</span>
-                <span className="footer-status-pill">
-                  <span className="footer-status-dot" aria-hidden="true" />
-                  <span>IRB Active</span>
-                </span>
-              </div>
+              <span className="footer-brand-title">CyberCampus</span>
+              <span className="footer-brand-tag">Academic Research Study</span>
             </div>
           </div>
 
@@ -116,137 +99,106 @@ export function SiteFooter({ compact }: SiteFooterProps) {
             cybersecurity behaviors, and user privacy risks among university students in Sri Lanka.
           </p>
 
-          <div className="footer-trust-badges">
-            <div className="footer-trust-chip">
-              <GraduationCap size={14} className="footer-chip-icon text-primary" aria-hidden="true" />
-              <span>Academic Research Initiative</span>
+          <div className="footer-brand-meta">
+            <div className="footer-meta-item">
+              <GraduationCap size={14} className="footer-meta-icon" aria-hidden="true" />
+              <span>University Research Initiative</span>
             </div>
-            <div className="footer-trust-chip">
-              <CheckCircle2 size={14} className="footer-chip-icon text-emerald" aria-hidden="true" />
-              <span>Confidential &amp; Anonymized Study</span>
+            <div className="footer-meta-item">
+              <Lock size={14} className="footer-meta-icon" aria-hidden="true" />
+              <span>IRB Protocol Governed &amp; Anonymized</span>
             </div>
           </div>
         </div>
 
         {/* Column 2 — Quick Navigation */}
         <div className="footer-col">
-          <div className="footer-col-header">
-            <Compass size={15} className="footer-col-icon text-cyan" aria-hidden="true" />
-            <h3 className="footer-col-heading">Quick Navigation</h3>
-          </div>
+          <h3 className="footer-col-heading">Quick Navigation</h3>
           <ul className="footer-nav-list" role="list">
             <li>
               <Link href="/" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Home Overview</span>
+                Home Overview
               </Link>
             </li>
             <li>
               <Link href="/#challenges" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Cyber Challenges</span>
-                <span className="footer-link-badge">Interactive</span>
+                Cyber Challenges
               </Link>
             </li>
             <li>
               <Link href="/consent" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Join Research</span>
-                <span className="footer-link-badge highlight">Enroll</span>
+                Join Research
               </Link>
             </li>
             <li>
               <Link href="/#about-study" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>About the Study</span>
+                About the Study
               </Link>
             </li>
           </ul>
         </div>
 
-        {/* Column 3 — Research Information & Ethics */}
+        {/* Column 3 — Research & Ethics */}
         <div className="footer-col">
-          <div className="footer-col-header">
-            <FileText size={15} className="footer-col-icon text-primary" aria-hidden="true" />
-            <h3 className="footer-col-heading">Research &amp; Ethics</h3>
-          </div>
+          <h3 className="footer-col-heading">Research &amp; Ethics</h3>
           <ul className="footer-nav-list" role="list">
             <li>
               <Link href="/consent" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Study Information &amp; Ethics</span>
+                Study Information &amp; Ethics
               </Link>
             </li>
             <li>
               <Link href="/privacy" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Privacy &amp; Data Protection</span>
+                Privacy &amp; Data Protection
               </Link>
             </li>
             <li>
               <Link href="/privacy#rights" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Participant Rights</span>
+                Participant Rights
               </Link>
             </li>
             <li>
               <Link href="/withdraw" prefetch={true} className="footer-nav-link">
-                <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
-                <span>Withdrawal Protocol</span>
+                Withdrawal Protocol
               </Link>
             </li>
           </ul>
         </div>
 
-        {/* Column 4 — Platform Governance (Enhanced Trust Cards) */}
+        {/* Column 4 — Platform Governance */}
         <div className="footer-col platform-col">
-          <div className="footer-col-header">
-            <Sparkles size={15} className="footer-col-icon text-amber" aria-hidden="true" />
-            <h3 className="footer-col-heading">Platform Governance</h3>
-          </div>
-          <div className="footer-governance-cards">
-            {/* Governance Card 1 */}
+          <h3 className="footer-col-heading">Platform Governance</h3>
+          <div className="footer-gov-list">
             <div className="footer-gov-item">
-              <div className="footer-gov-icon-wrap amber">
-                <ShieldAlert size={16} aria-hidden="true" />
+              <div className="footer-gov-icon-wrap">
+                <Shield size={14} aria-hidden="true" />
               </div>
               <div className="footer-gov-content">
-                <div className="footer-gov-title-row">
-                  <strong className="footer-gov-label">4 Threat Vectors</strong>
-                  <span className="footer-gov-tag">Simulated</span>
-                </div>
+                <span className="footer-gov-label">4 Threat Vectors</span>
                 <p className="footer-gov-text">
                   Phishing, pretexting, impersonation &amp; scam risk scenarios.
                 </p>
               </div>
             </div>
 
-            {/* Governance Card 2 */}
             <div className="footer-gov-item">
-              <div className="footer-gov-icon-wrap cyan">
-                <GraduationCap size={16} aria-hidden="true" />
+              <div className="footer-gov-icon-wrap">
+                <GraduationCap size={14} aria-hidden="true" />
               </div>
               <div className="footer-gov-content">
-                <div className="footer-gov-title-row">
-                  <strong className="footer-gov-label">Academic Inquiry</strong>
-                  <span className="footer-gov-tag">Non-Commercial</span>
-                </div>
+                <span className="footer-gov-label">Academic Inquiry</span>
                 <p className="footer-gov-text">
                   Dedicated to scientific research with zero commercial tracking.
                 </p>
               </div>
             </div>
 
-            {/* Governance Card 3 */}
             <div className="footer-gov-item">
-              <div className="footer-gov-icon-wrap emerald">
-                <Lock size={16} aria-hidden="true" />
+              <div className="footer-gov-icon-wrap">
+                <Lock size={14} aria-hidden="true" />
               </div>
               <div className="footer-gov-content">
-                <div className="footer-gov-title-row">
-                  <strong className="footer-gov-label">Data Protection</strong>
-                  <span className="footer-gov-tag">Anonymized</span>
-                </div>
+                <span className="footer-gov-label">Data Protection</span>
                 <p className="footer-gov-text">
                   Anonymized records governed under strict academic ethics.
                 </p>
@@ -270,7 +222,7 @@ export function SiteFooter({ compact }: SiteFooterProps) {
 
           <div className="footer-bottom-actions">
             <Link href="/admin/login" className="footer-admin-link">
-              <Lock size={13} aria-hidden="true" />
+              <Lock size={12} aria-hidden="true" />
               <span>Researcher Portal</span>
             </Link>
             <button
@@ -280,7 +232,7 @@ export function SiteFooter({ compact }: SiteFooterProps) {
               aria-label="Scroll back to top of page"
             >
               <span>Back to Top</span>
-              <ArrowUp size={13} aria-hidden="true" />
+              <ArrowUp size={12} aria-hidden="true" />
             </button>
           </div>
         </div>

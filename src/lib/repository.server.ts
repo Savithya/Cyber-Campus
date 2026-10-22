@@ -50,7 +50,7 @@ async function getOrCreateParticipantId(): Promise<string> {
 }
 
 export async function saveDemoSubmission(session: Session) {
-  if (session.mode === "practice") return;
+  if (session.mode === "practice" && session.code !== "001") return;
   const subPath = ".demo-data/submissions.json";
   try {
     await mkdir(".demo-data", { recursive: true });
@@ -62,9 +62,11 @@ export async function saveDemoSubmission(session: Session) {
     } catch {
       list = [];
     }
-    const idx = list.findIndex((x) => x.id === session.id);
+    const idx = list.findIndex(
+      (x) => x.id === session.id || (session.code && x.code === session.code),
+    );
     if (idx >= 0) {
-      list[idx] = session;
+      list[idx] = { ...list[idx], ...session };
     } else {
       list.unshift(session);
     }
@@ -76,19 +78,52 @@ export async function saveDemoSubmission(session: Session) {
 
 export async function getDemoSubmissions(): Promise<Session[]> {
   const subPath = ".demo-data/submissions.json";
+  let list: Session[] = [];
   try {
     const raw = await readFile(subPath, "utf-8");
-    const list = JSON.parse(raw);
-    if (!Array.isArray(list)) return [];
-    return list.filter(
-      (s: Session) =>
-        !s.id?.includes("synthetic") &&
-        !s.submissionId?.includes("synthetic") &&
-        !s.code?.includes("synthetic"),
-    );
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      list = parsed;
+    }
   } catch {
-    return [];
+    list = [];
   }
+
+  // Synchronize active local session from cookie if present in current request
+  try {
+    const local = await readLocal();
+    if (local?.session) {
+      const active = local.session;
+      const idx = list.findIndex(
+        (s: Session) => s.id === active.id || (active.code && s.code === active.code),
+      );
+      const activeDemo: Session = { ...active, mode: "demo" };
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...activeDemo };
+      } else {
+        list.unshift(activeDemo);
+      }
+      if (
+        active.status === "submitted_complete" ||
+        active.status === "submitted_with_missing" ||
+        active.code === "001"
+      ) {
+        await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
+      }
+    }
+  } catch {
+    // Outside request context or no cookie available
+  }
+
+  // Filter out author synthetic fixtures
+  const filtered = list.filter(
+    (s: Session) =>
+      !s.id?.includes("synthetic") &&
+      !s.submissionId?.includes("synthetic") &&
+      !s.code?.includes("synthetic"),
+  );
+
+  return filtered;
 }
 
 export async function removeDemoSubmission(code: string) {

@@ -199,122 +199,87 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           </div>
           <div className="quick-pill">
             <Lock size={15} className="text-primary" aria-hidden="true" />
-            <span><strong>100% Anonymous</strong> · Zero passwords</span>
+            <span><strong>100% Anonymous</strong> · Random token</span>
           </div>
           <div className="quick-pill">
-            <HeartHandshake size={15} className="text-emerald" aria-hidden="true" />
-            <span><strong>Voluntary</strong> · Skip or exit anytime</span>
+            <ShieldCheck size={15} className="text-emerald" aria-hidden="true" />
+            <span><strong>Safe Sandbox</strong> · Zero real passwords</span>
           </div>
           <div className="quick-pill">
             <GraduationCap size={15} className="text-purple" aria-hidden="true" />
-            <span><strong>Sri Lankan Undergraduates</strong> (18+)</span>
+            <span><strong>Sri Lankan Students</strong> (18+)</span>
           </div>
         </div>
       </div>
 
       {/* Main Two-Column Layout */}
       <div className="consent-split-grid">
-        {/* Left Column: Easy-to-Digest Experience & Protections */}
+        {/* Left Column: Easy-to-Digest Protections & Research Scope */}
         <div className="consent-left-col">
-          {/* Card 1: 3-Step Experience Journey */}
-          <div className="consent-feature-card">
-            <div className="feature-card-header">
-              <span className="feature-icon-badge cyan">
-                <Clock size={18} aria-hidden="true" />
-              </span>
-              <div>
-                <span className="card-kicker">WHAT TO EXPECT</span>
-                <h2 className="feature-card-heading">Your 15-Minute Research Journey</h2>
-              </div>
-            </div>
-
-            <div className="journey-steps-v2">
-              <div className="step-item-v2">
-                <div className="step-num-v2">1</div>
-                <div className="step-body-v2">
-                  <div className="step-head-row">
-                    <h3>Academic Profile</h3>
-                    <span className="time-badge">~2 Mins</span>
-                  </div>
-                  <p>Answer 5 brief demographic questions (field of study, year, university type). No names, student IDs, or emails are ever requested.</p>
-                </div>
-              </div>
-
-              <div className="step-item-v2">
-                <div className="step-num-v2">2</div>
-                <div className="step-body-v2">
-                  <div className="step-head-row">
-                    <h3>20 Interactive Threat Scenarios</h3>
-                    <span className="time-badge">~11 Mins</span>
-                  </div>
-                  <p>Encounter simulated emails, fake portal alerts, impersonated messages, and online shopping scams. Choose what action you would take.</p>
-                </div>
-              </div>
-
-              <div className="step-item-v2">
-                <div className="step-num-v2">3</div>
-                <div className="step-body-v2">
-                  <div className="step-head-row">
-                    <h3>Personal Debrief &amp; Score</h3>
-                    <span className="time-badge">~2 Mins</span>
-                  </div>
-                  <p>Submit your decisions to receive an instant cybersecurity awareness breakdown, key risk explanations, and practical defense tips.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="safe-sandbox-banner">
-              <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
-              <span>
-                <strong>Safe Synthetic Sandbox:</strong> All scenarios are fictional simulations. You will never be asked to enter real passwords or access real external links.
-              </span>
-            </div>
-          </div>
-
-          {/* Card 2: Privacy Safeguards Grid */}
+          {/* Privacy & Ethical Guarantees Card */}
           <div className="consent-feature-card">
             <div className="feature-card-header">
               <span className="feature-icon-badge emerald">
-                <ShieldCheck size={18} aria-hidden="true" />
+                <ShieldCheck size={20} aria-hidden="true" />
               </span>
               <div>
-                <span className="card-eyebrow">YOUR RIGHTS &amp; TRUST</span>
-                <h2 className="feature-card-heading">Privacy &amp; Ethical Guarantees</h2>
+                <span className="card-eyebrow">YOUR PRIVACY &amp; TRUST</span>
+                <h2 className="feature-card-heading">Ethical Protections &amp; Guarantees</h2>
               </div>
             </div>
+
+            <p className="consent-guarantees-intro">
+              This academic study is designed to protect your privacy at every step. You explore realistic threat simulations in a secure, controlled sandbox with zero personal risk:
+            </p>
 
             <div className="safeguards-grid-v2">
               <div className="safeguard-box">
                 <div className="box-top">
-                  <Lock size={16} className="text-primary" aria-hidden="true" />
+                  <span className="safeguard-mini-icon lavender">
+                    <Lock size={15} aria-hidden="true" />
+                  </span>
                   <strong>Zero Personal Data</strong>
                 </div>
-                <p>No student IDs, passwords, phone numbers, or emails are ever recorded.</p>
+                <p>No student IDs, names, passwords, phone numbers, or email addresses are ever requested or recorded.</p>
               </div>
 
               <div className="safeguard-box">
                 <div className="box-top">
-                  <HeartHandshake size={16} className="text-emerald" aria-hidden="true" />
+                  <span className="safeguard-mini-icon emerald">
+                    <ShieldCheck size={15} aria-hidden="true" />
+                  </span>
+                  <strong>Safe Synthetic Sandbox</strong>
+                </div>
+                <p>All scenarios operate in an isolated fictional simulation. You will never access real malware or input real credentials.</p>
+              </div>
+
+              <div className="safeguard-box">
+                <div className="box-top">
+                  <span className="safeguard-mini-icon amber">
+                    <HeartHandshake size={15} aria-hidden="true" />
+                  </span>
                   <strong>100% Voluntary</strong>
                 </div>
-                <p>Participation is optional. Skip any question or stop whenever you like.</p>
+                <p>Participation is optional and self-paced. You may skip any scenario, take a break, or exit at any moment without penalty.</p>
               </div>
 
               <div className="safeguard-box">
                 <div className="box-top">
-                  <FileCheck2 size={16} className="text-cyan" aria-hidden="true" />
+                  <span className="safeguard-mini-icon cyan">
+                    <FileCheck2 size={15} aria-hidden="true" />
+                  </span>
                   <strong>Purely Academic</strong>
                 </div>
-                <p>Findings inform higher education cyber safety curricula and published research.</p>
+                <p>Responses are aggregated under an anonymous token to evaluate cybersecurity awareness and enhance student safety curricula.</p>
               </div>
+            </div>
 
-              <div className="safeguard-box">
-                <div className="box-top">
-                  <RotateCcw size={16} className="text-amber" aria-hidden="true" />
-                  <strong>Self-Service Delete</strong>
-                </div>
-                <p>Your session generates a private receipt token to withdraw anytime.</p>
-              </div>
+            {/* Self-Service Token Withdrawal Callout */}
+            <div className="token-privacy-callout">
+              <RotateCcw size={16} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
+              <span>
+                <strong>Self-Service Data Withdrawal:</strong> Upon starting, an isolated random session token is issued. You can use this token anytime to review or permanently delete your unsubmitted or submitted data via the <Link href="/withdraw" className="underline font-semibold hover:text-primary">Withdrawal page</Link>.
+              </span>
             </div>
 
             {/* Expandable Ethics Protocol */}
