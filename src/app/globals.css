@@ -13749,14 +13749,14 @@ tfoot {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .challenge-standard-flow-container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 /* 1. Cyber Mission Header Card */
@@ -13764,12 +13764,13 @@ tfoot {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 18px;
-  padding: 24px 28px;
-  box-shadow: var(--shadow-card);
+  padding: 22px 28px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   width: 100%;
+  transition: all 0.2s ease;
 }
 
 .mission-header-top-row {
@@ -13799,6 +13800,7 @@ tfoot {
   border-color: var(--primary);
   background: var(--card-hover);
   color: var(--primary);
+  transform: translateX(-2px);
 }
 
 .mission-header-badges {
@@ -13811,28 +13813,38 @@ tfoot {
 .mission-iv-badge {
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
+  gap: 7px;
+  padding: 5px 13px;
   border-radius: 999px;
-  background: var(--lavender);
-  border: 1px solid var(--lavender-border);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   color: var(--primary);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 750;
-  letter-spacing: 0.05em;
-  font-family: monospace;
+  letter-spacing: 0.03em;
+}
+
+.badge-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #06b6d4;
+  box-shadow: 0 0 8px #06b6d4;
+  display: inline-block;
+  animation: pulse 2s infinite;
 }
 
 .mission-overall-badge {
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
+  gap: 6px;
+  padding: 5px 13px;
   border-radius: 999px;
-  background: var(--paper);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 11.5px;
-  font-weight: 700;
-  font-family: monospace;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #059669;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .mission-title-row {
@@ -13842,15 +13854,16 @@ tfoot {
 }
 
 .mission-icon-tile {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--lavender);
-  border: 1px solid var(--lavender-border);
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.15);
 }
 
 .mission-title-content {
@@ -13861,20 +13874,20 @@ tfoot {
 }
 
 .challenge-step-label {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--primary);
   text-transform: uppercase;
-  font-family: monospace;
 }
 
 .challenge-main-title {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--ink);
   line-height: 1.3;
+  letter-spacing: -0.015em;
 }
 
 .mission-progress-container {
@@ -13928,7 +13941,7 @@ tfoot {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
+  padding: 6px 13px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--paper);
@@ -13944,38 +13957,47 @@ tfoot {
   border-color: var(--primary);
   color: var(--ink);
   background: var(--card-hover);
+  transform: translateY(-1px);
 }
 
 .challenge-jump-pill.active {
   background: var(--primary);
   border-color: var(--primary);
   color: #ffffff;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
 .challenge-jump-pill.done {
-  border-color: var(--teal-border, #10b981);
-  color: var(--teal, #10b981);
-  background: var(--teal-bg);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
 }
 
 .challenge-jump-pill.active.done {
-  background: var(--teal, #10b981);
-  border-color: var(--teal, #10b981);
+  background: var(--primary);
+  border-color: var(--primary);
   color: #ffffff;
 }
 
 /* 2. Scenario Introduction Card */
 .scenario-intro-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(6, 182, 212, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
   border-left: 4px solid var(--primary);
   border-radius: 14px;
-  padding: 18px 24px;
+  padding: 16px 22px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+}
+
+.scenario-intro-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .scenario-intro-badge {
@@ -13983,10 +14005,16 @@ tfoot {
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  font-weight: 750;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   color: var(--primary);
+}
+
+.scenario-intro-hint {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .scenario-intro-text {
@@ -13994,7 +14022,6 @@ tfoot {
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--ink);
-  font-style: italic;
 }
 
 /* 3. University Email Simulator Card */
@@ -14003,7 +14030,7 @@ tfoot {
   border: 1px solid var(--card-border);
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 8px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
 }
@@ -14012,7 +14039,7 @@ tfoot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 12px 22px;
   background: var(--window-bar-bg);
   border-bottom: 1px solid var(--border);
   gap: 12px;
@@ -14032,25 +14059,32 @@ tfoot {
   display: inline-block;
 }
 
-.email-sim-window-dots .dot.red { background: #ef4444; }
-.email-sim-window-dots .dot.yellow { background: #f59e0b; }
-.email-sim-window-dots .dot.green { background: #10b981; }
+.email-sim-window-dots .dot.red { background: #ff5f56; }
+.email-sim-window-dots .dot.yellow { background: #ffbd2e; }
+.email-sim-window-dots .dot.green { background: #27c93f; }
+
+.email-sim-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
 
 .email-sim-client-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 240px;
+  max-width: 260px;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-left: 8px;
+  font-weight: 650;
+  color: var(--ink);
+  opacity: 0.85;
 }
 
 .email-sim-meta-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .email-sim-folder-tag {
@@ -14092,18 +14126,18 @@ tfoot {
 }
 
 .email-sender-avatar {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4f46e5 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
 .email-sender-info {
@@ -14123,7 +14157,7 @@ tfoot {
 
 .sender-display-name {
   overflow-wrap: break-word;
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 750;
   color: var(--ink);
 }
@@ -14132,10 +14166,11 @@ tfoot {
   overflow-wrap: anywhere;
   max-width: 100%;
   font-size: 12px;
-  color: var(--muted);
-  background: var(--code-bg);
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: monospace;
   word-break: break-all;
 }
@@ -14161,7 +14196,7 @@ tfoot {
 .dept-tag {
   font-size: 11px;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--paper);
   border: 1px solid var(--border);
   color: var(--muted);
@@ -14171,28 +14206,28 @@ tfoot {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 13px;
   border-radius: 8px;
   background: var(--paper);
   border: 1px solid var(--border);
   font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 650;
+  color: var(--ink);
   cursor: pointer;
   transition: all 0.18s ease;
 }
 
 .email-inspect-headers-btn:hover {
   border-color: var(--primary);
-  color: var(--ink);
-  background: var(--card-hover);
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
 }
 
 .email-rfc-headers-drawer {
   margin-top: 10px;
   padding: 14px 18px;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: #0f172a;
+  border: 1px solid #1e293b;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -14206,56 +14241,58 @@ tfoot {
   gap: 6px;
   font-size: 12px;
   font-weight: 750;
-  color: var(--ink);
+  color: #38bdf8;
 }
 
 .rfc-code-block {
   margin: 0;
   font-size: 11.5px;
   line-height: 1.6;
-  color: var(--code-color);
+  color: #e2e8f0;
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
 .email-sim-subject-bar {
-  padding: 14px 24px;
+  padding: 16px 24px;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-.subject-prefix {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.subject-prefix-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.06em;
   flex-shrink: 0;
 }
 
 .subject-text {
   margin: 0;
-  font-size: 17px;
+  font-size: 17.5px;
   font-weight: 750;
   color: var(--ink);
   line-height: 1.35;
 }
 
 .email-sim-body {
-  padding: 24px 24px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .email-body-p {
-  font-size: 14.5px;
-  line-height: 1.7;
+  font-size: 15px;
+  line-height: 1.75;
   color: var(--ink);
   margin: 0;
 }
@@ -14440,6 +14477,7 @@ tfoot {
   font-size: 11.5px;
   color: var(--muted);
   margin-top: 8px;
+  font-style: italic;
 }
 
 /* 4. Action Selection Group & Cards */
@@ -14455,11 +14493,23 @@ tfoot {
   gap: 4px;
 }
 
+.action-selection-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+
 .action-selection-title {
   margin: 0;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 800;
   color: var(--ink);
+  letter-spacing: -0.015em;
 }
 
 .action-selection-sub {
@@ -14487,15 +14537,15 @@ tfoot {
   align-items: flex-start;
   gap: 16px;
   padding: 18px 20px;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--card-bg);
   border: 1.5px solid var(--border);
   text-align: left;
   cursor: pointer;
   min-height: 84px;
   width: 100%;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-sm);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
   outline: none;
   position: relative;
   font: inherit;
@@ -14506,7 +14556,7 @@ tfoot {
   border-color: var(--primary);
   background: var(--card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.15);
 }
 
 .interactive-action-card:hover:not(:disabled) .action-letter-badge {
@@ -14519,9 +14569,10 @@ tfoot {
 }
 
 .interactive-action-card.selected {
-  border-color: var(--primary);
-  background: var(--lavender);
-  box-shadow: 0 0 0 1px var(--primary), var(--shadow-glow);
+  border: 2px solid var(--primary);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 24px -4px rgba(79, 70, 229, 0.18);
+  transform: translateY(-2px);
   opacity: 1 !important;
 }
 
@@ -14531,9 +14582,9 @@ tfoot {
 }
 
 .action-letter-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   background: var(--paper);
   border: 1.5px solid var(--border);
   display: flex;
@@ -14548,16 +14599,16 @@ tfoot {
 }
 
 .interactive-action-card.selected .action-letter-badge {
-  background: var(--primary);
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   color: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 2px 8px var(--primary-glow);
+  border-color: #4f46e5;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
 }
 
 .action-text-content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
   text-align: left;
@@ -14565,17 +14616,24 @@ tfoot {
 
 .action-label-text {
   font-size: 14.5px;
-  font-weight: 650;
+  font-weight: 700;
   color: var(--ink);
-  line-height: 1.5;
+  line-height: 1.45;
   text-align: left;
 }
 
 .action-reply-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
   font-size: 12.5px;
   color: var(--muted);
+  line-height: 1.45;
+  padding: 6px 10px;
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.08);
   font-style: italic;
-  line-height: 1.4;
   text-align: left;
 }
 
@@ -14588,8 +14646,8 @@ tfoot {
 }
 
 .radio-outer {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid var(--border);
   background: var(--card-bg);
@@ -14601,21 +14659,23 @@ tfoot {
 
 .radio-outer.active {
   border-color: var(--primary);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
 .radio-inner {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--primary);
+  background: #ffffff;
 }
 
 /* 5. Primary Navigation Controls */
 .next-challenge-controls-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-top: 20px;
+  gap: 16px;
+  padding-top: 24px;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -14647,6 +14707,44 @@ tfoot {
   flex-wrap: wrap;
 }
 
+.challenge-nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.challenge-selection-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.challenge-selection-hint.waiting {
+  color: var(--muted);
+}
+
+.hint-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  display: inline-block;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: pulse 1.8s infinite;
+}
+
+.challenge-selection-hint.ready {
+  color: #059669;
+}
+
+.challenge-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
 .prev-challenge-btn {
   display: inline-flex;
   align-items: center;
@@ -14659,7 +14757,17 @@ tfoot {
   gap: 10px;
   min-width: 190px;
   justify-content: center;
-  margin-left: auto;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primary-next-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
 }
 
 .primary-next-btn.btn-disabled,
@@ -14667,6 +14775,7 @@ tfoot {
   opacity: 0.55 !important;
   cursor: not-allowed !important;
   pointer-events: none;
+  box-shadow: none !important;
 }
 
 /* 6. Modal & Animations */

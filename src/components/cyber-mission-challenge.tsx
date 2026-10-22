@@ -30,6 +30,8 @@ import {
   Paperclip,
   Shield,
   Eye,
+  Compass,
+  MessageSquare,
 } from "lucide-react";
 import type { Scenario, ScenarioChoice, Attempt } from "@/lib/types";
 
@@ -764,12 +766,14 @@ export function CyberMissionHeader({
         </button>
 
         <div className="mission-header-badges">
-          <span className="mission-iv-badge font-mono">
-            {missionName.toUpperCase()} ({ivCode})
-          </span>
-          <span className="mission-overall-badge font-mono">
-            Overall: {overallCompleted} / {totalOverall}
-          </span>
+          <div className="mission-iv-badge">
+            <span className="badge-pulse-dot" aria-hidden="true" />
+            <span>{missionName} ({ivCode})</span>
+          </div>
+          <div className="mission-overall-badge">
+            <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
+            <span>Progress: {overallCompleted} / {totalOverall}</span>
+          </div>
         </div>
       </div>
 
@@ -777,7 +781,7 @@ export function CyberMissionHeader({
       <div className="mission-title-row">
         <div className="mission-icon-tile">{getIcon()}</div>
         <div className="mission-title-content">
-          <div className="challenge-step-label font-mono">
+          <div className="challenge-step-label">
             CHALLENGE 0{currentNum} OF 0{totalInMission}
           </div>
           <h1 className="challenge-main-title">{challengeTitle}</h1>
@@ -861,11 +865,14 @@ export function ScenarioIntroduction({ introText }: ScenarioIntroductionProps) {
       role="region"
       aria-label="Scenario Introduction"
     >
-      <div className="scenario-intro-badge">
-        <Info size={14} className="text-primary" aria-hidden="true" />
-        <span>Scenario Introduction</span>
+      <div className="scenario-intro-header">
+        <div className="scenario-intro-badge">
+          <Compass size={14} className="text-primary" aria-hidden="true" />
+          <span>SCENARIO BRIEFING</span>
+        </div>
+        <span className="scenario-intro-hint">Inspect the communication below before deciding</span>
       </div>
-      <p className="scenario-intro-text">&ldquo;{introText}&rdquo;</p>
+      <p className="scenario-intro-text">{introText}</p>
     </section>
   );
 }
@@ -895,9 +902,12 @@ export function UniversityEmailSimulator({ emailData }: UniversityEmailSimulator
           <span className="dot red" />
           <span className="dot yellow" />
           <span className="dot green" />
-          <span className="email-sim-client-name">
-            Campus Webmail · Secure Student Inbox
-          </span>
+          <div className="email-sim-title-group">
+            <Lock size={12} className="text-emerald" aria-hidden="true" />
+            <span className="email-sim-client-name">
+              Campus Webmail · Secure Student Inbox
+            </span>
+          </div>
         </div>
 
         <div className="email-sim-meta-actions">
@@ -974,7 +984,7 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
 
       {/* 3. Subject Line */}
       <div className="email-sim-subject-bar">
-        <span className="subject-prefix">Subject:</span>
+        <span className="subject-prefix-tag">SUBJECT</span>
         <h2 className="subject-text">{emailData.subject}</h2>
       </div>
 
@@ -1164,9 +1174,13 @@ export function ActionSelectionGroup({
       aria-label="Choose Your Next Action"
     >
       <div className="action-selection-heading">
+        <div className="action-selection-eyebrow">
+          <ShieldAlert size={14} className="text-primary" aria-hidden="true" />
+          <span>DECISION POINT</span>
+        </div>
         <h2 className="action-selection-title">What would you do next?</h2>
         <p className="action-selection-sub">
-          Choose the action you would most likely take in this situation.
+          Evaluate the threat indicators above and choose your immediate response.
         </p>
       </div>
 
@@ -1205,9 +1219,10 @@ export function ActionSelectionGroup({
               <div className="action-text-content">
                 <span className="action-label-text">{choice.label}</span>
                 {choice.reply && (
-                  <small className="action-reply-preview text-muted">
-                    &ldquo;{choice.reply}&rdquo;
-                  </small>
+                  <div className="action-reply-preview">
+                    <MessageSquare size={13} className="shrink-0 text-primary/70 mt-0.5" aria-hidden="true" />
+                    <span>&ldquo;{choice.reply}&rdquo;</span>
+                  </div>
                 )}
               </div>
 
@@ -1274,54 +1289,68 @@ export function NextChallengeButton({
         </div>
       )}
 
-      {/* Primary Actions Row */}
+      {/* Primary Actions Row with feedback prompt */}
       <div className="challenge-nav-row">
-        {/* Optional Previous Button */}
-        {canGoPrevious && onPrevious ? (
+        <div className="challenge-nav-left">
+          {hasSelectedAnswer ? (
+            <div className="challenge-selection-hint ready">
+              <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
+              <span>Action selected · Ready to proceed</span>
+            </div>
+          ) : (
+            <div className="challenge-selection-hint waiting">
+              <span className="hint-pulse-dot" aria-hidden="true" />
+              <span>Select an action above to proceed</span>
+            </div>
+          )}
+        </div>
+
+        <div className="challenge-nav-right">
+          {/* Optional Previous Button */}
+          {canGoPrevious && onPrevious && (
+            <button
+              type="button"
+              className="button secondary medium prev-challenge-btn"
+              onClick={onPrevious}
+              disabled={isSubmitting}
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              <span>Previous Challenge</span>
+            </button>
+          )}
+
+          {/* Primary Action Button: Next Challenge / Complete Mission */}
           <button
             type="button"
-            className="button secondary medium prev-challenge-btn"
-            onClick={onPrevious}
-            disabled={isSubmitting}
+            className={`button primary large primary-next-btn ${
+              !hasSelectedAnswer ? "btn-disabled" : ""
+            }`}
+            disabled={!hasSelectedAnswer || isSubmitting}
+            onClick={onAdvance}
+            aria-label={
+              isLastChallenge
+                ? "Complete Cyber Mission and Proceed"
+                : "Save Selection and Proceed to Next Challenge"
+            }
           >
-            <ArrowLeft size={16} aria-hidden="true" />
-            <span>Previous Challenge</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+                <span>Saving Response…</span>
+              </>
+            ) : isLastChallenge ? (
+              <>
+                <span>Complete Mission</span>
+                <ArrowRight size={18} aria-hidden="true" />
+              </>
+            ) : (
+              <>
+                <span>Next Challenge</span>
+                <ArrowRight size={18} aria-hidden="true" />
+              </>
+            )}
           </button>
-        ) : (
-          <div />
-        )}
-
-        {/* Primary Action Button: Next Challenge / Complete Mission */}
-        <button
-          type="button"
-          className={`button primary large primary-next-btn ${
-            !hasSelectedAnswer ? "btn-disabled" : ""
-          }`}
-          disabled={!hasSelectedAnswer || isSubmitting}
-          onClick={onAdvance}
-          aria-label={
-            isLastChallenge
-              ? "Complete Cyber Mission and Proceed"
-              : "Save Selection and Proceed to Next Challenge"
-          }
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 size={18} className="animate-spin" aria-hidden="true" />
-              <span>Saving Response…</span>
-            </>
-          ) : isLastChallenge ? (
-            <>
-              <span>Complete Mission</span>
-              <ArrowRight size={18} aria-hidden="true" />
-            </>
-          ) : (
-            <>
-              <span>Next Challenge</span>
-              <ArrowRight size={18} aria-hidden="true" />
-            </>
-          )}
-        </button>
+        </div>
       </div>
     </div>
   );
