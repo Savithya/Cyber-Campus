@@ -6,7 +6,6 @@ import { missions } from "@/content/missions";
 import type { Scenario, Attempt } from "@/lib/types";
 import {
   CyberMissionHeader,
-  CyberMissionsPanel,
   ScenarioIntroduction,
   UniversityEmailSimulator,
   ActionSelectionGroup,
@@ -170,22 +169,13 @@ export function InteractiveChallengeRunner({
         </div>
 
         {/* =====================================================================
-            RIGHT SIDE CORNER: All 4 Cyber Missions Tracker & Decision Console
+            RIGHT SIDE CORNER: Decision Console
             ===================================================================== */}
         <aside
           className="challenge-decision-corner"
-          aria-label="Decision Console and Cyber Missions"
+          aria-label="Decision Console"
         >
           <div className="decision-corner-sticky-wrapper">
-            {/* ALL 4 PARTS OF CYBER MISSIONS TRACKER */}
-            <CyberMissionsPanel
-              currentMissionId={missionId}
-              completedScenarioIds={completedScenarioIds}
-              totalOverall={totalOverall}
-              overallCompleted={overallCompleted}
-              onSelectMission={onSelectMission}
-            />
-
             {/* DECISION POINT: What would you do next? + NEXT CHALLENGE CONTROLS */}
             <div className="decision-action-console-card">
               <ActionSelectionGroup

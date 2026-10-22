@@ -14,13 +14,13 @@ import {
   RotateCcw,
   CheckCircle2,
   FileCheck2,
-  BookOpen,
   Check,
   Gamepad2,
   Lock,
-  Layers,
-  AlertCircle,
   Sparkles,
+  Award,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   api,
@@ -179,199 +179,149 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
         </div>
       )}
 
-      {/* Page Hero Header */}
-      <header className="consent-page-header">
-        <div className="consent-hero-badge">
+      {/* Friendly Hero Banner */}
+      <div className="consent-friendly-hero">
+        <div className="hero-pill-badge">
           <Sparkles size={14} className="text-primary" aria-hidden="true" />
-          <span>STEP 01 OF 04 · INFORMED CONSENT &amp; BRIEFING</span>
+          <span>STUDENT RESEARCH BRIEFING · STEP 01 OF 04</span>
         </div>
-        <h1 className="consent-main-heading">Before You Begin</h1>
-        <p className="consent-subtitle">
-          Explore real-world social engineering scenarios, test your privacy reflexes, and contribute to national academic cyber safety research in Sri Lanka.
+        <h1 className="consent-friendly-title">Welcome to Cyber Campus Research</h1>
+        <p className="consent-friendly-subtitle">
+          Help advance digital privacy and cyber defense for Sri Lankan university students.
+          Explore 20 interactive simulations in <strong>15 minutes</strong> and get an instant personal awareness report.
         </p>
 
-        {/* Quick Highlights Strip */}
-        <div className="consent-stats-strip">
-          <div className="strip-item">
-            <div className="strip-icon-circle cyan">
-              <Clock size={16} aria-hidden="true" />
-            </div>
-            <div>
-              <strong className="strip-title">15–20 Mins</strong>
-              <span className="strip-desc">Self-paced completion</span>
-            </div>
+        {/* 4 Quick Stat Pills */}
+        <div className="consent-quick-pills">
+          <div className="quick-pill">
+            <Clock size={15} className="text-cyan" aria-hidden="true" />
+            <span><strong>15–20 Mins</strong> · Self-paced</span>
           </div>
-
-          <div className="strip-item">
-            <div className="strip-icon-circle emerald">
-              <HeartHandshake size={16} aria-hidden="true" />
-            </div>
-            <div>
-              <strong className="strip-title">100% Voluntary</strong>
-              <span className="strip-desc">Skip or exit anytime</span>
-            </div>
+          <div className="quick-pill">
+            <Lock size={15} className="text-primary" aria-hidden="true" />
+            <span><strong>100% Anonymous</strong> · Zero passwords</span>
           </div>
-
-          <div className="strip-item">
-            <div className="strip-icon-circle primary">
-              <Lock size={16} aria-hidden="true" />
-            </div>
-            <div>
-              <strong className="strip-title">Zero Credentials</strong>
-              <span className="strip-desc">No passwords or OTPs</span>
-            </div>
+          <div className="quick-pill">
+            <HeartHandshake size={15} className="text-emerald" aria-hidden="true" />
+            <span><strong>Voluntary</strong> · Skip or exit anytime</span>
           </div>
-
-          <div className="strip-item">
-            <div className="strip-icon-circle purple">
-              <GraduationCap size={16} aria-hidden="true" />
-            </div>
-            <div>
-              <strong className="strip-title">University Students</strong>
-              <span className="strip-desc">Sri Lanka Higher Ed (18+)</span>
-            </div>
+          <div className="quick-pill">
+            <GraduationCap size={15} className="text-purple" aria-hidden="true" />
+            <span><strong>Sri Lankan Undergraduates</strong> (18+)</span>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Modern 2-Column Workspace Grid */}
+      {/* Main Two-Column Layout */}
       <div className="consent-split-grid">
-        {/* Left Column: Context, Journey & Ethical Safeguards */}
+        {/* Left Column: Easy-to-Digest Experience & Protections */}
         <div className="consent-left-col">
-          {/* Card 1: Study Background */}
-          <section className="consent-card" aria-labelledby="heading-study-topic">
-            <div className="card-header-row">
-              <div className="card-icon-bubble primary">
-                <BookOpen size={18} aria-hidden="true" />
-              </div>
+          {/* Card 1: 3-Step Experience Journey */}
+          <div className="consent-feature-card">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge cyan">
+                <Clock size={18} aria-hidden="true" />
+              </span>
               <div>
-                <span className="card-eyebrow">RESEARCH OBJECTIVE</span>
-                <h2 id="heading-study-topic" className="card-heading">
-                  About This Study
-                </h2>
+                <span className="card-kicker">WHAT TO EXPECT</span>
+                <h2 className="feature-card-heading">Your 15-Minute Research Journey</h2>
               </div>
             </div>
 
-            <div className="study-topic-highlight-box">
-              <span className="topic-tag">ACADEMIC RESEARCH TOPIC</span>
-              <p className="study-topic-title">&ldquo;{studyTitle}&rdquo;</p>
-            </div>
-
-            <p className="card-body-text">
-              This academic research investigates how university students across Sri Lanka recognize and respond to four key social engineering threat vectors: <strong>phishing</strong>, <strong>pretexting</strong>, <strong>impersonation</strong>, and <strong>deceptive online links</strong>. Your responses help build evidence-based privacy training and institutional cyber defense guidelines.
-            </p>
-          </section>
-
-          {/* Card 2: Interactive Journey */}
-          <section className="consent-card" aria-labelledby="heading-study-journey">
-            <div className="card-header-row">
-              <div className="card-icon-bubble cyan">
-                <Layers size={18} aria-hidden="true" />
-              </div>
-              <div>
-                <span className="card-eyebrow">WHAT YOU WILL DO</span>
-                <h2 id="heading-study-journey" className="card-heading">
-                  Your Research Experience
-                </h2>
-              </div>
-            </div>
-
-            <div className="journey-steps-timeline">
-              <div className="journey-step-item">
-                <div className="journey-step-badge">1</div>
-                <div className="journey-step-content">
-                  <div className="step-title-row">
+            <div className="journey-steps-v2">
+              <div className="step-item-v2">
+                <div className="step-num-v2">1</div>
+                <div className="step-body-v2">
+                  <div className="step-head-row">
                     <h3>Academic Profile</h3>
-                    <span className="time-pill">~2 Mins</span>
+                    <span className="time-badge">~2 Mins</span>
                   </div>
-                  <p>Answer 5 quick demographic questions (field of study, academic year, university type). No names or student IDs are ever requested.</p>
+                  <p>Answer 5 brief demographic questions (field of study, year, university type). No names, student IDs, or emails are ever requested.</p>
                 </div>
               </div>
 
-              <div className="journey-step-item">
-                <div className="journey-step-badge">2</div>
-                <div className="journey-step-content">
-                  <div className="step-title-row">
-                    <h3>20 Interactive Scenarios</h3>
-                    <span className="time-pill">~12 Mins</span>
+              <div className="step-item-v2">
+                <div className="step-num-v2">2</div>
+                <div className="step-body-v2">
+                  <div className="step-head-row">
+                    <h3>20 Interactive Threat Scenarios</h3>
+                    <span className="time-badge">~11 Mins</span>
                   </div>
-                  <p>Evaluate realistic digital scenarios (suspicious university emails, fake dean&apos;s audits, spoofed union messages, discount scams) and choose your response.</p>
+                  <p>Encounter simulated emails, fake portal alerts, impersonated messages, and online shopping scams. Choose what action you would take.</p>
                 </div>
               </div>
 
-              <div className="journey-step-item">
-                <div className="journey-step-badge">3</div>
-                <div className="journey-step-content">
-                  <div className="step-title-row">
-                    <h3>Instant Debrief &amp; Insights</h3>
-                    <span className="time-pill">~2 Mins</span>
+              <div className="step-item-v2">
+                <div className="step-num-v2">3</div>
+                <div className="step-body-v2">
+                  <div className="step-head-row">
+                    <h3>Personal Debrief &amp; Score</h3>
+                    <span className="time-badge">~2 Mins</span>
                   </div>
-                  <p>Submit your decisions securely and immediately receive educational cybersecurity debrief insights and your simulated privacy risk score.</p>
+                  <p>Submit your decisions to receive an instant cybersecurity awareness breakdown, key risk explanations, and practical defense tips.</p>
                 </div>
               </div>
             </div>
 
-            <div className="safe-simulation-callout">
-              <CheckCircle2 size={18} className="text-emerald flex-shrink-0" aria-hidden="true" />
-              <p>
-                <strong>Safe Synthetic Simulation:</strong> All scenarios operate inside a secure, fictional sandbox. You will never be asked to input real passwords, banking OTPs, or access live malicious websites.
-              </p>
+            <div className="safe-sandbox-banner">
+              <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
+              <span>
+                <strong>Safe Synthetic Sandbox:</strong> All scenarios are fictional simulations. You will never be asked to enter real passwords or access real external links.
+              </span>
             </div>
-          </section>
+          </div>
 
-          {/* Card 3: Privacy & Safeguards */}
-          <section className="consent-card" aria-labelledby="heading-trust-safeguards">
-            <div className="card-header-row">
-              <div className="card-icon-bubble emerald">
+          {/* Card 2: Privacy Safeguards Grid */}
+          <div className="consent-feature-card">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge emerald">
                 <ShieldCheck size={18} aria-hidden="true" />
-              </div>
+              </span>
               <div>
-                <span className="card-eyebrow">ETHICAL RESEARCH STANDARDS</span>
-                <h2 id="heading-trust-safeguards" className="card-heading">
-                  Privacy &amp; Participant Safeguards
-                </h2>
+                <span className="card-eyebrow">YOUR RIGHTS &amp; TRUST</span>
+                <h2 className="feature-card-heading">Privacy &amp; Ethical Guarantees</h2>
               </div>
             </div>
 
-            <div className="safeguards-compact-grid">
-              <div className="safeguard-mini-card">
-                <HeartHandshake size={18} className="text-emerald shrink-0" aria-hidden="true" />
-                <div>
-                  <strong>Voluntary Participation</strong>
-                  <p>Participation is optional. Skip questions or close the browser anytime before final submission.</p>
+            <div className="safeguards-grid-v2">
+              <div className="safeguard-box">
+                <div className="box-top">
+                  <Lock size={16} className="text-primary" aria-hidden="true" />
+                  <strong>Zero Personal Data</strong>
                 </div>
+                <p>No student IDs, passwords, phone numbers, or emails are ever recorded.</p>
               </div>
 
-              <div className="safeguard-mini-card">
-                <Lock size={18} className="text-primary shrink-0" aria-hidden="true" />
-                <div>
-                  <strong>No Real Credentials</strong>
-                  <p>We never collect index numbers, passwords, OTPs, or financial account details.</p>
+              <div className="safeguard-box">
+                <div className="box-top">
+                  <HeartHandshake size={16} className="text-emerald" aria-hidden="true" />
+                  <strong>100% Voluntary</strong>
                 </div>
+                <p>Participation is optional. Skip any question or stop whenever you like.</p>
               </div>
 
-              <div className="safeguard-mini-card">
-                <FileCheck2 size={18} className="text-cyan shrink-0" aria-hidden="true" />
-                <div>
-                  <strong>Academic Research Only</strong>
-                  <p>Responses are analysed exclusively for peer-reviewed academic research and university policy.</p>
+              <div className="safeguard-box">
+                <div className="box-top">
+                  <FileCheck2 size={16} className="text-cyan" aria-hidden="true" />
+                  <strong>Purely Academic</strong>
                 </div>
+                <p>Findings inform higher education cyber safety curricula and published research.</p>
               </div>
 
-              <div className="safeguard-mini-card">
-                <RotateCcw size={18} className="text-amber shrink-0" aria-hidden="true" />
-                <div>
-                  <strong>Private Receipt &amp; Withdrawal</strong>
-                  <p>Your session generates a private receipt token allowing you to withdraw your record anytime.</p>
+              <div className="safeguard-box">
+                <div className="box-top">
+                  <RotateCcw size={16} className="text-amber" aria-hidden="true" />
+                  <strong>Self-Service Delete</strong>
                 </div>
+                <p>Your session generates a private receipt token to withdraw anytime.</p>
               </div>
             </div>
 
-            {/* Expandable Ethics Accordion */}
-            <div className="ethics-accordion-wrapper">
+            {/* Expandable Ethics Protocol */}
+            <div className="ethics-accordion-box">
               <button
                 type="button"
-                className="ethics-toggle-button"
+                className="ethics-toggle-btn"
                 onClick={() => setExpandedDetails(!expandedDetails)}
                 aria-expanded={expandedDetails}
               >
@@ -380,57 +330,58 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               </button>
 
               {expandedDetails && (
-                <div className="ethics-content-drawer" role="region" aria-label="Detailed Research Terms">
+                <div className="ethics-expanded-drawer" role="region" aria-label="Detailed Research Terms">
+                  <div className="drawer-topic">
+                    <span className="drawer-label">ACADEMIC RESEARCH TOPIC:</span>
+                    <strong className="block text-ink text-sm mt-0.5">&ldquo;{studyTitle}&rdquo;</strong>
+                  </div>
                   <div className="drawer-item">
-                    <h4>Research Protocol &amp; Ethics Standards</h4>
+                    <h4>Ethical Research Standards</h4>
                     <p>
-                      This project adheres to ethical research principles for human participant studies.
+                      This study adheres to international ethical research principles for human participant studies.
                       Participation involves low risk, evaluating fictional scenarios depicting common digital communications.
                     </p>
                   </div>
                   <div className="drawer-item">
-                    <h4>Storage and Anonymity Limits</h4>
+                    <h4>Anonymity &amp; Aggregation Thresholds</h4>
                     <p>
-                      While no names, email addresses, or phone numbers are recorded, combinations of demographic fields
-                      could theoretically reduce anonymity in small subgroups. Researchers enforce strict aggregation thresholds
-                      in all published tables to protect respondent confidentiality.
+                      No names, emails, or phone numbers are recorded. Demographic fields are strictly aggregated in all published tables
+                      to guarantee participant confidentiality.
                     </p>
                   </div>
                   <div className="drawer-item">
                     <h4>Researcher Contact</h4>
                     <p>
-                      For inquiries regarding study methodology, data governance, or research rights, please use the
-                      Researcher Access channel or institutional supervisory office.
+                      For methodological or supervisory inquiries, access the Researcher Access channel or institutional supervisory office.
                     </p>
                   </div>
                 </div>
               )}
             </div>
-          </section>
+          </div>
         </div>
 
-        {/* Right Column: Sticky Action & Consent Card */}
-        <aside className="consent-right-col" aria-label="Consent and Study Launch">
-          <div className="consent-action-sticky-card">
-            <div className="action-card-header">
-              <div className="action-card-header-top">
-                <span className="badge-required">STEP 1 OF 4</span>
-                <span className="secure-badge">
-                  <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
-                  SSL Encrypted
-                </span>
-              </div>
-              <h2 className="action-card-title">Consent Confirmation</h2>
-              <p className="action-card-desc">
-                Confirm your student eligibility and voluntary agreement below to begin:
-              </p>
+        {/* Right Column: Sticky Action & Quick Consent Card */}
+        <aside className="consent-right-col" aria-label="Consent Confirmation">
+          <div className="consent-action-card-v2">
+            <div className="action-card-top-badge">
+              <span className="step-chip">STEP 1 OF 4</span>
+              <span className="ssl-chip">
+                <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
+                Secure &amp; Anonymous
+              </span>
             </div>
 
-            <div className="consent-interactive-checks">
-              {/* Mandatory Checkbox 1: Eligibility */}
+            <h2 className="action-title-v2">Consent Confirmation</h2>
+            <p className="action-subtitle-v2">
+              Please confirm your eligibility and agreement below to unlock the study:
+            </p>
+
+            <div className="consent-checks-container">
+              {/* Mandatory Checkbox 1: Age & University Eligibility */}
               <label
                 htmlFor="eligibility-checkbox"
-                className={`consent-check-item ${eligible ? "is-checked" : ""}`}
+                className={`consent-toggle-card ${eligible ? "is-selected" : ""}`}
               >
                 <input
                   id="eligibility-checkbox"
@@ -443,18 +394,18 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                 <span className="custom-check-box" aria-hidden="true">
                   {eligible && <Check size={14} strokeWidth={3} className="text-white" />}
                 </span>
-                <div className="check-label-body">
-                  <strong className="check-item-title">Age &amp; Student Eligibility</strong>
-                  <span className="check-item-sub">
+                <div className="toggle-text-block">
+                  <span className="toggle-main-title">Age &amp; Student Eligibility</span>
+                  <span className="toggle-sub-copy">
                     I confirm that I am <strong>18 years or older</strong> and currently enrolled at a higher education institution in <strong>Sri Lanka</strong>.
                   </span>
                 </div>
               </label>
 
-              {/* Mandatory Checkbox 2: Consent */}
+              {/* Mandatory Checkbox 2: Voluntary Agreement */}
               <label
                 htmlFor="consent-checkbox"
-                className={`consent-check-item ${consent ? "is-checked" : ""}`}
+                className={`consent-toggle-card ${consent ? "is-selected" : ""}`}
               >
                 <input
                   id="consent-checkbox"
@@ -467,10 +418,10 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                 <span className="custom-check-box" aria-hidden="true">
                   {consent && <Check size={14} strokeWidth={3} className="text-white" />}
                 </span>
-                <div className="check-label-body">
-                  <strong className="check-item-title">Voluntary Consent</strong>
-                  <span className="check-item-sub">
-                    I have read the research information and <strong>voluntarily agree to participate</strong> in this study.
+                <div className="toggle-text-block">
+                  <span className="toggle-main-title">Voluntary Agreement</span>
+                  <span className="toggle-sub-copy">
+                    I have reviewed the research information and <strong>voluntarily agree to participate</strong> in this study.
                   </span>
                 </div>
               </label>
@@ -479,30 +430,30 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
             {/* Primary Action Button */}
             <button
               type="button"
-              className="button primary large consent-cta-button"
+              className="button primary large consent-launch-button"
               onClick={() => handleStart(false)}
               disabled={!eligible || !consent || busy}
               aria-label="Agree & Continue · Continue to Student Profile · Consent and begin questionnaire"
             >
-              <span>{busy ? "Starting Research Session…" : "Agree & Continue"}</span>
+              <span>{busy ? "Starting Research Session…" : "Agree & Begin Study"}</span>
               <ArrowRight size={18} aria-hidden="true" />
             </button>
 
             {(!eligible || !consent) && (
-              <p className="consent-unlock-hint">
+              <p className="consent-hint-v2">
                 <AlertCircle size={13} className="inline mr-1 text-primary" aria-hidden="true" />
-                Check both items above to unlock research participation.
+                Check both boxes above to unlock research participation.
               </p>
             )}
 
-            <div className="action-card-divider">
-              <span>OR TRY WITHOUT RESEARCH DATA</span>
+            <div className="action-divider-v2">
+              <span>OR EXPLORE WITHOUT RECORDING</span>
             </div>
 
             {/* Practice Mode Alternative */}
             <button
               type="button"
-              className="button secondary consent-practice-btn"
+              className="button secondary consent-alt-btn"
               onClick={() => handleStart(true)}
               disabled={busy}
               title="Explore scenarios in educational mode without recording research data"
@@ -510,15 +461,15 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               <Gamepad2 size={16} aria-hidden="true" />
               <span>Explore Practice Challenges Only</span>
             </button>
-            <span className="practice-subtext">Purely educational simulation · no research data recorded</span>
+            <span className="practice-subtext-v2">Purely educational simulation · no research data saved</span>
 
-            <div className="action-card-footer">
-              <Link href="/" prefetch={true} className="return-home-link">
+            <div className="action-footer-row">
+              <Link href="/" prefetch={true} className="back-home-link">
                 Return Home
               </Link>
-              <span className="trust-footer-tag">
+              <span className="irb-safe-label">
                 <Lock size={12} className="text-emerald inline mr-1" aria-hidden="true" />
-                Anonymous IRB Protocol
+                IRB Protocol Protected
               </span>
             </div>
           </div>
