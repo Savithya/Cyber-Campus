@@ -88,8 +88,10 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
         if (typeof window !== "undefined") {
           localStorage.setItem("cc-practice-exposure", "yes");
         }
+        await state.reload();
         router.push("/play");
       } else {
+        clearParticipationStorage();
         putDraft({
           code: session.code,
           expires: session.draftExpiresAt,
@@ -97,6 +99,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           token,
           submitKey: crypto.randomUUID(),
         });
+        await state.reload();
         router.push("/demographics");
       }
     } catch (e) {
@@ -129,14 +132,8 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
   const hasSession = Boolean(state.session);
   const sessionData = state.session;
-  const isCompleted =
-    hasSession &&
-    sessionData?.mode !== "practice" &&
-    (sessionData?.status === "submitted_complete" ||
-      sessionData?.status === "submitted_with_missing");
   const isResumable =
     hasSession &&
-    !isCompleted &&
     (sessionData?.status === "draft" || sessionData?.mode === "practice");
 
   const studyTitle =
@@ -147,42 +144,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     <div className="consent-page-container container page-space">
       {/* 4-Stage Reusable Stepper */}
       <ResearchProgressStepper currentStep={1} />
-
-      {/* Demo Mode Notice */}
-      {mode === "demo" && (
-        <div className="demo-mode-compact-banner" role="status">
-          <Info size={16} className="text-cyan" aria-hidden="true" />
-          <span>Demo Mode — Your activity will not be included in research data.</span>
-        </div>
-      )}
-
-      {/* Previous Session / Completion Compact Notice */}
-      {isCompleted && (
-        <div className="previous-response-compact-card" role="region" aria-label="Previous Research Response">
-          <div className="previous-response-left">
-            <CheckCircle2 size={18} className="text-emerald" aria-hidden="true" />
-            <div>
-              <strong>Previous Research Participation Recorded</strong>
-              <p>
-                Anonymous Code: <span className="font-mono">{sessionData?.code}</span> · Status: Submitted
-              </p>
-            </div>
-          </div>
-          <div className="previous-response-actions">
-            <Link href="/results" prefetch={true} className="button secondary small">
-              <span>View Confirmation</span>
-            </Link>
-            <button
-              type="button"
-              className="button ghost small"
-              onClick={handleDiscardDraft}
-              disabled={discarding}
-            >
-              <span>Start New Attempt</span>
-            </button>
-          </div>
-        </div>
-      )}
 
       {isResumable && sessionData?.status === "draft" && (
         <div className="previous-response-compact-card resumable" role="region" aria-label="Resume Draft">

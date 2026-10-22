@@ -181,14 +181,6 @@ export async function startSession(input: {
   token: string;
 }) {
   const existing = await getSession();
-  if (existing && !input.practice) {
-    if (existing.status === "draft") {
-      throw new Error(
-        "A session draft already exists. Continue your profile or discard the draft before starting again.",
-      );
-    }
-    // Repeat submissions: participants can submit multiple responses without restrictions
-  }
   const pid = await getOrCreateParticipantId();
   if (input.practice || !isResearch()) {
     const now = new Date();
