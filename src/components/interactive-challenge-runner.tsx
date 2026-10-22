@@ -6,6 +6,7 @@ import { missions } from "@/content/missions";
 import type { Scenario, Attempt } from "@/lib/types";
 import {
   CyberMissionHeader,
+  CyberMissionsPanel,
   ScenarioIntroduction,
   UniversityEmailSimulator,
   ActionSelectionGroup,
@@ -25,6 +26,7 @@ export interface InteractiveChallengeRunnerProps {
   onPreviousScenario?: () => void;
   onNextScenario?: () => void;
   onSelectScenarioIndex?: (index: number) => void;
+  onSelectMission?: (missionId: string, scenarioIndex?: number) => void;
   onReturnToHub: () => void;
   previousAttempt?: Attempt;
   educationalMode?: boolean;
@@ -42,6 +44,7 @@ export function InteractiveChallengeRunner({
   onPreviousScenario,
   onNextScenario,
   onSelectScenarioIndex,
+  onSelectMission,
   onReturnToHub,
   previousAttempt,
   educationalMode = false,
@@ -153,41 +156,57 @@ export function InteractiveChallengeRunner({
         missionIds={currentMission.ids}
       />
 
-      {/* Main Single-Column Focused Investigation Layout */}
-      <div className="challenge-standard-flow-container">
+      {/* 2-Column Responsive Workstation Layout */}
+      <div className="challenge-workstation-grid">
         {/* =====================================================================
-            SECTION B — SHORT SCENARIO INTRODUCTION
+            LEFT MAIN STAGE: Scenario Briefing & University Email Simulator
             ===================================================================== */}
-        <ScenarioIntroduction introText={emailData.scenarioIntro} />
+        <div className="challenge-investigation-stage">
+          {/* SECTION B — SHORT SCENARIO INTRODUCTION */}
+          <ScenarioIntroduction introText={emailData.scenarioIntro} />
+
+          {/* SECTION C — REALISTIC UNIVERSITY EMAIL SIMULATOR */}
+          <UniversityEmailSimulator emailData={emailData} />
+        </div>
 
         {/* =====================================================================
-            SECTION C — REALISTIC UNIVERSITY EMAIL SIMULATOR
+            RIGHT SIDE CORNER: All 4 Cyber Missions Tracker & Decision Console
             ===================================================================== */}
-        <UniversityEmailSimulator emailData={emailData} />
+        <aside
+          className="challenge-decision-corner"
+          aria-label="Decision Console and Cyber Missions"
+        >
+          <div className="decision-corner-sticky-wrapper">
+            {/* ALL 4 PARTS OF CYBER MISSIONS TRACKER */}
+            <CyberMissionsPanel
+              currentMissionId={missionId}
+              completedScenarioIds={completedScenarioIds}
+              totalOverall={totalOverall}
+              overallCompleted={overallCompleted}
+              onSelectMission={onSelectMission}
+            />
 
-        {/* =====================================================================
-            SECTION D — CHOOSE YOUR NEXT ACTION
-            ===================================================================== */}
-        <ActionSelectionGroup
-          choices={scenario.choices}
-          selectedChoiceId={selectedChoiceId}
-          onSelectChoice={handleSelectChoice}
-          disabled={isSubmitting}
-        />
+            {/* DECISION POINT: What would you do next? + NEXT CHALLENGE CONTROLS */}
+            <div className="decision-action-console-card">
+              <ActionSelectionGroup
+                choices={scenario.choices}
+                selectedChoiceId={selectedChoiceId}
+                onSelectChoice={handleSelectChoice}
+                disabled={isSubmitting}
+              />
 
-        {/* =====================================================================
-            PRIMARY NAVIGATION — NEXT CHALLENGE BUTTON
-            (Confirm My Answer button is completely removed!)
-            ===================================================================== */}
-        <NextChallengeButton
-          isLastChallenge={isLastChallenge}
-          hasSelectedAnswer={Boolean(selectedChoiceId)}
-          isSubmitting={isSubmitting}
-          error={error}
-          onAdvance={handleAdvance}
-          onPrevious={onPreviousScenario}
-          canGoPrevious={scenarioIndex > 0 && Boolean(onPreviousScenario)}
-        />
+              <NextChallengeButton
+                isLastChallenge={isLastChallenge}
+                hasSelectedAnswer={Boolean(selectedChoiceId)}
+                isSubmitting={isSubmitting}
+                error={error}
+                onAdvance={handleAdvance}
+                onPrevious={onPreviousScenario}
+                canGoPrevious={scenarioIndex > 0 && Boolean(onPreviousScenario)}
+              />
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

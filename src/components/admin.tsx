@@ -218,8 +218,19 @@ export default function Admin({
   // History table pagination
   const [historyPage, setHistoryPage] = useState(0);
 
-  const filtered = filterSessions(sessions, filters),
-    all = filterSessions(sessions, filters, false),
+  // When in Research Workspace (demo === false), strictly filter out any mock or synthetic fixture records
+  const realSessions = useMemo(() => {
+    if (demo) return sessions;
+    return sessions.filter(
+      (s) =>
+        !s.id?.includes("synthetic") &&
+        !s.submissionId?.includes("synthetic") &&
+        !s.code?.includes("synthetic"),
+    );
+  }, [sessions, demo]);
+
+  const filtered = filterSessions(realSessions, filters),
+    all = filterSessions(realSessions, filters, false),
     active = path[0] ?? "",
     selected = questions.find((q) => q.id === path[1]),
     filterText = describeFilters(filters);
@@ -343,9 +354,7 @@ export default function Admin({
 
   const historyPageSize = 10;
   const historySessions = useMemo(() => {
-    return all.filter(
-      (s) => !s.id?.includes("synthetic") && !s.submissionId?.includes("synthetic"),
-    );
+    return all;
   }, [all]);
 
   const historySubmitted = useMemo(() => {
@@ -509,7 +518,7 @@ export default function Admin({
             );
           }}
           filteredCount={all.length}
-          totalCount={sessions.filter((s) => s.mode !== "practice").length}
+          totalCount={realSessions.filter((s) => s.mode !== "practice").length}
           activeSection={active}
         />
 
@@ -553,7 +562,7 @@ export default function Admin({
                 value={
                   counts.totalSubmissions
                     ? Math.round((counts.complete / counts.totalSubmissions) * 100)
-                    : 100
+                    : 0
                 }
                 detail="Percentage of fully complete submissions"
               />
@@ -1525,10 +1534,12 @@ export default function Admin({
                     Highest Simulated Privacy Risk:{" "}
                     {highestThreat
                       ? `${highestThreat.primaryIV} — ${highestThreat.threatName}`
-                      : "IV1 — Phishing Investigation"}
+                      : "No threat evaluation data recorded"}
                   </h2>
                   <p className="text-xs text-muted mt-1 max-w-3xl leading-relaxed">
-                    University students in this study sample exhibited the highest observed simulated privacy disclosure in this category.
+                    {highestThreat
+                      ? "University students in this study sample exhibited the highest observed simulated privacy disclosure in this category."
+                      : "Awaiting participant challenge evaluation responses."}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
                     <div className="p-2.5 rounded bg-surface border">
@@ -1909,7 +1920,11 @@ function ThreatAnalysisPanel({
           <ShieldAlert size={16} aria-hidden="true" />
           <span>Research Vulnerability Observations: {threatName}</span>
         </h4>
-        <p className="text-xs text-muted leading-relaxed">{insightsText}</p>
+        <p className="text-xs text-muted leading-relaxed">
+          {attemptedOnly.length > 0
+            ? `${unsafeRate}% unsafe decision rate across ${attemptedOnly.length} recorded participant evaluations (mean risk score: ${meanRisk}/4). ${insightsText}`
+            : "No participant challenge evaluations have been recorded yet for this threat module."}
+        </p>
       </div>
     </div>
   );

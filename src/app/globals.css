@@ -13740,16 +13740,23 @@ tfoot {
    ========================================================================== */
 
 /* ==========================================================================
-   CYBER MISSION CHALLENGE RUNNER — FOCUSED SINGLE-COLUMN INVESTIGATION FLOW
+   CYBER MISSION CHALLENGE RUNNER — DUAL-COLUMN WORKSTATION LAYOUT
+   Left: Investigation Stage (Email Simulator & Scenario Briefing)
+   Right: Command & Decision Console (4 Cyber Missions + Action Choices)
    ========================================================================== */
+
+.challenge-runner-container {
+  max-width: 1440px !important;
+  width: 100% !important;
+}
 
 .interactive-challenge-runner {
   width: 100%;
-  max-width: 980px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .challenge-standard-flow-container {
@@ -13757,6 +13764,485 @@ tfoot {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+/* Dual Column Workstation Grid */
+.challenge-workstation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(360px, 430px);
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+.challenge-investigation-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  width: 100%;
+}
+
+.challenge-decision-corner {
+  position: relative;
+  width: 100%;
+}
+
+.decision-corner-sticky-wrapper {
+  position: sticky;
+  top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.decision-corner-sticky-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.decision-corner-sticky-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   ALL 4 CYBER MISSIONS NAVIGATOR PANEL
+   ========================================================================== */
+
+.cyber-missions-panel-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.missions-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.missions-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.missions-panel-icon-tile {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(99, 102, 241, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.missions-panel-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.missions-panel-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.missions-panel-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.missions-panel-progress-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.missions-panel-toggle-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  border: 1px solid var(--border-subtle);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.missions-panel-toggle-btn:hover {
+  background: var(--card-hover);
+  color: var(--ink);
+  border-color: var(--primary);
+}
+
+/* Missions Nav List */
+.cyber-missions-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cyber-mission-nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--border-subtle);
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.cyber-mission-nav-item.interactive {
+  cursor: pointer;
+}
+
+.cyber-mission-nav-item.interactive:hover {
+  background: var(--card-hover);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.cyber-mission-nav-item.active-mission {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.cyber-mission-nav-item.done-mission {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.mission-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mission-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mission-iv-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.iv-tag-iv1 {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.iv-tag-iv2 {
+  background: rgba(13, 148, 136, 0.12);
+  color: #0d9488;
+  border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+.iv-tag-iv3 {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.iv-tag-iv4 {
+  background: rgba(168, 85, 247, 0.12);
+  color: #9333ea;
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.mission-item-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mission-item-right {
+  flex-shrink: 0;
+}
+
+.mission-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.mission-status-pill.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.pulse-dot-subtle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+  box-shadow: 0 0 6px var(--primary);
+  animation: pulse 1.6s infinite;
+}
+
+.mission-status-pill.done {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mission-status-pill.count {
+  background: var(--border-subtle);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mission-item-progress-track {
+  height: 3px;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.mission-item-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.iv-fill-iv1 {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+}
+
+.iv-fill-iv2 {
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+}
+
+.iv-fill-iv3 {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.iv-fill-iv4 {
+  background: linear-gradient(90deg, #a855f7, #9333ea);
+}
+
+/* Compact pills row */
+.cyber-missions-compact-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.compact-mission-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--ink);
+}
+
+.compact-mission-pill.active {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.compact-mission-pill.done {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
+   DECISION CONSOLE ACTION CARD (Right Side Corner)
+   ========================================================================== */
+
+.decision-action-console-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.decision-action-console-card .action-selection-section {
+  gap: 14px;
+}
+
+.decision-action-console-card .action-selection-heading {
+  gap: 4px;
+}
+
+.decision-action-console-card .action-selection-title {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.decision-action-console-card .action-selection-sub {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.decision-action-console-card .interactive-action-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.decision-action-console-card .interactive-action-card {
+  padding: 13px 15px;
+  gap: 12px;
+  min-height: auto;
+  border-radius: 14px;
+}
+
+.decision-action-console-card .action-letter-badge {
+  width: 30px;
+  height: 30px;
+  font-size: 12.5px;
+  border-radius: 8px;
+}
+
+.decision-action-console-card .action-label-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.decision-action-console-card .action-reply-preview {
+  font-size: 12px;
+  padding: 5px 8px;
+}
+
+.decision-action-console-card .next-challenge-controls-panel {
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  gap: 12px;
+}
+
+.decision-action-console-card .challenge-nav-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.decision-action-console-card .challenge-nav-left {
+  width: 100%;
+}
+
+.decision-action-console-card .challenge-selection-hint {
+  font-size: 12.5px;
+}
+
+.decision-action-console-card .challenge-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-left: 0;
+}
+
+.decision-action-console-card .prev-challenge-btn {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.decision-action-console-card .primary-next-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 12px 18px;
+  font-size: 14.5px;
+  justify-content: center;
+}
+
+/* Responsive Breakpoints for Dual-Column Workstation */
+@media (max-width: 1060px) {
+  .challenge-workstation-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .decision-corner-sticky-wrapper {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .decision-action-console-card .challenge-nav-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .decision-action-console-card .challenge-nav-right {
+    width: auto;
+    margin-left: auto;
+  }
+
+  .decision-action-console-card .primary-next-btn {
+    width: auto;
+    min-width: 180px;
+  }
 }
 
 /* 1. Cyber Mission Header Card */

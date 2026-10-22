@@ -79,7 +79,13 @@ export async function getDemoSubmissions(): Promise<Session[]> {
   try {
     const raw = await readFile(subPath, "utf-8");
     const list = JSON.parse(raw);
-    return Array.isArray(list) ? list : [];
+    if (!Array.isArray(list)) return [];
+    return list.filter(
+      (s: Session) =>
+        !s.id?.includes("synthetic") &&
+        !s.submissionId?.includes("synthetic") &&
+        !s.code?.includes("synthetic"),
+    );
   } catch {
     return [];
   }

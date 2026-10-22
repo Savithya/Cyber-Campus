@@ -32,7 +32,9 @@ import {
   Eye,
   Compass,
   MessageSquare,
+  Layers,
 } from "lucide-react";
+import { missions } from "@/content/missions";
 import type { Scenario, ScenarioChoice, Attempt } from "@/lib/types";
 
 // =========================================================================
@@ -851,6 +853,183 @@ export function CyberMissionHeader({
 }
 
 // =========================================================================
+// SECTION A.2: ALL 4 CYBER MISSIONS NAVIGATOR & PROGRESS TRACKER
+// Displays the 4 research IV modules with completion counts and live state
+// =========================================================================
+
+export interface CyberMissionsPanelProps {
+  currentMissionId: string;
+  completedScenarioIds: string[];
+  totalOverall?: number;
+  overallCompleted?: number;
+  onSelectMission?: (missionId: string, scenarioIndex?: number) => void;
+  className?: string;
+}
+
+export function CyberMissionsPanel({
+  currentMissionId,
+  completedScenarioIds = [],
+  totalOverall = 20,
+  overallCompleted = 0,
+  onSelectMission,
+  className = "",
+}: CyberMissionsPanelProps) {
+  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const activeMissionList = missions.filter((m) => !m.proposed);
+
+  return (
+    <div
+      className={`cyber-missions-panel-card ${className}`}
+      role="region"
+      aria-label="All 4 Cyber Missions"
+    >
+      {/* Header with Title and Overall Progress */}
+      <div className="missions-panel-header">
+        <div className="missions-panel-title-wrap">
+          <div className="missions-panel-icon-tile">
+            <Layers size={15} className="text-primary" aria-hidden="true" />
+          </div>
+          <div>
+            <div className="missions-panel-eyebrow">RESEARCH MODULES</div>
+            <h3 className="missions-panel-title">4 Cyber Missions</h3>
+          </div>
+        </div>
+
+        <div className="missions-panel-meta">
+          <span className="missions-panel-progress-pill font-mono" title="Total Scenarios Completed">
+            {overallCompleted} / {totalOverall}
+          </span>
+          <button
+            type="button"
+            className="missions-panel-toggle-btn"
+            onClick={() => setIsExpanded(!isExpanded)}
+            aria-label={isExpanded ? "Collapse 4 Cyber Missions tracker" : "Expand 4 Cyber Missions tracker"}
+            title={isExpanded ? "Collapse tracker" : "Expand tracker"}
+          >
+            <ChevronDown
+              size={15}
+              className={`transform transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded List of 4 Cyber Missions */}
+      {isExpanded ? (
+        <div className="cyber-missions-nav-list" role="list" aria-label="Cyber Missions List">
+          {activeMissionList.map((m, index) => {
+            const isCurrent = m.id === currentMissionId;
+            const completedCount = m.ids.filter((id) => completedScenarioIds.includes(id)).length;
+            const totalCount = m.ids.length;
+            const isDone = completedCount >= totalCount;
+            const percent = Math.round((completedCount / totalCount) * 100);
+
+            const content = (
+              <>
+                <div className="mission-item-header">
+                  <div className="mission-item-left">
+                    <span className={`mission-iv-tag iv-tag-${m.iv.toLowerCase()}`}>
+                      {m.iv}
+                    </span>
+                    <span className="mission-item-name">
+                      {index + 1}. {m.name}
+                    </span>
+                  </div>
+
+                  <div className="mission-item-right">
+                    {isCurrent ? (
+                      <span className="mission-status-pill active">
+                        <span className="pulse-dot-subtle" aria-hidden="true" />
+                        <span>Active</span>
+                      </span>
+                    ) : isDone ? (
+                      <span className="mission-status-pill done">
+                        <Check size={11} strokeWidth={3} aria-hidden="true" />
+                        <span>Done</span>
+                      </span>
+                    ) : (
+                      <span className="mission-status-pill count">
+                        {completedCount}/{totalCount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mission-item-progress-track">
+                  <div
+                    className={`mission-item-progress-fill iv-fill-${m.iv.toLowerCase()} ${isCurrent ? "active-glow" : ""}`}
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </>
+            );
+
+            if (onSelectMission) {
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="listitem"
+                  onClick={() => onSelectMission(m.id, 0)}
+                  className={`cyber-mission-nav-item interactive ${isCurrent ? "active-mission" : ""} ${
+                    isDone ? "done-mission" : ""
+                  }`}
+                  aria-current={isCurrent ? "true" : undefined}
+                  title={`Switch to ${m.name} (${m.iv})`}
+                >
+                  {content}
+                </button>
+              );
+            }
+
+            return (
+              <div
+                key={m.id}
+                role="listitem"
+                className={`cyber-mission-nav-item ${isCurrent ? "active-mission" : ""} ${
+                  isDone ? "done-mission" : ""
+                }`}
+              >
+                {content}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Collapsed Compact Pills */
+        <div className="cyber-missions-compact-row" role="list" aria-label="Cyber Missions Compact">
+          {activeMissionList.map((m) => {
+            const isCurrent = m.id === currentMissionId;
+            const completedCount = m.ids.filter((id) => completedScenarioIds.includes(id)).length;
+            const isDone = completedCount >= m.ids.length;
+
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="listitem"
+                onClick={() => onSelectMission?.(m.id, 0)}
+                disabled={!onSelectMission}
+                className={`compact-mission-pill ${isCurrent ? "active" : ""} ${isDone ? "done" : ""}`}
+                title={`${m.name} (${completedCount}/${m.ids.length})`}
+              >
+                <span className="font-bold">{m.iv}</span>
+                {isDone ? (
+                  <Check size={11} strokeWidth={3} className="text-emerald" />
+                ) : (
+                  <span className="text-[11px] opacity-80">{completedCount}/5</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =========================================================================
 // SECTION B: SHORT SCENARIO INTRODUCTION COMPONENT
 // =========================================================================
 
@@ -1180,7 +1359,7 @@ export function ActionSelectionGroup({
         </div>
         <h2 className="action-selection-title">What would you do next?</h2>
         <p className="action-selection-sub">
-          Evaluate the threat indicators above and choose your immediate response.
+          Evaluate the communication and choose your immediate response.
         </p>
       </div>
 

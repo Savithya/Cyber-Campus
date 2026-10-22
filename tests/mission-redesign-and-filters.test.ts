@@ -271,3 +271,49 @@ describe("Review My Answers — Professional Educational Debrief Data Integrity"
     expect(typeof errorModule.default).toBe("function");
   });
 });
+
+describe("Dual-Column Cyber Investigation Workstation & 4 Cyber Missions Navigator", () => {
+  it("should export CyberMissionsPanel, ActionSelectionGroup, and NextChallengeButton", async () => {
+    const challengeModule = await import("@/components/cyber-mission-challenge");
+    expect(challengeModule.CyberMissionsPanel).toBeDefined();
+    expect(typeof challengeModule.CyberMissionsPanel).toBe("function");
+    expect(challengeModule.ActionSelectionGroup).toBeDefined();
+    expect(typeof challengeModule.ActionSelectionGroup).toBe("function");
+    expect(challengeModule.NextChallengeButton).toBeDefined();
+    expect(typeof challengeModule.NextChallengeButton).toBe("function");
+    expect(challengeModule.CyberMissionHeader).toBeDefined();
+    expect(typeof challengeModule.CyberMissionHeader).toBe("function");
+  });
+
+  it("should export InteractiveChallengeRunner component supporting dual-column layout and mission switching", async () => {
+    const runnerModule = await import("@/components/interactive-challenge-runner");
+    expect(runnerModule.InteractiveChallengeRunner).toBeDefined();
+    expect(typeof runnerModule.InteractiveChallengeRunner).toBe("function");
+  });
+
+  it("should verify all 4 parts of Cyber Missions have exactly 5 challenges each (20 total)", async () => {
+    const { missions } = await import("@/content/missions");
+    const active = missions.filter((m) => !m.proposed);
+    expect(active).toHaveLength(4);
+
+    const expectedParts = [
+      { iv: "IV1", id: "phishing", name: "Phishing Investigation" },
+      { iv: "IV2", id: "pretexting", name: "Pretexting Detection" },
+      { iv: "IV3", id: "impersonation", name: "Impersonation Investigation" },
+      { iv: "IV4", id: "links", name: "Scam & Malicious Link Investigation" },
+    ];
+
+    for (const part of expectedParts) {
+      const match = active.find((m) => m.iv === part.iv);
+      expect(match, `Mission for ${part.iv} must exist`).toBeDefined();
+      expect(match?.id).toBe(part.id);
+      expect(match?.name).toBe(part.name);
+      expect(match?.ids).toHaveLength(5);
+    }
+
+    const allActiveIds = active.flatMap((m) => m.ids);
+    expect(allActiveIds).toHaveLength(20);
+    const uniqueIds = new Set(allActiveIds);
+    expect(uniqueIds.size).toBe(20);
+  });
+});

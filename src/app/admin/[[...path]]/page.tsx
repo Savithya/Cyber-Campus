@@ -16,7 +16,13 @@ export default async function Page({
     const db = await requireResearcher();
     const { data, error } = await db.rpc("research_dataset");
     if (error) throw Error("Database unavailable");
-    sessions = data as Session[];
+    // Ensure all mock and synthetic records are strictly excluded from Research Workspace
+    sessions = (data as Session[]).filter(
+      (s) =>
+        !s.id?.includes("synthetic") &&
+        !s.submissionId?.includes("synthetic") &&
+        !s.code?.includes("synthetic"),
+    );
   } catch {
     return (
       <div className="narrow page-space">

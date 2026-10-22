@@ -293,7 +293,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
     );
 
     return (
-      <div className="container page-space">
+      <div className="container challenge-runner-container page-space">
         <InteractiveChallengeRunner
           scenario={activeScenario}
           missionId={activeMissionId}
@@ -345,6 +345,11 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
           onSelectScenarioIndex={(idx) => {
             void state.reload();
             setActiveScenarioIndex(idx);
+          }}
+          onSelectMission={(mid, sIdx = 0) => {
+            void state.reload();
+            setActiveMissionId(mid);
+            setActiveScenarioIndex(sIdx);
           }}
           onReturnToHub={() => {
             void state.reload();

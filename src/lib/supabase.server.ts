@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getResearcherSession } from "./researcher-auth.server";
 import { isResearch } from "./config.server";
-import { syntheticSessions } from "./fixtures.server";
 
 export async function supabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -57,12 +56,20 @@ export async function requireResearcher() {
     throw new Error("Researcher authentication required.");
   }
 
-  // In demo mode, return an authenticated mock provider that serves synthetic data
+  // In local/demo mode, return actual submitted participant sessions (excluding synthetic mock fixtures)
   if (!isResearch()) {
     return {
       rpc: async (name: string) => {
         if (name === "research_dataset") {
-          return { data: syntheticSessions(), error: null };
+          const { getDemoSubmissions } = await import("./repository.server");
+          const demoSubs = await getDemoSubmissions();
+          const cleanSubs = demoSubs.filter(
+            (s) =>
+              !s.id?.includes("synthetic") &&
+              !s.submissionId?.includes("synthetic") &&
+              !s.code?.includes("synthetic"),
+          );
+          return { data: cleanSubs, error: null };
         }
         if (name === "audit_export") {
           return { data: null, error: null };

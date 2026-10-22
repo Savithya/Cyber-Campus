@@ -116,7 +116,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         const result = await db.rpc("research_dataset");
         if (result.error)
           throw new Error("The database is unavailable. Please retry.");
-        data = result.data as Session[];
+        data = (result.data as Session[]).filter(
+          (s) =>
+            !s.id?.includes("synthetic") &&
+            !s.submissionId?.includes("synthetic") &&
+            !s.code?.includes("synthetic"),
+        );
       }
       if (path.endsWith("/data")) return json({ sessions: data });
       const kind = req.nextUrl.searchParams.get("kind") as string;
