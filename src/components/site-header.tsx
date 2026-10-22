@@ -191,6 +191,7 @@ export function SiteHeader() {
         <Link
           href="/#home"
           onClick={handleHomeClick}
+          prefetch={true}
           className="brand"
           aria-label="Cyber Campus Home - Return to Hero Section"
         >
@@ -213,6 +214,7 @@ export function SiteHeader() {
           <Link
             href="/#home"
             onClick={handleHomeClick}
+            prefetch={true}
             className={`nav-pill ${isHomeActive ? "active" : ""}`}
             aria-current={isHomeActive ? "page" : undefined}
           >
@@ -223,6 +225,7 @@ export function SiteHeader() {
           <Link
             href={challengesHref}
             onClick={handleChallengesClick}
+            prefetch={true}
             className={`nav-pill ${isChallengesActive ? "active" : ""}`}
             aria-current={isChallengesActive ? "page" : undefined}
           >
@@ -232,6 +235,7 @@ export function SiteHeader() {
 
           <Link
             href={joinHref}
+            prefetch={true}
             className={`nav-pill ${isJoinActive ? "active" : ""}`}
             aria-current={isJoinActive ? "page" : undefined}
           >
@@ -241,6 +245,7 @@ export function SiteHeader() {
 
           <Link
             href="/privacy"
+            prefetch={true}
             className={`nav-pill ${isAboutActive ? "active" : ""}`}
             aria-current={isAboutActive ? "page" : undefined}
           >
@@ -253,6 +258,7 @@ export function SiteHeader() {
         <div className="desktop-header-right">
           <Link
             href="/admin/login"
+            prefetch={true}
             className={`nav-admin nav-researcher-pill ${
               isResearcherActive ? "active" : ""
             }`}
@@ -333,6 +339,7 @@ export function SiteHeader() {
               <Link
                 href="/#home"
                 onClick={handleHomeClick}
+                prefetch={true}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isHomeActive ? "active" : ""
                 }`}
@@ -346,6 +353,7 @@ export function SiteHeader() {
               <Link
                 href={challengesHref}
                 onClick={handleChallengesClick}
+                prefetch={true}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isChallengesActive ? "active" : ""
                 }`}
@@ -359,6 +367,7 @@ export function SiteHeader() {
               <Link
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
+                prefetch={true}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isJoinActive ? "active" : ""
                 }`}
@@ -372,6 +381,7 @@ export function SiteHeader() {
               <Link
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
+                prefetch={true}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isAboutActive ? "active" : ""
                 }`}
@@ -385,6 +395,7 @@ export function SiteHeader() {
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
+                prefetch={true}
                 className={`mobile-nav-item mobile-nav-pill mobile-researcher-pill ${
                   isResearcherActive ? "active" : ""
                 }`}

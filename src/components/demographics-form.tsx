@@ -47,6 +47,11 @@ export function DemographicsForm() {
   const q5 = questions.find((q) => q.id === "Q5")!;
 
   useEffect(() => {
+    router.prefetch("/play");
+    router.prefetch("/consent");
+  }, [router]);
+
+  useEffect(() => {
     if (!state.loading && !state.session) {
       router.replace("/consent");
       return;
@@ -487,6 +492,7 @@ export function DemographicsForm() {
       <footer className="demographics-actions-bar">
         <Link
           href="/consent"
+          prefetch={true}
           className="button secondary large demo-back-btn"
           aria-label="Back to Research Consent"
         >

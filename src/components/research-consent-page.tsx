@@ -55,6 +55,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
   // Load config & check practice exposure flag
   useEffect(() => {
+    router.prefetch("/demographics");
+    router.prefetch("/play");
+
     api<{ config: StudyConfig; mode: string }>("config")
       .then((d) => {
         setConfig(d.config);
@@ -65,7 +68,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     if (typeof window !== "undefined") {
       setPrior(localStorage.getItem("cc-practice-exposure") === "yes");
     }
-  }, []);
+  }, [router]);
 
   // Start research session or practice mode
   async function handleStart(practice: boolean) {
@@ -166,7 +169,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
             </div>
           </div>
           <div className="previous-response-actions">
-            <Link href="/results" className="button secondary small">
+            <Link href="/results" prefetch={true} className="button secondary small">
               <span>View Confirmation</span>
             </Link>
             <button
@@ -193,7 +196,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
             </div>
           </div>
           <div className="previous-response-actions">
-            <Link href="/demographics" className="button primary small">
+            <Link href="/demographics" prefetch={true} className="button primary small">
               <span>Resume Participation</span>
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
@@ -453,7 +456,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               <ArrowRight size={18} aria-hidden="true" />
             </button>
 
-            <Link href="/" className="button ghost large">
+            <Link href="/" prefetch={true} className="button ghost large">
               <span>Return Home</span>
             </Link>
 

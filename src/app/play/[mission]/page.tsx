@@ -7,6 +7,15 @@ export const metadata = {
   description: "Interactive scenario-based cybersecurity challenges investigating social engineering threats on user privacy.",
 };
 
+export function generateStaticParams() {
+  return [
+    { mission: "phishing" },
+    { mission: "pretexting" },
+    { mission: "impersonation" },
+    { mission: "links" },
+  ];
+}
+
 export default async function Page({
   params,
 }: {

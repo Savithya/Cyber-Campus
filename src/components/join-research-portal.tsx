@@ -439,13 +439,14 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
 
                   <Link
                     href="/survey/complete"
+                    prefetch={true}
                     className="button secondary w-full portal-btn-touch"
                   >
                     <span>View Submission Confirmation</span>
                     <FileCheck2 size={16} aria-hidden="true" />
                   </Link>
 
-                  <Link href="/" className="button secondary w-full portal-btn-touch">
+                  <Link href="/" prefetch={true} className="button secondary w-full portal-btn-touch">
                     <span>Return to Homepage</span>
                     <Home size={16} aria-hidden="true" />
                   </Link>
@@ -1285,11 +1286,11 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
             </div>
 
             <div className="lab-action-group">
-              <Link href="/#challenges" className="button primary large portal-btn-touch">
+              <Link href="/#challenges" prefetch={true} className="button primary large portal-btn-touch">
                 <Gamepad2 size={18} aria-hidden="true" />
                 <span>Explore Practice Lab</span>
               </Link>
-              <Link href="/privacy" className="button secondary portal-btn-touch">
+              <Link href="/privacy" prefetch={true} className="button secondary portal-btn-touch">
                 <span>About the Study</span>
               </Link>
             </div>

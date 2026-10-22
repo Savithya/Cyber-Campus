@@ -50,12 +50,14 @@ interface CyberMissionControlProps {
   initialMissionId?: string;
 }
 
+let cachedScenarios: Scenario[] | null = null;
+
 export function CyberMissionControl({ initialMissionId }: CyberMissionControlProps = {}) {
   const router = useRouter();
   const state = useSession();
 
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [loadingScenarios, setLoadingScenarios] = useState<boolean>(true);
+  const [scenarios, setScenarios] = useState<Scenario[]>(() => cachedScenarios ?? []);
+  const [loadingScenarios, setLoadingScenarios] = useState<boolean>(() => !cachedScenarios);
   const [error, setError] = useState<string>("");
   const [startingPractice, setStartingPractice] = useState<boolean>(false);
 
@@ -74,11 +76,17 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
   }, [activeMissionId, activeScenarioIndex]);
 
   const fetchScenarios = useCallback(async () => {
+    if (cachedScenarios && cachedScenarios.length > 0) {
+      setScenarios(cachedScenarios);
+      setLoadingScenarios(false);
+      return;
+    }
     setLoadingScenarios(true);
     setError("");
     try {
       const data = await api<{ scenarios: Scenario[] }>("scenarios");
-      setScenarios(data.scenarios || []);
+      cachedScenarios = data.scenarios || [];
+      setScenarios(cachedScenarios);
     } catch (err) {
       setError((err as Error).message || "Failed to load cyber missions.");
     } finally {
@@ -128,7 +136,8 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
       state.setSession(res.session);
       setLoadingScenarios(true);
       const scRes = await api<{ scenarios: Scenario[] }>("scenarios");
-      setScenarios(scRes.scenarios || []);
+      cachedScenarios = scRes.scenarios || [];
+      setScenarios(cachedScenarios);
     } catch (e) {
       setError((e as Error).message || "Failed to launch practice mode.");
     } finally {
@@ -165,7 +174,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
           </p>
 
           <div className="cyber-access-actions">
-            <Link href="/consent" className="button primary large">
+            <Link href="/consent" prefetch={true} className="button primary large">
               <span>Begin Research Consent</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -180,7 +189,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
               <span>{startingPractice ? "Launching Practice…" : "Explore Practice Challenges"}</span>
             </button>
 
-            <Link href="/" className="button ghost">
+            <Link href="/" prefetch={true} className="button ghost">
               <span>Back to Home</span>
             </Link>
           </div>
@@ -212,7 +221,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
           </p>
 
           <div className="cyber-access-actions">
-            <Link href="/demographics" className="button primary large">
+            <Link href="/demographics" prefetch={true} className="button primary large">
               <span>Continue Student Profile</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -227,7 +236,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
               <span>{startingPractice ? "Launching Practice…" : "Explore Practice Challenges"}</span>
             </button>
 
-            <Link href="/" className="button ghost">
+            <Link href="/" prefetch={true} className="button ghost">
               <span>Back to Home</span>
             </Link>
           </div>
@@ -585,7 +594,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
               </p>
             </div>
           </div>
-          <Link href="/results" className="button primary large banner-cta-btn">
+          <Link href="/results" prefetch={true} className="button primary large banner-cta-btn">
             <span>Complete &amp; Review My Answers</span>
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
@@ -730,7 +739,7 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
         </div>
 
         {completedCount > 0 && (
-          <Link href="/results" className="button secondary">
+          <Link href="/results" prefetch={true} className="button secondary">
             <span>View Completion &amp; Debrief ({completedCount}/{totalScenariosCount})</span>
             <ChevronRight size={16} aria-hidden="true" />
           </Link>

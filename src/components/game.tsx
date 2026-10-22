@@ -105,7 +105,7 @@ export function CampusMap() {
             </div>
           </div>
           <div className="hud-action-tile">
-            <Link className="button primary hud-launch-btn" href="/results">
+            <Link className="button primary hud-launch-btn" href="/results" prefetch={true}>
               <span>View Badges & Debrief</span>
             </Link>
           </div>
@@ -192,11 +192,12 @@ export function CampusMap() {
       <div className="survey-bottom">
         <Link
           href={s.mode === "practice" ? "/" : "/survey/complete"}
+          prefetch={true}
           className="button secondary"
         >
           Finish for now
         </Link>
-        <Link className="button primary" href="/results">
+        <Link className="button primary" href="/results" prefetch={true}>
           View my progress & debrief
         </Link>
       </div>
@@ -537,12 +538,12 @@ export function Mission({ missionId }: { missionId: string }) {
 
           <div className="completion-actions-bar">
             {nextMission ? (
-              <Link className="button primary large" href={`/play/${nextMission.id}`}>
+              <Link className="button primary large" href={`/play/${nextMission.id}`} prefetch={true}>
                 <span>Continue to {nextMission.code}: {nextMission.name}</span>
                 <ArrowRight size={16} />
               </Link>
             ) : (
-              <Link className="button primary large" href="/results">
+              <Link className="button primary large" href="/results" prefetch={true}>
                 <span>View Platform Results & Debrief</span>
                 <ArrowRight size={16} />
               </Link>
@@ -555,7 +556,7 @@ export function Mission({ missionId }: { missionId: string }) {
               <RotateCcw size={15} />
               <span>Review Scenarios</span>
             </button>
-            <Link className="button ghost" href="/play">
+            <Link className="button ghost" href="/play" prefetch={true}>
               Return to Campus Map
             </Link>
           </div>

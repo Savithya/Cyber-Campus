@@ -55,14 +55,14 @@ export function SiteFooter({ compact }: SiteFooterProps) {
           </div>
 
           <nav className="footer-compact-links" aria-label="Footer Quick Links">
-            <Link href="/" className="footer-compact-link">Home</Link>
-            <Link href="/play" className="footer-compact-link">Cyber Missions</Link>
-            <Link href="/privacy" className="footer-compact-link">Privacy &amp; Rights</Link>
-            <Link href="/withdraw" className="footer-compact-link">Withdrawal Protocol</Link>
+            <Link href="/" prefetch={true} className="footer-compact-link">Home</Link>
+            <Link href="/play" prefetch={true} className="footer-compact-link">Cyber Missions</Link>
+            <Link href="/privacy" prefetch={true} className="footer-compact-link">Privacy &amp; Rights</Link>
+            <Link href="/withdraw" prefetch={true} className="footer-compact-link">Withdrawal Protocol</Link>
           </nav>
 
           <div className="footer-compact-actions">
-            <Link href="/admin/login" className="footer-compact-admin-link">
+            <Link href="/admin/login" prefetch={true} className="footer-compact-admin-link">
               <Lock size={12} aria-hidden="true" />
               <span>Researcher Access</span>
             </Link>
@@ -136,27 +136,27 @@ export function SiteFooter({ compact }: SiteFooterProps) {
           </div>
           <ul className="footer-nav-list" role="list">
             <li>
-              <Link href="/" className="footer-nav-link">
+              <Link href="/" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Home Overview</span>
               </Link>
             </li>
             <li>
-              <Link href="/#challenges" className="footer-nav-link">
+              <Link href="/#challenges" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Cyber Challenges</span>
                 <span className="footer-link-badge">Interactive</span>
               </Link>
             </li>
             <li>
-              <Link href="/consent" className="footer-nav-link">
+              <Link href="/consent" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Join Research</span>
                 <span className="footer-link-badge highlight">Enroll</span>
               </Link>
             </li>
             <li>
-              <Link href="/#about-study" className="footer-nav-link">
+              <Link href="/#about-study" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>About the Study</span>
               </Link>
@@ -172,25 +172,25 @@ export function SiteFooter({ compact }: SiteFooterProps) {
           </div>
           <ul className="footer-nav-list" role="list">
             <li>
-              <Link href="/consent" className="footer-nav-link">
+              <Link href="/consent" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Study Information &amp; Ethics</span>
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="footer-nav-link">
+              <Link href="/privacy" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Privacy &amp; Data Protection</span>
               </Link>
             </li>
             <li>
-              <Link href="/privacy#rights" className="footer-nav-link">
+              <Link href="/privacy#rights" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Participant Rights</span>
               </Link>
             </li>
             <li>
-              <Link href="/withdraw" className="footer-nav-link">
+              <Link href="/withdraw" prefetch={true} className="footer-nav-link">
                 <ChevronRight size={13} className="footer-nav-arrow" aria-hidden="true" />
                 <span>Withdrawal Protocol</span>
               </Link>

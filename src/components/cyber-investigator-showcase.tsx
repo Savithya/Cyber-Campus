@@ -596,6 +596,7 @@ export function CyberInvestigatorShowcase() {
               <div className="mt-5 flex items-center justify-center gap-3 flex-wrap">
                 <Link
                   href="/consent"
+                  prefetch={true}
                   className="button primary large w-full sm:w-auto font-bold shadow-md shadow-primary/20"
                 >
                   <span>Start Cyber Investigation</span>
@@ -603,6 +604,7 @@ export function CyberInvestigatorShowcase() {
                 </Link>
                 <Link
                   href="/play"
+                  prefetch={true}
                   className="button secondary large w-full sm:w-auto font-medium"
                 >
                   <Gamepad2 size={17} aria-hidden="true" />

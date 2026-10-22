@@ -1,12 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { Session, Answers } from "./types";
+
+// Client-side in-memory cache for static GET responses
+const getCache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function api<T = Record<string, unknown>>(
   path: string,
   body?: unknown,
 ): Promise<T> {
   const isMutation = path === "session/discard" || path === "auth/logout";
   const method = body !== undefined || isMutation ? "POST" : "GET";
+
+  // Serve static read-only GET requests from memory cache when available
+  if (method === "GET" && path === "config") {
+    const cached = getCache.get(path);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data as T;
+    }
+  }
+
   const r = await fetch("/api/" + path, {
     method,
     headers:
@@ -26,27 +40,59 @@ export async function api<T = Record<string, unknown>>(
     throw new Error(
       data.error ?? "Unable to save. Check your connection and retry.",
     );
+
+  if (method === "GET" && path === "config") {
+    getCache.set(path, { data, timestamp: Date.now() });
+  }
+
   return data;
 }
-export function useSession() {
-  const [session, setSession] = useState<Session | null>(null),
-    [loading, setLoading] = useState(true),
-    [error, setError] = useState("");
-  const reload = async () => {
+
+export interface SessionContextType {
+  session: Session | null;
+  setSession: React.Dispatch<React.SetStateAction<Session | null>>;
+  loading: boolean;
+  error: string;
+  reload: () => Promise<void>;
+}
+
+export const SessionContext = createContext<SessionContextType | null>(null);
+
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const reload = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      setSession((await api<{ session: Session | null }>("session")).session);
+      const res = await api<{ session: Session | null }>("session");
+      setSession(res.session);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
   useEffect(() => {
     void reload();
-  }, []);
-  return { session, setSession, loading, error, reload };
+  }, [reload]);
+
+  return React.createElement(
+    SessionContext.Provider,
+    { value: { session, setSession, loading, error, reload } },
+    children,
+  );
+}
+
+export function useSession(): SessionContextType {
+  const ctx = useContext(SessionContext);
+  if (!ctx) {
+    throw new Error("useSession must be used within a SessionProvider");
+  }
+  return ctx;
 }
 export const draftKey = "cc-private-draft-v1";
 type LocalDraft = {
@@ -71,10 +117,18 @@ export function loadDraft(code: string): LocalDraft | null {
   }
 }
 export function putDraft(d: LocalDraft) {
-  localStorage.setItem(draftKey, JSON.stringify(d));
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(d));
+    } catch {}
+  }
 }
 export function clearDraft() {
-  localStorage.removeItem(draftKey);
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {}
+  }
 }
 export function randomToken() {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
@@ -83,5 +137,10 @@ export function randomToken() {
 }
 export function clearParticipationStorage() {
   clearDraft();
-  sessionStorage.removeItem("cc-receipt");
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.removeItem("cc-receipt");
+    } catch {}
+  }
+  getCache.clear();
 }

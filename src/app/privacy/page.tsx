@@ -2,7 +2,7 @@ import { getConfig } from "@/lib/repository.server";
 import { demoConfig } from "@/lib/config.server";
 import { ResearchParticipationPage } from "@/components/research-participation-page";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata = {
   title: "Research & Participation · Cyber Campus",

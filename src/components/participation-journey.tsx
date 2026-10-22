@@ -328,6 +328,7 @@ export function ParticipationJourney() {
           <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
             <Link
               href={selectedStepData.directActionHref}
+              prefetch={true}
               className="button primary large text-center justify-center font-bold shadow-md hover:shadow-primary/30"
             >
               <span>{selectedStepData.directActionLabel}</span>
@@ -362,6 +363,7 @@ export function ParticipationJourney() {
         <div className="flex items-center gap-3 w-full md:w-auto justify-center">
           <Link
             href="/consent"
+            prefetch={true}
             className="button primary large w-full sm:w-auto font-bold shadow-lg shadow-primary/20"
           >
             <span>Start Research Participation</span>

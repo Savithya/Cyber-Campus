@@ -156,7 +156,7 @@ export function ResearchCompletion() {
       <div className="container page-space narrow text-center">
         <h2>Research Session Incomplete</h2>
         <p className="mt-2 text-muted">You have not started or submitted your research session yet.</p>
-        <Link href="/consent" className="button primary large mt-6">
+        <Link href="/consent" prefetch={true} className="button primary large mt-6">
           <span>Go to Research Consent</span>
           <ArrowRight size={18} aria-hidden="true" />
         </Link>
@@ -455,11 +455,11 @@ export function ResearchCompletion() {
 
         {/* Navigation Action Buttons */}
         <div className="completion-header-actions mt-8">
-          <Link href="/" className="button primary large flex items-center gap-2">
+          <Link href="/" prefetch={true} className="button primary large flex items-center gap-2">
             <Home size={18} aria-hidden="true" />
             <span>Return to Home</span>
           </Link>
-          <Link href="/play" className="button ghost large flex items-center gap-2">
+          <Link href="/play" prefetch={true} className="button ghost large flex items-center gap-2">
             <RotateCcw size={18} aria-hidden="true" />
             <span>Practice Missions</span>
           </Link>

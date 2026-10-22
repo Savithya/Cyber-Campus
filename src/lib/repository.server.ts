@@ -107,8 +107,13 @@ import { scoreDecision } from "./scoring";
 import type { Session, Answers, Attempt } from "./types";
 export const hashToken = (token: string) =>
   createHash("sha256").update(token).digest("hex");
+let cachedConfig: { data: StudyConfig; expiresAt: number } | null = null;
+
 export async function getConfig(): Promise<StudyConfig> {
   if (!isResearch()) return demoConfig;
+  if (cachedConfig && Date.now() < cachedConfig.expiresAt) {
+    return cachedConfig.data;
+  }
   const db = await supabase();
   const { data, error } = await db
     .from("study_config")
@@ -119,7 +124,9 @@ export async function getConfig(): Promise<StudyConfig> {
     throw new Error(
       "Research database unavailable. Your answers have not been submitted.",
     );
-  return data.public_config as StudyConfig;
+  const cfg = data.public_config as StudyConfig;
+  cachedConfig = { data: cfg, expiresAt: Date.now() + 5 * 60 * 1000 };
+  return cfg;
 }
 async function rpc<T>(
   name: string,

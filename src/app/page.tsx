@@ -53,6 +53,7 @@ export default function Home() {
             <Link
               className="button primary large hero-cta-btn"
               href="/consent"
+              prefetch={true}
               aria-label="Start Research Participation"
             >
               <span>Start Research</span>

@@ -379,6 +379,7 @@ export function HomeThreatCards() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/consent"
+                  prefetch={true}
                   className="threat-investigate-link button primary small inline-flex items-center gap-1.5 text-xs font-bold py-1.5 px-3.5 shadow-sm"
                   title={`Participate in ${card.title} challenges`}
                 >

@@ -1,14 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
 import "./globals.css";
 import DraftLifecycle from "@/components/draft-lifecycle";
 import { ThemeProvider, ThemeScript } from "@/components/theme-provider";
+import { SessionProvider } from "@/lib/client";
 import { SiteHeader } from "@/components/site-header";
-
 import { SiteFooter } from "@/components/site-footer";
-
-export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -37,16 +33,18 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <DraftLifecycle />
-          <a className="skip-link" href="#main">
-            Skip to content
-          </a>
+          <SessionProvider>
+            <DraftLifecycle />
+            <a className="skip-link" href="#main">
+              Skip to content
+            </a>
 
-          <SiteHeader />
+            <SiteHeader />
 
-          <main id="main">{children}</main>
+            <main id="main">{children}</main>
 
-          <SiteFooter />
+            <SiteFooter />
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
