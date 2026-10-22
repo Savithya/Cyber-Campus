@@ -273,7 +273,7 @@ export function GlobalResearchFilters({
               id="filter-search-input"
               type="text"
               className="filter-text-input"
-              placeholder="Participant code or submission ID…"
+              placeholder="Participant code…"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
             />

@@ -253,6 +253,7 @@ export default function Admin({
     const next = { ...filters, [key]: value };
     setFilters(next);
     setPage(0);
+    setHistoryPage(0);
     const q = new URLSearchParams(
       Object.entries(next).filter(([, v]) => v) as [string, string][],
     );
@@ -341,10 +342,32 @@ export default function Admin({
   );
 
   const historyPageSize = 10;
-  const paginatedHistorySessions = all.slice(
-    historyPage * historyPageSize,
-    (historyPage + 1) * historyPageSize,
-  );
+  const historySessions = useMemo(() => {
+    return all.filter(
+      (s) => !s.id?.includes("synthetic") && !s.submissionId?.includes("synthetic"),
+    );
+  }, [all]);
+
+  const historySubmitted = useMemo(() => {
+    return historySessions.filter(
+      (s) =>
+        s.status === "submitted_complete" ||
+        s.status === "submitted_with_missing",
+    );
+  }, [historySessions]);
+
+  const historyUniqueParticipants = useMemo(() => {
+    return new Set(
+      historySubmitted.map((s) => s.participantId || s.code),
+    ).size;
+  }, [historySubmitted]);
+
+  const paginatedHistorySessions = useMemo(() => {
+    return historySessions.slice(
+      historyPage * historyPageSize,
+      (historyPage + 1) * historyPageSize,
+    );
+  }, [historySessions, historyPage, historyPageSize]);
 
   return (
     <div className="admin-layout">
@@ -1401,8 +1424,8 @@ export default function Admin({
                 <div>
                   <h2>Participant Submission History</h2>
                   <p className="text-sm opacity-80 mt-1">
-                    {all.length} matching records · {counts.totalSubmissions} total submissions from{" "}
-                    {counts.uniqueParticipants} unique participants
+                    {historySessions.length} matching records · {historySubmitted.length} total submissions from{" "}
+                    {historyUniqueParticipants} unique participants
                   </p>
                 </div>
                 <span className="tag">Times in Asia/Colombo</span>
@@ -1417,21 +1440,16 @@ export default function Admin({
                 <table>
                   <thead>
                     <tr>
-                      <th>Submission ID</th>
                       <th>Participant code</th>
                       <th>Status</th>
                       <th>Answered / 25</th>
                       <th>Missions Finished</th>
                       <th>Submission Date &amp; Time</th>
-                      <th>Known Exposure</th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedHistorySessions.map((s) => (
                       <tr key={s.submissionId ?? s.id}>
-                        <td>
-                          <code className="text-xs font-mono">{s.submissionId ?? s.id}</code>
-                        </td>
                         <td>
                           <code>{s.code}</code>
                         </td>
@@ -1449,14 +1467,13 @@ export default function Admin({
                         </td>
                         <td>{scoreSummary(s.attempts).completed} / 20</td>
                         <td>{colomboTime(s.submittedAt) || colomboTime(s.createdAt)}</td>
-                        <td>{s.priorExposure ? "Yes" : "No known exposure"}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {!all.length && (
+              {!historySessions.length && (
                 <p className="empty-copy">No sessions match these filters.</p>
               )}
 
@@ -1470,11 +1487,11 @@ export default function Admin({
                 </button>
                 <span>
                   Page {historyPage + 1} of{" "}
-                  {Math.max(1, Math.ceil(all.length / historyPageSize))}
+                  {Math.max(1, Math.ceil(historySessions.length / historyPageSize))}
                 </span>
                 <button
                   className="button secondary"
-                  disabled={(historyPage + 1) * historyPageSize >= all.length}
+                  disabled={(historyPage + 1) * historyPageSize >= historySessions.length}
                   onClick={() => setHistoryPage(historyPage + 1)}
                 >
                   Next

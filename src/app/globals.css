@@ -20233,11 +20233,13 @@ img, svg {
   z-index: 1;
 }
 
-.filter-text-input {
+.filter-text-input,
+input.filter-text-input {
   width: 100%;
+  min-height: 38px;
   height: 38px;
-  padding-left: 34px;
-  padding-right: 32px;
+  padding-left: 36px !important;
+  padding-right: 32px !important;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--input-bg);
@@ -20246,7 +20248,8 @@ img, svg {
   transition: all 0.15s ease;
 }
 
-.filter-text-input:focus {
+.filter-text-input:focus,
+input.filter-text-input:focus {
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 0 3px var(--primary-glow);
