@@ -6,6 +6,7 @@ import { missions } from "@/content/missions";
 import type { Scenario, Attempt } from "@/lib/types";
 import {
   CyberMissionHeader,
+  CyberMissionsPanel,
   ScenarioIntroduction,
   UniversityEmailSimulator,
   ActionSelectionGroup,
@@ -155,22 +156,29 @@ export function InteractiveChallengeRunner({
         missionIds={currentMission.ids}
       />
 
-      {/* 2-Column Responsive Workstation Layout */}
-      <div className="challenge-workstation-grid">
-        {/* =====================================================================
-            LEFT MAIN STAGE: Scenario Briefing & University Email Simulator
-            ===================================================================== */}
-        <div className="challenge-investigation-stage">
+      {/* 3-Column / Responsive Investigation Workstation Layout */}
+      <div className="challenge-workstation-grid workstation-3col">
+        {/* LEFT SIDEBAR: 4 Cyber Mission Categories & Live Progress */}
+        <aside className="challenge-workspace-sidebar" aria-label="Research Modules Navigator">
+          <CyberMissionsPanel
+            currentMissionId={missionId}
+            completedScenarioIds={completedScenarioIds}
+            totalOverall={totalOverall}
+            overallCompleted={overallCompleted}
+            onSelectMission={onSelectMission}
+          />
+        </aside>
+
+        {/* CENTER STAGE: Scenario Briefing & University Email Simulator */}
+        <main className="challenge-investigation-stage" aria-label="Scenario Evidence Stage">
           {/* SECTION B — SHORT SCENARIO INTRODUCTION */}
           <ScenarioIntroduction introText={emailData.scenarioIntro} />
 
           {/* SECTION C — REALISTIC UNIVERSITY EMAIL SIMULATOR */}
           <UniversityEmailSimulator emailData={emailData} />
-        </div>
+        </main>
 
-        {/* =====================================================================
-            RIGHT SIDE CORNER: Decision Console
-            ===================================================================== */}
+        {/* RIGHT SIDE PANEL: Decision Console */}
         <aside
           className="challenge-decision-corner"
           aria-label="Decision Console"

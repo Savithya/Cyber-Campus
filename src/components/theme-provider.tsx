@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 
-export type Theme = "dark" | "light";
+export type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -22,8 +22,8 @@ const THEME_STORAGE_KEY = "cc-theme";
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const THEMES: { id: Theme; label: string; icon: string }[] = [
-  { id: "dark", label: "Dark", icon: "moon" },
   { id: "light", label: "Light", icon: "sun" },
+  { id: "dark", label: "Dark", icon: "moon" },
 ];
 
 export function ThemeScript() {
@@ -31,9 +31,8 @@ export function ThemeScript() {
     try {
       var stored = localStorage.getItem("${THEME_STORAGE_KEY}");
       var theme = stored;
-      if (!theme || (theme !== "dark" && theme !== "light")) {
-        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        theme = prefersDark ? "dark" : "light";
+      if (!theme || (theme !== "light" && theme !== "dark" && theme !== "cyber")) {
+        theme = "light";
       }
       document.documentElement.setAttribute("data-theme", theme);
       document.documentElement.classList.remove("dark", "light", "cyber");
@@ -49,7 +48,7 @@ export function ThemeScript() {
   );
 }
 
-function applyTheme(t: Theme) {
+function applyTheme(t: Theme | string) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   root.setAttribute("data-theme", t);
@@ -58,23 +57,21 @@ function applyTheme(t: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (stored && (stored === "dark" || stored === "light")) {
-        setThemeState(stored);
+      if (stored && (stored === "dark" || stored === "light" || (stored as string) === "cyber")) {
+        setThemeState(stored as Theme);
         applyTheme(stored);
       } else {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const initial = prefersDark ? "dark" : "light";
-        setThemeState(initial);
-        applyTheme(initial);
+        // First-time visitors without a stored preference receive Light mode
+        setThemeState("light");
+        applyTheme("light");
       }
     } catch {
-      // localStorage may fail in restricted sandboxes
-      applyTheme("dark");
+      applyTheme("light");
     }
   }, []);
 
@@ -90,7 +87,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     setThemeState((current) => {
-      const next: Theme = current === "dark" ? "light" : "dark";
+      const next: Theme = current === "light" ? "dark" : "light";
 
       applyTheme(next);
       try {

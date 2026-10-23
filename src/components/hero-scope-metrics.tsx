@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layers, ShieldAlert, Clock, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { Layers, ShieldAlert, Clock, ArrowUpRight, CheckCircle2, GraduationCap } from "lucide-react";
 
 export function HeroScopeMetrics() {
   const scrollToChallenges = (e: React.MouseEvent) => {
@@ -14,7 +14,7 @@ export function HeroScopeMetrics() {
 
   return (
     <div
-      className="hero-scope-metrics-grid"
+      className="hero-scope-metrics-grid grid-4"
       role="region"
       aria-label="Research Scope and Participation Metrics"
     >
@@ -138,6 +138,44 @@ export function HeroScopeMetrics() {
         <div className="scope-card-hint static">
           <CheckCircle2 size={13} className="text-emerald" aria-hidden="true" />
           <span>Flexible &amp; Self-Paced</span>
+        </div>
+      </div>
+
+      {/* Card 4: University Students in Sri Lanka */}
+      <div
+        className="hero-scope-card cat-amber"
+        tabIndex={0}
+        role="article"
+        aria-label="Target Population: University Students in Sri Lanka"
+      >
+        <div className="scope-card-glow-bg amber" aria-hidden="true" />
+        <div className="scope-card-top">
+          <div className="scope-icon-wrap amber">
+            <GraduationCap size={20} aria-hidden="true" />
+          </div>
+          <span className="scope-pill-badge amber">
+            Target Population
+          </span>
+        </div>
+
+        <div className="scope-metric-val">
+          Sri Lanka
+        </div>
+        <div className="scope-metric-title">University Students</div>
+        <p className="scope-metric-desc">
+          Higher education undergraduates &amp; postgraduates across Sri Lanka.
+        </p>
+
+        {/* User-friendly UX Chips */}
+        <div className="scope-metric-tags" aria-label="Target institutions">
+          <span className="scope-tag-item">State Universities</span>
+          <span className="scope-tag-item">Private Campuses</span>
+          <span className="scope-tag-item">All Disciplines</span>
+        </div>
+
+        <div className="scope-card-hint static">
+          <CheckCircle2 size={13} className="text-amber" aria-hidden="true" />
+          <span>Higher Education Study</span>
         </div>
       </div>
     </div>

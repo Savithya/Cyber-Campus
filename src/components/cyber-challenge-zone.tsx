@@ -140,13 +140,12 @@ export function CyberChallengeZone() {
             <span>OPTIONAL CYBER CHALLENGE ZONE · PRACTICE LAB</span>
           </div>
 
-          <h2 id="challenge-zone-heading" className="challenge-title">
-            Learn Cybersecurity Through Interactive Challenges
-          </h2>
+          <h1 id="challenge-zone-heading" className="challenge-title">
+            Explore Cybersecurity Challenges
+          </h1>
 
           <p className="challenge-subtitle">
-            Develop your ability to recognize online threats through realistic and engaging activities.
-            Practice spotting phishing, deceptive links, pretexting stories, and impersonation attempts in an inert learning sandbox.
+            Discover realistic social engineering scenarios and practice identifying suspicious digital interactions.
           </p>
 
           {/* Academic Isolation Disclaimer */}
@@ -267,20 +266,60 @@ export function CyberChallengeZone() {
         {/* TAB 1: The 4 Core Challenge Zones */}
         {activeTab === "challenges" && (
           <div className="challenge-cards-grid">
-            {/* 1. Phishing Detection */}
+            {/* 1. IV1 — Phishing */}
             <div className="challenge-game-card card-phishing">
               <div className="card-top-header">
-                <span className="card-category-tag">IV1 · EMAIL INBOX</span>
+                <span className="card-category-tag">IV1 · PHISHING</span>
                 <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon purple-glow">
                 <Mail size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Phishing Detection Challenges</h3>
+              <h3 className="card-title">IV1 — Phishing</h3>
               <p className="card-desc">
-                Investigate deceptive campus emails. Uncover disguised sender addresses,
-                spoofed IT warnings, urgent password reset traps, and credential harvesters.
+                Investigate suspicious emails and urgent credential traps. Detect deceptive lookalike domains, spoofed university notices, and malicious attachments.
               </p>
+
+              {/* Realistic Simulated Email Preview Illustration */}
+              <div className="mission-preview-mini-card bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3 my-3 text-xs">
+                <div className="flex items-center justify-between pb-1.5 border-b border-indigo-500/20 text-[10px] text-muted-foreground font-mono">
+                  <span>Simulated Webmail</span>
+                  <span className="text-red-400 font-bold">Unverified Sender</span>
+                </div>
+                <div className="mt-1.5 text-foreground/90 font-mono text-[11px] truncate">
+                  IT Helpdesk &lt;security@campus-portal-verify.example&gt;
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1 italic">
+                  &ldquo;Urgent 2-hour deadline to confirm student password...&rdquo;
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="card-progress-bar-wrap mb-3">
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Module Progress</span>
+                  <span className="font-bold text-indigo-400">
+                    {(() => {
+                      const m = missions.find((x) => x.id === "phishing");
+                      const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                      return `${done}/5 Completed`;
+                    })()}
+                  </span>
+                </div>
+                <div className="hud-progress-track">
+                  <div
+                    className="hud-progress-fill bg-indigo-500"
+                    style={{
+                      width: `${(() => {
+                        const m = missions.find((x) => x.id === "phishing");
+                        const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                        return (done / 5) * 100;
+                      })()}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="card-skills-list">
                 <span className="skill-chip">Header Analysis</span>
                 <span className="skill-chip">Urgency Flags</span>
@@ -293,13 +332,13 @@ export function CyberChallengeZone() {
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Start Learning</span>
+                  <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {/* 2. Pretexting Awareness */}
+            {/* 2. IV2 — Pretexting */}
             <div className="challenge-game-card card-pretexting">
               <div className="card-top-header">
                 <span className="card-category-tag">IV2 · PRETEXTING</span>
@@ -308,11 +347,51 @@ export function CyberChallengeZone() {
               <div className="card-main-icon emerald-glow">
                 <MessagesSquare size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Pretexting Detection Quizzes</h3>
+              <h3 className="card-title">IV2 — Pretexting</h3>
               <p className="card-desc">
-                Dissect psychological manipulation. Detect fabricated emergency stories,
-                bogus campus IT support requests, and coercive emotional pressure.
+                Dissect fabricated crisis stories and support conversations. Identify psychological manipulation, false administrative emergencies, and one-time password (OTP) solicitations.
               </p>
+
+              {/* Fabricated Support Conversation Simulation Preview */}
+              <div className="mission-preview-mini-card bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 my-3 text-xs">
+                <div className="flex items-center justify-between pb-1.5 border-b border-emerald-500/20 text-[10px] text-muted-foreground font-mono">
+                  <span>Support Chat Simulation</span>
+                  <span className="text-amber-400 font-bold">Unverified Bot</span>
+                </div>
+                <div className="mt-1.5 text-foreground/90 font-mono text-[11px] truncate">
+                  Campus IT Support Assistant
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1 italic">
+                  &ldquo;Emergency server failure: share your phone OTP to restore...&rdquo;
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="card-progress-bar-wrap mb-3">
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Module Progress</span>
+                  <span className="font-bold text-emerald-400">
+                    {(() => {
+                      const m = missions.find((x) => x.id === "pretexting");
+                      const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                      return `${done}/5 Completed`;
+                    })()}
+                  </span>
+                </div>
+                <div className="hud-progress-track">
+                  <div
+                    className="hud-progress-fill bg-emerald-500"
+                    style={{
+                      width: `${(() => {
+                        const m = missions.find((x) => x.id === "pretexting");
+                        const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                        return (done / 5) * 100;
+                      })()}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="card-skills-list">
                 <span className="skill-chip">Psychological Analysis</span>
                 <span className="skill-chip">Pretexting Stories</span>
@@ -325,26 +404,66 @@ export function CyberChallengeZone() {
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Start Learning</span>
+                  <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {/* 3. Impersonation Investigation */}
+            {/* 3. IV3 — Impersonation */}
             <div className="challenge-game-card card-impersonation">
               <div className="card-top-header">
-                <span className="card-category-tag">IV3 · IDENTITY</span>
+                <span className="card-category-tag">IV3 · IMPERSONATION</span>
                 <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon amber-glow">
                 <UserRoundSearch size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Impersonation Defense Missions</h3>
+              <h3 className="card-title">IV3 — Impersonation</h3>
               <p className="card-desc">
-                Defend personal credentials and privacy. Identify spoofed student representatives,
-                unverified Telegram/WhatsApp profiles, and enforce data withholding.
+                Defend personal credentials and privacy against deceptive identities. Recognize spoofed professors, unverified student council profiles, and unauthorized staff contacts.
               </p>
+
+              {/* Deceptive Identity / Social Profile Preview */}
+              <div className="mission-preview-mini-card bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 my-3 text-xs">
+                <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20 text-[10px] text-muted-foreground font-mono">
+                  <span>Social Profile Simulation</span>
+                  <span className="text-amber-400 font-bold">0 Mutual Friends</span>
+                </div>
+                <div className="mt-1.5 text-foreground/90 font-mono text-[11px] truncate">
+                  Prof. K. L. Wickramasinghe (Duplicate Account)
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1 italic">
+                  &ldquo;Stuck in an urgent meeting; transfer Rs. 5,000 for badges...&rdquo;
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="card-progress-bar-wrap mb-3">
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Module Progress</span>
+                  <span className="font-bold text-amber-400">
+                    {(() => {
+                      const m = missions.find((x) => x.id === "impersonation");
+                      const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                      return `${done}/5 Completed`;
+                    })()}
+                  </span>
+                </div>
+                <div className="hud-progress-track">
+                  <div
+                    className="hud-progress-fill bg-amber-500"
+                    style={{
+                      width: `${(() => {
+                        const m = missions.find((x) => x.id === "impersonation");
+                        const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                        return (done / 5) * 100;
+                      })()}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="card-skills-list">
                 <span className="skill-chip">Account Verification</span>
                 <span className="skill-chip">Withholding OTPs</span>
@@ -357,26 +476,66 @@ export function CyberChallengeZone() {
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Start Learning</span>
+                  <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {/* 4. Scam & Malicious Links */}
+            {/* 4. IV4 — Online Scams & Malicious Links */}
             <div className="challenge-game-card card-links">
               <div className="card-top-header">
-                <span className="card-category-tag">IV4 · LINK LAB</span>
+                <span className="card-category-tag">IV4 · SCAMS &amp; LINKS</span>
                 <span className="card-xp-badge">+50 XP</span>
               </div>
               <div className="card-main-icon cyan-glow">
                 <Link2 size={28} aria-hidden="true" />
               </div>
-              <h3 className="card-title">Scams &amp; Malicious Links</h3>
+              <h3 className="card-title">IV4 — Online Scams &amp; Malicious Links</h3>
               <p className="card-desc">
-                Inspect dangerous URLs before clicking. Spot typo-squatted domains,
-                deceptive subdomains, misleading HTTPS certificates, and fake checkout forms.
+                Inspect fraudulent offers and dangerous URLs before clicking. Identify deceptive subdomains, advance-fee laptop discounts, fake scholarship messages, and malware traps.
               </p>
+
+              {/* Fraudulent Website / Link Preview */}
+              <div className="mission-preview-mini-card bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-3 my-3 text-xs">
+                <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20 text-[10px] text-muted-foreground font-mono">
+                  <span>Link Inspection Panel</span>
+                  <span className="text-red-400 font-bold">Subdomain Trick</span>
+                </div>
+                <div className="mt-1.5 text-foreground/90 font-mono text-[11px] truncate">
+                  serendib.campus.example.verify-login.example
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1 italic">
+                  Root domain is verify-login.example (external harvesting host)
+                </div>
+              </div>
+
+              {/* Progress Indicator */}
+              <div className="card-progress-bar-wrap mb-3">
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Module Progress</span>
+                  <span className="font-bold text-cyan-400">
+                    {(() => {
+                      const m = missions.find((x) => x.id === "links");
+                      const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                      return `${done}/5 Completed`;
+                    })()}
+                  </span>
+                </div>
+                <div className="hud-progress-track">
+                  <div
+                    className="hud-progress-fill bg-cyan-500"
+                    style={{
+                      width: `${(() => {
+                        const m = missions.find((x) => x.id === "links");
+                        const done = attempts.filter((a) => (m?.ids as readonly string[] | undefined)?.includes(a.scenarioId)).length;
+                        return (done / 5) * 100;
+                      })()}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="card-skills-list">
                 <span className="skill-chip">Domain Inspection</span>
                 <span className="skill-chip">Typo-squatting</span>
@@ -389,7 +548,7 @@ export function CyberChallengeZone() {
                   className="button secondary card-play-btn"
                   onClick={launchPractice}
                 >
-                  <span>Start Learning</span>
+                  <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               </div>

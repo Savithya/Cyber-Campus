@@ -267,7 +267,7 @@ export function ResearchCompletion() {
         </div>
 
         <h1 className="completion-redesign-title mt-3">
-          Research Participation Completed
+          Research Participation Complete
         </h1>
 
         <p className="completion-redesign-subtitle mt-3 max-w-2xl mx-auto">

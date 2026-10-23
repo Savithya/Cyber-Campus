@@ -38,13 +38,12 @@ export default async function Page({
     );
   }
   const resolvedPath = (await params).path ?? [];
-  const safePath = resolvedPath[0] === "statistics" ? [] : resolvedPath;
   return (
     <Suspense fallback={<Loading />}>
       <Admin
         sessions={sessions}
         demo={false}
-        path={safePath}
+        path={resolvedPath}
         scenarios={scenarios}
       />
     </Suspense>

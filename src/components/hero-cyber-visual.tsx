@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Layers, Lock } from "lucide-react";
+import { ShieldCheck, Mail, MessagesSquare, UserRoundSearch, Link2, Lock } from "lucide-react";
 
 export function HeroCyberVisual() {
   return (
@@ -22,7 +22,7 @@ export function HeroCyberVisual() {
           <source srcSet="/images/professional-cyber-lab.png" type="image/png" />
           <img
             src="/images/professional-cyber-lab.jpg"
-            alt="Futuristic Academic Cybersecurity Research Laboratory — Digital Privacy Shield and Threat Telemetry"
+            alt="Futuristic Academic Cybersecurity Research Laboratory — Digital Research Console, Privacy Shield and Threat Telemetry"
             className="hero-full-cyber-image"
             width={1376}
             height={768}
@@ -39,42 +39,65 @@ export function HeroCyberVisual() {
         {/* Holographic Radial Grid Light Accent */}
         <div className="cyber-holographic-overlay" aria-hidden="true" />
 
-        {/* Discreet Live Telemetry Badge (Top-Left) */}
+        {/* Live Research Console Telemetry Badge (Top-Left) */}
         <div className="hero-live-beacon-pill" aria-hidden="true">
           <span className="live-pulse-emerald" />
-          <span>CYBER THREAT LAB · SRI LANKA</span>
+          <span>CYBER THREAT LAB · RESEARCH CONSOLE</span>
         </div>
 
-        {/* Floating Holographic Glass Chip 1 (Top-Right) */}
-        <div className="hero-floating-glass-chip top-right">
-          <div className="chip-icon-circle cyan">
-            <ShieldCheck size={16} className="text-cyan" aria-hidden="true" />
+        {/* Glowing Privacy Shield Indicator (Center-Top) */}
+        <div className="hero-floating-glass-chip top-center-shield">
+          <div className="chip-icon-circle cyan pulse-glow">
+            <ShieldCheck size={18} className="text-cyan" aria-hidden="true" />
           </div>
           <div className="chip-text-content">
             <span className="chip-sup">DEPENDENT VARIABLE (DV)</span>
-            <strong className="chip-main">User Privacy Protected</strong>
+            <strong className="chip-main">User Privacy Shield</strong>
           </div>
         </div>
 
-        {/* Floating Holographic Glass Chip 2 (Bottom-Left) */}
-        <div className="hero-floating-glass-chip bottom-left">
+        {/* 4 Floating Threat-Category Indicators */}
+        {/* Indicator 1: IV1 Phishing */}
+        <div className="hero-floating-glass-chip chip-threat-iv1">
           <div className="chip-icon-circle purple">
-            <Layers size={16} className="text-purple" aria-hidden="true" />
+            <Mail size={15} className="text-indigo-400" aria-hidden="true" />
           </div>
           <div className="chip-text-content">
-            <span className="chip-sup">EMPIRICAL SCOPE</span>
-            <strong className="chip-main">4 Threats · 20 Challenges</strong>
+            <span className="chip-sup">IV1 · 5 CHALLENGES</span>
+            <strong className="chip-main">Phishing</strong>
           </div>
         </div>
 
-        {/* Subtle Bottom Trust Badges (Bottom-Right) */}
-        <div className="hero-floating-glass-chip bottom-right">
+        {/* Indicator 2: IV2 Pretexting */}
+        <div className="hero-floating-glass-chip chip-threat-iv2">
           <div className="chip-icon-circle emerald">
-            <Lock size={15} className="text-emerald" aria-hidden="true" />
+            <MessagesSquare size={15} className="text-emerald" aria-hidden="true" />
           </div>
           <div className="chip-text-content">
-            <span className="chip-sup">RESEARCH PROTOCOL</span>
-            <strong className="chip-main">100% Anonymous &amp; Safe</strong>
+            <span className="chip-sup">IV2 · 5 CHALLENGES</span>
+            <strong className="chip-main">Pretexting</strong>
+          </div>
+        </div>
+
+        {/* Indicator 3: IV3 Impersonation */}
+        <div className="hero-floating-glass-chip chip-threat-iv3">
+          <div className="chip-icon-circle amber">
+            <UserRoundSearch size={15} className="text-amber" aria-hidden="true" />
+          </div>
+          <div className="chip-text-content">
+            <span className="chip-sup">IV3 · 5 CHALLENGES</span>
+            <strong className="chip-main">Impersonation</strong>
+          </div>
+        </div>
+
+        {/* Indicator 4: IV4 Online Scams & Malicious Links */}
+        <div className="hero-floating-glass-chip chip-threat-iv4">
+          <div className="chip-icon-circle cyan">
+            <Link2 size={15} className="text-cyan" aria-hidden="true" />
+          </div>
+          <div className="chip-text-content">
+            <span className="chip-sup">IV4 · 5 CHALLENGES</span>
+            <strong className="chip-main">Scams &amp; Links</strong>
           </div>
         </div>
       </div>

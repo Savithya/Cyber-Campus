@@ -27,7 +27,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>

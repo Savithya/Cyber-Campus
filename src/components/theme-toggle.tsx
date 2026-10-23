@@ -66,7 +66,7 @@ export function ThemeToggle({
     }
   };
 
-  const currentTheme = mounted ? theme : "dark";
+  const currentTheme = mounted ? theme : "light";
 
   // Arrow key navigation for radio group
   const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {

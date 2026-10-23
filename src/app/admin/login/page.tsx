@@ -65,12 +65,11 @@ export default function Page() {
           </div>
 
           <h1 id="research-portal-heading" className="research-portal-title">
-            Researcher Access Portal
+            Researcher Access
           </h1>
 
           <p className="research-portal-subtitle">
-            Securely access your academic research dashboard, analyse participant
-            responses and explore cybersecurity research insights.
+            Secure access to research administration and analysis tools.
           </p>
 
           {/* 3D Cybersecurity Research Illustration Container */}

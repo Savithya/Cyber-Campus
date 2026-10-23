@@ -14,6 +14,7 @@ import {
 import {
   LayoutDashboard,
   ChartNoAxesCombined,
+  Calculator,
   Users,
   Gamepad2,
   Download,
@@ -56,19 +57,17 @@ import { api } from "@/lib/client";
 import type { Session, Filters, Question, Scenario } from "@/lib/types";
 import { PageHeading, ErrorBox } from "./ui";
 import { GlobalResearchFilters } from "./global-research-filters";
+import StatisticalAnalysis from "./statistical-analysis";
 
 const navs = [
   ["", "Overview", LayoutDashboard],
+  ["responses", "Responses", Database],
   ["demographics", "Demographics", Users],
-  ["links-mission", "Scam & Link Mission", Compass],
-  ["links-analysis", "Scam & Link Analysis (IV4)", AlertTriangle],
-  ["phishing", "Phishing Investigation (IV1)", Mail],
-  ["pretexting", "Pretexting Detection (IV2)", Layers],
-  ["impersonation", "Impersonation (IV3)", UserCheck],
-  ["supplementary", "Supplementary Items (DV)", ShieldCheck],
+  ["threats", "Threat Analysis (IV1–IV4)", ShieldAlert],
+  ["supplementary", "User Privacy (DV)", ShieldCheck],
+  ["statistics", "Statistical Analysis", Calculator],
   ["performance", "Game Performance", Gamepad2],
-  ["responses", "Original Responses", Database],
-  ["exports", "Export Research Data", Download],
+  ["exports", "Data Export", Download],
   ["history", "Submission History", History],
 ] as const;
 
@@ -235,6 +234,16 @@ export default function Admin({
     selected = questions.find((q) => q.id === path[1]),
     filterText = describeFilters(filters);
 
+  const isThreatSection = [
+    "threats",
+    "iv-analysis",
+    "phishing",
+    "pretexting",
+    "impersonation",
+    "links-analysis",
+    "links-mission",
+  ].includes(active);
+
   const query = new URLSearchParams(
     Object.entries(filters).filter(([, v]) => v) as [string, string][],
   ).toString();
@@ -386,16 +395,28 @@ export default function Admin({
           <span>RESEARCH WORKSPACE</span>
         </div>
         <nav aria-label="Researcher navigation">
-          {navs.map(([p, label, Icon]) => (
-            <Link
-              key={p}
-              href={href(p)}
-              className={active === p ? "selected" : ""}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </Link>
-          ))}
+          {navs.map(([p, label, Icon]) => {
+            const isSelected =
+              p === ""
+                ? active === ""
+                : p === "threats"
+                  ? isThreatSection
+                  : p === "supplementary"
+                    ? active === "supplementary" || active === "privacy-dv"
+                    : p === "performance"
+                      ? active === "performance" || active === "game-analytics"
+                      : active === p;
+            return (
+              <Link
+                key={p}
+                href={href(p)}
+                className={isSelected ? "selected" : ""}
+              >
+                <Icon size={18} />
+                <span>{label}</span>
+              </Link>
+            );
+          })}
         </nav>
         <div className="admin-sidebar-bottom">
           <span className="tag">
@@ -427,7 +448,14 @@ export default function Admin({
             <span>
               Cyber Campus /{" "}
               <strong>
-                {navs.find((n) => n[0] === active)?.[1] ?? "Research Workspace"}
+                {navs.find((n) => n[0] === active)?.[1] ??
+                  (isThreatSection
+                    ? "Threat Analysis (IV1–IV4)"
+                    : active === "privacy-dv"
+                      ? "User Privacy (DV)"
+                      : active === "game-analytics"
+                        ? "Game Performance"
+                        : "Research Workspace")}
               </strong>
             </span>
             <span className="admin-tz-badge">Asia/Colombo (UTC+05:30)</span>
@@ -456,6 +484,8 @@ export default function Admin({
               ? selected.id + " · Response distribution"
               : active === "demographics"
                 ? "Participant Demographics (Q1–Q5)"
+                : active === "statistics"
+                  ? "Statistical Analysis & Hypothesis Testing"
                 : active === "links-mission"
                   ? "Scam & Malicious Link Mission Definition (IV4)"
                   : active === "links-analysis"
@@ -476,36 +506,38 @@ export default function Admin({
                                   ? "Participant Submission History"
                                   : active === "exports"
                                     ? "Secure Research Data Export Centre"
-                                    : active === "threats"
-                                        ? "Threat Impact Comparison"
-                                        : active === "iv-analysis"
-                                          ? "Threat Variables (IV1–IV4)"
-                                          : active === "questions"
-                                            ? "Every question. Its own perspective."
-                                            : active === "report"
-                                              ? "All-question research report"
-                                              : "Cyber Campus Research Workspace"
+                                    : active === "threats" || active === "iv-analysis"
+                                      ? "Threat Analysis & Impact Comparison (IV1–IV4)"
+                                      : active === "questions"
+                                        ? "Every question. Its own perspective."
+                                        : active === "report"
+                                          ? "All-question research report"
+                                          : "Cyber Campus Research Workspace"
           }
         >
           {demo
             ? "Synthetic demonstration data · no actual participant findings."
-              : active === "links-mission"
-                ? "Dedicated mission definition and question overview for SC01–SC05."
-                : active === "links-analysis"
-                  ? "Empirical analysis of student vulnerability to deceptive online scams and malicious links."
-                  : active === "phishing"
-                    ? "Empirical analysis of phishing detection, credential exposure, and reporting behavior."
-                    : active === "pretexting"
-                      ? "Empirical analysis of pretexts, psychological manipulation, and disclosure decisions."
-                      : active === "impersonation"
-                        ? "Empirical analysis of fake profiles, faculty impersonation, and identity verification."
-                        : active === "supplementary" || active === "privacy-dv"
-                          ? "Standardized User Privacy construct measurement (Q19–Q25) alongside simulated decision data."
-                          : active === "responses"
-                            ? "Immutable audit table of raw participant challenge decisions and survey entries."
-                            : active === "history"
-                              ? "Session records, timestamps, and validation statuses."
-                              : "Descriptive, item-level findings from submitted research responses."}
+            : active === "statistics"
+              ? "Parametric and non-parametric statistical tests, correlation matrices, multiple regression, and reliability analysis."
+            : active === "threats" || active === "iv-analysis"
+              ? "Comparative analysis across the four social engineering threat categories (IV1–IV4) and their relationship with User Privacy."
+            : active === "links-mission"
+              ? "Dedicated mission definition and question overview for SC01–SC05."
+              : active === "links-analysis"
+                ? "Empirical analysis of student vulnerability to deceptive online scams and malicious links."
+                : active === "phishing"
+                  ? "Empirical analysis of phishing detection, credential exposure, and reporting behavior."
+                  : active === "pretexting"
+                    ? "Empirical analysis of pretexts, psychological manipulation, and disclosure decisions."
+                    : active === "impersonation"
+                      ? "Empirical analysis of fake profiles, faculty impersonation, and identity verification."
+                      : active === "supplementary" || active === "privacy-dv"
+                        ? "Standardized User Privacy construct measurement (Q19–Q25) alongside simulated decision data."
+                        : active === "responses"
+                          ? "Immutable audit table of raw participant challenge decisions and survey entries."
+                          : active === "history"
+                            ? "Session records, timestamps, and validation statuses."
+                            : "Descriptive, item-level findings from submitted research responses."}
         </PageHeading>
 
         {demo && (
@@ -538,6 +570,54 @@ export default function Admin({
           totalCount={realSessions.filter((s) => s.mode !== "practice").length}
           activeSection={active}
         />
+
+        {/* Threat Analysis Sub-Navigation */}
+        {isThreatSection && (
+          <div className="stats-tab-nav" style={{ marginBottom: "1.5rem" }}>
+            <Link
+              href={href("threats")}
+              className={`stats-tab-btn ${active === "threats" || active === "iv-analysis" ? "active" : ""}`}
+            >
+              <ShieldAlert size={15} />
+              <span>IV1–IV4 Comparison</span>
+            </Link>
+            <Link
+              href={href("phishing")}
+              className={`stats-tab-btn ${active === "phishing" ? "active" : ""}`}
+            >
+              <Mail size={15} />
+              <span>IV1: Phishing</span>
+            </Link>
+            <Link
+              href={href("pretexting")}
+              className={`stats-tab-btn ${active === "pretexting" ? "active" : ""}`}
+            >
+              <Layers size={15} />
+              <span>IV2: Pretexting</span>
+            </Link>
+            <Link
+              href={href("impersonation")}
+              className={`stats-tab-btn ${active === "impersonation" ? "active" : ""}`}
+            >
+              <UserCheck size={15} />
+              <span>IV3: Impersonation</span>
+            </Link>
+            <Link
+              href={href("links-analysis")}
+              className={`stats-tab-btn ${active === "links-analysis" ? "active" : ""}`}
+            >
+              <AlertTriangle size={15} />
+              <span>IV4: Online Scams &amp; Links</span>
+            </Link>
+            <Link
+              href={href("links-mission")}
+              className={`stats-tab-btn ${active === "links-mission" ? "active" : ""}`}
+            >
+              <Compass size={15} />
+              <span>IV4 Scenario Definitions</span>
+            </Link>
+          </div>
+        )}
 
         {/* =====================================================================
             1. OVERVIEW
@@ -1528,14 +1608,22 @@ export default function Admin({
         )}
 
         {/* =====================================================================
-            13. STATISTICAL ANALYSIS
+            13. STATISTICAL ANALYSIS & HYPOTHESIS TESTING
             ===================================================================== */}
-        {/* Statistical Analysis removed */}
+        {active === "statistics" && (
+          <StatisticalAnalysis
+            sessions={filtered}
+            allSessions={realSessions}
+            demo={demo}
+            filters={filters}
+            filterText={filterText}
+          />
+        )}
 
         {/* =====================================================================
-            LEGACY / BOOKMARK ROUTES: THREATS & IV-ANALYSIS
+            THREAT ANALYSIS & IMPACT COMPARISON (IV1–IV4)
             ===================================================================== */}
-        {active === "threats" && (
+        {(active === "threats" || active === "iv-analysis") && (
           <div className="space-y-6">
             <div className="card border-cyan/40 bg-surface p-5">
               <div className="flex items-start gap-4 flex-wrap sm:flex-nowrap">
@@ -1588,6 +1676,41 @@ export default function Admin({
               </div>
             </div>
 
+            {/* 4 Threat Dimension Action Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {threatSummary.metrics.map((m) => {
+                const targetPath =
+                  m.primaryIV === "IV1"
+                    ? "phishing"
+                    : m.primaryIV === "IV2"
+                      ? "pretexting"
+                      : m.primaryIV === "IV3"
+                        ? "impersonation"
+                        : "links-analysis";
+                return (
+                  <div key={m.threatKey} className="card p-4 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="tag text-xs font-mono font-bold">{m.primaryIV}</span>
+                        <strong className="text-base font-mono text-cyan">{m.privacyRiskScore}% Risk</strong>
+                      </div>
+                      <h3 className="text-sm font-bold text-foreground mb-1">{m.threatName}</h3>
+                      <p className="text-xs text-muted mb-3">
+                        {m.completedAttempts} Evaluations · Unsafe: {m.unsafeRate}%
+                      </p>
+                    </div>
+                    <Link
+                      href={href(targetPath)}
+                      className="button secondary small w-full justify-center text-xs mt-2"
+                    >
+                      <span>Investigate {m.primaryIV}</span>
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+
             {/* Horizontal Bar Chart Comparing All 4 Threats */}
             <div className="card">
               <div className="card-top">
@@ -1613,6 +1736,68 @@ export default function Admin({
                     <Bar dataKey="unsafeRate" name="Unsafe Decision Rate (%)" fill="#f43f5e" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Tabular Comparative Breakdown */}
+            <div className="card">
+              <div className="card-top">
+                <h2>Threat Dimensions Comparison Table</h2>
+              </div>
+              <div className="table-scroll" style={{ overflowX: "auto", marginTop: "1rem" }}>
+                <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border)", fontSize: "12px", color: "var(--muted)" }}>
+                      <th style={{ padding: "8px" }}>Threat Variable</th>
+                      <th style={{ padding: "8px" }}>Evaluations (N)</th>
+                      <th style={{ padding: "8px" }}>Unsafe Decision Rate</th>
+                      <th style={{ padding: "8px" }}>Privacy Risk Score</th>
+                      <th style={{ padding: "8px" }}>Mean Risk (0–4)</th>
+                      <th style={{ padding: "8px" }}>95% Confidence Interval</th>
+                      <th style={{ padding: "8px", textAlign: "right" }}>Detailed Audit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {threatSummary.metrics.map((m) => {
+                      const targetPath =
+                        m.primaryIV === "IV1"
+                          ? "phishing"
+                          : m.primaryIV === "IV2"
+                            ? "pretexting"
+                            : m.primaryIV === "IV3"
+                              ? "impersonation"
+                              : "links-analysis";
+                      return (
+                        <tr key={m.threatKey} style={{ borderBottom: "1px solid var(--border)", fontSize: "13px" }}>
+                          <td style={{ padding: "10px 8px", fontWeight: 600 }}>
+                            <span className="tag font-mono mr-2">{m.primaryIV}</span>
+                            {m.threatName}
+                          </td>
+                          <td style={{ padding: "10px 8px", fontFamily: "var(--font-mono, monospace)" }}>
+                            {m.completedAttempts}
+                          </td>
+                          <td style={{ padding: "10px 8px", fontFamily: "var(--font-mono, monospace)", color: m.unsafeRate > 30 ? "var(--red, #ef4444)" : "inherit" }}>
+                            {m.unsafeRate}%
+                          </td>
+                          <td style={{ padding: "10px 8px", fontFamily: "var(--font-mono, monospace)", fontWeight: 700, color: "var(--cyan, #06b6d4)" }}>
+                            {m.privacyRiskScore}%
+                          </td>
+                          <td style={{ padding: "10px 8px", fontFamily: "var(--font-mono, monospace)" }}>
+                            {m.meanPrivacyRisk}
+                          </td>
+                          <td style={{ padding: "10px 8px", fontFamily: "var(--font-mono, monospace)", fontSize: "12px" }}>
+                            [{m.ciLow}, {m.ciHigh}]
+                          </td>
+                          <td style={{ padding: "10px 8px", textAlign: "right" }}>
+                            <Link href={href(targetPath)} className="button secondary small text-xs">
+                              Examine
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

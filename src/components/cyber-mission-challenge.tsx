@@ -755,17 +755,25 @@ export function CyberMissionHeader({
 
   return (
     <header className="cyber-mission-header-card" aria-label="Cyber Mission Header">
-      {/* Top Bar: Return link + IV identifier + Telemetry */}
+      {/* Top Bar: Cyber Campus Brand + Return link + IV identifier + Session Telemetry */}
       <div className="mission-header-top-row">
-        <button
-          type="button"
-          onClick={onReturnToHub}
-          className="mission-return-link"
-          aria-label="Return to Mission Control Hub"
-        >
-          <ArrowLeft size={15} aria-hidden="true" />
-          <span>Mission Control</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onReturnToHub}
+            className="mission-return-link"
+            aria-label="Pause and return to Mission Control Hub"
+            title="Pause and return to Mission Control"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            <span>Mission Hub</span>
+          </button>
+
+          <div className="workspace-brand-pill hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-primary/10 border border-primary/20 text-primary">
+            <ShieldCheck size={13} aria-hidden="true" />
+            <span>CYBER CAMPUS LAB</span>
+          </div>
+        </div>
 
         <div className="mission-header-badges">
           <div className="mission-iv-badge">
@@ -774,7 +782,11 @@ export function CyberMissionHeader({
           </div>
           <div className="mission-overall-badge">
             <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
-            <span>Progress: {overallCompleted} / {totalOverall}</span>
+            <span>{overallCompleted}/{totalOverall} Completed ({Math.round((overallCompleted / totalOverall) * 100)}%)</span>
+          </div>
+          <div className="workspace-save-pill hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono text-muted bg-surface-subtle border border-border">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald inline-block" />
+            <span>Auto-Saved</span>
           </div>
         </div>
       </div>

@@ -21,6 +21,7 @@ import {
   Award,
   AlertCircle,
   ExternalLink,
+  Layers,
 } from "lucide-react";
 import {
   api,
@@ -185,10 +186,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           <Sparkles size={14} className="text-primary" aria-hidden="true" />
           <span>STUDENT RESEARCH BRIEFING · STEP 01 OF 04</span>
         </div>
-        <h1 className="consent-friendly-title">Welcome to Cyber Campus Research</h1>
+        <h1 className="consent-friendly-title">Before You Begin</h1>
         <p className="consent-friendly-subtitle">
-          Help advance digital privacy and cyber defense for Sri Lankan university students.
-          Explore 20 interactive simulations in <strong>15 minutes</strong> and get an instant personal awareness report.
+          Please review the study information and confirm your eligibility before participating in the Cyber Campus research study exploring social engineering threats and digital privacy among university students in Sri Lanka.
         </p>
 
         {/* 4 Quick Stat Pills */}
@@ -214,22 +214,88 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
       {/* Main Two-Column Layout */}
       <div className="consent-split-grid">
-        {/* Left Column: Easy-to-Digest Protections & Research Scope */}
+        {/* Left Column: 5 Information Cards */}
         <div className="consent-left-col">
-          {/* Privacy & Ethical Guarantees Card */}
-          <div className="consent-feature-card">
+          {/* Information Card 1: About the Research */}
+          <div className="consent-feature-card mb-5">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge purple">
+                <GraduationCap size={20} aria-hidden="true" />
+              </span>
+              <div>
+                <span className="card-eyebrow">ACADEMIC STUDY CONTEXT</span>
+                <h2 className="feature-card-heading">About the Research</h2>
+              </div>
+            </div>
+            <p className="consent-guarantees-intro">
+              <strong>Title:</strong> &ldquo;{studyTitle}&rdquo;
+            </p>
+            <p className="text-xs sm:text-sm text-muted mt-2 leading-relaxed">
+              This empirical research investigates the relationship between four major social engineering threat categories—phishing, pretexting, impersonation, and online scams—and user privacy risks among university students in Sri Lanka.
+            </p>
+          </div>
+
+          {/* Information Card 2: What Participation Involves */}
+          <div className="consent-feature-card mb-5">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge cyan">
+                <Layers size={20} aria-hidden="true" />
+              </span>
+              <div>
+                <span className="card-eyebrow">PROCEDURE</span>
+                <h2 className="feature-card-heading">What Participation Involves</h2>
+              </div>
+            </div>
+            <ul className="space-y-2 text-xs sm:text-sm text-muted">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="text-cyan shrink-0 mt-0.5" />
+                <span>Provide basic non-identifying academic background (demographics).</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="text-cyan shrink-0 mt-0.5" />
+                <span>Examine 20 realistic simulated cybersecurity scenarios across 4 threat categories.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="text-cyan shrink-0 mt-0.5" />
+                <span>Make simulated safety and disclosure decisions in a 100% inert sandbox.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="text-cyan shrink-0 mt-0.5" />
+                <span>Receive an immediate educational debrief on safest protective practices.</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Information Card 3: Voluntary Participation */}
+          <div className="consent-feature-card mb-5">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge amber">
+                <HeartHandshake size={20} aria-hidden="true" />
+              </span>
+              <div>
+                <span className="card-eyebrow">PARTICIPANT RIGHTS</span>
+                <h2 className="feature-card-heading">Voluntary Participation</h2>
+              </div>
+            </div>
+            <p className="text-xs sm:text-sm text-muted leading-relaxed">
+              Participation is entirely voluntary. You may pause your session, skip scenarios, or withdraw completely at any point prior to final submission without any academic, institutional, or personal consequence.
+            </p>
+          </div>
+
+          {/* Information Card 4: Data Privacy & Confidentiality */}
+          <div className="consent-feature-card mb-5">
             <div className="feature-card-header">
               <span className="feature-icon-badge emerald">
                 <ShieldCheck size={20} aria-hidden="true" />
               </span>
               <div>
                 <span className="card-eyebrow">YOUR PRIVACY &amp; TRUST</span>
-                <h2 className="feature-card-heading">Ethical Protections &amp; Guarantees</h2>
+                <h2 className="feature-card-heading">Data Privacy &amp; Confidentiality</h2>
               </div>
             </div>
 
             <p className="consent-guarantees-intro">
-              This academic study is designed to protect your privacy at every step. You explore realistic threat simulations in a secure, controlled sandbox with zero personal risk:
+              This academic study is designed to protect your privacy at every step:
             </p>
 
             <div className="safeguards-grid-v2">
@@ -258,9 +324,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                   <span className="safeguard-mini-icon amber">
                     <HeartHandshake size={15} aria-hidden="true" />
                   </span>
-                  <strong>100% Voluntary</strong>
+                  <strong>Self-Service Token</strong>
                 </div>
-                <p>Participation is optional and self-paced. You may skip any scenario, take a break, or exit at any moment without penalty.</p>
+                <p>Your session is governed by an anonymous random token that allows you to manage or revoke your record at any time.</p>
               </div>
 
               <div className="safeguard-box">
@@ -268,22 +334,38 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                   <span className="safeguard-mini-icon cyan">
                     <FileCheck2 size={15} aria-hidden="true" />
                   </span>
-                  <strong>Purely Academic</strong>
+                  <strong>Academic Research Only</strong>
                 </div>
-                <p>Responses are aggregated under an anonymous token to evaluate cybersecurity awareness and enhance student safety curricula.</p>
+                <p>Responses are stored securely and aggregated strictly for university scholarly analysis and statistical modeling.</p>
               </div>
             </div>
 
             {/* Self-Service Token Withdrawal Callout */}
-            <div className="token-privacy-callout">
+            <div className="token-privacy-callout mt-4">
               <RotateCcw size={16} className="text-primary shrink-0 mt-0.5" aria-hidden="true" />
               <span>
                 <strong>Self-Service Data Withdrawal:</strong> Upon starting, an isolated random session token is issued. You can use this token anytime to review or permanently delete your unsubmitted or submitted data via the <Link href="/withdraw" className="underline font-semibold hover:text-primary">Withdrawal page</Link>.
               </span>
             </div>
+          </div>
+
+          {/* Information Card 5: Researcher Information */}
+          <div className="consent-feature-card">
+            <div className="feature-card-header">
+              <span className="feature-icon-badge lavender">
+                <Lock size={20} aria-hidden="true" />
+              </span>
+              <div>
+                <span className="card-eyebrow">GOVERNANCE</span>
+                <h2 className="feature-card-heading">Researcher Information &amp; Ethics</h2>
+              </div>
+            </div>
+            <p className="text-xs sm:text-sm text-muted leading-relaxed">
+              This study is conducted by academic researchers under institutional research ethics standards and adheres to Sri Lanka Personal Data Protection Act No. 9 of 2022 principles of data minimization and purpose specification.
+            </p>
 
             {/* Expandable Ethics Protocol */}
-            <div className="ethics-accordion-box">
+            <div className="ethics-accordion-box mt-3">
               <button
                 type="button"
                 className="ethics-toggle-btn"

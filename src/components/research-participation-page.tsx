@@ -445,17 +445,30 @@ export function ResearchParticipationPage({
                 <div className="dv-diagram-title">RESEARCH MODEL RELATIONSHIP</div>
                 <div className="dv-flow-visual">
                   <div className="dv-iv-block">
-                    <span>Independent Dimensions</span>
-                    <small>Awareness · Experience · Behaviors · Protection</small>
+                    <span className="font-bold">Independent Variables (IV1–IV4)</span>
+                    <div className="grid grid-cols-2 gap-1.5 mt-2 text-[11px] text-left">
+                      <div className="p-1.5 rounded bg-surface border border-border">
+                        <strong>IV1:</strong> Phishing Threats
+                      </div>
+                      <div className="p-1.5 rounded bg-surface border border-border">
+                        <strong>IV2:</strong> Pretexting Threats
+                      </div>
+                      <div className="p-1.5 rounded bg-surface border border-border">
+                        <strong>IV3:</strong> Impersonation
+                      </div>
+                      <div className="p-1.5 rounded bg-surface border border-border">
+                        <strong>IV4:</strong> Scams &amp; Links
+                      </div>
+                    </div>
                   </div>
                   <div className="dv-arrow-block">
                     <ArrowRight size={20} className="dv-arrow-icon" aria-hidden="true" />
-                    <span className="dv-arrow-label">Impacts</span>
+                    <span className="dv-arrow-label">Proposed Relationship</span>
                   </div>
                   <div className="dv-dv-block">
-                    <ShieldCheck size={20} aria-hidden="true" />
+                    <ShieldCheck size={22} className="text-emerald" aria-hidden="true" />
                     <strong>User Privacy</strong>
-                    <small>Dependent Variable</small>
+                    <small className="text-muted">Dependent Variable (DV)</small>
                   </div>
                 </div>
               </div>

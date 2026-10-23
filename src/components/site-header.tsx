@@ -145,7 +145,7 @@ export function SiteHeader() {
     ? "/play"
     : pathname === "/"
     ? "/#challenges"
-    : "/play";
+    : "/challenges";
 
   // Smooth scroll to Cyber Challenges Section on home page if unauthenticated
   const handleChallengesClick = useCallback(
@@ -175,6 +175,7 @@ export function SiteHeader() {
   const isHomeActive = pathname === "/" && activeSection !== "challenges";
   const isChallengesActive =
     pathname?.startsWith("/play") ||
+    pathname === "/challenges" ||
     (pathname === "/" && activeSection === "challenges");
   const isJoinActive =
     pathname === "/consent" ||

@@ -247,13 +247,13 @@ export function DemographicsForm() {
       <header className="demographics-header">
         <div className="eyebrow">
           <span className="live-pulse-dot" aria-hidden="true" />
-          <span>STEP 02 OF 04 · PARTICIPANT BACKGROUND</span>
+          <span>STEP 02 OF 04 · PARTICIPANT PROFILE</span>
         </div>
         <h1 className="demographics-title">
-          Tell Us a Little About Your Studies <span className="sr-only">(Student Demographic Profile)</span>
+          Participant Profile
         </h1>
         <p className="demographics-subtitle">
-          These questions help us understand the backgrounds of participating university students.
+          Provide basic academic background information to support research analysis.
         </p>
 
         <div className="demographics-info-bar" role="status" aria-label="Participation Information">
