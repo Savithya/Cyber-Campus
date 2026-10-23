@@ -19,6 +19,7 @@ export function HeroCyberVisual() {
       <div className="hero-full-image-frame">
         {/* Full Image Artwork */}
         <picture>
+          <source srcSet="/images/cyber-hero-lab-8x5.webp" type="image/webp" />
           <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
           <img
             src="/images/cyber-hero-lab-8x5.jpg"

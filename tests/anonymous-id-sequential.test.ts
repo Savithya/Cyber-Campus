@@ -33,6 +33,16 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
   const subPath = ".demo-data/submissions.json";
   const counterPath = ".demo-data/participant_counter.json";
 
+  beforeEach(async () => {
+    try {
+      const raw0 = await readFile(subPath, "utf-8");
+      const list0: Session[] = JSON.parse(raw0);
+      const cleaned = list0.filter((s) => s.code === "001");
+      await writeFile(subPath, JSON.stringify(cleaned, null, 2), "utf-8");
+      await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
+    } catch {}
+  });
+
   it("assigns sequential Anonymous IDs: 001 -> 002 -> 003 -> 004 and records all in research area", async () => {
     // 1. Verify 001 exists as the base record
     const raw0 = await readFile(subPath, "utf-8");

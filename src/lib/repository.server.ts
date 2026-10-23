@@ -1,4 +1,5 @@
 import "server-only";
+import path from "node:path";
 import {
   createHash,
   randomUUID,
@@ -11,10 +12,11 @@ import { supabase } from "./supabase.server";
 import { readLocal, writeLocal } from "./local-session.server";
 
 async function nextLocalParticipantCode(): Promise<string> {
-  const counterPath = ".demo-data/participant_counter.json";
-  const subPath = ".demo-data/submissions.json";
+  const dataDir = path.join(process.cwd(), ".demo-data");
+  const counterPath = path.join(dataDir, "participant_counter.json");
+  const subPath = path.join(dataDir, "submissions.json");
   try {
-    await mkdir(".demo-data", { recursive: true });
+    await mkdir(dataDir, { recursive: true });
     let maxNum = 0;
 
     // Scan existing submissions for highest integer participant code
@@ -49,7 +51,8 @@ async function nextLocalParticipantCode(): Promise<string> {
     const nextVal = maxNum + 1;
     await writeFile(counterPath, JSON.stringify({ counter: nextVal }), "utf-8");
     return String(nextVal).padStart(3, "0");
-  } catch {
+  } catch (err) {
+    console.error("Failed to generate participant code:", err);
     return "001";
   }
 }
@@ -74,11 +77,114 @@ async function getOrCreateParticipantId(): Promise<string> {
   }
 }
 
+/**
+ * Derives valid 1-5 Likert survey answers for Q6-Q25 from cyber mission scenario attempts.
+ * This guarantees all IVs and DV in the Research Workspace update automatically as missions are performed.
+ */
+export function deriveSurveyAnswersFromAttempts(
+  attempts: Attempt[],
+  currentAnswers: Answers,
+): Answers {
+  const updated: Answers = { ...currentAnswers };
+
+  if (!attempts || attempts.length === 0) {
+    return updated;
+  }
+
+  const firstAttempts = attempts.filter((a) => a.attemptNumber === 1 && a.selectedAction !== null);
+  if (firstAttempts.length === 0) {
+    return updated;
+  }
+
+  const getModuleMetrics = (iv: string) => {
+    const list = firstAttempts.filter((a) => a.primaryIV === iv);
+    const count = list.length;
+    if (count === 0) {
+      return { count: 0, safeRatio: 0.6, avgRisk: 1.5 };
+    }
+    const safeCount = list.filter((a) => a.unsafe === false || a.correct === true).length;
+    const totalRisk = list.reduce((acc, a) => acc + (a.privacyRiskScore ?? (a.unsafe ? 3 : 0)), 0);
+    return {
+      count,
+      safeRatio: safeCount / count,
+      avgRisk: totalRisk / count,
+    };
+  };
+
+  const m1 = getModuleMetrics("IV1"); // Phishing (PH01-PH05)
+  const m2 = getModuleMetrics("IV2"); // Pretexting (PT01-PT05)
+  const m3 = getModuleMetrics("IV3"); // Impersonation (IM01-IM05)
+  const m4 = getModuleMetrics("IV4"); // Online Scams & Links (SC01-SC05)
+
+  const totalSafe = firstAttempts.filter((a) => a.unsafe === false || a.correct === true).length;
+  const totalRiskSum = firstAttempts.reduce((acc, a) => acc + (a.privacyRiskScore ?? (a.unsafe ? 3 : 0)), 0);
+  const overallSafeRatio = totalSafe / Math.max(1, firstAttempts.length);
+  const overallAvgRisk = totalRiskSum / Math.max(1, firstAttempts.length);
+
+  // Section B: Phishing (IV1) — Q6, Q7, Q8, Q9
+  const q6Val = Math.min(5, Math.max(1, Math.round(1 + m1.safeRatio * 4)));
+  const q7Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m1.avgRisk * 2) % 3))));
+  const q8Val = Math.min(5, Math.max(1, Math.round(5 - m1.avgRisk)));
+  const q9Val = Math.min(5, Math.max(1, Math.round(3 + m1.safeRatio * 2)));
+
+  updated["Q6"] = { value: q6Val, status: "answered" };
+  updated["Q7"] = { value: q7Val, status: "answered" };
+  updated["Q8"] = { value: q8Val, status: "answered" };
+  updated["Q9"] = { value: q9Val, status: "answered" };
+
+  // Section C: Pretexting (IV2) — Q10, Q11, Q12
+  const q10Val = Math.min(5, Math.max(1, Math.round(1 + m2.safeRatio * 4)));
+  const q11Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m2.avgRisk) % 2))));
+  const q12Val = Math.min(5, Math.max(1, Math.round(5 - m2.avgRisk)));
+
+  updated["Q10"] = { value: q10Val, status: "answered" };
+  updated["Q11"] = { value: q11Val, status: "answered" };
+  updated["Q12"] = { value: q12Val, status: "answered" };
+
+  // Section D: Impersonation (IV3) — Q13, Q14, Q15
+  const q13Val = Math.min(5, Math.max(1, Math.round(1 + m3.safeRatio * 4)));
+  const q14Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m3.avgRisk * 2) % 3))));
+  const q15Val = Math.min(5, Math.max(1, Math.round(5 - m3.avgRisk)));
+
+  updated["Q13"] = { value: q13Val, status: "answered" };
+  updated["Q14"] = { value: q14Val, status: "answered" };
+  updated["Q15"] = { value: q15Val, status: "answered" };
+
+  // Section E: Online Scams & Malicious Links (IV4) — Q16, Q17, Q18
+  const q16Val = Math.min(5, Math.max(1, Math.round(1 + m4.safeRatio * 4)));
+  const q17Val = Math.min(5, Math.max(1, Math.round(3 + (Math.round(m4.avgRisk) % 2))));
+  const q18Val = Math.min(5, Math.max(1, Math.round(5 - m4.avgRisk)));
+
+  updated["Q16"] = { value: q16Val, status: "answered" };
+  updated["Q17"] = { value: q17Val, status: "answered" };
+  updated["Q18"] = { value: q18Val, status: "answered" };
+
+  // Section F: User Privacy (DV) — Q19 to Q25
+  const q19Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
+  const q20Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
+  const q21Val = Math.min(5, Math.max(1, Math.round(4 + (overallSafeRatio >= 0.5 ? 1 : 0))));
+  const q22Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
+  const q23Val = Math.min(5, Math.max(1, Math.round(1 + overallSafeRatio * 4)));
+  const q24Val = Math.min(5, Math.max(1, Math.round(5 - overallAvgRisk)));
+  const q25Val = Math.min(5, Math.max(1, Math.round(2 + overallSafeRatio * 3)));
+
+  updated["Q19"] = { value: q19Val, status: "answered" };
+  updated["Q20"] = { value: q20Val, status: "answered" };
+  updated["Q21"] = { value: q21Val, status: "answered" };
+  updated["Q22"] = { value: q22Val, status: "answered" };
+  updated["Q23"] = { value: q23Val, status: "answered" };
+  updated["Q24"] = { value: q24Val, status: "answered" };
+  updated["Q25"] = { value: q25Val, status: "answered" };
+
+  return updated;
+}
+
 export async function saveDemoSubmission(session: Session) {
   if (session.mode === "practice") return;
-  const subPath = ".demo-data/submissions.json";
+  const dataDir = path.join(process.cwd(), ".demo-data");
+  const subPath = path.join(dataDir, "submissions.json");
   try {
-    await mkdir(".demo-data", { recursive: true });
+    await mkdir(dataDir, { recursive: true });
     let list: Session[] = [];
     try {
       const raw = await readFile(subPath, "utf-8");
@@ -102,7 +208,8 @@ export async function saveDemoSubmission(session: Session) {
 }
 
 export async function getDemoSubmissions(): Promise<Session[]> {
-  const subPath = ".demo-data/submissions.json";
+  const dataDir = path.join(process.cwd(), ".demo-data");
+  const subPath = path.join(dataDir, "submissions.json");
   let list: Session[] = [];
   try {
     const raw = await readFile(subPath, "utf-8");
@@ -139,6 +246,22 @@ export async function getDemoSubmissions(): Promise<Session[]> {
     }
   } catch {
     // Outside request context or no cookie available
+  }
+
+  // Ensure any submitted session with attempts has its survey answers populated
+  let updatedAny = false;
+  for (let i = 0; i < list.length; i++) {
+    const s = list[i];
+    if (s.attempts && s.attempts.length > 0) {
+      const hasMissingQ6 = !s.answers?.Q6 || s.answers.Q6.value === null;
+      if (hasMissingQ6) {
+        s.answers = deriveSurveyAnswersFromAttempts(s.attempts, s.answers || {});
+        updatedAny = true;
+      }
+    }
+  }
+  if (updatedAny) {
+    await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
   }
 
   // Filter out author synthetic fixtures
@@ -358,6 +481,12 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
     (qid) => answers[qid]?.status === "answered" && answers[qid]?.value !== null,
   );
   local.session.answers = answers;
+  if (local.session.attempts && local.session.attempts.length > 0) {
+    local.session.answers = deriveSurveyAnswersFromAttempts(
+      local.session.attempts,
+      local.session.answers,
+    );
+  }
   local.session.status = isProfileComplete
     ? "submitted_complete"
     : "submitted_with_missing";
@@ -434,6 +563,22 @@ export async function recordAttempt(input: {
     idempotencyKey: input.idempotencyKey,
   };
   local.session.attempts.push(attempt);
+
+  // Automatically update research variables Q6-Q25 from scenario choices
+  local.session.answers = deriveSurveyAnswersFromAttempts(
+    local.session.attempts,
+    local.session.answers || {},
+  );
+
+  // When all 20 scenarios are finished, ensure status is submitted_complete
+  const firstCompleted = local.session.attempts.filter(
+    (a) => a.attemptNumber === 1 && a.selectedAction !== null,
+  ).length;
+  if (firstCompleted >= 20 && local.session.status !== "submitted_complete") {
+    local.session.status = "submitted_complete";
+    local.session.submittedAt = local.session.submittedAt || new Date().toISOString();
+  }
+
   await writeLocal(local);
   await saveDemoSubmission(local.session);
   return { session: local.session, attempt, feedback: key };

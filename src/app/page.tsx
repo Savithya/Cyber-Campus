@@ -9,7 +9,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { HomeThreatCards } from "@/components/home-threat-cards";
-import { CyberInvestigatorShowcase } from "@/components/cyber-investigator-showcase";
 import { HeroScopeMetrics } from "@/components/hero-scope-metrics";
 import { HeroCyberVisual } from "@/components/hero-cyber-visual";
 import { ParticipationJourney } from "@/components/participation-journey";
@@ -106,7 +105,9 @@ export default function Home() {
           ========================================================================= */}
       <section className="explore-threats-section container my-16 lg:my-24" aria-labelledby="threats-heading">
         <div className="section-header-centered text-center max-w-3xl mx-auto">
-          <span className="mini-label">RESEARCH VARIABLES (IV1–IV4)</span>
+          <span className="mini-label inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 mb-2">
+            RESEARCH VARIABLES (IV1–IV4)
+          </span>
           <h2 id="threats-heading" className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mt-2">
             Explore the Four Social Engineering Threats
           </h2>
@@ -123,13 +124,6 @@ export default function Home() {
           SECTION 4 — HOW CYBER CAMPUS WORKS (4-STEP PARTICIPATION JOURNEY)
           ========================================================================= */}
       <ParticipationJourney />
-
-      {/* =========================================================================
-          SECTION 5 — CYBER LAB PREVIEW (EDUCATIONAL SIMULATION SHOWCASE)
-          ========================================================================= */}
-      <div id="cyber-lab-preview">
-        <CyberInvestigatorShowcase />
-      </div>
 
       {/* =========================================================================
           SECTION 6 — RESEARCH ETHICS & PRIVACY

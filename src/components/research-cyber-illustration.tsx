@@ -84,7 +84,8 @@ export function ResearchCyberIllustration() {
         <div className="cyber-image-frame">
           {/* High-Resolution 3D Cybersecurity Shield Artwork */}
           <picture>
-            <source srcSet="/images/cyber-privacy-shield-hero.jpg" type="image/jpeg" />
+            <source srcSet="/images/cyber-privacy-shield-hero.webp" type="image/webp" />
+            <source srcSet="/images/cyber-privacy-shield-hero.png" type="image/png" />
             <img
               src="/images/cyber-privacy-shield-hero.jpg"
               alt="Futuristic 3D Cybersecurity Shield & Cryptographic Privacy Core for Academic Research"

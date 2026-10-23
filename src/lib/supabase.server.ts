@@ -1,5 +1,6 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
+// @ts-expect-error - @supabase/supabase-js exports resolution in moduleResolution bundler
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getResearcherSession } from "./researcher-auth.server";
@@ -16,7 +17,7 @@ export async function supabase() {
   return createServerClient(url, key, {
     cookies: {
       getAll: () => jar.getAll(),
-      setAll(values) {
+      setAll(values: any) {
         for (const { name, value, options } of values) {
           try {
             jar.set(name, value, {

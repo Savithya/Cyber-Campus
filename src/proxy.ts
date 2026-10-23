@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
   const db = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll(values) {
+      setAll(values: any) {
         for (const { name, value } of values) request.cookies.set(name, value);
         response = NextResponse.next({ request });
         for (const { name, value, options } of values)

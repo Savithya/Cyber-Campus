@@ -129,14 +129,8 @@ export function SiteHeader() {
   const state = useSession();
   const session = state.session;
 
-  // Determine dynamic target URLs based on participant research progress
-  const joinHref = !session
-    ? "/consent"
-    : session.status === "draft"
-    ? "/demographics"
-    : (session.attempts?.filter((a) => a.attemptNumber === 1).length ?? 0) >= 20
-    ? "/results"
-    : "/play";
+  // Research onboarding portal always directs to consent where participants can start fresh or resume
+  const joinHref = "/consent";
 
   const hasAuthorizedPlaySession =
     !!session && (session.status !== "draft" || session.mode === "practice");

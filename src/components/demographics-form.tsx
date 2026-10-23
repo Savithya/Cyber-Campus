@@ -22,6 +22,7 @@ import { api, useSession, loadDraft, putDraft } from "@/lib/client";
 import { questions } from "@/content/questionnaire";
 import type { Answers, Session } from "@/lib/types";
 import { ResearchProgressStepper } from "./research-progress-stepper";
+import { Loading } from "./ui";
 
 export function DemographicsForm() {
   const router = useRouter();
@@ -192,6 +193,10 @@ export function DemographicsForm() {
       setSaving(false);
     }
   };
+
+  if (state.loading) {
+    return <Loading />;
+  }
 
   const participantCode = state.session?.code ?? "ANON";
 

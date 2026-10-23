@@ -27,7 +27,6 @@ interface ThreatCardData {
   themeColor: string;
   accentBg: string;
   accentBorder: string;
-  accentGlow: string;
   summary: string;
   exampleSnippet: {
     type: string;
@@ -54,10 +53,9 @@ const THREAT_CARDS: ThreatCardData[] = [
     categoryTag: "Urgency & Domain Spoofing",
     threatTarget: "LMS & Student Portal Passwords",
     icon: Mail,
-    themeColor: "text-indigo-400",
-    accentBg: "bg-indigo-500/10",
-    accentBorder: "border-indigo-500/30",
-    accentGlow: "shadow-[0_0_25px_rgba(99,102,241,0.18)]",
+    themeColor: "text-blue-600 dark:text-blue-400",
+    accentBg: "bg-blue-50 dark:bg-blue-950/40",
+    accentBorder: "border-blue-200/80 dark:border-blue-800/60",
     summary:
       "Investigate suspicious emails and messages designed to deceive students into surrendering university credentials.",
     exampleSnippet: {
@@ -84,10 +82,9 @@ const THREAT_CARDS: ThreatCardData[] = [
     categoryTag: "Crisis Fabrication",
     threatTarget: "Two-Factor Auth & Phone OTPs",
     icon: MessagesSquare,
-    themeColor: "text-emerald-400",
-    accentBg: "bg-emerald-500/10",
-    accentBorder: "border-emerald-500/30",
-    accentGlow: "shadow-[0_0_25px_rgba(16,185,129,0.18)]",
+    themeColor: "text-teal-600 dark:text-teal-400",
+    accentBg: "bg-teal-50 dark:bg-teal-950/40",
+    accentBorder: "border-teal-200/80 dark:border-teal-800/60",
     summary:
       "Identify fabricated crisis stories and deceptive support requests used to persuade people to reveal private verification codes.",
     exampleSnippet: {
@@ -114,10 +111,9 @@ const THREAT_CARDS: ThreatCardData[] = [
     categoryTag: "Authority & Social Trust",
     threatTarget: "Personal Funds & Student Directory",
     icon: UserRoundSearch,
-    themeColor: "text-amber-400",
-    accentBg: "bg-amber-500/10",
-    accentBorder: "border-amber-500/30",
-    accentGlow: "shadow-[0_0_25px_rgba(245,158,11,0.18)]",
+    themeColor: "text-indigo-600 dark:text-indigo-400",
+    accentBg: "bg-indigo-50 dark:bg-indigo-950/40",
+    accentBorder: "border-indigo-200/80 dark:border-indigo-800/60",
     summary:
       "Recognise suspicious accounts and individuals pretending to be trusted professors, university staff, or student council members.",
     exampleSnippet: {
@@ -144,10 +140,9 @@ const THREAT_CARDS: ThreatCardData[] = [
     categoryTag: "Typosquatting & Scam Schemes",
     threatTarget: "Banking Cards & Device Integrity",
     icon: Link2,
-    themeColor: "text-cyan-400",
-    accentBg: "bg-cyan-500/10",
-    accentBorder: "border-cyan-500/30",
-    accentGlow: "shadow-[0_0_25px_rgba(6,182,212,0.18)]",
+    themeColor: "text-sky-600 dark:text-sky-400",
+    accentBg: "bg-sky-50 dark:bg-sky-950/40",
+    accentBorder: "border-sky-200/80 dark:border-sky-800/60",
     summary:
       "Examine fraudulent student offers, deceptive domain structures, misleading links, and disguised malicious attachments.",
     exampleSnippet: {
@@ -171,7 +166,7 @@ const THREAT_CARDS: ThreatCardData[] = [
 export function HomeThreatCards() {
   // Track inspected mode for each card
   const [inspectedCards, setInspectedCards] = useState<Record<string, boolean>>({
-    phishing: true, // Opened by default for immediate user visual delight!
+    phishing: false,
   });
 
   // Track active tab view per card: "simulation" | "defense"
@@ -210,14 +205,14 @@ export function HomeThreatCards() {
         return (
           <article
             key={card.id}
-            className={`threat-info-card relative rounded-2xl border border-border/80 bg-card/60 backdrop-blur-xl p-6 transition-all duration-300 hover:border-border hover:shadow-xl flex flex-col justify-between ${card.accentGlow}`}
+            className="threat-info-card relative rounded-2xl border border-border/80 bg-card p-6 transition-all duration-300 hover:border-border hover:shadow-md flex flex-col justify-between"
           >
             {/* Card Header */}
             <div>
               <div className="flex items-start sm:items-center justify-between gap-3 mb-4 flex-wrap sm:flex-nowrap">
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-sm`}
+                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-xs`}
                   >
                     <Icon size={22} aria-hidden="true" className="sm:w-6 sm:h-6" />
                   </div>
@@ -225,15 +220,15 @@ export function HomeThreatCards() {
                     <h3 className="text-lg sm:text-xl font-bold text-foreground leading-snug truncate">
                       {card.title}
                     </h3>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium truncate">
-                      <Target size={12} className={card.themeColor} />
+                    <span className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium truncate">
+                      <Target size={12} className="text-muted-foreground/70" />
                       Target: {card.threatTarget}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 flex-shrink-0">
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-background border border-border text-foreground/80 shadow-sm">
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
                     {card.badge}
                   </span>
                   <span className="text-[10px] text-muted-foreground font-medium hidden sm:inline-block">
@@ -248,15 +243,15 @@ export function HomeThreatCards() {
               </p>
 
               {/* View Switcher Pills */}
-              <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3 mb-4">
-                <div className="inline-flex rounded-lg bg-background/80 p-0.5 border border-border/70 text-xs">
+              <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3 mb-4 flex-wrap">
+                <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800/90 p-0.5 border border-slate-200/80 dark:border-slate-700/80 text-xs">
                   <button
                     type="button"
                     onClick={() => setCardView(card.id, "simulation")}
-                    className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
                       currentView === "simulation"
-                        ? "bg-primary text-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                     }`}
                   >
                     Simulated Scenario
@@ -264,10 +259,10 @@ export function HomeThreatCards() {
                   <button
                     type="button"
                     onClick={() => setCardView(card.id, "defense")}
-                    className={`px-3 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
                       currentView === "defense"
-                        ? "bg-primary text-white shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                     }`}
                   >
                     Defense &amp; Strategy
@@ -279,15 +274,19 @@ export function HomeThreatCards() {
                   <button
                     type="button"
                     onClick={() => toggleInspect(card.id)}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border transition-all cursor-pointer ${
                       isInspected
-                        ? "bg-amber-500/15 border-amber-500/40 text-amber-400 shadow-sm"
-                        : "bg-background/60 border-border text-muted-foreground hover:text-foreground"
+                        ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 shadow-xs"
+                        : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                     }`}
                     title="Toggle highlight markers on deceptive text"
                     aria-pressed={isInspected}
                   >
-                    {isInspected ? <EyeOff size={13} /> : <Eye size={13} />}
+                    {isInspected ? (
+                      <EyeOff size={13} className="text-amber-700 dark:text-amber-300" />
+                    ) : (
+                      <Eye size={13} className="text-slate-500 dark:text-slate-400" />
+                    )}
                     <span>{isInspected ? "Hide Traps" : "Spot Red Flags"}</span>
                   </button>
                 )}
@@ -296,11 +295,11 @@ export function HomeThreatCards() {
               {/* View Content 1: Simulated Artifact with Interactive Inspection */}
               {currentView === "simulation" ? (
                 <div
-                  className="rounded-xl border border-border/70 bg-background/70 p-4 transition-colors"
+                  className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-4 transition-colors"
                   aria-label="Simulated Scenario Preview"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border/50 text-[11px]">
-                    <span className="font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/70 dark:border-slate-800 text-[11px]">
+                    <span className="font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700/60 text-[10px]">
                       {card.exampleSnippet.type}
                     </span>
                     <span
@@ -315,9 +314,9 @@ export function HomeThreatCards() {
                   <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-sans mt-2">
                     {card.exampleSnippet.highlightLead}
                     <span
-                      className={`font-semibold px-1 py-0.5 rounded transition-all ${
+                      className={`font-semibold px-1.5 py-0.5 rounded-sm transition-all ${
                         isInspected
-                          ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40"
+                          ? "bg-amber-100 dark:bg-amber-950/70 text-amber-950 dark:text-amber-200 border-b-2 border-amber-500 dark:border-amber-400"
                           : "text-foreground"
                       }`}
                     >
@@ -328,18 +327,18 @@ export function HomeThreatCards() {
 
                   {/* Red Flag Warning Callout when Inspected */}
                   {isInspected && (
-                    <div className="mt-3 pt-2.5 border-t border-amber-500/30 text-xs text-amber-300 bg-amber-500/10 -mx-4 -mb-4 p-3 rounded-b-xl flex items-start gap-2">
-                      <AlertTriangle size={15} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div className="mt-3 pt-2.5 border-t border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 bg-amber-50/90 dark:bg-amber-950/50 -mx-4 -mb-4 p-3 rounded-b-xl flex items-start gap-2.5">
+                      <AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                       <span className="leading-snug">{card.exampleSnippet.deceptionNote}</span>
                     </div>
                   )}
                 </div>
               ) : (
                 /* View Content 2: Defense & Key Indicators */
-                <div className="space-y-3 rounded-xl border border-border/70 bg-background/70 p-4 text-xs sm:text-sm">
+                <div className="space-y-3 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-4 text-xs sm:text-sm">
                   <div>
-                    <div className="flex items-center gap-1.5 text-amber-400 font-bold mb-1">
-                      <AlertTriangle size={14} />
+                    <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-bold mb-1">
+                      <AlertTriangle size={14} className="text-amber-600 dark:text-amber-400" />
                       <span>Key Warning Sign:</span>
                     </div>
                     <p className="text-muted-foreground text-xs leading-relaxed">
@@ -347,9 +346,9 @@ export function HomeThreatCards() {
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-border/50">
-                    <div className="flex items-center gap-1.5 text-primary font-bold mb-1">
-                      <Flame size={14} />
+                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      <Flame size={14} className="text-indigo-600 dark:text-indigo-400" />
                       <span>Attacker Objective:</span>
                     </div>
                     <p className="text-muted-foreground text-xs leading-relaxed">
@@ -357,9 +356,9 @@ export function HomeThreatCards() {
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-border/50">
-                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold mb-1">
-                      <CheckCircle2 size={14} />
+                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-bold mb-1">
+                      <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
                       <span>Safe Decision Protocol:</span>
                     </div>
                     <p className="text-foreground/90 font-medium text-xs leading-relaxed">
@@ -380,7 +379,7 @@ export function HomeThreatCards() {
                 <Link
                   href="/consent"
                   prefetch={true}
-                  className="threat-investigate-link button primary small inline-flex items-center gap-1.5 text-xs font-bold py-1.5 px-3.5 shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all cursor-pointer"
                   title={`Participate in ${card.title} challenges`}
                 >
                   <span>Investigate Challenges</span>
