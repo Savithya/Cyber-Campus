@@ -1,7 +1,5 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
-// @ts-expect-error - @supabase/supabase-js exports resolution in moduleResolution bundler
-import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getResearcherSession } from "./researcher-auth.server";
 import { isResearch } from "./config.server";
@@ -42,7 +40,11 @@ export function serverAdminSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey) return null;
-  return createClient(url, serviceKey, {
+  return createServerClient(url, serviceKey, {
+    cookies: {
+      getAll: () => [],
+      setAll: () => {},
+    },
     auth: { persistSession: false },
   });
 }
