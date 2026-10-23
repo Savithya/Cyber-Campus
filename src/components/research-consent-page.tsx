@@ -18,6 +18,8 @@ import {
   Lock,
   Sparkles,
   AlertCircle,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import {
   api,
@@ -144,58 +146,83 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
       {/* Resumable draft banner if user already started */}
       {isResumable && sessionData?.status === "draft" && (
-        <div className="previous-response-compact-card resumable" role="region" aria-label="Resume Draft">
-          <div className="previous-response-left">
-            <RotateCcw size={18} className="text-primary" aria-hidden="true" />
-            <div>
-              <strong>Draft Session In Progress</strong>
-              <p>
-                Anonymous Code: <span className="font-mono">{sessionData?.code}</span> · Unsubmitted responses saved
-              </p>
+        <div className="draft-session-banner-wrapper">
+          <div className="draft-session-banner" role="region" aria-label="Resume Draft">
+            <div className="draft-session-left">
+              <div className="draft-icon-box" aria-hidden="true">
+                <RotateCcw size={20} />
+              </div>
+              <div className="draft-info-content">
+                <div className="draft-title-row">
+                  <span className="draft-title-text">Draft Session In Progress</span>
+                  <span className="draft-status-pill">Saved Draft</span>
+                </div>
+                <p className="draft-meta-text">
+                  Anonymous Code: <span className="draft-id-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="previous-response-actions">
-            <Link href="/demographics" prefetch={true} className="button primary small">
-              <span>Resume Participation</span>
-              <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-            <button
-              type="button"
-              className="button ghost small text-red"
-              onClick={handleDiscardDraft}
-              disabled={discarding}
-            >
-              <span>Discard Draft (Start New ID)</span>
-            </button>
+            <div className="draft-session-actions">
+              <Link href="/demographics" prefetch={true} className="btn-resume-primary">
+                <span>Resume Participation</span>
+                <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                className="btn-discard-secondary"
+                onClick={handleDiscardDraft}
+                disabled={discarding}
+                title="Discard this draft and start over with a new Anonymous ID"
+              >
+                {discarding ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                    <span>Discarding...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={14} aria-hidden="true" />
+                    <span>Discard Draft (Start New ID)</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Completed research notice */}
       {hasSession && sessionData?.status === "submitted_complete" && (
-        <div className="previous-response-compact-card resumable mb-4" role="region" aria-label="Completed Research">
-          <div className="previous-response-left">
-            <CheckCircle2 size={18} className="text-emerald" aria-hidden="true" />
-            <div>
-              <strong>Previous Research Completed (Anonymous ID: {sessionData.code})</strong>
-              <p>
-                Thank you! Your previous answers are recorded. Confirm your consent below to join as a new participant with a new Anonymous ID.
-              </p>
+        <div className="draft-session-banner-wrapper">
+          <div className="draft-session-banner completed-mode" role="region" aria-label="Completed Research">
+            <div className="draft-session-left">
+              <div className="draft-icon-box completed-icon" aria-hidden="true">
+                <CheckCircle2 size={20} />
+              </div>
+              <div className="draft-info-content">
+                <div className="draft-title-row">
+                  <span className="draft-title-text">Previous Research Completed</span>
+                  <span className="draft-status-pill completed-pill">Recorded</span>
+                </div>
+                <p className="draft-meta-text">
+                  Anonymous ID: <span className="draft-id-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="previous-response-actions">
-            <button
-              type="button"
-              className="button secondary small"
-              onClick={async () => {
-                clearParticipationStorage();
-                await api("session/discard", {}).catch(() => {});
-                await state.reload();
-              }}
-            >
-              <span>Join as New Participant</span>
-              <ArrowRight size={14} aria-hidden="true" />
-            </button>
+            <div className="draft-session-actions">
+              <button
+                type="button"
+                className="btn-join-fresh-primary"
+                onClick={async () => {
+                  clearParticipationStorage();
+                  await api("session/discard", {}).catch(() => {});
+                  await state.reload();
+                }}
+              >
+                <span>Join as New Participant</span>
+                <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       )}
