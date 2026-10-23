@@ -214,25 +214,25 @@ export function HomeThreatCards() {
           >
             {/* Card Header */}
             <div>
-              <div className="flex items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start sm:items-center justify-between gap-3 mb-4 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center border ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-sm`}
+                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-sm`}
                   >
-                    <Icon size={24} aria-hidden="true" />
+                    <Icon size={22} aria-hidden="true" className="sm:w-6 sm:h-6" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground leading-snug">
+                  <div className="min-w-0">
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground leading-snug truncate">
                       {card.title}
                     </h3>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium truncate">
                       <Target size={12} className={card.themeColor} />
                       Target: {card.threatTarget}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 flex-shrink-0">
                   <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-background border border-border text-foreground/80 shadow-sm">
                     {card.badge}
                   </span>
@@ -371,12 +371,12 @@ export function HomeThreatCards() {
             </div>
 
             {/* Card Action Footer */}
-            <div className="threat-card-footer mt-5 pt-4 border-t border-border/60 flex items-center justify-between gap-3">
+            <div className="threat-card-footer mt-5 pt-4 border-t border-border/60 flex items-center justify-between gap-3 flex-wrap">
               <span className="text-xs text-muted-foreground font-medium">
                 5 Research Questions
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href="/consent"
                   prefetch={true}

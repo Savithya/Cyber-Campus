@@ -19,13 +19,13 @@ export function HeroCyberVisual() {
       <div className="hero-full-image-frame">
         {/* Full Image Artwork */}
         <picture>
-          <source srcSet="/images/professional-cyber-lab.png" type="image/png" />
+          <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
           <img
-            src="/images/professional-cyber-lab.jpg"
+            src="/images/cyber-hero-lab-8x5.jpg"
             alt="Futuristic Academic Cybersecurity Research Laboratory — Digital Research Console, Privacy Shield and Threat Telemetry"
             className="hero-full-cyber-image"
-            width={1376}
-            height={768}
+            width={1200}
+            height={750}
             loading="eager"
           />
         </picture>

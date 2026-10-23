@@ -416,18 +416,18 @@ export function CyberInvestigatorShowcase() {
                       <Globe size={14} />
                       <span>URL Structural Analysis:</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono text-center">
                       <div className="p-2 rounded bg-background/60 border border-border">
                         <span className="text-muted-foreground block text-[9px] uppercase">Subdomain Lure</span>
-                        <span className="text-amber-400 font-bold">serendib.campus</span>
+                        <span className="text-amber-400 font-bold break-all">serendib.campus</span>
                       </div>
                       <div className="p-2 rounded bg-red-500/10 border border-red-500/40">
                         <span className="text-red-400 block text-[9px] uppercase font-bold">Root Domain (Trap)</span>
-                        <span className="text-red-400 font-bold">verify-login.example</span>
+                        <span className="text-red-400 font-bold break-all">verify-login.example</span>
                       </div>
                       <div className="p-2 rounded bg-background/60 border border-border">
                         <span className="text-muted-foreground block text-[9px] uppercase">Path</span>
-                        <span className="text-muted-foreground">/security-gate</span>
+                        <span className="text-muted-foreground break-all">/security-gate</span>
                       </div>
                     </div>
                   </div>

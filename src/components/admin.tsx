@@ -59,17 +59,48 @@ import { PageHeading, ErrorBox } from "./ui";
 import { GlobalResearchFilters } from "./global-research-filters";
 import StatisticalAnalysis from "./statistical-analysis";
 
-const navs = [
-  ["", "Overview", LayoutDashboard],
-  ["responses", "Responses", Database],
-  ["demographics", "Demographics", Users],
-  ["threats", "Threat Analysis (IV1–IV4)", ShieldAlert],
-  ["supplementary", "User Privacy (DV)", ShieldCheck],
-  ["statistics", "Statistical Analysis", Calculator],
-  ["performance", "Game Performance", Gamepad2],
-  ["exports", "Data Export", Download],
-  ["history", "Submission History", History],
-] as const;
+interface NavItemDef {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  badge?: "count" | string;
+}
+
+interface NavSectionDef {
+  heading: string;
+  items: NavItemDef[];
+}
+
+const navSections: NavSectionDef[] = [
+  {
+    heading: "Core Workspace",
+    items: [
+      { id: "", label: "Overview", icon: LayoutDashboard },
+      { id: "responses", label: "Responses", icon: Database, badge: "count" },
+      { id: "demographics", label: "Demographics", icon: Users, badge: "Q1–Q5" },
+    ],
+  },
+  {
+    heading: "Research Variables",
+    items: [
+      { id: "threats", label: "Threat Analysis (IV1–IV4)", icon: ShieldAlert, badge: "4 IVs" },
+      { id: "supplementary", label: "User Privacy (DV)", icon: ShieldCheck, badge: "DV" },
+    ],
+  },
+  {
+    heading: "Analytics & Data",
+    items: [
+      { id: "statistics", label: "Statistical Analysis", icon: Calculator, badge: "Stats" },
+      { id: "performance", label: "Game Performance", icon: Gamepad2 },
+      { id: "exports", label: "Data Export", icon: Download },
+      { id: "history", label: "Submission History", icon: History },
+    ],
+  },
+];
+
+const navs = navSections.flatMap((s) =>
+  s.items.map((i) => [i.id, i.label, i.icon] as const),
+);
 
 const SCENARIO_TITLES: Record<string, string> = {
   PH01: "Suspicious University Email",
@@ -390,55 +421,95 @@ export default function Admin({
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
-        <div className="research-label">
-          <ShieldCheck size={20} />
-          <span>RESEARCH WORKSPACE</span>
+        <div className="admin-sidebar-header">
+          <div className="admin-brand-icon">
+            <ShieldCheck size={18} />
+          </div>
+          <div className="admin-brand-info">
+            <span className="admin-brand-title">Research Workspace</span>
+            <span className="admin-brand-status">
+              <span className="admin-status-dot online" />
+              {demo ? "Synthetic Fixtures" : "Active Research Study"}
+            </span>
+          </div>
         </div>
-        <nav aria-label="Researcher navigation">
-          {navs.map(([p, label, Icon]) => {
-            const isSelected =
-              p === ""
-                ? active === ""
-                : p === "threats"
-                  ? isThreatSection
-                  : p === "supplementary"
-                    ? active === "supplementary" || active === "privacy-dv"
-                    : p === "performance"
-                      ? active === "performance" || active === "game-analytics"
-                      : active === p;
-            return (
-              <Link
-                key={p}
-                href={href(p)}
-                className={isSelected ? "selected" : ""}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </Link>
-            );
-          })}
+
+        <nav aria-label="Researcher navigation" className="admin-sidebar-nav">
+          {navSections.map((sec) => (
+            <div key={sec.heading} className="admin-nav-group">
+              <span className="admin-nav-heading">{sec.heading}</span>
+              <div className="admin-nav-list">
+                {sec.items.map((item) => {
+                  const p = item.id;
+                  const isSelected =
+                    p === ""
+                      ? active === ""
+                      : p === "threats"
+                        ? isThreatSection
+                        : p === "supplementary"
+                          ? active === "supplementary" || active === "privacy-dv"
+                          : p === "performance"
+                            ? active === "performance" || active === "game-analytics"
+                            : active === p;
+
+                  const badgeText =
+                    item.badge === "count"
+                      ? counts.totalSubmissions
+                      : item.badge;
+
+                  return (
+                    <Link
+                      key={p}
+                      href={href(p)}
+                      className={`admin-nav-item ${isSelected ? "selected" : ""}`}
+                      title={item.label}
+                    >
+                      <div className="admin-nav-item-left">
+                        <item.icon size={17} className="admin-nav-icon" />
+                        <span className="admin-nav-label">{item.label}</span>
+                      </div>
+                      {badgeText !== undefined && (
+                        <span className={`admin-nav-badge ${isSelected ? "active" : ""}`}>
+                          {badgeText}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
+
         <div className="admin-sidebar-bottom">
-          <span className="tag">
-            {demo ? "SYNTHETIC PREVIEW" : "RESEARCH MODE"}
-          </span>
-          <p>
-            {demo
-              ? "48 authored fixture sessions. Your local trial responses are not included."
-              : "Private access · assigned researcher role"}
-          </p>
-          {!demo && (
-            <button
-              className="button secondary"
-              onClick={async () => {
-                await api("auth/logout", {});
-                router.replace("/admin/login");
-                router.refresh();
-              }}
-            >
-              <LogOut size={15} /> Sign out
-            </button>
-          )}
+          <div className="admin-profile-card">
+            <div className="admin-profile-avatar">
+              <UserCheck size={16} />
+            </div>
+            <div className="admin-profile-info">
+              <span className="admin-profile-name">
+                {demo ? "Synthetic Preview" : "Authorized Researcher"}
+              </span>
+              <span className="admin-profile-meta">
+                {demo ? "48 Fixture Sessions" : `${counts.totalSubmissions} Submissions · UTC+05:30`}
+              </span>
+            </div>
+            {!demo && (
+              <button
+                type="button"
+                className="admin-profile-logout"
+                onClick={async () => {
+                  await api("auth/logout", {});
+                  router.replace("/admin/login");
+                  router.refresh();
+                }}
+                title="Sign out of researcher session"
+                aria-label="Sign out of researcher session"
+              >
+                <LogOut size={14} />
+              </button>
+            )}
+          </div>
         </div>
       </aside>
 
