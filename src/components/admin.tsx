@@ -423,13 +423,30 @@ export default function Admin({
 
       <div className="admin-main">
         <div className="admin-top">
-          <span>
-            Cyber Campus /{" "}
-            <strong>
-              {navs.find((n) => n[0] === active)?.[1] ?? "Research Workspace"}
-            </strong>
-          </span>
-          <span>Asia/Colombo (UTC+05:30)</span>
+          <div className="admin-top-breadcrumb">
+            <span>
+              Cyber Campus /{" "}
+              <strong>
+                {navs.find((n) => n[0] === active)?.[1] ?? "Research Workspace"}
+              </strong>
+            </span>
+            <span className="admin-tz-badge">Asia/Colombo (UTC+05:30)</span>
+          </div>
+          {!demo && (
+            <button
+              type="button"
+              className="button secondary small admin-mobile-signout"
+              onClick={async () => {
+                await api("auth/logout", {});
+                router.replace("/admin/login");
+                router.refresh();
+              }}
+              title="Sign out of researcher session"
+              aria-label="Sign out of researcher session"
+            >
+              <LogOut size={14} /> <span>Sign out</span>
+            </button>
+          )}
         </div>
 
         <PageHeading
@@ -1297,11 +1314,11 @@ export default function Admin({
                 </label>
               </div>
 
-              <div className="table-scroll mt-4">
+              <div className="table-scroll mt-4" tabIndex={0} role="region" aria-label="Original participant responses table">
                 <table>
                   <thead>
                     <tr>
-                      <th>Participant Code</th>
+                      <th className="sticky-col-header">Participant Code</th>
                       <th>Scenario ID</th>
                       <th>Scenario Title</th>
                       <th>Variable</th>
@@ -1315,7 +1332,7 @@ export default function Admin({
                   <tbody>
                     {paginatedAuditAttempts.map((item, idx) => (
                       <tr key={`${item.participantId}-${item.scenarioId}-${idx}`}>
-                        <td><code>{item.participantId}</code></td>
+                        <td className="sticky-col-cell"><code>{item.participantId}</code></td>
                         <td><code>{item.scenarioId}</code></td>
                         <td className="text-xs">{item.scenarioTitle}</td>
                         <td><span className="tag small">{item.primaryIV}</span></td>
@@ -1449,7 +1466,7 @@ export default function Admin({
                 <table>
                   <thead>
                     <tr>
-                      <th>Participant code</th>
+                      <th className="sticky-col-header">Participant code</th>
                       <th>Status</th>
                       <th>Answered / 25</th>
                       <th>Missions Finished</th>
@@ -1459,7 +1476,7 @@ export default function Admin({
                   <tbody>
                     {paginatedHistorySessions.map((s) => (
                       <tr key={s.submissionId ?? s.id}>
-                        <td>
+                        <td className="sticky-col-cell">
                           <code>{s.code}</code>
                         </td>
                         <td>
