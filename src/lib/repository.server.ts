@@ -276,7 +276,7 @@ export async function getDemoSubmissions(): Promise<Session[]> {
 }
 
 export async function removeDemoSubmission(code: string) {
-  const subPath = ".demo-data/submissions.json";
+  const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
   try {
     const raw = await readFile(subPath, "utf-8");
     const list = JSON.parse(raw);

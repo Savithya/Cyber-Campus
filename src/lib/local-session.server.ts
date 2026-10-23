@@ -13,10 +13,14 @@ async function secret() {
   if (raw && raw.trim().length > 0) {
     return createHash("sha256").update(raw.trim()).digest();
   }
-  if (isResearch() || process.env.VERCEL)
+  if (isResearch()) {
     throw new Error(
       "Set LOCAL_SESSION_SECRET to 64 random hex characters for local practice sessions.",
     );
+  }
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    return createHash("sha256").update("cyber-campus-demo-local-secret-fallback").digest();
+  }
   await mkdir(".demo-data", { recursive: true });
   try {
     return await readFile(".demo-data/secret.bin");
