@@ -12,20 +12,45 @@ import { readLocal, writeLocal } from "./local-session.server";
 
 async function nextLocalParticipantCode(): Promise<string> {
   const counterPath = ".demo-data/participant_counter.json";
+  const subPath = ".demo-data/submissions.json";
   try {
-    const raw = await readFile(counterPath, "utf-8");
-    const parsed = JSON.parse(raw);
-    const nextVal = (typeof parsed.counter === "number" ? parsed.counter : 0) + 1;
+    await mkdir(".demo-data", { recursive: true });
+    let maxNum = 0;
+
+    // Scan existing submissions for highest integer participant code
+    try {
+      const rawSubs = await readFile(subPath, "utf-8");
+      const list = JSON.parse(rawSubs);
+      if (Array.isArray(list)) {
+        for (const s of list) {
+          if (s.code && /^\d+$/.test(String(s.code).trim())) {
+            const num = parseInt(String(s.code).trim(), 10);
+            if (num > maxNum && num < 100000) {
+              maxNum = num;
+            }
+          }
+        }
+      }
+    } catch {
+      // Submissions file may not exist yet
+    }
+
+    // Scan counter file
+    try {
+      const rawCounter = await readFile(counterPath, "utf-8");
+      const parsed = JSON.parse(rawCounter);
+      if (typeof parsed.counter === "number" && parsed.counter > maxNum && parsed.counter < 100000) {
+        maxNum = parsed.counter;
+      }
+    } catch {
+      // Counter file may not exist yet
+    }
+
+    const nextVal = maxNum + 1;
     await writeFile(counterPath, JSON.stringify({ counter: nextVal }), "utf-8");
     return String(nextVal).padStart(3, "0");
   } catch {
-    try {
-      await mkdir(".demo-data", { recursive: true });
-      await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
-      return "001";
-    } catch {
-      return "001";
-    }
+    return "001";
   }
 }
 
@@ -50,7 +75,7 @@ async function getOrCreateParticipantId(): Promise<string> {
 }
 
 export async function saveDemoSubmission(session: Session) {
-  if (session.mode === "practice" && session.code !== "001") return;
+  if (session.mode === "practice") return;
   const subPath = ".demo-data/submissions.json";
   try {
     await mkdir(".demo-data", { recursive: true });
@@ -106,7 +131,8 @@ export async function getDemoSubmissions(): Promise<Session[]> {
       if (
         active.status === "submitted_complete" ||
         active.status === "submitted_with_missing" ||
-        active.code === "001"
+        active.status === "draft" ||
+        Boolean(active.code)
       ) {
         await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
       }
@@ -254,6 +280,9 @@ export async function startSession(input: {
       attempts: [],
     };
     await writeLocal({ session, tokenHash: hashToken(input.token) });
+    if (!input.practice) {
+      await saveDemoSubmission(session);
+    }
     return session;
   }
   const config = await getConfig();
@@ -297,6 +326,9 @@ export async function saveDraft(answers: Answers) {
   const local = (await readLocal())!;
   local.session.answers = answers;
   await writeLocal(local);
+  if (local.session.mode !== "practice") {
+    await saveDemoSubmission(local.session);
+  }
   return local.session;
 }
 export async function submitBaseline(answers: Answers, idempotencyKey: string) {
@@ -413,6 +445,9 @@ export async function discardDraft() {
       "Use your private withdrawal token to delete a submitted response.",
     );
   if (s?.mode === "research") await rpc("discard_draft");
+  if (s?.code) {
+    await removeDemoSubmission(s.code);
+  }
   await writeLocal(null);
 }
 export async function withdraw(code: string, token: string) {

@@ -173,4 +173,76 @@ test.describe("Hero Page & Cyber Mission Control Verification", () => {
     await expect(scenarioRunner).toBeVisible();
     await expect(scenarioRunner).toContainText("Challenge 1 of 5");
   });
+
+  test("Cyber Mission Control questions are fully responsive across all devices", async ({ page }) => {
+    // Launch practice mode directly on /play to enter the workstation immediately
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/play");
+
+    // Click "Explore Practice Challenges" if on access card
+    const practiceBtn = page.getByRole("button", { name: /Explore Practice Challenges/i });
+    if (await practiceBtn.isVisible()) {
+      await practiceBtn.click();
+    }
+
+    // Now on Mission Control hub, click Start Mission on first card
+    const startMissionBtn = page.locator(".module-launch-btn").first();
+    await expect(startMissionBtn).toBeVisible({ timeout: 15000 });
+    await startMissionBtn.click();
+
+    // Challenge runner should be visible
+    const runner = page.locator(".interactive-challenge-runner");
+    await expect(runner).toBeVisible({ timeout: 15000 });
+
+    const decisionHeading = page.locator(".action-selection-title");
+    await expect(decisionHeading).toBeVisible();
+    await expect(decisionHeading).toContainText("What would you do next?");
+
+    const actionCards = page.locator(".interactive-action-card");
+    await expect(actionCards).toHaveCount(4);
+
+    const testBreakpoints = [320, 375, 430, 768, 1024, 1280, 1440];
+    for (const width of testBreakpoints) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.waitForTimeout(200);
+
+      // Verify no horizontal page overflow
+      const noOverflow = await page.evaluate(() => {
+        return document.documentElement.scrollWidth <= window.innerWidth;
+      });
+      expect(noOverflow, `Horizontal overflow in Cyber Mission Control at ${width}px`).toBe(true);
+
+      // Verify all 4 question choices are visible and contained
+      for (let i = 0; i < 4; i++) {
+        const card = actionCards.nth(i);
+        await expect(card).toBeVisible();
+        const cardBox = await card.boundingBox();
+        expect(cardBox).not.toBeNull();
+        if (cardBox) {
+          expect(cardBox.x).toBeGreaterThanOrEqual(0);
+          expect(cardBox.x + cardBox.width).toBeLessThanOrEqual(width + 2);
+          // On mobile, touch target height should be >= 44px
+          if (width <= 768) {
+            expect(cardBox.height).toBeGreaterThanOrEqual(44);
+          }
+        }
+      }
+
+      // Verify Next Challenge button is visible and contained
+      const nextBtn = page.locator(".primary-next-btn");
+      await expect(nextBtn).toBeVisible();
+      const nextBox = await nextBtn.boundingBox();
+      expect(nextBox).not.toBeNull();
+      if (nextBox) {
+        expect(nextBox.x + nextBox.width).toBeLessThanOrEqual(width + 2);
+        if (width <= 768) {
+          expect(nextBox.height).toBeGreaterThanOrEqual(44);
+        }
+      }
+    }
+
+    // Verify selecting an option works cleanly
+    await actionCards.first().click();
+    await expect(actionCards.first()).toHaveClass(/selected/);
+  });
 });

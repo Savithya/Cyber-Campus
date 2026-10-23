@@ -110,7 +110,9 @@ export async function GET(req: NextRequest, ctx: Ctx) {
             { error: "Demo fixtures are disabled in research mode." },
             404,
           );
-        data = syntheticSessions();
+        const { getDemoSubmissions } = await import("@/lib/repository.server");
+        const demoSubs = await getDemoSubmissions();
+        data = [...demoSubs, ...syntheticSessions()];
       } else {
         const db = await requireResearcher();
         const result = await db.rpc("research_dataset");

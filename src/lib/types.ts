@@ -44,6 +44,8 @@ export type Evidence = {
 export type InteractionType =
   | "email"
   | "sms"
+  | "call"
+  | "message"
   | "qr"
   | "attachment"
   | "dual_browser"

@@ -36,7 +36,7 @@ export default function Home() {
 
             <h1 className="hero-main-heading">
               Explore Cyber Threats.
-              <br />
+              <br className="hero-heading-break" />
               Protect Your <span>Digital Privacy</span>.
             </h1>
 

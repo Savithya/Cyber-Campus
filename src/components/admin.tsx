@@ -346,7 +346,7 @@ export default function Admin({
   // Flattened responses for Original Responses audit table
   const auditAttempts = useMemo(() => {
     return filtered.flatMap((s) => {
-      const participantId = s.participantId || s.code;
+      const participantId = s.code || s.participantId || "ANON";
       const status = s.status;
       return (s.attempts || [])
         .filter((a) => a.attemptNumber === 1 && a.selectedAction !== null)

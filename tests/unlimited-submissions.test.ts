@@ -37,6 +37,23 @@ vi.mock("@/lib/config.server", () => ({
   },
 }));
 
+vi.mock("node:fs/promises", () => ({
+  readFile: vi.fn(async (path: string) => {
+    if (String(path).includes("participant_counter")) {
+      return JSON.stringify({ counter: mockStore.submissions.length });
+    }
+    return JSON.stringify(mockStore.submissions);
+  }),
+  writeFile: vi.fn(async (path: string, content: string) => {
+    if (String(path).includes("submissions")) {
+      try {
+        mockStore.submissions = JSON.parse(content);
+      } catch {}
+    }
+  }),
+  mkdir: vi.fn(async () => {}),
+}));
+
 import { startSession, submitBaseline } from "@/lib/repository.server";
 
 describe("Unlimited Research Submissions", () => {

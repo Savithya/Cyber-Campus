@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -33,6 +33,18 @@ import {
   Compass,
   MessageSquare,
   Layers,
+  Phone,
+  PhoneCall,
+  PhoneIncoming,
+  PhoneOff,
+  Mic,
+  Volume2,
+  Smartphone,
+  CheckCheck,
+  Radio,
+  Activity,
+  Signal,
+  Wifi,
 } from "lucide-react";
 import { missions } from "@/content/missions";
 import type { Scenario, ScenarioChoice, Attempt } from "@/lib/types";
@@ -52,6 +64,13 @@ export interface EmailMetadata {
   department: string;
   scenarioIntro: string;
   bodyParagraphs: string[];
+  communicationType?: "message" | "call" | "email";
+  channelTitle?: string;
+  phoneNumber?: string;
+  callerId?: string;
+  callStatus?: string;
+  callAudioTranscript?: string[];
+  messagePlatform?: "sms" | "chat" | "whatsapp" | "direct_message";
   linkCta?: {
     buttonText: string;
     destinationUrl: string;
@@ -88,10 +107,15 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
   switch (scenario.id) {
     // -----------------------------------------------------------------------
-    // IV1: PHISHING INVESTIGATION (PH01 - PH05)
+    // IV1: PHISHING INVESTIGATION (PH01 - PH05) — MSG TYPE & CALL TYPE
     // -----------------------------------------------------------------------
     case "PH01":
       return {
+        communicationType: "call",
+        channelTitle: "Incoming Phone Call · University IT Security Desk",
+        phoneNumber: "+94 11 234 5678 (Caller ID Spoofed)",
+        callerId: "CAMPUS-IT-SECURITY",
+        callStatus: "Connected · 00:48",
         senderInitials: "IT",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -100,10 +124,14 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 10:14 AM",
         department: "University IT Account Services",
         scenarioIntro:
-          "You have received an urgent email regarding your university student account and LMS access. Read the email carefully and decide what you would do next.",
+          "You receive an urgent phone call claiming to be University IT Account Services warning your account will be deactivated within two hours. Listen to the caller's instructions carefully and decide what you would do next.",
+        callAudioTranscript: [
+          "[Caller — Officer Perera, Purported IT Security]: 'Hello, this is University IT Account Services. We have flagged your undergraduate single sign-on account for immediate deactivation within two hours due to a security audit failure.'",
+          "'To prevent cancellation of your exam admissions and LMS access, you must immediately confirm your student credentials on our emergency portal: serendib.campus.example.verify-login.example. Do you have access to your browser right now?'",
+        ],
         bodyParagraphs: [
           "Dear Student,",
-          "Our automated security auditing system has flagged your university account for non-compliance with the quarterly security policy.",
+          "Phone call from +94 11 234 5678: 'Our automated security auditing system has flagged your university account for non-compliance with the quarterly security policy.'",
           "Your student single sign-on (SSO), examination timetable admissions, and LMS enrollment are scheduled for suspension within two hours unless credentials are re-validated immediately.",
           "Please verify your credentials using the secure campus verification portal link below to maintain uninterrupted access.",
         ],
@@ -117,13 +145,17 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
           returnPath: "<bounce@campus-serendib-verify.example>",
           spfResult: "spf=neutral (sender IP not authorized for campus.example)",
           dkimDomain: "campus-serendib-verify.example",
-          originatingIp: "203.0.113.195 (External Host)",
+          originatingIp: "203.0.113.195 (VoIP Trunk Gateway)",
           messageId: "<ph01-audit@gateway-relay.example>",
         },
       };
 
     case "PH02":
       return {
+        communicationType: "message",
+        messagePlatform: "sms",
+        channelTitle: "SMS Notification · GrantOffice-SL",
+        phoneNumber: "+94 77 000 1234",
         senderInitials: "GO",
         senderName: "Higher Education Grant Office (SL)",
         senderEmail: "notifications@grant-office-sl-disbursement.example",
@@ -132,11 +164,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 09:32 AM",
         department: "National Student Financial Assistance Division",
         scenarioIntro:
-          "You have received an official notification regarding an approved university student scholarship grant. Read the communication carefully and decide what you would do next.",
+          "You receive an SMS notification claiming you have been approved for a national university welfare grant of LKR 85,000. Review the message and claim link carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
-          "We are pleased to inform you that your university profile has been approved for the National Undergraduate Higher Education Support Grant of LKR 85,000.",
-          "Funds are ready for direct bank disbursement. To receive your funds, you must verify your identity and banking credentials within 24 hours.",
+          "Ministry Welfare Grant: Your higher education bursary of LKR 85,000 is approved.",
+          "To disburse funds to your bank account, submit your National Identity Card (NIC) number and bank debit card number at the claim link below.",
           "Click the secure grant disbursement claim link below to complete your payment enrollment.",
         ],
         linkCta: {
@@ -147,15 +179,19 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         },
         rfcHeaders: {
           returnPath: "<outbound@grant-office-sl-disbursement.example>",
-          spfResult: "spf=softfail (unauthenticated external SMS/email gateway)",
+          spfResult: "spf=softfail (unauthenticated external SMS gateway)",
           dkimDomain: "grant-claim-portal.example",
-          originatingIp: "192.0.2.88 (Commercial Gateway)",
+          originatingIp: "192.0.2.88 (Commercial SMS Gateway)",
           messageId: "<ph02-grant-sl@disbursement-relay.example>",
         },
       };
 
     case "PH03":
       return {
+        communicationType: "message",
+        messagePlatform: "chat",
+        channelTitle: "Campus Tech Society Mobile Announcement",
+        phoneNumber: "Campus-Tech-Fest (+94 78 221 9901)",
         senderInitials: "TS",
         senderName: "Campus Tech Society & Cafeteria Services",
         senderEmail: "events@campus-tech-society.example",
@@ -164,7 +200,7 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 11:05 AM",
         department: "Student Activities & Society Coordination",
         scenarioIntro:
-          "You have received an announcement regarding free passes and cafeteria vouchers for the annual campus symposium. Read the message carefully and decide what you would do next.",
+          "You receive an announcement message forwarded in your student activities group chat offering free symposium vouchers with a registration link. Review the message carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
           "The Campus Tech Society is releasing complimentary cafeteria vouchers and all-access passes for Tech Symposium 2026.",
@@ -188,6 +224,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
     case "PH04":
       return {
+        communicationType: "call",
+        channelTitle: "Incoming Phone Call & Transferred File · Global Talent Recruiters",
+        phoneNumber: "+94 71 987 6543 (Direct Recruiter Line)",
+        callerId: "GLOBAL-TALENT-HR",
+        callStatus: "Connected · 01:12",
         senderInitials: "GT",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -196,11 +237,15 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 08:45 AM",
         department: "Global Talent Recruiters — Regional Career Placement",
         scenarioIntro:
-          "You have received an email from an internship recruiter containing an employment contract attachment. Read the message carefully and decide what you would do next.",
+          "You receive a phone call from an internship recruiter offering a high-paying remote placement and transferring a contract file to your device. Review the call and attached document carefully and decide what you would do next.",
+        callAudioTranscript: [
+          "[Caller — Talent Acquisition Specialist]: 'Good day, we evaluated top undergraduates from your university and selected you for a remote paid software internship at LKR 120,000 per month.'",
+          "'I have just transferred your customized employment contract file Internship_Offer_Contract_2026.docx.exe to your device. You must open and execute it today to reserve your placement.'",
+        ],
         bodyParagraphs: [
           "Dear Student,",
-          "Following an evaluation of high-achieving computing and engineering students, we are pleased to offer you a remote research internship position.",
-          "The monthly stipend is LKR 120,000 with flexible hours. Your customized employment contract and onboarding agreement are attached to this message.",
+          "Phone call from Global Talent Recruiters (+94 71 987 6543): 'Following an evaluation of computing students, we are offering you a remote internship (LKR 120,000/mo).'",
+          "Your customized employment contract has been transferred to your device as an onboarding package.",
           "Please download, review, and execute the attached agreement document to secure your placement.",
         ],
         attachment: {
@@ -212,13 +257,17 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
           returnPath: "<careers@career-network-internships.example>",
           spfResult: "spf=pass (external third-party domain)",
           dkimDomain: "career-network-internships.example",
-          originatingIp: "198.51.100.12",
+          originatingIp: "198.51.100.12 (Direct Recruiter Inbound)",
           messageId: "<ph04-contract@recruiters-cloud.example>",
         },
       };
 
     case "PH05":
       return {
+        communicationType: "message",
+        messagePlatform: "chat",
+        channelTitle: "Urgent Chat Alert · Examination Division",
+        phoneNumber: "Exam-Portal-Sync (+94 72 901 3456)",
         senderInitials: "EP",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -227,10 +276,10 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 09:18 AM",
         department: "University Examination Division & Student Records",
         scenarioIntro:
-          "You have received an email regarding your semester examination schedule and student portal verification. Read the email carefully and decide what you would do next.",
+          "You receive an urgent message in your course batch chat claiming exam hall allocations have been updated with a verification link. Review the message carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
-          "The Central Examination Division has updated the seating arrangements and hall admission passes for the upcoming semester finals.",
+          "URGENT: Central Examination Division updated seating arrangements and hall admission passes for semester finals.",
           "Due to an internal database synchronization update, all registered candidates must log in through the examination verification link below to confirm their exam hall entry pass.",
           "Failure to confirm before 5:00 PM today will result in temporary suspension of exam hall eligibility.",
         ],
@@ -517,10 +566,14 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
       };
 
     // -----------------------------------------------------------------------
-    // IV4: SCAM & MALICIOUS LINK INVESTIGATION (SC01 - SC05)
+    // IV4: SCAM & MALICIOUS LINK INVESTIGATION (SC01 - SC05) — ALL MSG TYPE
     // -----------------------------------------------------------------------
     case "SC01":
       return {
+        communicationType: "message",
+        messagePlatform: "chat",
+        channelTitle: "Sponsored Product Message · Telegram/WhatsApp Deals",
+        phoneNumber: "Campus Clearance Deals (+94 71 884 9210)",
         senderInitials: "ME",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -529,12 +582,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 12:30 PM",
         department: "Campus Electronics Clearance Outlet",
         scenarioIntro:
-          "You have received an email advertising heavily discounted tech accessories on a university clearance store. Read the message carefully and decide what you would do next.",
+          "You receive a sponsored instant message promoting an undergraduate clearance sale for Apple laptops. Review the message and link carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
-          "The Annual Student Tech Clearance is now live! Over 200 high-performance laptops and graphics tablets are being cleared at 80% below retail prices.",
-          "Brand new Apple MacBook Air laptops are available for only LKR 75,000 for university ID holders. Stocks are strictly limited to the first 25 orders received today.",
-          "Click the clearance checkout store link below to place your order with direct debit or card payment immediately.",
+          "FLASH CLEARANCE SALE: Only 3 units remaining in Colombo warehouse! Brand new Apple MacBook Air laptops are available for only LKR 75,000 (80% off retail) for university ID holders.",
+          "Countdown timer: 08:34 remaining. Tap the clearance checkout link below to place your order with card payment immediately.",
         ],
         linkCta: {
           buttonText: "Open Mega Clearance Store & Order Online",
@@ -553,6 +605,10 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
     case "SC02":
       return {
+        communicationType: "message",
+        messagePlatform: "direct_message",
+        channelTitle: "Direct Message · Campus Boarding Chat",
+        phoneNumber: "+44 7911 123456 (Overseas Landlord)",
         senderInitials: "PO",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -561,12 +617,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 03:00 PM",
         department: "Private Student Boarding Network",
         scenarioIntro:
-          "You have received an email response regarding private student accommodation and boarding near campus. Read the message carefully and decide what you would do next.",
+          "You receive a direct message regarding an off-campus luxury studio lease from an overseas landlord. Review the message and payment demand carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
-          "Thank you for inquiring about boarding accommodation near the university. I have a fully furnished, luxury single studio apartment located only 200 meters from the campus gate.",
-          "The rent is LKR 22,000 per month with all utilities included. I am currently overseas on business, so physical viewings are not possible until next month.",
-          "Due to intense student demand, I require an advance security deposit of two months' rent (LKR 44,000) transferred today via Western Union or direct wire to hold the keys for you.",
+          "Thank you for inquiring about boarding accommodation near campus. I have a fully furnished, luxury single studio apartment located only 200 meters from the campus gate for LKR 22,000/month with all utilities included.",
+          "I am currently overseas on humanitarian work, so physical viewings are not possible until next month. Due to intense student demand, transfer an advance security deposit of two months' rent (LKR 44,000) and your NIC scan immediately via wire to hold the keys for you.",
         ],
         rfcHeaders: {
           returnPath: "<landlord@campus-boarding-rentals.example>",
@@ -579,6 +634,10 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
     case "SC03":
       return {
+        communicationType: "message",
+        messagePlatform: "sms",
+        channelTitle: "SMS Alert · PaySec University Gateway",
+        phoneNumber: "PAYSEC-SL (+94 77 555 0192)",
         senderInitials: "PG",
         senderName: scenario.senderName,
         senderEmail: "billing@campus-exam-fees-sl.example",
@@ -587,12 +646,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 11:15 AM",
         department: "University Bursar & Payment Processing",
         scenarioIntro:
-          "You have received an invoice notification with a payment link for university administrative fees. Read the email carefully and decide what you would do next.",
+          "You receive an urgent SMS alert regarding library fee settlement with an online payment link. Review the notification carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Student,",
-          "Your semester examination registration fee invoice of LKR 6,500 is overdue. Unsettled balances will lead to immediate cancellation of your admission token.",
-          "To clear your examination hold immediately, complete the payment transaction using the online payment gateway processor link provided below.",
-          "Please have your 16-digit debit card number and ATM security PIN ready to authorize the transaction.",
+          "PAYMENT PROCESSING: Your semester examination registration fee invoice of LKR 6,500 is overdue. Unsettled balances will lead to immediate cancellation of your admission token.",
+          "To clear your examination hold immediately, complete the payment transaction using the online payment gateway processor link provided below. Have your 16-digit debit card number and ATM security PIN ready to authorize.",
         ],
         linkCta: {
           buttonText: "Proceed to Online Payment Gateway (HTTP)",
@@ -611,6 +669,10 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
     case "SC04":
       return {
+        communicationType: "message",
+        messagePlatform: "chat",
+        channelTitle: "Batch Group Chat · Inter-University Hackathon",
+        phoneNumber: "Hackathon-2026 Admin (+94 76 332 8190)",
         senderInitials: "HC",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -619,12 +681,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 01:45 PM",
         department: "National Hackathon Organizing Committee",
         scenarioIntro:
-          "You have received an invitation to register for a national university hackathon. Read the email carefully and decide what you would do next.",
+          "You receive an announcement message in your student batch chat with an event registration link. Review the message and permissions carefully and decide what you would do next.",
         bodyParagraphs: [
           "Dear Undergraduates,",
           "Registrations are now open for the National Inter-University Hackathon 2026, sponsored by top international tech firms with cash prizes of LKR 1,500,000.",
-          "All participating teams must register their members through the online registration portal link below. Each participant must provide their university Single Sign-On credentials to verify student eligibility.",
-          "Registrations close strictly at midnight tonight. Click below to register your team.",
+          "All participating teams must register their members through the online registration portal link below. Each participant must connect their university Google Account to verify student SSO eligibility before midnight tonight.",
         ],
         linkCta: {
           buttonText: "Register Hackathon Team & Verify Student SSO",
@@ -643,6 +704,10 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
 
     case "SC05":
       return {
+        communicationType: "message",
+        messagePlatform: "direct_message",
+        channelTitle: "Direct Message · Career Recruiter (LinkedIn/Telegram)",
+        phoneNumber: "Apex Careers Lanka (+94 70 441 5520)",
         senderInitials: "AG",
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
@@ -651,12 +716,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         timestamp: "Today, 10:05 AM",
         department: "Apex Global Research Lanka — Human Resources",
         scenarioIntro:
-          "You have received an email offering a guaranteed paid research internship. Read the message carefully and decide what you would do next.",
+          "You receive a direct message offering a high-stipend remote internship with an upfront fee request. Review the message carefully and decide what you would do next.",
         bodyParagraphs: [
-          "Dear Student,",
-          "We have selected your university profile for an exclusive 6-month undergraduate research fellowship with Apex Global Research Lanka.",
-          "This position includes a monthly research grant of LKR 95,000 and direct mentorship from industry experts. Placement is guaranteed without interviews.",
-          "To finalize your appointment and receive your welcome kit, an administrative background screening fee of LKR 5,000 must be deposited to our finance account within 48 hours.",
+          "Dear Candidate,",
+          "CAREER OPPORTUNITY: We have selected your university profile for an exclusive 6-month undergraduate research fellowship with Apex Global Research Lanka (LKR 95,000/mo).",
+          "Placement is guaranteed without interviews. To finalize your appointment and receive your workstation security credentials, an administrative background screening fee of LKR 5,000 must be deposited within 48 hours.",
         ],
         rfcHeaders: {
           returnPath: "<hr@apex-careers-lanka.example>",
@@ -887,6 +951,13 @@ export function CyberMissionsPanel({
   className = "",
 }: CyberMissionsPanelProps) {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsExpanded(window.innerWidth > 1024);
+    }
+  }, []);
+
   const activeMissionList = missions.filter((m) => !m.proposed);
 
   return (
@@ -1072,11 +1143,536 @@ export function ScenarioIntroduction({ introText }: ScenarioIntroductionProps) {
 // SECTION C: REALISTIC UNIVERSITY EMAIL SIMULATOR COMPONENT
 // =========================================================================
 
+// =========================================================================
+// SECTION C: REALISTIC COMMUNICATION SIMULATORS (MSG, CALL & EMAIL)
+// =========================================================================
+
 interface UniversityEmailSimulatorProps {
   emailData: EmailMetadata;
 }
 
-export function UniversityEmailSimulator({ emailData }: UniversityEmailSimulatorProps) {
+// -------------------------------------------------------------------------
+// 1. SMARTPHONE VOICE CALL & VISHING SIMULATOR (CALL TYPE)
+// -------------------------------------------------------------------------
+export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadata }) {
+  const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
+  const [linkHovered, setLinkHovered] = useState<boolean>(false);
+  const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
+
+  return (
+    <section
+      className="smartphone-call-simulator-card"
+      role="region"
+      aria-label="Interactive Phone Call & Voice Phishing (Vishing) Simulator"
+    >
+      {/* Mobile Status Bar */}
+      <div className="call-sim-top-bar">
+        <div className="call-carrier-info">
+          <Signal size={12} className="text-emerald" aria-hidden="true" />
+          <span className="carrier-name">DIALOG 5G</span>
+          <Wifi size={12} className="text-cyan" aria-hidden="true" />
+        </div>
+
+        {/* Live Call Telemetry Badge */}
+        <div className="call-status-pill">
+          <span className="call-pulse-green" aria-hidden="true" />
+          <span className="font-mono">{emailData.callStatus || "Call Connected · 00:48"}</span>
+        </div>
+
+        <div className="call-sim-time font-mono">
+          <Clock size={12} aria-hidden="true" />
+          <span>{emailData.timestamp}</span>
+        </div>
+      </div>
+
+      {/* Caller Identity Section */}
+      <div className="call-caller-profile-section">
+        <div className="call-avatar-wrapper">
+          <div className="call-avatar-circle" aria-hidden="true">
+            <PhoneIncoming size={32} className="text-cyan" />
+          </div>
+          <div className="call-avatar-pulse-ring" aria-hidden="true" />
+        </div>
+
+        <div className="call-caller-meta">
+          <span className="call-type-badge">
+            <Radio size={12} className="text-amber" aria-hidden="true" />
+            <span>{emailData.channelTitle || "INCOMING VOICE CALL (VISHING)"}</span>
+          </span>
+          <h2 className="call-display-name">{emailData.senderName}</h2>
+          <div className="call-phone-number font-mono">
+            {emailData.phoneNumber || "+94 11 234 5678"}
+          </div>
+          <span className="call-dept-tag text-muted">{emailData.department}</span>
+        </div>
+
+        {/* Expandable Telecom & Caller ID Header Inspector */}
+        <button
+          type="button"
+          className="call-inspect-telecom-btn"
+          onClick={() => setHeadersExpanded(!headersExpanded)}
+          aria-expanded={headersExpanded}
+          aria-label="Inspect Telecom Routing & Caller ID Spoofing Headers"
+        >
+          <Info size={13} aria-hidden="true" />
+          <span>{headersExpanded ? "Hide Caller ID Telemetry" : "Inspect Caller ID Telemetry"}</span>
+          <ChevronDown
+            size={13}
+            className={`chevron-icon transition-transform ${headersExpanded ? "rotate-180" : ""}`}
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+
+      {/* Expandable Telecom Inspection Drawer */}
+      {headersExpanded && (
+        <div className="call-telecom-headers-drawer" role="region" aria-label="Telecom & VoIP Route Inspection">
+          <div className="rfc-header-title">
+            <ShieldAlert size={13} className="text-amber" aria-hidden="true" />
+            <span>VoIP Gateway &amp; Caller ID Spoofing Telemetry</span>
+          </div>
+          <pre className="rfc-code-block font-mono">
+{`Inbound-Caller-ID: ${emailData.phoneNumber || "+94 11 234 5678"} (Purported Campus Line)
+Originating-SIP-Trunk: sip:relay@${emailData.rfcHeaders.dkimDomain}
+VoIP-Gateway-IP: [${emailData.rfcHeaders.originatingIp}]
+CLI-Spoofing-Risk: HIGH · Caller ID unauthenticated by originating carrier
+SIP-Authentication: ${emailData.rfcHeaders.spfResult}
+Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
+          </pre>
+        </div>
+      )}
+
+      {/* Live Audio Waveform Animation */}
+      <div className="call-audio-visualizer-container" aria-label="Audio Stream Waveform">
+        <div className="audio-live-tag">
+          <Volume2 size={13} className="text-cyan animate-pulse" aria-hidden="true" />
+          <span>LIVE AUDIO WAVEFORM</span>
+        </div>
+        <div className="waveform-bars-row" aria-hidden="true">
+          {[40, 75, 55, 90, 60, 30, 85, 100, 65, 45, 95, 70, 80, 50, 88, 62, 40, 75, 90, 55].map((h, i) => (
+            <span
+              key={i}
+              className="waveform-bar"
+              style={{
+                height: `${h}%`,
+                animationDelay: `${(i * 0.12).toFixed(2)}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Spoken Dialogue Transcript Box */}
+      <div className="call-transcript-card">
+        <div className="transcript-head">
+          <Mic size={14} className="text-emerald" aria-hidden="true" />
+          <strong>Caller Audio Transcript:</strong>
+        </div>
+        <div className="transcript-body">
+          {(emailData.callAudioTranscript || emailData.bodyParagraphs).map((paragraph, pIdx) => (
+            <p key={pIdx} className="call-transcript-p">
+              &ldquo;{paragraph.replace(/^Dear (Student|Candidate|Undergraduate)[,\.]?\s*/i, "")}&rdquo;
+            </p>
+          ))}
+        </div>
+
+        {/* Action Link Demand if caller directed user to a website */}
+        {emailData.linkCta && (
+          <div className="call-action-link-box">
+            <span className="link-intro-label">Link mentioned by caller during phone call:</span>
+            <div className="link-button-wrapper">
+              <button
+                type="button"
+                className="simulated-safe-link-btn"
+                onMouseEnter={() => setLinkHovered(true)}
+                onMouseLeave={() => setLinkHovered(false)}
+                onClick={() => setLinkHovered(!linkHovered)}
+                aria-label="Inspect destination link safely"
+              >
+                <ExternalLink size={15} aria-hidden="true" />
+                <span>{emailData.linkCta.buttonText}</span>
+              </button>
+            </div>
+
+            {linkHovered && (
+              <div className="safe-link-inspection-tooltip" role="tooltip">
+                <div className="tooltip-head">
+                  <ShieldCheck size={13} className="text-primary" aria-hidden="true" />
+                  <strong>Simulated Link Destination (Safe Inspection)</strong>
+                </div>
+                <div className="tooltip-row">
+                  <span className="tooltip-key">Full Destination URL:</span>
+                  <code className="tooltip-url font-mono">{emailData.linkCta.destinationUrl}</code>
+                </div>
+                <div className="tooltip-row">
+                  <span className="tooltip-key">Actual Root Host Domain:</span>
+                  <strong className="tooltip-host text-primary">{emailData.linkCta.hostDomain}</strong>
+                </div>
+                {emailData.linkCta.legitDomain && (
+                  <div className="tooltip-row">
+                    <span className="tooltip-key">Official Campus Domain:</span>
+                    <strong className="tooltip-legit text-emerald">{emailData.linkCta.legitDomain}</strong>
+                  </div>
+                )}
+                <small className="tooltip-disclaimer text-muted">
+                  Note: All links remain safely contained inside the Cyber Campus research simulation platform.
+                </small>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* File transferred during call if applicable (e.g. PH04) */}
+        {emailData.attachment && (
+          <div className="call-action-attachment-box">
+            <div className="attachment-icon-tile">
+              <FileText size={24} className="text-amber" aria-hidden="true" />
+            </div>
+            <div className="attachment-details">
+              <span className="attachment-label">File transferred during call:</span>
+              <strong className="attachment-filename">{emailData.attachment.name}</strong>
+              <span className="attachment-size text-muted">
+                {emailData.attachment.size} · {emailData.attachment.type}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="button secondary small"
+              onClick={() => setAttachmentModalOpen(true)}
+              aria-label="Inspect file properties safely"
+            >
+              <Search size={14} aria-hidden="true" />
+              <span>Inspect File Properties</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* In-Call Controls Bar (Aesthetic) */}
+      <div className="call-controls-bar" aria-hidden="true">
+        <div className="call-action-circle muted" title="Mute Microphone">
+          <Mic size={18} />
+          <span>Mute</span>
+        </div>
+        <div className="call-action-circle muted" title="Keypad">
+          <Activity size={18} />
+          <span>Keypad</span>
+        </div>
+        <div className="call-action-circle active" title="Speaker Active">
+          <Volume2 size={18} />
+          <span>Speaker</span>
+        </div>
+        <div className="call-action-circle decline" title="End Call">
+          <PhoneOff size={18} />
+          <span>End Call</span>
+        </div>
+      </div>
+
+      {/* Attachment Inspection Modal */}
+      {attachmentModalOpen && emailData.attachment && (
+        <div className="modal-backdrop" onClick={() => setAttachmentModalOpen(false)} role="presentation">
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <AlertTriangle size={18} className="text-amber" aria-hidden="true" />
+                <h3 className="modal-title">File Security Inspection</h3>
+              </div>
+              <button
+                type="button"
+                className="close-btn"
+                onClick={() => setAttachmentModalOpen(false)}
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body font-mono text-sm">
+              <div className="grid gap-2">
+                <div>
+                  <span className="text-muted text-xs block">Reported File Name:</span>
+                  <strong>{emailData.attachment.name}</strong>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">File Size:</span>
+                  <strong>{emailData.attachment.size}</strong>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">True Detected File Format:</span>
+                  <code className="text-primary font-mono">{emailData.attachment.type}</code>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">Security Sandbox Status:</span>
+                  <strong className="text-emerald">Safely Quarantined in Research Sandbox</strong>
+                </div>
+              </div>
+              <div className="modal-dialog-footer mt-4 text-right">
+                <button
+                  type="button"
+                  className="button secondary small"
+                  onClick={() => setAttachmentModalOpen(false)}
+                >
+                  Close Inspection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// -------------------------------------------------------------------------
+// 2. MOBILE MESSAGE / SMS / CHAT SIMULATOR (MSG TYPE)
+// -------------------------------------------------------------------------
+export function MobileMessageSimulator({ emailData }: { emailData: EmailMetadata }) {
+  const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
+  const [linkHovered, setLinkHovered] = useState<boolean>(false);
+  const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
+
+  return (
+    <section
+      className="mobile-message-simulator-card"
+      role="region"
+      aria-label="Interactive Mobile Messaging & SMS Simulation"
+    >
+      {/* Mobile Messenger Top Header Bar */}
+      <div className="msg-sim-top-bar">
+        <div className="msg-nav-left">
+          <span className="msg-back-arrow" aria-hidden="true">
+            <ArrowLeft size={16} />
+          </span>
+          <div className="msg-contact-avatar" aria-hidden="true">
+            <span>{emailData.senderInitials}</span>
+          </div>
+          <div className="msg-contact-info">
+            <div className="msg-contact-name-row">
+              <h2 className="msg-contact-name">{emailData.senderName}</h2>
+              <span className="msg-verified-pill">
+                <Smartphone size={10} aria-hidden="true" />
+                <span>{emailData.messagePlatform?.toUpperCase() || "SMS"}</span>
+              </span>
+            </div>
+            <span className="msg-contact-number font-mono">
+              {emailData.phoneNumber || emailData.senderEmail}
+            </span>
+          </div>
+        </div>
+
+        <div className="msg-nav-right">
+          <button
+            type="button"
+            className="msg-inspect-route-btn"
+            onClick={() => setHeadersExpanded(!headersExpanded)}
+            aria-expanded={headersExpanded}
+            aria-label="Inspect SMS Gateway & Sender Routing"
+          >
+            <Info size={13} aria-hidden="true" />
+            <span>{headersExpanded ? "Hide Route Info" : "Inspect Route"}</span>
+            <ChevronDown
+              size={13}
+              className={`chevron-icon transition-transform ${headersExpanded ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* Expandable SMS / Telecom Route Drawer */}
+      {headersExpanded && (
+        <div className="msg-route-headers-drawer" role="region" aria-label="SMS Routing & Gateway Telemetry">
+          <div className="rfc-header-title">
+            <Shield size={13} className="text-primary" aria-hidden="true" />
+            <span>SMS Gateway &amp; Originating Route Telemetry</span>
+          </div>
+          <pre className="rfc-code-block font-mono">
+{`Sender-Number: ${emailData.phoneNumber || emailData.senderEmail}
+SMS-Gateway-Trunk: ${emailData.rfcHeaders.returnPath}
+Authentication-Status: ${emailData.rfcHeaders.spfResult}
+Destination-Protocol: SMPP/HTTP Gateway v2.4
+Originating-IP: [${emailData.rfcHeaders.originatingIp}]
+Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
+          </pre>
+        </div>
+      )}
+
+      {/* Chat / SMS Conversation Thread Area */}
+      <div className="msg-conversation-stage">
+        {/* Date Timestamp Divider */}
+        <div className="msg-date-divider" aria-hidden="true">
+          <span>{emailData.timestamp} · Cellular Messaging Channel</span>
+        </div>
+
+        {/* Incoming Message Bubble */}
+        <div className="msg-incoming-bubble-wrapper">
+          <div className="msg-bubble incoming">
+            <div className="msg-sender-header-tag">
+              <span className="sender-tag-text">{emailData.department}</span>
+            </div>
+
+            <div className="msg-body-content">
+              {emailData.bodyParagraphs.map((paragraph, pIdx) => (
+                <p key={pIdx} className="msg-body-p">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            {/* Interactive Link Preview Card inside the message bubble */}
+            {emailData.linkCta && (
+              <div className="msg-link-preview-box">
+                <div className="msg-link-card-inner">
+                  <div className="msg-link-badge">
+                    <ExternalLink size={14} className="text-primary" aria-hidden="true" />
+                    <span>Attached Link Destination</span>
+                  </div>
+                  <div className="msg-link-url font-mono">{emailData.linkCta.destinationUrl}</div>
+
+                  <button
+                    type="button"
+                    className="simulated-safe-link-btn msg-link-btn"
+                    onMouseEnter={() => setLinkHovered(true)}
+                    onMouseLeave={() => setLinkHovered(false)}
+                    onClick={() => setLinkHovered(!linkHovered)}
+                    aria-label="Inspect destination link safely"
+                  >
+                    <Search size={14} aria-hidden="true" />
+                    <span>{emailData.linkCta.buttonText}</span>
+                  </button>
+                </div>
+
+                {linkHovered && (
+                  <div className="safe-link-inspection-tooltip msg-tooltip" role="tooltip">
+                    <div className="tooltip-head">
+                      <ShieldCheck size={13} className="text-primary" aria-hidden="true" />
+                      <strong>Simulated Link Destination (Safe Inspection)</strong>
+                    </div>
+                    <div className="tooltip-row">
+                      <span className="tooltip-key">Full Destination URL:</span>
+                      <code className="tooltip-url font-mono">{emailData.linkCta.destinationUrl}</code>
+                    </div>
+                    <div className="tooltip-row">
+                      <span className="tooltip-key">Actual Root Host Domain:</span>
+                      <strong className="tooltip-host text-primary">{emailData.linkCta.hostDomain}</strong>
+                    </div>
+                    {emailData.linkCta.legitDomain && (
+                      <div className="tooltip-row">
+                        <span className="tooltip-key">Official Campus Domain:</span>
+                        <strong className="tooltip-legit text-emerald">{emailData.linkCta.legitDomain}</strong>
+                      </div>
+                    )}
+                    <small className="tooltip-disclaimer text-muted">
+                      Note: All links remain safely contained inside the Cyber Campus research simulation platform.
+                    </small>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Attachment Card if applicable */}
+            {emailData.attachment && (
+              <div className="msg-attachment-box">
+                <div className="attachment-icon-tile">
+                  <FileText size={24} className="text-amber" aria-hidden="true" />
+                </div>
+                <div className="attachment-details">
+                  <strong className="attachment-filename">{emailData.attachment.name}</strong>
+                  <span className="attachment-size text-muted">
+                    {emailData.attachment.size} · {emailData.attachment.type}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="button secondary small"
+                  onClick={() => setAttachmentModalOpen(true)}
+                  aria-label="Inspect attachment properties safely"
+                >
+                  <Search size={14} aria-hidden="true" />
+                  <span>Inspect File</span>
+                </button>
+              </div>
+            )}
+
+            {/* Message Delivery Checkmarks */}
+            <div className="msg-meta-footer" aria-hidden="true">
+              <span className="msg-time-pill">{emailData.timestamp.split(",")[1] || emailData.timestamp}</span>
+              <CheckCheck size={14} className="text-primary" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Message Input Draft Placeholder */}
+      <div className="msg-input-draft-bar" aria-hidden="true">
+        <div className="msg-input-action-icon">
+          <Paperclip size={18} className="text-muted" />
+        </div>
+        <div className="msg-input-fake-field">
+          <span className="placeholder-text">Select investigation response on right console...</span>
+        </div>
+        <div className="msg-send-action-btn">
+          <Send size={15} />
+        </div>
+      </div>
+
+      {/* Attachment Inspection Modal */}
+      {attachmentModalOpen && emailData.attachment && (
+        <div className="modal-backdrop" onClick={() => setAttachmentModalOpen(false)} role="presentation">
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <AlertTriangle size={18} className="text-amber" aria-hidden="true" />
+                <h3 className="modal-title">File Security Inspection</h3>
+              </div>
+              <button
+                type="button"
+                className="close-btn"
+                onClick={() => setAttachmentModalOpen(false)}
+                aria-label="Close dialog"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body font-mono text-sm">
+              <div className="modal-meta-grid">
+                <div>
+                  <span className="text-muted text-xs block">Reported File Name:</span>
+                  <strong>{emailData.attachment.name}</strong>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">File Size:</span>
+                  <strong>{emailData.attachment.size}</strong>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">True Detected File Format:</span>
+                  <code className="text-primary font-mono">{emailData.attachment.type}</code>
+                </div>
+                <div>
+                  <span className="text-muted text-xs block">Security Sandbox Status:</span>
+                  <strong className="text-emerald">Safely Quarantined in Research Sandbox</strong>
+                </div>
+              </div>
+              <div className="modal-dialog-footer mt-4 text-right">
+                <button
+                  type="button"
+                  className="button secondary small"
+                  onClick={() => setAttachmentModalOpen(false)}
+                >
+                  Close Inspection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// -------------------------------------------------------------------------
+// 3. CLASSIC WEBMAIL SIMULATOR (EMAIL TYPE)
+// -------------------------------------------------------------------------
+export function WebmailSimulator({ emailData }: { emailData: EmailMetadata }) {
   const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
   const [linkHovered, setLinkHovered] = useState<boolean>(false);
   const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
@@ -1340,6 +1936,21 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
     </section>
   );
 }
+
+// -------------------------------------------------------------------------
+// 4. UNIFIED COMMUNICATION SIMULATOR SWITCHER
+// -------------------------------------------------------------------------
+export function UniversityEmailSimulator({ emailData }: UniversityEmailSimulatorProps) {
+  if (emailData.communicationType === "call") {
+    return <SmartphoneCallSimulator emailData={emailData} />;
+  }
+  if (emailData.communicationType === "message") {
+    return <MobileMessageSimulator emailData={emailData} />;
+  }
+  return <WebmailSimulator emailData={emailData} />;
+}
+
+export const CyberCommunicationSimulator = UniversityEmailSimulator;
 
 // =========================================================================
 // SECTION D: CHOOSE YOUR NEXT ACTION — INTERACTIVE SELECTION CARDS
