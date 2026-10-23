@@ -105,13 +105,13 @@ export default function Home() {
           ========================================================================= */}
       <section className="explore-threats-section container my-16 lg:my-24" aria-labelledby="threats-heading">
         <div className="section-header-centered text-center max-w-3xl mx-auto">
-          <span className="mini-label inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 mb-2">
+          <span className="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 mb-3 shadow-2xs">
             RESEARCH VARIABLES (IV1–IV4)
           </span>
-          <h2 id="threats-heading" className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mt-2">
+          <h2 id="threats-heading" className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mt-2">
             Explore the Four Social Engineering Threats
           </h2>
-          <p className="text-muted mt-3 text-base md:text-lg leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-300 mt-3 text-base md:text-lg leading-relaxed">
             Examine how each category operates through realistic simulated scenarios. No technical
             cybersecurity background required.
           </p>

@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  AlertCircle,
   ArrowRight,
   Home,
   RotateCcw,
@@ -34,6 +35,10 @@ import {
   FileText,
   ArrowLeft,
   ListChecks,
+  BarChart3,
+  ExternalLink,
+  Loader2,
+  Send,
 } from "lucide-react";
 import { api, useSession, clearDraft } from "@/lib/client";
 import { missions, getActiveMissions } from "@/content/missions";
@@ -71,6 +76,50 @@ export function ResearchCompletion() {
   // Filter state for reviewing answers
   const [activeFilter, setActiveFilter] = useState<"all" | "unsafe" | "safe">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Research Workspace explicit submit state
+  const [submittingToWorkspace, setSubmittingToWorkspace] = useState<boolean>(false);
+  const [submitFeedback, setSubmitFeedback] = useState<{
+    status: "idle" | "success" | "error";
+    message: string;
+  }>({
+    status: state.session?.status === "submitted_complete" ? "success" : "idle",
+    message:
+      state.session?.status === "submitted_complete"
+        ? "Your participant responses are recorded and verified in the Research Workspace."
+        : "",
+  });
+
+  async function handleSubmitToWorkspace() {
+    if (submittingToWorkspace) return;
+    setSubmittingToWorkspace(true);
+    setSubmitFeedback({ status: "idle", message: "" });
+    try {
+      const res = await api<{ ok: boolean; session: Session; message: string }>(
+        "session/submit-answers",
+        {},
+      );
+      if (res.session) {
+        state.setSession(res.session);
+      }
+      setSubmitFeedback({
+        status: "success",
+        message:
+          res.message ||
+          "Your answers and scenario attempts have been successfully recorded into the Research Workspace!",
+      });
+    } catch (err: unknown) {
+      setSubmitFeedback({
+        status: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to record answers in the Research Workspace. Please try again.",
+      });
+    } finally {
+      setSubmittingToWorkspace(false);
+    }
+  }
 
   // Clear unneeded draft tokens
   useEffect(() => {
@@ -453,16 +502,104 @@ export function ResearchCompletion() {
           </div>
         </div>
 
-        {/* Navigation Action Buttons */}
-        <div className="completion-header-actions mt-8">
-          <Link href="/" prefetch={true} className="button primary large flex items-center gap-2">
-            <Home size={18} aria-hidden="true" />
-            <span>Return to Home</span>
-          </Link>
-          <Link href="/play" prefetch={true} className="button ghost large flex items-center gap-2">
-            <RotateCcw size={18} aria-hidden="true" />
-            <span>Practice Missions</span>
-          </Link>
+        {/* Research Workspace Submission Card */}
+        <div className="workspace-submission-card mt-8" role="region" aria-label="Submit Answers to Research Workspace">
+          <div className="workspace-submission-header">
+            <div className="workspace-submission-icon-box" aria-hidden="true">
+              <Database size={24} />
+            </div>
+            <div className="workspace-submission-heading">
+              <div className="workspace-submission-badge-row">
+                <span className="workspace-submission-pill">RESEARCH WORKSPACE INTEGRATION</span>
+                {submitFeedback.status === "success" && (
+                  <span className="workspace-recorded-pill">
+                    <CheckCircle2 size={12} /> RECORDED IN DATASET
+                  </span>
+                )}
+              </div>
+              <h3 className="workspace-submission-title">
+                {submitFeedback.status === "success"
+                  ? "Answers Recorded in Research Workspace"
+                  : "Submit Answers to Research Workspace"}
+              </h3>
+              <p className="workspace-submission-subtitle">
+                {submitFeedback.status === "success"
+                  ? `Your complete participant responses (Anonymous ID: ${s.code}) and all 20 scenario metrics are permanently synchronized across all 9 Research Workspace modules.`
+                  : `Submit your completed challenge decisions to automatically populate and update all 9 analytics, hypothesis models, and demographic charts in the Research Workspace.`}
+              </p>
+            </div>
+          </div>
+
+          {/* Success / Error Feedback Alert */}
+          {submitFeedback.status === "success" && submitFeedback.message && (
+            <div className="workspace-feedback-banner success mt-4" role="status">
+              <CheckCircle2 size={18} className="text-emerald shrink-0" aria-hidden="true" />
+              <div className="feedback-text">
+                <strong>Submission Confirmed</strong>
+                <p>{submitFeedback.message}</p>
+              </div>
+            </div>
+          )}
+
+          {submitFeedback.status === "error" && submitFeedback.message && (
+            <div className="workspace-feedback-banner error mt-4" role="alert">
+              <AlertCircle size={18} className="text-red shrink-0" aria-hidden="true" />
+              <div className="feedback-text">
+                <strong>Submission Failed</strong>
+                <p>{submitFeedback.message}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons Row */}
+          <div className="workspace-submission-actions mt-6">
+            <button
+              type="button"
+              onClick={handleSubmitToWorkspace}
+              disabled={submittingToWorkspace}
+              className={`btn-workspace-submit ${submitFeedback.status === "success" ? "is-recorded" : "is-primary"}`}
+              title="Record answers into Research Workspace"
+            >
+              {submittingToWorkspace ? (
+                <>
+                  <Loader2 size={17} className="animate-spin" aria-hidden="true" />
+                  <span>Recording in Research Workspace...</span>
+                </>
+              ) : submitFeedback.status === "success" ? (
+                <>
+                  <CheckCircle2 size={17} aria-hidden="true" />
+                  <span>✓ Submit / Re-sync Answers</span>
+                </>
+              ) : (
+                <>
+                  <Send size={17} aria-hidden="true" />
+                  <span>Submit Answers to Research Workspace</span>
+                  <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                </>
+              )}
+            </button>
+
+            <Link
+              href="/admin"
+              prefetch={true}
+              className="btn-workspace-open"
+              title="Open Research Workspace analytics to view real-time participant charts"
+            >
+              <BarChart3 size={17} className="text-primary" aria-hidden="true" />
+              <span>Open Research Workspace</span>
+              <ExternalLink size={14} className="opacity-70" aria-hidden="true" />
+            </Link>
+
+            <Link href="/" prefetch={true} className="button ghost large flex items-center gap-2">
+              <Home size={18} aria-hidden="true" />
+              <span>Return to Home</span>
+            </Link>
+
+            <Link href="/play" prefetch={true} className="button ghost large flex items-center gap-2">
+              <RotateCcw size={18} aria-hidden="true" />
+              <span>Practice Missions</span>
+            </Link>
+          </div>
         </div>
       </header>
 

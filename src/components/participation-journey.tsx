@@ -47,9 +47,9 @@ const JOURNEY_STEPS: JourneyStep[] = [
     badge: "Voluntary & Informed",
     icon: BookOpen,
     colorKey: "lavender",
-    themeColor: "text-indigo-400",
-    accentBg: "bg-indigo-500/10",
-    accentBorder: "border-indigo-500/30",
+    themeColor: "text-indigo-600 dark:text-indigo-400",
+    accentBg: "bg-indigo-50 dark:bg-indigo-950/40",
+    accentBorder: "border-indigo-200 dark:border-indigo-800",
     deliverables: [
       "Read empirical research objectives and academic governance scope",
       "Confirm university student eligibility (18+ undergraduate or postgraduate)",
@@ -68,9 +68,9 @@ const JOURNEY_STEPS: JourneyStep[] = [
     badge: "5 Profile Indicators",
     icon: UserCheck,
     colorKey: "cyan",
-    themeColor: "text-cyan-400",
-    accentBg: "bg-cyan-500/10",
-    accentBorder: "border-cyan-500/30",
+    themeColor: "text-teal-700 dark:text-cyan-400",
+    accentBg: "bg-teal-50 dark:bg-teal-950/40",
+    accentBorder: "border-teal-200 dark:border-teal-800",
     deliverables: [
       "Select age category, year of study, and faculty discipline",
       "Indicate university type (State, Private, Foreign Branch Campus)",
@@ -89,9 +89,9 @@ const JOURNEY_STEPS: JourneyStep[] = [
     badge: "20 Research Challenges",
     icon: ShieldAlert,
     colorKey: "emerald",
-    themeColor: "text-emerald-400",
-    accentBg: "bg-emerald-500/10",
-    accentBorder: "border-emerald-500/30",
+    themeColor: "text-emerald-700 dark:text-emerald-400",
+    accentBg: "bg-emerald-50 dark:bg-emerald-950/40",
+    accentBorder: "border-emerald-200 dark:border-emerald-800",
     deliverables: [
       "5 Phishing scenarios: deceptive email domains & urgency hooks (IV1)",
       "5 Pretexting scenarios: fabricated stories & OTP solicitations (IV2)",
@@ -111,9 +111,9 @@ const JOURNEY_STEPS: JourneyStep[] = [
     badge: "Educational Debrief",
     icon: CheckCircle2,
     colorKey: "amber",
-    themeColor: "text-amber-400",
-    accentBg: "bg-amber-500/10",
-    accentBorder: "border-amber-500/30",
+    themeColor: "text-amber-800 dark:text-amber-400",
+    accentBg: "bg-amber-50 dark:bg-amber-950/40",
+    accentBorder: "border-amber-200 dark:border-amber-800",
     deliverables: [
       "Confirm secure submission under your anonymous Participant Token",
       "Review your decisions alongside expert recommended protective actions",
@@ -194,10 +194,10 @@ export function ParticipationJourney() {
                     setActiveStep(s.step);
                   }
                 }}
-                className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer flex flex-col justify-between border backdrop-blur-md ${
+                className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer flex flex-col justify-between border ${
                   isSelected
-                    ? "bg-card/90 border-primary/60 shadow-[0_10px_30px_rgba(79,70,229,0.22)] -translate-y-1.5 ring-1 ring-primary/40"
-                    : "bg-card/40 border-border/70 hover:bg-card/70 hover:border-border hover:-translate-y-1 hover:shadow-lg"
+                    ? "bg-white dark:bg-slate-900 border-indigo-500 shadow-xl shadow-indigo-100/80 dark:shadow-indigo-950/40 -translate-y-1.5 ring-2 ring-indigo-500/25"
+                    : "bg-white/80 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300 hover:-translate-y-1 hover:shadow-md"
                 }`}
               >
                 {/* Step Top Bar */}
@@ -206,15 +206,15 @@ export function ParticipationJourney() {
                     <span
                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase transition-colors ${
                         isSelected
-                          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/40"
-                          : "bg-muted/40 text-muted-foreground group-hover:bg-muted/70 group-hover:text-foreground"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100"
                       }`}
                     >
                       {s.stepStr}
                     </span>
 
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-background/60 px-2 py-0.5 rounded-md border border-border/50">
-                      <Clock size={11} className="text-primary/80" />
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-slate-700">
+                      <Clock size={11} className="text-indigo-600 dark:text-indigo-400" />
                       {s.duration}
                     </span>
                   </div>
@@ -222,28 +222,28 @@ export function ParticipationJourney() {
                   {/* Icon Tile */}
                   <div className="flex items-center gap-3.5 mb-4">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 border ${s.accentBg} ${s.accentBorder} ${s.themeColor}`}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 border shrink-0 ${s.accentBg} ${s.accentBorder} ${s.themeColor} shadow-2xs`}
                     >
                       <Icon size={24} aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base text-foreground leading-snug group-hover:text-primary transition-colors">
+                      <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {s.title}
                       </h3>
-                      <span className="text-[11px] text-muted-foreground line-clamp-1">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
                         {s.subtitle}
                       </span>
                     </div>
                   </div>
 
                   {/* Key Highlights list */}
-                  <ul className="space-y-2 mt-4 text-xs text-muted-foreground">
+                  <ul className="space-y-2 mt-4 text-xs text-slate-600 dark:text-slate-300">
                     {s.deliverables.slice(0, 2).map((item, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <CheckCircle2
                           size={13}
-                          className={`mt-0.5 flex-shrink-0 ${
-                            isSelected ? s.themeColor : "text-muted-foreground/60"
+                          className={`mt-0.5 shrink-0 ${
+                            isSelected ? s.themeColor : "text-slate-400 dark:text-slate-500"
                           }`}
                         />
                         <span className="leading-tight">{item}</span>
@@ -253,12 +253,12 @@ export function ParticipationJourney() {
                 </div>
 
                 {/* Step Card Footer */}
-                <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between gap-2">
+                <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
                   <span
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded ${
                       isSelected
-                        ? "bg-primary/10 text-primary border border-primary/20"
-                        : "text-muted-foreground bg-muted/20"
+                        ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
+                        : "text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800"
                     }`}
                   >
                     {s.badge}
@@ -266,7 +266,7 @@ export function ParticipationJourney() {
 
                   <span
                     className={`inline-flex items-center text-xs font-semibold gap-1 transition-transform group-hover:translate-x-1 ${
-                      isSelected ? "text-primary" : "text-muted-foreground"
+                      isSelected ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400"
                     }`}
                   >
                     <span>Details</span>
@@ -276,7 +276,7 @@ export function ParticipationJourney() {
 
                 {/* Active Indicator Glow Pip */}
                 {isSelected && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary shadow-[0_0_12px_var(--primary)]" />
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-indigo-600 shadow-[0_0_12px_rgba(79,70,229,0.5)]" />
                 )}
               </div>
             );
@@ -285,51 +285,54 @@ export function ParticipationJourney() {
       </div>
 
       {/* Interactive Step Deep-Dive Showcase Box */}
-      <div className="mt-8 rounded-2xl border border-primary/30 bg-card/70 backdrop-blur-xl p-6 lg:p-7 shadow-xl">
+      <div className="mt-8 rounded-2xl border border-indigo-100 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 lg:p-8 shadow-sm dark:shadow-xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded text-xs font-extrabold uppercase bg-primary text-white tracking-wider">
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-indigo-600 text-white tracking-wider shadow-2xs">
                 {selectedStepData.stepStr} Active Inspection
               </span>
-              <span className="text-xs text-muted-foreground font-mono">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
+                <Clock size={12} className="text-indigo-600 dark:text-indigo-400" />
                 Duration: {selectedStepData.duration}
               </span>
             </div>
 
-            <h4 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <h4 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               {selectedStepData.title}
             </h4>
 
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {selectedStepData.subtitle}
             </p>
 
-            {/* Detailed Key Activities Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+            {/* Detailed Key Activities Grid (2x2 layout, clean contrast) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
               {selectedStepData.deliverables.map((deliv, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg bg-background/50 border border-border/50 text-xs text-foreground/80 flex items-start gap-2"
+                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200 flex items-start gap-2.5 transition-all hover:border-indigo-300 hover:bg-indigo-50/20 shadow-2xs"
                 >
-                  <Sparkles size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                  <span className="leading-snug">{deliv}</span>
+                  <Sparkles size={15} className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
+                  <span className="leading-relaxed font-medium">{deliv}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium pt-1">
-              <ShieldCheck size={14} className="flex-shrink-0" />
-              <span>Academic Assurance: {selectedStepData.privacyGuarantee}</span>
+            <div className="pt-1">
+              <div className="inline-flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/70 px-3.5 py-1.5 rounded-lg shadow-2xs">
+                <ShieldCheck size={15} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <span>Academic Assurance: {selectedStepData.privacyGuarantee}</span>
+              </div>
             </div>
           </div>
 
           {/* Quick Action Button for this step */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
             <Link
               href={selectedStepData.directActionHref}
               prefetch={true}
-              className="button primary large text-center justify-center font-bold shadow-md hover:shadow-primary/30"
+              className="button primary large text-center justify-center font-bold shadow-md shadow-indigo-200 dark:shadow-none hover:shadow-lg"
             >
               <span>{selectedStepData.directActionLabel}</span>
               <ArrowRight size={16} aria-hidden="true" />
@@ -337,7 +340,7 @@ export function ParticipationJourney() {
 
             <a
               href="#threats-heading"
-              className="button secondary text-center justify-center text-xs"
+              className="button secondary text-center justify-center text-xs font-semibold px-4 py-2.5 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs"
             >
               <span>View Threat Scenarios</span>
             </a>
@@ -345,26 +348,26 @@ export function ParticipationJourney() {
         </div>
       </div>
 
-      {/* Bottom CTA Banner (Redesigned & Professional) */}
-      <div className="journey-cta-banner mt-8 p-6 lg:p-8 rounded-2xl border border-border/80 bg-gradient-to-r from-card/90 via-card/60 to-card/90 backdrop-blur-md shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-1 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
-            <Zap size={14} />
+      {/* Bottom CTA Banner (Redesigned & Professional for Light and Dark Modes) */}
+      <div className="journey-cta-banner mt-8 p-6 lg:p-8 rounded-2xl border border-indigo-100 dark:border-slate-800 bg-gradient-to-r from-indigo-50/80 via-white to-blue-50/80 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-900 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="space-y-1.5 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-indigo-700 dark:text-cyan-400 uppercase tracking-wider">
+            <Zap size={14} className="text-amber-500 fill-amber-500" />
             <span>Ready for Empirical Participation?</span>
           </div>
-          <h3 className="text-lg font-bold text-foreground">
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
             Start with Step 01 (Consent &amp; Rights) at any time.
           </h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
             Takes approximately 12–15 minutes total. Self-paced, autosaved, and zero login credentials required.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto justify-center">
+        <div className="flex items-center gap-3 w-full md:w-auto justify-center shrink-0">
           <Link
             href="/consent"
             prefetch={true}
-            className="button primary large w-full sm:w-auto font-bold shadow-lg shadow-primary/20"
+            className="button primary large w-full sm:w-auto font-bold shadow-md shadow-indigo-200 dark:shadow-none hover:shadow-lg"
           >
             <span>Start Research Participation</span>
             <ArrowRight size={17} aria-hidden="true" />

@@ -205,53 +205,53 @@ export function HomeThreatCards() {
         return (
           <article
             key={card.id}
-            className="threat-info-card relative rounded-2xl border border-border/80 bg-card p-6 transition-all duration-300 hover:border-border hover:shadow-md flex flex-col justify-between"
+            className="threat-info-card relative rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 sm:p-7 transition-all duration-300 hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:shadow-xl flex flex-col justify-between shadow-xs"
           >
             {/* Card Header */}
             <div>
               <div className="flex items-start sm:items-center justify-between gap-3 mb-4 flex-wrap sm:flex-nowrap">
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-xs`}
+                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border shrink-0 ${card.accentBg} ${card.accentBorder} ${card.themeColor} shadow-2xs`}
                   >
                     <Icon size={22} aria-hidden="true" className="sm:w-6 sm:h-6" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground leading-snug truncate">
+                    <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-slate-100 leading-snug truncate">
                       {card.title}
                     </h3>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium truncate">
-                      <Target size={12} className="text-muted-foreground/70" />
+                    <span className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium truncate mt-0.5">
+                      <Target size={13} className="text-slate-400 dark:text-slate-500 shrink-0" />
                       Target: {card.threatTarget}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 flex-shrink-0">
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-1.5 shrink-0">
+                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs">
                     {card.badge}
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-medium hidden sm:inline-block">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold hidden sm:inline-block">
                     {card.categoryTag}
                   </span>
                 </div>
               </div>
 
               {/* Summary Description */}
-              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
                 {card.summary}
               </p>
 
               {/* View Switcher Pills */}
-              <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-3 mb-4 flex-wrap">
-                <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800/90 p-0.5 border border-slate-200/80 dark:border-slate-700/80 text-xs">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3 mb-4 flex-wrap">
+                <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-800/90 p-1 border border-slate-200/90 dark:border-slate-700/80 text-xs gap-1">
                   <button
                     type="button"
                     onClick={() => setCardView(card.id, "simulation")}
                     className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
                       currentView === "simulation"
-                        ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs border border-slate-200/70 dark:border-slate-600"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                     }`}
                   >
                     Simulated Scenario
@@ -261,8 +261,8 @@ export function HomeThreatCards() {
                     onClick={() => setCardView(card.id, "defense")}
                     className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
                       currentView === "defense"
-                        ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs border border-slate-200/70 dark:border-slate-600"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                     }`}
                   >
                     Defense &amp; Strategy
@@ -274,16 +274,16 @@ export function HomeThreatCards() {
                   <button
                     type="button"
                     onClick={() => toggleInspect(card.id)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
                       isInspected
-                        ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 shadow-xs"
-                        : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        ? "bg-amber-100 text-amber-900 border border-amber-300 font-bold shadow-xs ring-2 ring-amber-300/40 dark:bg-amber-950/60 dark:border-amber-700 dark:text-amber-200"
+                        : "bg-white hover:bg-amber-50/80 border border-slate-200 hover:border-amber-300 text-slate-700 hover:text-amber-900 font-semibold shadow-2xs dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:text-amber-200"
                     }`}
                     title="Toggle highlight markers on deceptive text"
                     aria-pressed={isInspected}
                   >
                     {isInspected ? (
-                      <EyeOff size={13} className="text-amber-700 dark:text-amber-300" />
+                      <EyeOff size={13} className="text-amber-800 dark:text-amber-300" />
                     ) : (
                       <Eye size={13} className="text-slate-500 dark:text-slate-400" />
                     )}
@@ -295,73 +295,76 @@ export function HomeThreatCards() {
               {/* View Content 1: Simulated Artifact with Interactive Inspection */}
               {currentView === "simulation" ? (
                 <div
-                  className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-4 transition-colors"
+                  className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/70 p-4 transition-all shadow-2xs"
                   aria-label="Simulated Scenario Preview"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/70 dark:border-slate-800 text-[11px]">
-                    <span className="font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700/60 text-[10px]">
+                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-[11px]">
+                    <span className="font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-200/90 dark:border-indigo-800 text-[10px]">
                       {card.exampleSnippet.type}
                     </span>
                     <span
-                      className="font-mono text-muted-foreground truncate max-w-[220px]"
+                      className="font-mono text-xs text-slate-600 dark:text-slate-400 truncate max-w-[240px]"
                       title={card.exampleSnippet.sender}
                     >
                       {card.exampleSnippet.sender}
                     </span>
                   </div>
 
-                  {/* Body Text with Interactive Inspection Highlights */}
-                  <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-sans mt-2">
-                    {card.exampleSnippet.highlightLead}
+                  {/* Body Text with Interactive Inspection Highlights in a Clean White Message Box */}
+                  <div className="mt-2.5 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 text-xs sm:text-sm text-slate-800 dark:text-slate-100 leading-relaxed font-sans shadow-2xs">
+                    <span>{card.exampleSnippet.highlightLead}</span>
                     <span
-                      className={`font-semibold px-1.5 py-0.5 rounded-sm transition-all ${
+                      className={`transition-all ${
                         isInspected
-                          ? "bg-amber-100 dark:bg-amber-950/70 text-amber-950 dark:text-amber-200 border-b-2 border-amber-500 dark:border-amber-400"
-                          : "text-foreground"
+                          ? "bg-amber-200/90 text-amber-950 dark:bg-amber-950 dark:text-amber-100 font-semibold px-1.5 py-0.5 rounded border-b-2 border-amber-500 dark:border-amber-400 shadow-2xs"
+                          : "font-medium"
                       }`}
                     >
                       {card.exampleSnippet.highlightDeception}
                     </span>
-                    {card.exampleSnippet.highlightTrail}
-                  </p>
+                    <span>{card.exampleSnippet.highlightTrail}</span>
+                  </div>
 
                   {/* Red Flag Warning Callout when Inspected */}
                   {isInspected && (
-                    <div className="mt-3 pt-2.5 border-t border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 bg-amber-50/90 dark:bg-amber-950/50 -mx-4 -mb-4 p-3 rounded-b-xl flex items-start gap-2.5">
-                      <AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                      <span className="leading-snug">{card.exampleSnippet.deceptionNote}</span>
+                    <div className="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5 shadow-2xs animate-fadeIn">
+                      <AlertTriangle size={15} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                      <div className="leading-relaxed">
+                        <strong className="font-bold text-amber-950 dark:text-amber-100">Deception Analysis: </strong>
+                        {card.exampleSnippet.deceptionNote.replace(/^FLAGGED:\s*/, "")}
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (
                 /* View Content 2: Defense & Key Indicators */
-                <div className="space-y-3 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-4 text-xs sm:text-sm">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-bold mb-1">
-                      <AlertTriangle size={14} className="text-amber-600 dark:text-amber-400" />
+                <div className="space-y-2.5 text-xs sm:text-sm">
+                  <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60 shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-300 font-bold mb-1">
+                      <AlertTriangle size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
                       <span>Key Warning Sign:</span>
                     </div>
-                    <p className="text-muted-foreground text-xs leading-relaxed">
+                    <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed pl-5">
                       {card.keyWarningSign}
                     </p>
                   </div>
 
-                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
-                    <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200 font-bold mb-1">
-                      <Flame size={14} className="text-indigo-600 dark:text-indigo-400" />
+                  <div className="p-3.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/60 shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-indigo-900 dark:text-indigo-300 font-bold mb-1">
+                      <Target size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
                       <span>Attacker Objective:</span>
                     </div>
-                    <p className="text-muted-foreground text-xs leading-relaxed">
+                    <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed pl-5">
                       {card.attackerGoal}
                     </p>
                   </div>
 
-                  <div className="pt-2.5 border-t border-slate-200/70 dark:border-slate-800">
-                    <div className="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-bold mb-1">
-                      <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/60 shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-300 font-bold mb-1">
+                      <CheckCircle2 size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span>Safe Decision Protocol:</span>
                     </div>
-                    <p className="text-foreground/90 font-medium text-xs leading-relaxed">
+                    <p className="text-slate-800 dark:text-slate-200 font-medium text-xs leading-relaxed pl-5">
                       {card.safeDecision}
                     </p>
                   </div>
@@ -370,8 +373,8 @@ export function HomeThreatCards() {
             </div>
 
             {/* Card Action Footer */}
-            <div className="threat-card-footer mt-5 pt-4 border-t border-border/60 flex items-center justify-between gap-3 flex-wrap">
-              <span className="text-xs text-muted-foreground font-medium">
+            <div className="threat-card-footer mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                 5 Research Questions
               </span>
 
@@ -379,7 +382,7 @@ export function HomeThreatCards() {
                 <Link
                   href="/consent"
                   prefetch={true}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs hover:shadow-md transition-all cursor-pointer"
                   title={`Participate in ${card.title} challenges`}
                 >
                   <span>Investigate Challenges</span>

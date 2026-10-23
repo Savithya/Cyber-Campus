@@ -500,6 +500,55 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
   await saveDemoSubmission(local.session);
   return local.session;
 }
+
+export async function recordSessionToWorkspace(): Promise<{
+  ok: boolean;
+  session: Session;
+  message: string;
+}> {
+  const s = await getSession();
+  if (!s) {
+    throw new Error("No active participant session found to record.");
+  }
+  if (s.mode === "practice") {
+    throw new Error("Practice mode sessions are simulated and not recorded into the Research Workspace.");
+  }
+
+  let updatedAnswers = s.answers || {};
+  if (s.attempts && s.attempts.length > 0) {
+    updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
+  }
+
+  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4", "Q5"].every(
+    (qid) => updatedAnswers[qid]?.status === "answered" && updatedAnswers[qid]?.value !== null,
+  );
+
+  const updatedSession: Session = {
+    ...s,
+    answers: updatedAnswers,
+    status: isProfileComplete ? "submitted_complete" : "submitted_with_missing",
+    submittedAt: s.submittedAt || new Date().toISOString(),
+    submissionId: s.submissionId || s.id,
+  };
+
+  if (!updatedSession.participantId) {
+    updatedSession.participantId = await getOrCreateParticipantId();
+  }
+
+  const local = await readLocal();
+  if (local) {
+    local.session = updatedSession;
+    await writeLocal(local);
+  }
+
+  await saveDemoSubmission(updatedSession);
+
+  return {
+    ok: true,
+    session: updatedSession,
+    message: `Participant answers (Anonymous ID: ${updatedSession.code}) successfully recorded into the Research Workspace.`,
+  };
+}
 export async function recordAttempt(input: {
   scenarioId: string;
   action: string | null;

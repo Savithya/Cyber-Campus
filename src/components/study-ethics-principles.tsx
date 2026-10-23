@@ -46,9 +46,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "Investigating which social engineering threat category—phishing, pretexting, impersonation, or online scams—has the strongest observed association with user privacy risks among participating university students in Sri Lanka.",
     icon: GraduationCap,
-    themeColor: "text-indigo-400",
-    accentBg: "bg-indigo-500/10",
-    accentBorder: "border-indigo-500/30",
+    themeColor: "text-indigo-600 dark:text-indigo-400",
+    accentBg: "bg-indigo-50 dark:bg-indigo-950/40",
+    accentBorder: "border-indigo-200 dark:border-indigo-800",
     guarantees: [
       "Rigorous quantitative analysis of 4 threat variables (IV1–IV4)",
       "Advances evidence-based student cybersecurity curricula across Sri Lanka",
@@ -63,9 +63,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "Undergraduate and postgraduate students aged 18 and above currently enrolled at any state university, private higher education institute, or foreign branch campus in Sri Lanka.",
     icon: BookOpen,
-    themeColor: "text-cyan-400",
-    accentBg: "bg-cyan-500/10",
-    accentBorder: "border-cyan-500/30",
+    themeColor: "text-teal-700 dark:text-cyan-400",
+    accentBg: "bg-teal-50 dark:bg-teal-950/40",
+    accentBorder: "border-teal-200 dark:border-teal-800",
     guarantees: [
       "Open across all academic faculties: STEM, Management, Arts, Law & Medicine",
       "No specialized technical or coding background required to participate",
@@ -80,9 +80,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "Your involvement is entirely voluntary. You may pause, skip challenges, or exit the platform at any time before final submission without any academic, institutional, or personal penalty.",
     icon: HeartHandshake,
-    themeColor: "text-rose-400",
-    accentBg: "bg-rose-500/10",
-    accentBorder: "border-rose-500/30",
+    themeColor: "text-rose-600 dark:text-rose-400",
+    accentBg: "bg-rose-50 dark:bg-rose-950/40",
+    accentBorder: "border-rose-200 dark:border-rose-800",
     guarantees: [
       "Exit or pause anytime with zero penalty or academic consequence",
       "Option to skip challenges you do not wish to answer",
@@ -97,9 +97,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "Only aggregated non-identifying demographic indicators (age group, faculty, year of study) and your interactive challenge decisions. We never ask for or collect real passwords, student registration IDs, or banking details.",
     icon: FileText,
-    themeColor: "text-teal-400",
-    accentBg: "bg-teal-500/10",
-    accentBorder: "border-teal-500/30",
+    themeColor: "text-emerald-700 dark:text-emerald-400",
+    accentBg: "bg-emerald-50 dark:bg-emerald-950/40",
+    accentBorder: "border-emerald-200 dark:border-emerald-800",
     guarantees: [
       "Zero collection of student registration numbers, names, or email IDs",
       "All scenario forms operate strictly in sandbox simulation mode",
@@ -114,9 +114,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "All submissions are associated solely with an anonymous participant code. Research data is stored securely, separated from identifying contact information, and used exclusively for scholarly statistical analysis.",
     icon: LockKeyhole,
-    themeColor: "text-blue-400",
-    accentBg: "bg-blue-500/10",
-    accentBorder: "border-blue-500/30",
+    themeColor: "text-blue-600 dark:text-blue-400",
+    accentBg: "bg-blue-50 dark:bg-blue-950/40",
+    accentBorder: "border-blue-200 dark:border-blue-800",
     guarantees: [
       "Isolated participant tokens with zero IP tracking or fingerprinting",
       "Encrypted storage adhering to international scientific repository norms",
@@ -131,9 +131,9 @@ const ETHICS_CARDS: EthicsCardData[] = [
     description:
       "You may withdraw your unsubmitted draft at any time. For questions regarding the research protocol or ethics clearance, you may consult our published information documents or contact the research team directly.",
     icon: Database,
-    themeColor: "text-amber-400",
-    accentBg: "bg-amber-500/10",
-    accentBorder: "border-amber-500/30",
+    themeColor: "text-amber-700 dark:text-amber-400",
+    accentBg: "bg-amber-50 dark:bg-amber-950/40",
+    accentBorder: "border-amber-200 dark:border-amber-800",
     guarantees: [
       "Draft cancellation instantly purges all temporary in-memory responses",
       "Dedicated researcher contact channels for inquiries and protocol verification",
@@ -157,14 +157,14 @@ export function StudyEthicsPrinciples() {
     >
       {/* Header Block */}
       <div className="section-header-centered text-center max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-teal-50 dark:bg-cyan-500/10 border border-teal-200 dark:border-cyan-500/20 text-teal-800 dark:text-cyan-400 mb-3 shadow-2xs">
           <Scale size={14} aria-hidden="true" />
           <span>RESEARCH INFORMATION &amp; ETHICS</span>
         </div>
-        <h2 id="ethics-heading" className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+        <h2 id="ethics-heading" className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Study Information &amp; Ethical Principles
         </h2>
-        <p className="text-muted-foreground mt-3 text-base md:text-lg leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-300 mt-3 text-base md:text-lg leading-relaxed">
           Cyber Campus operates under rigorous academic research governance, protecting participant
           privacy and ensuring full transparency.
         </p>
@@ -180,10 +180,10 @@ export function StudyEthicsPrinciples() {
             role="tab"
             aria-selected={selectedFilter === "all"}
             onClick={() => setSelectedFilter("all")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedFilter === "all"
-                ? "bg-primary text-white shadow-sm shadow-primary/30"
-                : "bg-card/60 text-muted-foreground border border-border/70 hover:text-foreground hover:bg-card"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             All Principles (6)
@@ -193,10 +193,10 @@ export function StudyEthicsPrinciples() {
             role="tab"
             aria-selected={selectedFilter === "governance"}
             onClick={() => setSelectedFilter("governance")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedFilter === "governance"
-                ? "bg-primary text-white shadow-sm shadow-primary/30"
-                : "bg-card/60 text-muted-foreground border border-border/70 hover:text-foreground hover:bg-card"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             Governance &amp; Scope (2)
@@ -206,10 +206,10 @@ export function StudyEthicsPrinciples() {
             role="tab"
             aria-selected={selectedFilter === "rights"}
             onClick={() => setSelectedFilter("rights")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedFilter === "rights"
-                ? "bg-primary text-white shadow-sm shadow-primary/30"
-                : "bg-card/60 text-muted-foreground border border-border/70 hover:text-foreground hover:bg-card"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             Participant Rights (2)
@@ -219,10 +219,10 @@ export function StudyEthicsPrinciples() {
             role="tab"
             aria-selected={selectedFilter === "privacy"}
             onClick={() => setSelectedFilter("privacy")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               selectedFilter === "privacy"
-                ? "bg-primary text-white shadow-sm shadow-primary/30"
-                : "bg-card/60 text-muted-foreground border border-border/70 hover:text-foreground hover:bg-card"
+                ? "bg-indigo-600 text-white shadow-xs"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
             }`}
           >
             Data Privacy &amp; Security (2)
@@ -238,7 +238,7 @@ export function StudyEthicsPrinciples() {
           return (
             <article
               key={card.id}
-              className="why-card group rounded-2xl border border-border/80 bg-card/60 backdrop-blur-xl p-6 transition-all duration-300 hover:border-border hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+              className="why-card group rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 transition-all duration-300 hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between shadow-xs"
             >
               <div>
                 {/* Card Top Row: Icon + Takeaway Badge */}

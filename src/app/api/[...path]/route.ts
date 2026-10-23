@@ -7,6 +7,7 @@ import {
   saveDraft,
   submitBaseline,
   recordAttempt,
+  recordSessionToWorkspace,
   discardDraft,
   withdraw,
 } from "@/lib/repository.server";
@@ -354,6 +355,9 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     if (path === "session/discard") {
       await discardDraft();
       return json({ ok: true });
+    }
+    if (path === "session/submit-answers" || path === "session/record-workspace") {
+      return json(await recordSessionToWorkspace());
     }
     if (path === "game/attempt")
       return json(await recordAttempt(attemptSchema.parse(body)));
