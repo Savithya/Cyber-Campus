@@ -12137,6 +12137,105 @@ tfoot {
   background: var(--border);
 }
 
+.btn-new-participant-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(124, 108, 252, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(124, 108, 252, 0.3);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-new-participant-pill:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-new-participant-pill:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.completed-participant-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin: 0 auto 28px;
+  max-width: 960px;
+}
+
+.completed-participant-banner .banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.completed-participant-banner .banner-text strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.completed-participant-banner .banner-text p {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.admin-top-right-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.admin-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-refresh-btn:hover {
+  background: var(--hover-bg, rgba(124, 108, 252, 0.1));
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* Demographic Cards Grid */
 .demographics-cards-grid {
   display: grid;
@@ -20012,14 +20111,25 @@ img, svg {
   white-space: nowrap;
 }
 
-.btn-join-fresh-primary:hover {
+.btn-join-fresh-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #047857 0%, #065f46 100%);
   box-shadow: 0 6px 20px rgba(5, 150, 105, 0.42);
   transform: translateY(-1.5px);
   color: #ffffff !important;
 }
 
-.btn-join-fresh-primary:hover .arrow-icon {
+.btn-join-fresh-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-join-fresh-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-join-fresh-primary:hover:not(:disabled) .arrow-icon {
   transform: translateX(3px);
 }
 

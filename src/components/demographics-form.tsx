@@ -17,8 +17,10 @@ import {
   Lock,
   Layers,
   Loader2,
+  RotateCcw,
+  CheckCircle2,
 } from "lucide-react";
-import { api, useSession, loadDraft, putDraft } from "@/lib/client";
+import { api, useSession, loadDraft, putDraft, randomToken, clearParticipationStorage } from "@/lib/client";
 import { questions } from "@/content/questionnaire";
 import type { Answers, Session } from "@/lib/types";
 import { ResearchProgressStepper } from "./research-progress-stepper";
@@ -40,6 +42,40 @@ export function DemographicsForm() {
   const [error, setError] = useState<string>("");
   const [validationError, setValidationError] = useState<string>("");
   const [missingQuestionIds, setMissingQuestionIds] = useState<string[]>([]);
+  const [resettingParticipant, setResettingParticipant] = useState(false);
+
+  const handleStartNewParticipant = async () => {
+    setResettingParticipant(true);
+    setError("");
+    setValidationError("");
+    try {
+      clearParticipationStorage();
+      const res = await api<{ session: Session }>("session/new-participant", {});
+      if (res.session) {
+        state.setSession(res.session);
+        putDraft({
+          code: res.session.code,
+          expires: res.session.draftExpiresAt,
+          answers: res.session.answers,
+          token: randomToken(),
+          submitKey: crypto.randomUUID(),
+        });
+        setAnswers({
+          Q1: null,
+          Q2: null,
+          Q3: null,
+          Q4: null,
+          Q5: null,
+        });
+        setSaveStatus("New anonymous participant ready");
+      }
+      await state.reload();
+    } catch (e) {
+      setError((e as Error).message || "Failed to assign new Anonymous ID. Please retry.");
+    } finally {
+      setResettingParticipant(false);
+    }
+  };
 
   const q1 = questions.find((q) => q.id === "Q1")!;
   const q2 = questions.find((q) => q.id === "Q2")!;
@@ -279,8 +315,50 @@ export function DemographicsForm() {
             <span className="info-pill-label">Research Stage:</span>
             <strong className="info-pill-value">Stage 02 of 04</strong>
           </div>
+          <div className="info-bar-divider" aria-hidden="true" />
+          <button
+            type="button"
+            className="btn-new-participant-pill"
+            onClick={handleStartNewParticipant}
+            disabled={resettingParticipant}
+            title="Generate a new dynamic Anonymous ID and join as a new research participant"
+            aria-label="Generate new dynamic Anonymous ID"
+          >
+            {resettingParticipant ? (
+              <>
+                <Loader2 size={13} className="animate-spin" aria-hidden="true" />
+                <span>Assigning ID...</span>
+              </>
+            ) : (
+              <>
+                <RotateCcw size={13} aria-hidden="true" />
+                <span>New Anonymous ID</span>
+              </>
+            )}
+          </button>
         </div>
       </header>
+
+      {/* Previously Completed Profile Banner */}
+      {state.session?.status !== "draft" && (
+        <div className="completed-participant-banner mb-6" role="region" aria-label="Previously Completed Profile">
+          <div className="banner-content">
+            <CheckCircle2 size={18} className="text-emerald shrink-0" aria-hidden="true" />
+            <div className="banner-text">
+              <strong>Previously Completed Profile (Anonymous ID: {participantCode})</strong>
+              <p>This profile was previously validated and recorded into the Research Workspace. Click below to start as a new participant with a fresh Anonymous ID.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleStartNewParticipant}
+            disabled={resettingParticipant}
+            className="button secondary small"
+          >
+            {resettingParticipant ? "Assigning New ID..." : "Join as New Participant (Next ID)"}
+          </button>
+        </div>
+      )}
 
       {/* Error Banner */}
       {error && (

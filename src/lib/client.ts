@@ -10,7 +10,12 @@ export async function api<T = Record<string, unknown>>(
   path: string,
   body?: unknown,
 ): Promise<T> {
-  const isMutation = path === "session/discard" || path === "auth/logout";
+  const isMutation =
+    path === "session/discard" ||
+    path === "session/new-participant" ||
+    path === "session/clear" ||
+    path === "session/reset" ||
+    path === "auth/logout";
   const method = body !== undefined || isMutation ? "POST" : "GET";
 
   // Serve static read-only GET requests from memory cache when available

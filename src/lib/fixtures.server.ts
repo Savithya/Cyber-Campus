@@ -7,9 +7,6 @@ import { scenarios } from "@/content/scenarios.server";
 export function syntheticSessions(): Session[] {
   const moduleOrders = [
     ["phishing", "pretexting", "impersonation", "links"],
-    ["pretexting", "impersonation", "links", "phishing"],
-    ["impersonation", "links", "phishing", "pretexting"],
-    ["links", "phishing", "pretexting", "impersonation"],
   ];
 
   return Array.from({ length: 48 }, (_, i) => {

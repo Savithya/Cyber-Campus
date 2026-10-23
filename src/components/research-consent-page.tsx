@@ -107,11 +107,11 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     }
   }
 
-  // Safe discard draft handler for returning participants
+  // Safe discard draft handler for returning participants: generates new Anonymous ID
   async function handleDiscardDraft() {
     if (
       !window.confirm(
-        "Are you sure you want to discard your saved draft and start fresh? All unsubmitted answers in this session will be cleared."
+        "Are you sure you want to discard your saved draft and start fresh? A new Anonymous ID will be assigned."
       )
     ) {
       return;
@@ -119,9 +119,72 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     setDiscarding(true);
     setError("");
     try {
-      await api("session/discard", {});
       clearParticipationStorage();
+      const res = await api<{ session: Session }>("session/new-participant", {});
+      if (res.session) {
+        state.setSession(res.session);
+        putDraft({
+          code: res.session.code,
+          expires: res.session.draftExpiresAt,
+          answers: res.session.answers,
+          token: randomToken(),
+          submitKey: crypto.randomUUID(),
+        });
+        await state.reload();
+        router.push("/demographics");
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setDiscarding(false);
+    }
+  }
+
+  // Start fresh research session as a new participant from completed notice
+  async function handleJoinNewParticipant() {
+    setBusy(true);
+    setError("");
+    try {
+      clearParticipationStorage();
+      const token = randomToken();
+      const res = await api<{ session: Session; token?: string }>("session/new-participant", {
+        token,
+      });
+      if (res?.session) {
+        state.setSession(res.session);
+        putDraft({
+          code: res.session.code,
+          expires: res.session.draftExpiresAt,
+          answers: res.session.answers,
+          token: res.token || token,
+          submitKey: crypto.randomUUID(),
+        });
+        await state.reload();
+        router.push("/demographics");
+      } else {
+        throw new Error("Unable to create a new participant session. Please retry.");
+      }
+    } catch (e) {
+      setError((e as Error).message || "Failed to start new participant session. Please retry.");
+      setBusy(false);
+    }
+  }
+
+  // Safe reset returning participant session to review consent briefing
+  async function handleResetSessionToConsent() {
+    setDiscarding(true);
+    setError("");
+    try {
+      clearParticipationStorage();
+      await api("session/clear", {}).catch(() => api("session/discard", {}));
+      state.setSession(null);
       await state.reload();
+      setTimeout(() => {
+        const el = document.getElementById("consent-compact-card") || document.querySelector(".consent-compact-card");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -192,7 +255,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
       )}
 
       {/* Completed research notice */}
-      {hasSession && sessionData?.status === "submitted_complete" && (
+      {hasSession &&
+        (sessionData?.status === "submitted_complete" ||
+          sessionData?.status === "submitted_with_missing") && (
         <div className="draft-session-banner-wrapper">
           <div className="draft-session-banner completed-mode" role="region" aria-label="Completed Research">
             <div className="draft-session-left">
@@ -213,14 +278,21 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               <button
                 type="button"
                 className="btn-join-fresh-primary"
-                onClick={async () => {
-                  clearParticipationStorage();
-                  await api("session/discard", {}).catch(() => {});
-                  await state.reload();
-                }}
+                onClick={handleJoinNewParticipant}
+                disabled={busy || discarding}
+                aria-label="Join as New Participant"
               >
-                <span>Join as New Participant</span>
-                <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                {busy ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                    <span>Starting New Session...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Join as New Participant</span>
+                    <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -236,7 +308,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
       {/* Modern, Compact & User-Friendly Briefing Card */}
       <div className="consent-compact-wrapper">
-        <div className="consent-compact-card">
+        <div className="consent-compact-card" id="consent-compact-card">
           {/* Card Header */}
           <div className="consent-compact-header">
             <div className="hero-pill-badge mb-2">
@@ -371,7 +443,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           </div>
 
           {/* Consent Checkboxes & Action Section */}
-          <div className="consent-decision-box">
+          <div className="consent-decision-box" id="consent-decision-box">
             <div className="consent-decision-header">
               <span className="step-chip">STEP 1 OF 4</span>
               <span className="ssl-chip">

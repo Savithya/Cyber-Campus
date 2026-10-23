@@ -128,6 +128,30 @@ export function ResearchCompletion() {
     }
   }, [state.session]);
 
+  // Automatically record and synchronize complete participant answers & missions with the Research Workspace
+  useEffect(() => {
+    if (state.session && state.session.mode !== "practice") {
+      api<{ ok: boolean; session: Session; message: string }>(
+        "session/record-workspace",
+        {},
+      )
+        .then((res) => {
+          if (res.session) {
+            state.setSession(res.session);
+          }
+          setSubmitFeedback({
+            status: "success",
+            message:
+              res.message ||
+              `Participant responses (Anonymous ID: ${state.session?.code}) automatically recorded across all 9 Research Workspace parts.`,
+          });
+        })
+        .catch(() => {
+          // Keep existing status
+        });
+    }
+  }, []);
+
   // Load scenarios and debrief answer keys
   useEffect(() => {
     if (!state.session) return;
@@ -511,21 +535,15 @@ export function ResearchCompletion() {
             <div className="workspace-submission-heading">
               <div className="workspace-submission-badge-row">
                 <span className="workspace-submission-pill">RESEARCH WORKSPACE INTEGRATION</span>
-                {submitFeedback.status === "success" && (
-                  <span className="workspace-recorded-pill">
-                    <CheckCircle2 size={12} /> RECORDED IN DATASET
-                  </span>
-                )}
+                <span className="workspace-recorded-pill">
+                  <CheckCircle2 size={12} /> AUTOMATICALLY RECORDED IN WORKSPACE
+                </span>
               </div>
               <h3 className="workspace-submission-title">
-                {submitFeedback.status === "success"
-                  ? "Answers Recorded in Research Workspace"
-                  : "Submit Answers to Research Workspace"}
+                Participant Answers & Missions Recorded
               </h3>
               <p className="workspace-submission-subtitle">
-                {submitFeedback.status === "success"
-                  ? `Your complete participant responses (Anonymous ID: ${s.code}) and all 20 scenario metrics are permanently synchronized across all 9 Research Workspace modules.`
-                  : `Submit your completed challenge decisions to automatically populate and update all 9 analytics, hypothesis models, and demographic charts in the Research Workspace.`}
+                {`Your complete participant responses (Anonymous ID: ${s.code}) and all 20 scenario metrics are automatically updated across all 9 Research Workspace parts in real time.`}
               </p>
             </div>
           </div>

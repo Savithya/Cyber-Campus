@@ -62,6 +62,13 @@ export async function writeLocal(record: LocalRecord | null) {
   const jar = await cookies();
   if (!record) {
     jar.delete(cookieName);
+    jar.set(cookieName, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
     return;
   }
   const iv = randomBytes(12),

@@ -4,6 +4,8 @@ import {
   getConfig,
   getSession,
   startSession,
+  startNewParticipantSession,
+  clearActiveSession,
   saveDraft,
   submitBaseline,
   recordAttempt,
@@ -344,6 +346,14 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const body = raw ? JSON.parse(raw) : {};
     if (path === "session/start")
       return json({ session: await startSession(startSchema.parse(body)) });
+    if (path === "session/new-participant") {
+      const clientToken = typeof body?.token === "string" ? body.token : undefined;
+      return json({ session: await startNewParticipantSession({ token: clientToken }) });
+    }
+    if (path === "session/clear" || path === "session/reset") {
+      await clearActiveSession();
+      return json({ ok: true });
+    }
     if (path === "session/draft")
       return json({ session: await saveDraft(saveSchema.parse(body).answers) });
     if (path === "session/submit") {

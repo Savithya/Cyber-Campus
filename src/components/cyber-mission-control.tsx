@@ -107,7 +107,9 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
     if (initialMissionId && scenarios.length > 0 && activeMissionId === initialMissionId && session) {
       const currentMission = missions.find((m) => m.id === initialMissionId);
       if (currentMission) {
-        const mScenarios = scenarios.filter((s) => currentMission.ids.includes(s.id));
+        const mScenarios = currentMission.ids
+          .map((id) => scenarios.find((s) => s.id === id))
+          .filter((s): s is Scenario => Boolean(s));
         const firstUncompleted = mScenarios.findIndex(
           (sc) => !session.attempts.some((a) => a.scenarioId === sc.id && a.attemptNumber === 1),
         );
@@ -268,24 +270,21 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
   const completionXP = completedCount * 10;
   const rank = getOperativeRank(completionXP);
 
-  // Active missions list with counterbalanced order if assigned
+  // Canonical order: IV1 — Phishing, IV2 — Pretexting, IV3 — Impersonation, IV4 — Online Scams & Malicious Links
+  const CANONICAL_MISSION_ORDER = ["phishing", "pretexting", "impersonation", "links"] as const;
   const activeMissions = getActiveMissions(false);
-  const orderedMissions = session.assignedModuleOrder
-    ? [...activeMissions].sort((a, b) => {
-        const order = session.assignedModuleOrder!;
-        const indexA = order.indexOf(a.id);
-        const indexB = order.indexOf(b.id);
-        if (indexA === -1 && indexB === -1) return 0;
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-      })
-    : activeMissions;
+  const orderedMissions = [...activeMissions].sort((a, b) => {
+    const indexA = CANONICAL_MISSION_ORDER.indexOf(a.id as typeof CANONICAL_MISSION_ORDER[number]);
+    const indexB = CANONICAL_MISSION_ORDER.indexOf(b.id as typeof CANONICAL_MISSION_ORDER[number]);
+    return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+  });
 
   // Active scenario runner view
   if (activeMissionId) {
     const currentMission = missions.find((m) => m.id === activeMissionId) ?? missions[0];
-    const missionScenarios = scenarios.filter((s) => currentMission.ids.includes(s.id));
+    const missionScenarios = currentMission.ids
+      .map((id) => scenarios.find((s) => s.id === id))
+      .filter((s): s is Scenario => Boolean(s));
     const activeScenario = missionScenarios[activeScenarioIndex] ?? missionScenarios[0];
 
     const currentAttempt = attempts.find(
@@ -323,7 +322,9 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
               let nextMissionToLoad: { missionId: string; index: number } | null = null;
               for (let i = 1; i <= orderedMissions.length; i++) {
                 const candidate = orderedMissions[(currentMissionIdx + i) % orderedMissions.length];
-                const candScenarios = scenarios.filter((s) => candidate.ids.includes(s.id));
+                const candScenarios = candidate.ids
+                  .map((id) => scenarios.find((s) => s.id === id))
+                  .filter((s): s is Scenario => Boolean(s));
                 const candUncompleted = candScenarios.findIndex(
                   (sc) => !firstAttempts.some((a) => a.scenarioId === sc.id) && sc.id !== activeScenario?.id,
                 );
@@ -619,7 +620,9 @@ export function CyberMissionControl({ initialMissionId }: CyberMissionControlPro
       <section className="threat-modules-grid" aria-label="Four Social Engineering Threat Modules">
         {orderedMissions.map((mission) => {
           const Icon = missionIcons[mission.icon] ?? Mail;
-          const missionScenarios = scenarios.filter((s) => mission.ids.includes(s.id));
+          const missionScenarios = mission.ids
+            .map((id) => scenarios.find((s) => s.id === id))
+            .filter((s): s is Scenario => Boolean(s));
           const completedInMission = missionScenarios.filter((sc) =>
             firstAttempts.some((a) => a.scenarioId === sc.id),
           ).length;

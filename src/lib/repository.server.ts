@@ -1,5 +1,6 @@
 import "server-only";
 import path from "node:path";
+import os from "node:os";
 import {
   createHash,
   randomUUID,
@@ -11,13 +12,22 @@ import { isResearch, demoConfig, type StudyConfig } from "./config.server";
 import { supabase } from "./supabase.server";
 import { readLocal, writeLocal } from "./local-session.server";
 
-async function nextLocalParticipantCode(): Promise<string> {
-  const dataDir = path.join(process.cwd(), ".demo-data");
+function getDemoDataDir(): string {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), ".demo-data");
+  }
+  return path.join(process.cwd(), ".demo-data");
+}
+
+let memoryParticipantCounter = 0;
+
+export async function nextLocalParticipantCode(): Promise<string> {
+  const dataDir = getDemoDataDir();
   const counterPath = path.join(dataDir, "participant_counter.json");
   const subPath = path.join(dataDir, "submissions.json");
   try {
     await mkdir(dataDir, { recursive: true });
-    let maxNum = 0;
+    let fileMax = 0;
 
     // Scan existing submissions for highest integer participant code
     try {
@@ -27,8 +37,8 @@ async function nextLocalParticipantCode(): Promise<string> {
         for (const s of list) {
           if (s.code && /^\d+$/.test(String(s.code).trim())) {
             const num = parseInt(String(s.code).trim(), 10);
-            if (num > maxNum && num < 100000) {
-              maxNum = num;
+            if (num > fileMax && num < 100000) {
+              fileMax = num;
             }
           }
         }
@@ -41,19 +51,22 @@ async function nextLocalParticipantCode(): Promise<string> {
     try {
       const rawCounter = await readFile(counterPath, "utf-8");
       const parsed = JSON.parse(rawCounter);
-      if (typeof parsed.counter === "number" && parsed.counter > maxNum && parsed.counter < 100000) {
-        maxNum = parsed.counter;
+      if (typeof parsed.counter === "number" && parsed.counter > fileMax && parsed.counter < 100000) {
+        fileMax = parsed.counter;
       }
     } catch {
       // Counter file may not exist yet
     }
 
+    const maxNum = Math.max(fileMax, memoryParticipantCounter);
     const nextVal = maxNum + 1;
-    await writeFile(counterPath, JSON.stringify({ counter: nextVal }), "utf-8");
+    memoryParticipantCounter = nextVal;
+    await writeFile(counterPath, JSON.stringify({ counter: nextVal }), "utf-8").catch(() => {});
     return String(nextVal).padStart(3, "0");
   } catch (err) {
     console.error("Failed to generate participant code:", err);
-    return "001";
+    memoryParticipantCounter++;
+    return String(memoryParticipantCounter).padStart(3, "0");
   }
 }
 
@@ -181,7 +194,7 @@ export function deriveSurveyAnswersFromAttempts(
 
 export async function saveDemoSubmission(session: Session) {
   if (session.mode === "practice") return;
-  const dataDir = path.join(process.cwd(), ".demo-data");
+  const dataDir = getDemoDataDir();
   const subPath = path.join(dataDir, "submissions.json");
   try {
     await mkdir(dataDir, { recursive: true });
@@ -208,7 +221,7 @@ export async function saveDemoSubmission(session: Session) {
 }
 
 export async function getDemoSubmissions(): Promise<Session[]> {
-  const dataDir = path.join(process.cwd(), ".demo-data");
+  const dataDir = getDemoDataDir();
   const subPath = path.join(dataDir, "submissions.json");
   let list: Session[] = [];
   try {
@@ -276,7 +289,7 @@ export async function getDemoSubmissions(): Promise<Session[]> {
 }
 
 export async function removeDemoSubmission(code: string) {
-  const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
+  const subPath = path.join(getDemoDataDir(), "submissions.json");
   try {
     const raw = await readFile(subPath, "utf-8");
     const list = JSON.parse(raw);
@@ -375,13 +388,12 @@ export async function startSession(input: {
   if (input.practice || !isResearch()) {
     const now = new Date();
     const sessionId = randomUUID();
-    const moduleOrders = [
-      ["phishing", "pretexting", "impersonation", "links"],
-      ["pretexting", "impersonation", "links", "phishing"],
-      ["impersonation", "links", "phishing", "pretexting"],
-      ["links", "phishing", "pretexting", "impersonation"],
+    const assignedModuleOrder = [
+      "phishing",
+      "pretexting",
+      "impersonation",
+      "links",
     ];
-    const assignedModuleOrder = moduleOrders[Math.floor(Math.random() * moduleOrders.length)];
     const session: Session = {
       id: sessionId,
       submissionId: sessionId,
@@ -438,6 +450,76 @@ export async function startSession(input: {
     session.participantId = pid;
     session.submissionId = session.id;
   }
+  return session;
+}
+
+export async function startNewParticipantSession(input?: {
+  token?: string;
+}): Promise<Session> {
+  const pid = "PART-" + randomUUID().slice(0, 10).toUpperCase();
+  const token =
+    input?.token && /^[a-f0-9]{64}$/.test(input.token)
+      ? input.token
+      : randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
+
+  if (isResearch()) {
+    const config = await getConfig();
+    if (!config.collectionOpen || config.contact === demoConfig.contact) {
+      throw new Error(
+        "Research collection is not open. The researcher must configure contact, retention, and database settings first.",
+      );
+    }
+    const db = await supabase();
+    await db.auth.signOut().catch(() => {});
+    const { error } = await db.auth.signInAnonymously();
+    if (error) {
+      throw new Error(
+        "Anonymous sign-in failed. Please retry or contact the researcher.",
+      );
+    }
+    await writeLocal(null);
+    const session = await rpc<Session>("start_session", {
+      p_exposed: false,
+      p_token_hash: hashToken(token),
+      p_consent: true,
+      p_eligible: true,
+    });
+    if (session) {
+      session.participantId = pid;
+      session.submissionId = session.id;
+    }
+    return session;
+  }
+
+  const now = new Date();
+  const sessionId = randomUUID();
+  const assignedModuleOrder = [
+    "phishing",
+    "pretexting",
+    "impersonation",
+    "links",
+  ];
+  const nextCode = await nextLocalParticipantCode();
+  const session: Session = {
+    id: sessionId,
+    submissionId: sessionId,
+    participantId: pid,
+    code: nextCode,
+    mode: "demo",
+    status: "draft",
+    createdAt: now.toISOString(),
+    submittedAt: null,
+    draftExpiresAt: new Date(+now + 7 * 86400000).toISOString(),
+    withdrawDeadline: new Date(+now + 7 * 86400000).toISOString(),
+    instrumentVersion: INSTRUMENT_VERSION,
+    consentVersion: CONSENT_VERSION,
+    priorExposure: false,
+    assignedModuleOrder,
+    answers: blankAnswers(),
+    attempts: [],
+  };
+  await writeLocal({ session, tokenHash: hashToken(token) });
+  await saveDemoSubmission(session);
   return session;
 }
 export async function saveDraft(answers: Answers) {
@@ -632,17 +714,31 @@ export async function recordAttempt(input: {
   await saveDemoSubmission(local.session);
   return { session: local.session, attempt, feedback: key };
 }
+export async function clearActiveSession() {
+  if (isResearch()) {
+    try {
+      const db = await supabase();
+      await db.auth.signOut();
+    } catch {
+      /* ignore */
+    }
+  }
+  await writeLocal(null);
+}
+
 export async function discardDraft() {
   const s = await getSession();
-  if (s && s.status !== "draft" && s.mode !== "practice")
-    throw new Error(
-      "Use your private withdrawal token to delete a submitted response.",
-    );
+  if (s && s.status !== "draft" && s.mode !== "practice") {
+    // Session is already completed/submitted. Do not delete saved research submission,
+    // but safely clear the active local browser session cookie.
+    await clearActiveSession();
+    return;
+  }
   if (s?.mode === "research") await rpc("discard_draft");
   if (s?.code) {
     await removeDemoSubmission(s.code);
   }
-  await writeLocal(null);
+  await clearActiveSession();
 }
 export async function withdraw(code: string, token: string) {
   if (isResearch()) {

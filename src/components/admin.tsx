@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -38,6 +38,7 @@ import {
   ExternalLink,
   ChevronRight,
   Filter,
+  RotateCcw,
   Check,
   X,
   Lock,
@@ -247,6 +248,15 @@ export default function Admin({
 
   // History table pagination
   const [historyPage, setHistoryPage] = useState(0);
+
+  // Live auto-refresh when tab gains focus so completed participant missions immediately reflect
+  useEffect(() => {
+    const handleFocus = () => {
+      router.refresh();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [router]);
 
   // When in Research Workspace (demo === false), strictly filter out any mock or synthetic fixture records
   const realSessions = useMemo(() => {
@@ -531,21 +541,37 @@ export default function Admin({
             </span>
             <span className="admin-tz-badge">Asia/Colombo (UTC+05:30)</span>
           </div>
-          {!demo && (
+          <div className="admin-top-right-group">
+            <span className="admin-sync-badge" title="Research Workspace parts update automatically as participants join and complete missions">
+              <span className="admin-status-dot online" />
+              <span>Workspace Sync Active</span>
+            </span>
             <button
               type="button"
-              className="button secondary small admin-mobile-signout"
-              onClick={async () => {
-                await api("auth/logout", {});
-                router.replace("/admin/login");
-                router.refresh();
-              }}
-              title="Sign out of researcher session"
-              aria-label="Sign out of researcher session"
+              className="admin-refresh-btn"
+              onClick={() => router.refresh()}
+              title="Refresh workspace parts with latest participant responses"
+              aria-label="Refresh workspace data"
             >
-              <LogOut size={14} /> <span>Sign out</span>
+              <RotateCcw size={13} />
+              <span>Refresh</span>
             </button>
-          )}
+            {!demo && (
+              <button
+                type="button"
+                className="button secondary small admin-mobile-signout"
+                onClick={async () => {
+                  await api("auth/logout", {});
+                  router.replace("/admin/login");
+                  router.refresh();
+                }}
+                title="Sign out of researcher session"
+                aria-label="Sign out of researcher session"
+              >
+                <LogOut size={14} /> <span>Sign out</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <PageHeading

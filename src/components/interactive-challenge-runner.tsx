@@ -121,6 +121,9 @@ export function InteractiveChallengeRunner({
       });
 
       setRecordedAttempt(res.attempt);
+      if (res.session) {
+        state.setSession(res.session);
+      }
       onCompleteScenario(res.attempt);
       onNextScenario?.();
     } catch (e) {

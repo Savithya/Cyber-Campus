@@ -100,9 +100,10 @@ export function CyberChallengeZone() {
   const stats = scoreSummary(attempts);
   const rank = getOperativeRank(stats.completed * 10);
 
-  async function launchPractice() {
+  async function launchPractice(missionId?: string) {
+    const targetUrl = missionId ? `/play/${missionId}` : "/play";
     if (session && session.status !== "draft") {
-      router.push("/play");
+      router.push(targetUrl);
       return;
     }
     setBusy(true);
@@ -122,7 +123,7 @@ export function CyberChallengeZone() {
       if (res.session) {
         state.setSession(res.session);
       }
-      router.push("/play");
+      router.push(targetUrl);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -203,7 +204,7 @@ export function CyberChallengeZone() {
               <button
                 type="button"
                 className="button primary hud-launch-btn"
-                onClick={launchPractice}
+                onClick={() => launchPractice()}
                 disabled={busy}
               >
                 <Gamepad2 size={18} aria-hidden="true" />
@@ -330,7 +331,7 @@ export function CyberChallengeZone() {
                 <button
                   type="button"
                   className="button secondary card-play-btn"
-                  onClick={launchPractice}
+                  onClick={() => launchPractice("phishing")}
                 >
                   <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
@@ -402,7 +403,7 @@ export function CyberChallengeZone() {
                 <button
                   type="button"
                   className="button secondary card-play-btn"
-                  onClick={launchPractice}
+                  onClick={() => launchPractice("pretexting")}
                 >
                   <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
@@ -474,7 +475,7 @@ export function CyberChallengeZone() {
                 <button
                   type="button"
                   className="button secondary card-play-btn"
-                  onClick={launchPractice}
+                  onClick={() => launchPractice("impersonation")}
                 >
                   <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
@@ -546,7 +547,7 @@ export function CyberChallengeZone() {
                 <button
                   type="button"
                   className="button secondary card-play-btn"
-                  onClick={launchPractice}
+                  onClick={() => launchPractice("links")}
                 >
                   <span>Start Mission</span>
                   <ChevronRight size={16} aria-hidden="true" />
@@ -666,7 +667,7 @@ export function CyberChallengeZone() {
                 <button
                   type="button"
                   className="button primary"
-                  onClick={launchPractice}
+                  onClick={() => launchPractice()}
                 >
                   <Gamepad2 size={18} aria-hidden="true" />
                   <span>Launch Interactive Simulator</span>
@@ -696,7 +697,7 @@ export function CyberChallengeZone() {
             <button
               type="button"
               className="button secondary large"
-              onClick={launchPractice}
+              onClick={() => launchPractice()}
             >
               <span>Practice Missions Only</span>
             </button>
