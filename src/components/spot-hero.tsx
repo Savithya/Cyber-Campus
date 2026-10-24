@@ -7,83 +7,88 @@ import {
   ShieldCheck,
   ArrowRight,
   Mail,
-  MessagesSquare,
-  UserRoundSearch,
-  Link2,
-  Check,
-  Lock,
   GraduationCap,
   Sparkles,
+  ArrowUpRight,
+  Info,
+  CheckCircle2,
 } from "lucide-react";
 
-interface ThreatPreview {
-  id: "phishing" | "pretexting" | "impersonation" | "links";
+interface ThreatExample {
+  id: "all" | "phishing" | "pretexting" | "impersonation" | "links";
   iv: string;
-  tabLabel: string;
+  name: string;
   sender: string;
   senderRole: string;
-  avatarBg: string;
-  headline: string;
-  snippet: string;
-  tag: string;
+  subject: string;
+  teaser: string;
+  redFlag: string;
 }
 
-const THREAT_PREVIEWS: ThreatPreview[] = [
+const THREAT_EXAMPLES: ThreatExample[] = [
+  {
+    id: "all",
+    iv: "IV1–IV4",
+    name: "Overview",
+    sender: "Student Services",
+    senderRole: "to: you · Research simulation",
+    subject: "You've got a new message.",
+    teaser: "Some messages are routine. Others deserve a second look.",
+    redFlag: "4 threat categories tested: Phishing, Pretexting, Impersonation & Scams.",
+  },
   {
     id: "phishing",
     iv: "IV1",
-    tabLabel: "Phishing (IV1)",
-    sender: "IT Helpdesk",
+    name: "Phishing",
+    sender: "Campus IT Webmail Desk",
     senderRole: "to: you · Research simulation",
-    avatarBg: "bg-blue-600 text-white",
-    headline: "Urgent LMS Account Verification",
-    snippet:
-      "Your campus portal login will expire in 2 hours due to an unverified security audit. Please confirm your password immediately.",
-    tag: "Domain Spoofing & Urgency",
+    subject: "Urgent LMS Account Verification",
+    teaser: "Your university account will be locked in 2 hours. Confirm your password now.",
+    redFlag: "Red Flag: Artificial 2-hour deadline & lookalike verification link.",
   },
   {
     id: "pretexting",
     iv: "IV2",
-    tabLabel: "Pretexting (IV2)",
-    sender: "Campus IT Support Assistant",
+    name: "Pretexting",
+    sender: "Exam Database Support",
     senderRole: "to: you · Research simulation",
-    avatarBg: "bg-teal-600 text-white",
-    headline: "Critical Exam Server Alert",
-    snippet:
-      "We detected an emergency database error affecting your course registrations. Share your phone SMS OTP so our desk can restore access.",
-    tag: "Fabricated Crisis & OTP",
+    subject: "Critical Server Registration Failure",
+    teaser: "We detected an emergency database error. Share your SMS OTP to restore subjects.",
+    redFlag: "Red Flag: University staff never ask for private 2FA codes or SMS OTPs.",
   },
   {
     id: "impersonation",
     iv: "IV3",
-    tabLabel: "Impersonation (IV3)",
+    name: "Impersonation",
     sender: "Prof. K. L. Wickramasinghe",
     senderRole: "to: you · Research simulation",
-    avatarBg: "bg-indigo-600 text-white",
-    headline: "Departmental Committee Notice",
-    snippet:
-      "I am stuck in an urgent faculty meeting without access to university funds. Could you urgently transfer Rs. 5,000 for student badges?",
-    tag: "Authority & Social Trust",
+    subject: "Department Committee Badges",
+    teaser: "I am stuck in a board meeting. Could you transfer Rs. 5,000 for symposium badges?",
+    redFlag: "Red Flag: Fake profile with 0 mutuals demanding direct personal money transfers.",
   },
   {
     id: "links",
     iv: "IV4",
-    tabLabel: "Scams & Links (IV4)",
-    sender: "Campus Laptop Scheme",
+    name: "Scams & Links",
+    sender: "Campus Tech Grant Scheme",
     senderRole: "to: you · Research simulation",
-    avatarBg: "bg-amber-600 text-white",
-    headline: "85% Student Tech Subsidy Won",
-    snippet:
-      "Exclusive grant for university students in Sri Lanka! Limited to the first 20 applicants. Pay Rs. 2,500 courier deposit right now.",
-    tag: "Fake Grants & Typosquatting",
+    subject: "85% Student Laptop Subsidy",
+    teaser: "Exclusive student subsidy! First 20 applicants only. Pay shipping fee immediately.",
+    redFlag: "Red Flag: Advance-fee scam exploiting student discounts with unverified links.",
   },
 ];
 
 export function SpotHero() {
-  const [activeThreatId, setActiveThreatId] = useState<ThreatPreview["id"]>("phishing");
+  const [selectedThreat, setSelectedThreat] = useState<ThreatExample["id"]>("all");
+  const [showClue, setShowClue] = useState<boolean>(false);
 
-  const activeThreat =
-    THREAT_PREVIEWS.find((t) => t.id === activeThreatId) || THREAT_PREVIEWS[0];
+  const activeExample =
+    THREAT_EXAMPLES.find((t) => t.id === selectedThreat) || THREAT_EXAMPLES[0];
+
+  const handleSelectThreat = (id: ThreatExample["id"]) => {
+    setSelectedThreat(id);
+    setShowClue(false);
+  };
 
   return (
     <section className="spot-hero-section" aria-label="Cyber Campus Research Overview">
@@ -161,16 +166,16 @@ export function SpotHero() {
           </div>
         </div>
 
-        {/* Right Column: Interactive Mockup Card */}
+        {/* Right Column: User-Friendly Interactive Mockup Card */}
         <div className="spot-hero-visual">
-          {/* Decorative Sparkles */}
+          {/* Subtle Sparkle Accent */}
           <div className="spot-sparkle spot-sparkle-top" aria-hidden="true">
-            <Sparkles size={20} />
+            <Sparkles size={22} />
           </div>
 
-          {/* Top Floating Pill */}
+          {/* Top Floating Badge */}
           <div className="spot-floating-top-pill">
-            <span className="spot-pill-icon">🔍</span>
+            <span className="spot-pill-icon" aria-hidden="true">🔍</span>
             <div className="spot-pill-text">
               <strong>Look a little closer</strong>
               <small>Your next mission awaits</small>
@@ -179,62 +184,83 @@ export function SpotHero() {
 
           {/* The Challenge Inbox Preview Card */}
           <div className="spot-inbox-card">
-            {/* Inbox Header */}
+            {/* Inbox Top Bar */}
             <div className="spot-inbox-header">
               <div className="spot-inbox-header-title">
-                <Mail size={15} aria-hidden="true" />
+                <Mail size={15} aria-hidden="true" className="spot-inbox-mail-icon" />
                 <span>YOUR CHALLENGE INBOX</span>
               </div>
-              <span className="spot-inbox-counter">
-                4 Threat Categories (IV1–IV4)
-              </span>
+              <div className="spot-inbox-counter">
+                <span>Simulation Ready</span>
+              </div>
             </div>
 
-            {/* Interactive Threat Variable Tabs Inside Card */}
-            <div className="spot-inbox-tabs" role="tablist" aria-label="Select threat variable to preview">
-              {THREAT_PREVIEWS.map((threat) => (
-                <button
-                  key={threat.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeThreatId === threat.id}
-                  onClick={() => setActiveThreatId(threat.id)}
-                  className={`spot-inbox-tab ${
-                    activeThreatId === threat.id ? "active" : ""
-                  }`}
-                >
-                  <span className="spot-tab-iv">{threat.iv}</span>
-                  <span className="spot-tab-name">
-                    {threat.id === "links" ? "Scams" : threat.id}
-                  </span>
-                </button>
-              ))}
+            {/* Interactive Threat Selector Pills (User-Friendly & Clean) */}
+            <div
+              className="spot-threat-pills-bar"
+              role="tablist"
+              aria-label="Choose threat variable preview"
+            >
+              {THREAT_EXAMPLES.map((example) => {
+                const isActive = selectedThreat === example.id;
+                return (
+                  <button
+                    key={example.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => handleSelectThreat(example.id)}
+                    className={`spot-threat-pill ${isActive ? "active" : ""}`}
+                    title={`Preview ${example.name} scenario`}
+                  >
+                    <span className="spot-pill-name">{example.name}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Simulated Message Preview Box */}
+            {/* Inside Message Mockup */}
             <div className="spot-inbox-message">
-              {/* Message Header */}
+              {/* Sender Info Row */}
               <div className="spot-msg-sender-row">
-                <div className={`spot-msg-avatar ${activeThreat.avatarBg}`}>
-                  <GraduationCap size={16} aria-hidden="true" />
+                <div className="spot-msg-avatar">
+                  <GraduationCap size={17} aria-hidden="true" />
                 </div>
                 <div className="spot-msg-meta">
-                  <span className="spot-msg-sender">{activeThreat.sender}</span>
-                  <span className="spot-msg-dest">{activeThreat.senderRole}</span>
+                  <span className="spot-msg-sender">{activeExample.sender}</span>
+                  <span className="spot-msg-dest">{activeExample.senderRole}</span>
                 </div>
                 <span className="spot-msg-time">Now</span>
               </div>
 
               {/* Message Content */}
               <div className="spot-msg-body">
-                <h3 className="spot-msg-subject">{activeThreat.headline}</h3>
-                <p className="spot-msg-snippet">{activeThreat.snippet}</p>
-                <div className="spot-msg-flag-badge">
-                  <span>Category: {activeThreat.tag}</span>
-                </div>
+                <h3 className="spot-msg-subject">{activeExample.subject}</h3>
+                <p className="spot-msg-snippet">{activeExample.teaser}</p>
               </div>
 
-              {/* Interactive Action Button Inside Card */}
+              {/* User-Friendly "Spot Red Flag" Clue Toggle */}
+              {selectedThreat !== "all" && (
+                <div className="spot-clue-container">
+                  <button
+                    type="button"
+                    onClick={() => setShowClue(!showClue)}
+                    className={`spot-clue-toggle ${showClue ? "active" : ""}`}
+                    aria-expanded={showClue}
+                  >
+                    <Info size={13} aria-hidden="true" />
+                    <span>{showClue ? "Hide Red Flag" : "💡 Spot the Trap"}</span>
+                  </button>
+
+                  {showClue && (
+                    <div className="spot-clue-box animate-fadeIn">
+                      <p>{activeExample.redFlag}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Button: What would you do? */}
               <div className="spot-msg-action">
                 <Link
                   href="/consent"
@@ -243,14 +269,14 @@ export function SpotHero() {
                   aria-label="What would you do? Start Challenge"
                 >
                   <span>What would you do?</span>
-                  <ArrowRight size={14} aria-hidden="true" />
+                  <ArrowUpRight size={15} aria-hidden="true" />
                 </Link>
               </div>
 
-              {/* Card Bottom Indicator */}
+              {/* Card Footer Counter */}
               <div className="spot-inbox-footer">
-                <span className="spot-footer-dot" />
-                <span>20 interactive research scenarios</span>
+                <span className="spot-footer-dot" aria-hidden="true" />
+                <span>20 interactive fictional scenarios · 4 threat categories</span>
               </div>
             </div>
           </div>

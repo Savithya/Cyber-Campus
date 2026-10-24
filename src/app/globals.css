@@ -25536,11 +25536,17 @@ body {
 .spot-inbox-card {
   position: relative;
   background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e7e5e0;
   border-radius: 24px;
   padding: 22px;
   box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.04);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.spot-inbox-card:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: 0 26px 56px -12px rgba(15, 23, 42, 0.18);
 }
 
 [data-theme="dark"] .spot-inbox-card,
@@ -25569,92 +25575,99 @@ body {
   gap: 7px;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--muted);
+}
+
+.spot-inbox-mail-icon {
   color: var(--muted);
 }
 
 .spot-inbox-counter {
   font-size: 10.5px;
   font-weight: 700;
-  color: #4f46e5;
-  background-color: rgba(79, 70, 229, 0.08);
-  padding: 3px 8px;
-  border-radius: 6px;
+  color: #059669;
+  background-color: rgba(5, 150, 105, 0.08);
+  padding: 3px 9px;
+  border-radius: 9999px;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 [data-theme="dark"] .spot-inbox-counter,
 .dark .spot-inbox-counter {
-  color: #818cf8;
-  background-color: rgba(99, 102, 241, 0.18);
+  color: #34d399;
+  background-color: rgba(5, 150, 105, 0.18);
+  border-color: rgba(5, 150, 105, 0.35);
 }
 
-.spot-inbox-tabs {
+/* User-Friendly Threat Selector Pills */
+.spot-threat-pills-bar {
   display: flex;
   gap: 6px;
   margin-top: 12px;
   margin-bottom: 12px;
   flex-wrap: wrap;
+  background-color: #f6f5f1;
+  padding: 4px;
+  border-radius: 12px;
 }
 
-.spot-inbox-tab {
-  font-size: 11px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+[data-theme="dark"] .spot-threat-pills-bar,
+.dark .spot-threat-pills-bar {
+  background-color: #0c1424;
+}
+
+.spot-threat-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: transparent;
   color: var(--muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   transition: all 0.15s ease;
 }
 
-[data-theme="dark"] .spot-inbox-tab,
-.dark .spot-inbox-tab {
-  border-color: #22324f;
-  background-color: #0f172a;
-}
-
-.spot-inbox-tab:hover {
-  background-color: #f1f5f9;
+.spot-threat-pill:hover {
   color: var(--ink);
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
-[data-theme="dark"] .spot-inbox-tab:hover,
-.dark .spot-inbox-tab:hover {
-  background-color: #1a2742;
-}
-
-.spot-inbox-tab.active {
-  background-color: #182232;
-  color: #ffffff;
-  border-color: #182232;
-  font-weight: 700;
-}
-
-[data-theme="dark"] .spot-inbox-tab.active,
-.dark .spot-inbox-tab.active {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+[data-theme="dark"] .spot-threat-pill:hover,
+.dark .spot-threat-pill:hover {
+  background-color: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
-.spot-tab-iv {
-  font-size: 9.5px;
-  opacity: 0.85;
+.spot-threat-pill.active {
+  background-color: #ffffff;
+  color: var(--ink);
+  border-color: rgba(0, 0, 0, 0.06);
+  font-weight: 750;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.spot-tab-name {
-  text-transform: capitalize;
+[data-theme="dark"] .spot-threat-pill.active,
+.dark .spot-threat-pill.active {
+  background-color: #1e293b;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .spot-inbox-message {
-  background-color: #fbfbfa;
-  border: 1px solid #ededeb;
+  background-color: #fcfbf9;
+  border: 1px solid #eae8e1;
   border-radius: 16px;
-  padding: 16px;
+  padding: 18px;
 }
 
 [data-theme="dark"] .spot-inbox-message,
@@ -25671,13 +25684,23 @@ body {
 }
 
 .spot-msg-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+[data-theme="dark"] .spot-msg-avatar,
+.dark .spot-msg-avatar {
+  background-color: #064e3b;
+  color: #6ee7b7;
+  border-color: #047857;
 }
 
 .spot-msg-meta {
@@ -25686,8 +25709,8 @@ body {
 }
 
 .spot-msg-sender {
-  font-size: 13px;
-  font-weight: 750;
+  font-size: 13.5px;
+  font-weight: 800;
   color: var(--ink);
   display: block;
   white-space: nowrap;
@@ -25696,65 +25719,100 @@ body {
 }
 
 .spot-msg-dest {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--muted);
   display: block;
 }
 
 .spot-msg-time {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--muted-light);
 }
 
 .spot-msg-body {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .spot-msg-subject {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -0.015em;
   color: var(--ink);
-  margin: 0 0 5px 0;
+  margin: 0 0 6px 0;
 }
 
 .spot-msg-snippet {
-  font-size: 12.5px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.55;
   color: var(--muted);
   margin: 0;
 }
 
-.spot-msg-flag-badge {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 10.5px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background-color: rgba(224, 138, 60, 0.12);
-  color: #b45309;
-  border: 1px solid rgba(224, 138, 60, 0.25);
+/* User-Friendly Clue Box */
+.spot-clue-container {
+  margin-top: 10px;
 }
 
-[data-theme="dark"] .spot-msg-flag-badge,
-.dark .spot-msg-flag-badge {
+.spot-clue-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background-color: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.spot-clue-toggle:hover {
+  background-color: #fef3c7;
+}
+
+[data-theme="dark"] .spot-clue-toggle,
+.dark .spot-clue-toggle {
   background-color: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border-color: rgba(245, 158, 11, 0.3);
 }
 
+.spot-clue-box {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  font-size: 12px;
+  color: #854d0e;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .spot-clue-box,
+.dark .spot-clue-box {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #fef08a;
+}
+
+.spot-clue-box p {
+  margin: 0;
+}
+
 .spot-msg-action {
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .spot-msg-cta {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 12.5px;
-  font-weight: 700;
-  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 750;
+  padding: 9px 18px;
   border-radius: 9999px;
   background-color: #182232;
   color: #ffffff !important;
@@ -25779,7 +25837,7 @@ body {
 }
 
 .spot-inbox-footer {
-  margin-top: 12px;
+  margin-top: 14px;
   padding-top: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
