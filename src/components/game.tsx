@@ -105,8 +105,8 @@ export function CampusMap() {
             </div>
           </div>
           <div className="hud-action-tile">
-            <Link className="button primary hud-launch-btn" href="/results" prefetch={true}>
-              <span>View Badges & Debrief</span>
+            <Link className="button primary hud-launch-btn" href="/survey/review" prefetch={true}>
+              <span>Review Responses & Baseline</span>
             </Link>
           </div>
         </div>
@@ -191,14 +191,14 @@ export function CampusMap() {
       </div>
       <div className="survey-bottom">
         <Link
-          href={s.mode === "practice" ? "/" : "/survey/complete"}
+          href={s.mode === "practice" ? "/" : "/survey/review"}
           prefetch={true}
           className="button secondary"
         >
           Finish for now
         </Link>
-        <Link className="button primary" href="/results" prefetch={true}>
-          View my progress & debrief
+        <Link className="button primary" href="/survey/review" prefetch={true}>
+          Review Responses & Baseline
         </Link>
       </div>
       {s.mode === "practice" && (
@@ -543,8 +543,8 @@ export function Mission({ missionId }: { missionId: string }) {
                 <ArrowRight size={16} />
               </Link>
             ) : (
-              <Link className="button primary large" href="/results" prefetch={true}>
-                <span>View Platform Results & Debrief</span>
+              <Link className="button primary large" href="/survey/review" prefetch={true}>
+                <span>Review Responses & Baseline</span>
                 <ArrowRight size={16} />
               </Link>
             )}

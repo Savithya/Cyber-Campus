@@ -72,13 +72,12 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     expect(newParticipant.code).toBe("002");
     expect(newParticipant.status).toBe("draft");
 
-    // 2. User completes Demographic Profile (Q1-Q5)
+    // 2. User completes Demographic Profile (Q1-Q4)
     const profileAnswers: Answers = {
       Q1: { value: 3, status: "answered" }, // 24-26 years
       Q2: { value: 2, status: "answered" }, // Female
       Q3: { value: 4, status: "answered" }, // Year 4
       Q4: { value: 2, status: "answered" }, // Engineering
-      Q5: { value: 2, status: "answered" }, // Private University
     };
     const submittedBaseline = await submitBaseline(profileAnswers, "idemp-part002-profile");
     expect(submittedBaseline.code).toBe("002");
@@ -134,7 +133,7 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     // Part 2: Responses Audit
     const participant002 = submitted.find((s) => s.code === "002");
     expect(participant002).toBeDefined();
-    expect(Object.keys(participant002!.answers).length).toBe(25);
+    expect(Object.keys(participant002!.answers).length).toBe(24);
 
     // Part 3: Demographics
     const q1Values = submitted.map((s) => s.answers.Q1?.value);
@@ -148,24 +147,24 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     expect(threats.metrics.find((m) => m.primaryIV === "IV3")).toBeDefined();
     expect(threats.metrics.find((m) => m.primaryIV === "IV4")).toBeDefined();
 
-    // Part 5: User Privacy (DV)
-    const dvVals = extractVariableValues(STANDARD_VARIABLES[4], submitted);
-    const validDv = dvVals.filter((v): v is number => v !== null);
-    expect(validDv.length).toBeGreaterThanOrEqual(2);
+    // Part 5: Demographic Variables
+    const demoVals = extractVariableValues(STANDARD_VARIABLES[3], submitted);
+    const validDemo = demoVals.filter((v): v is number => v !== null);
+    expect(validDemo.length).toBeGreaterThanOrEqual(2);
 
     // Part 6: Statistical Analysis (Correlations, Regression, Reliability)
-    const matrixVars = STANDARD_VARIABLES.slice(0, 5).map((v) => ({
+    const matrixVars = STANDARD_VARIABLES.slice(0, 4).map((v) => ({
       id: v.id,
       label: v.name,
       values: extractVariableValues(v, submitted),
     }));
     const matrix = calculateCorrelationMatrix(matrixVars, "spearman");
-    expect(matrix.variableLabels.length).toBe(5);
+    expect(matrix.variableLabels.length).toBe(4);
     const outcome = {
-      name: STANDARD_VARIABLES[4].name,
-      values: extractVariableValues(STANDARD_VARIABLES[4], submitted),
+      name: STANDARD_VARIABLES[3].name,
+      values: extractVariableValues(STANDARD_VARIABLES[3], submitted),
     };
-    const predictors = STANDARD_VARIABLES.slice(0, 4).map((v) => ({
+    const predictors = STANDARD_VARIABLES.slice(0, 3).map((v) => ({
       name: v.name,
       values: extractVariableValues(v, submitted),
     }));

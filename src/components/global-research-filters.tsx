@@ -146,8 +146,8 @@ export function GlobalResearchFilters({
     onChange({});
   };
 
-  // Demographic questions Q1..Q5
-  const demoQuestions = questions.slice(0, 5);
+  // Demographic questions Q1..Q4 (Section A)
+  const demoQuestions = questions.filter((q) => q.section === "A");
 
   // Active filter chips list
   const activeChips: Array<{ key: string; label: string }> = [];

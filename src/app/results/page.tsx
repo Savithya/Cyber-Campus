@@ -1,4 +1,5 @@
-import { ResearchCompletion } from "@/components/research-completion";
+import { redirect } from "next/navigation";
+
 export default function Page() {
-  return <ResearchCompletion />;
+  redirect("/survey/review");
 }

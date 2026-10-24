@@ -438,7 +438,7 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
                   </button>
 
                   <Link
-                    href="/survey/complete"
+                    href="/survey/review"
                     prefetch={true}
                     className="button secondary w-full portal-btn-touch"
                   >
@@ -502,7 +502,7 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
                         ? "/survey"
                         : sessionData?.mode === "practice"
                           ? "/play"
-                          : "/survey/complete"
+                          : "/survey/review"
                     }
                     className="button primary large w-full portal-btn-touch"
                   >
@@ -1101,8 +1101,8 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
             {isCompleted && (
               <div className="mt-2 text-xs text-slate-400 text-center w-full">
                 Previous response recorded: <code className="font-mono text-teal-300">{sessionData?.code}</code> ·{" "}
-                <Link href="/survey/complete" className="text-teal-400 hover:underline">
-                  View Confirmation
+                <Link href="/survey/review" className="text-teal-400 hover:underline">
+                  View Responses
                 </Link>
               </div>
             )}

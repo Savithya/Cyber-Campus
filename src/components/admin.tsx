@@ -78,7 +78,7 @@ const navSections: NavSectionDef[] = [
     items: [
       { id: "", label: "Overview", icon: LayoutDashboard },
       { id: "responses", label: "Responses", icon: Database, badge: "count" },
-      { id: "demographics", label: "Demographics", icon: Users, badge: "Q1–Q5" },
+      { id: "demographics", label: "Demographics", icon: Users, badge: "Q1–Q4" },
     ],
   },
   {
@@ -580,7 +580,7 @@ export default function Admin({
             selected
               ? selected.id + " · Response distribution"
               : active === "demographics"
-                ? "Participant Demographics (Q1–Q5)"
+                ? "Participant Demographics (Q1–Q4)"
                 : active === "statistics"
                   ? "Statistical Analysis & Hypothesis Testing"
                 : active === "links-mission"
@@ -896,7 +896,7 @@ export default function Admin({
               <div className="card-top">
                 <div>
                   <span className="eyebrow text-cyan font-bold">SECTION A · PARTICIPANT PROFILE</span>
-                  <h2 className="text-xl font-bold mt-1">Sample Demographics (Q1–Q5)</h2>
+                  <h2 className="text-xl font-bold mt-1">Sample Demographics (Q1–Q4)</h2>
                   <p className="text-xs text-muted mt-1 max-w-3xl leading-relaxed">
                     Descriptive aggregate distributions for participating university students across Sri Lanka.
                     These variables characterize the research sample without compromising individual participant privacy.

@@ -30,7 +30,7 @@ export default function Survey() {
   useEffect(() => {
     if (state.session) {
       if (state.session.status !== "draft") {
-        router.replace("/survey/complete");
+        router.replace("/survey/review");
         return;
       }
       const local = loadDraft(state.session.code);

@@ -290,7 +290,7 @@ export function exportCsv(
           q.scale,
           o.code,
           o.label,
-          q.scale === "EXPERIENCE" || ["Q2", "Q4", "Q5"].includes(q.id)
+          q.scale === "EXPERIENCE" || ["Q2", "Q4"].includes(q.id)
             ? "nominal category"
             : q.scale === "FREQUENCY"
               ? "ordered category, not exact count"

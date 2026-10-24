@@ -12,12 +12,16 @@ describe("authoritative research instrument", () => {
   it("matches the frozen import of the supplied question wording, options and introductions", () => {
     expect(questions).toEqual(original.questions);
     expect(sections).toEqual(original.sections);
-    expect(questions.map((q) => q.id)).toEqual(
-      Array.from({ length: 25 }, (_, i) => "Q" + (i + 1)),
-    );
+    expect(questions.map((q) => q.id)).toEqual([
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      ...Array.from({ length: 20 }, (_, i) => "Q" + (i + 6)),
+    ]);
   });
   it("keeps exactly four IVs and demographic profile apart", () => {
-    expect(sections.map((s) => s.questions.length)).toEqual([5, 5, 5, 5, 5]);
+    expect(sections.map((s) => s.questions.length)).toEqual([4, 5, 5, 5, 5]);
     expect(sections.map((s) => s.role)).toEqual([
       "Profile",
       "IV1",
@@ -70,7 +74,8 @@ describe("descriptive statistics and filters", () => {
   it("retains Not sure as a valid experience category", () => {
     const s = records[0];
     s.answers.Q11 = { value: 4, status: "answered" };
-    const a = aggregateQuestion(questions[10], [s]);
+    const q11 = questions.find((q) => q.id === "Q11")!;
+    const a = aggregateQuestion(q11, [s]);
     expect(a.rows[3]).toMatchObject({
       label: "Not sure",
       count: 1,
@@ -171,7 +176,7 @@ describe("research CSV", () => {
       /withdrawal_hash|tokenHash|owner_id|idempotencyKey/,
     );
   });
-  it("exports all 25 questions, every category, and no invented composite", () => {
+  it("exports all questionnaire questions, every category, and no invented composite", () => {
     const csv = exportCsv("codebook", [], {});
     expect(csv).toContain("nominal category");
     expect(csv).toContain("ordered category, not exact count");

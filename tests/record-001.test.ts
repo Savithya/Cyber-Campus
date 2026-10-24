@@ -44,13 +44,12 @@ describe("Record 001 Integration & Visibility", () => {
     const answers: Answers = {};
     for (const q of questions) {
       // Realistic undergraduate answers:
-      // Q1: 21-23 (code 2), Q2: Male (code 1), Q3: Year 3 (code 3), Q4: Computing/IT (code 1), Q5: State University (code 1)
+      // Q1: 21-23 (code 2), Q2: Male (code 1), Q3: Year 3 (code 3), Q4: Computing/IT (code 1)
       let val = 4;
       if (q.id === "Q1") val = 2;
       else if (q.id === "Q2") val = 1;
       else if (q.id === "Q3") val = 3;
       else if (q.id === "Q4") val = 1;
-      else if (q.id === "Q5") val = 1;
       else val = (q.number % 3) + 3; // Likert 3, 4, 5
 
       answers[q.id] = {
@@ -119,7 +118,7 @@ describe("Record 001 Integration & Visibility", () => {
     expect(found001).toBeDefined();
     expect(found001?.status).toBe("submitted_complete");
     expect(found001?.attempts.length).toBe(20);
-    expect(Object.keys(found001?.answers || {}).length).toBe(25);
+    expect(Object.keys(found001?.answers || {}).length).toBe(24);
 
     // Verify filterSessions matches 001 by code
     const matched = filterSessions(verifyList, { code: "001" });

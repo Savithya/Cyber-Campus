@@ -7,6 +7,8 @@ import { SpotResearchVariables } from "@/components/spot-research-variables";
 import { ResearchProgressStepper } from "@/components/research-progress-stepper";
 import { ResearchConsentPage } from "@/components/research-consent-page";
 import { DemographicsForm } from "@/components/demographics-form";
+import { SiteHeader } from "@/components/site-header";
+import { ThemeProvider } from "@/components/theme-provider";
 import Review from "@/components/review";
 import { CyberMissionControl } from "@/components/cyber-mission-control";
 import { InteractiveChallengeRunner } from "@/components/interactive-challenge-runner";
@@ -169,10 +171,15 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     );
     expect(html).toContain("YOUR RESEARCH JOURNEY");
     expect(html).toContain("About You");
+    expect(html).toContain("What is your age group?");
     expect(html).toContain("What is your gender?");
     expect(html).toContain("What is your current year of study?");
     expect(html).toContain("What is your main field of study?");
-    expect(html).toContain("Have you received any formal training or education about cybersecurity or phishing?");
+    // Question 5 ('Have you received any formal training...') has been removed:
+    expect(html).not.toContain("Have you received any formal training or education about cybersecurity or phishing?");
+    expect(html).toContain("Question 1 of 24");
+    expect(html).toContain("Question 4 of 24");
+    expect(html).not.toContain("Question 5 of 25");
   });
 
   it("renders the redesigned BEFORE THE INBOX Review & Save page matching the journey layout", () => {
@@ -187,7 +194,6 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
           Q2: { value: 1, status: "answered" as const },
           Q3: { value: 1, status: "answered" as const },
           Q4: { value: 1, status: "answered" as const },
-          Q5: { value: 1, status: "answered" as const },
         },
         attempts: [],
       },
@@ -429,9 +435,42 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("Phishing Investigation");
 
     // Questions and Decision Point are properly rendered
-    expect(html).toContain("SCENARIO BRIEFING");
-    expect(html).toContain("DECISION POINT");
-    expect(html).toContain("What would you do next?");
+    expect(html).toContain("What would you do?");
     expect(html).toContain("Withhold details and report the email to campus IT security");
+  });
+
+  it("renders the redesigned Spot Cyber Campus header brand mark with cyber shield and telemetry badge", () => {
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(SiteHeader)
+      )
+    );
+
+    // Verify brand anchor attributes
+    expect(html).toContain('href="/#home"');
+    expect(html).toContain('aria-label="Cyber Campus Home - Return to Hero Section"');
+
+    // Verify brand title text and structure
+    expect(html).toContain("cyber");
+    expect(html).toContain("campus");
+    expect(html).toContain("brand-title");
+    expect(html).toContain("brand-light");
+
+    // Verify redesigned cyber shield SVG
+    expect(html).toContain("brand-shield-svg");
+    expect(html).toContain("brand-shield-grad");
+    expect(html).toContain("brand-icon-glow");
+
+    // Verify Research live telemetry badge
+    expect(html).toContain("brand-badge");
+    expect(html).toContain("brand-badge-pulse");
+    expect(html).toContain("RESEARCH");
+
+    // Verify Subtitle platform descriptor
+    expect(html).toContain("Cybersecurity Research Platform");
+    expect(html).toContain("brand-subtitle");
+    expect(html).toContain("brand-subtitle-dot");
   });
 });

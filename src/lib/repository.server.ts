@@ -552,7 +552,7 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
   if (local.session.status !== "draft") {
     return local.session;
   }
-  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4", "Q5"].every(
+  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4"].every(
     (qid) => answers[qid]?.status === "answered" && answers[qid]?.value !== null,
   );
   local.session.answers = answers;
@@ -594,7 +594,7 @@ export async function recordSessionToWorkspace(): Promise<{
     updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
   }
 
-  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4", "Q5"].every(
+  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4"].every(
     (qid) => updatedAnswers[qid]?.status === "answered" && updatedAnswers[qid]?.value !== null,
   );
 

@@ -119,6 +119,8 @@ interface ResearchJourneyFrameProps {
   continueLabel?: string;
   continueDisabled?: boolean;
   continueLoading?: boolean;
+  hideProgressHeader?: boolean;
+  hideActionBar?: boolean;
   children: React.ReactNode;
 }
 
@@ -136,6 +138,8 @@ export function ResearchJourneyFrame({
   continueLabel = "Continue",
   continueDisabled = false,
   continueLoading = false,
+  hideProgressHeader = false,
+  hideActionBar = false,
   children,
 }: ResearchJourneyFrameProps) {
   // Normalize alias keys to canonical 7 steps so only ONE card is active
@@ -226,18 +230,20 @@ export function ResearchJourneyFrame({
             =================================================================== */}
         <main className="journey-main-content">
           {/* Progress Header */}
-          <div className="journey-progress-header">
-            <div className="journey-progress-labels">
-              <span className="journey-progress-title">Questionnaire progress</span>
-              <span className="journey-progress-percent">{progressPercent}%</span>
+          {!hideProgressHeader && (
+            <div className="journey-progress-header">
+              <div className="journey-progress-labels">
+                <span className="journey-progress-title">Questionnaire progress</span>
+                <span className="journey-progress-percent">{progressPercent}%</span>
+              </div>
+              <div className="journey-progress-bar-track">
+                <div
+                  className="journey-progress-bar-fill"
+                  style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
+                />
+              </div>
             </div>
-            <div className="journey-progress-bar-track">
-              <div
-                className="journey-progress-bar-fill"
-                style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-              />
-            </div>
-          </div>
+          )}
 
           {/* Mission Stage Header */}
           <div className="journey-stage-header">
@@ -257,48 +263,50 @@ export function ResearchJourneyFrame({
           <div className="journey-body-cards">{children}</div>
 
           {/* Action Buttons Row */}
-          <div className="journey-action-bar">
-            {backHref ? (
-              <Link href={backHref} prefetch={true} className="journey-back-btn">
-                <ArrowLeft size={16} aria-hidden="true" />
-                <span>{backLabel}</span>
-              </Link>
-            ) : onBack ? (
-              <button
-                type="button"
-                onClick={onBack}
-                className="journey-back-btn"
-              >
-                <ArrowLeft size={16} aria-hidden="true" />
-                <span>{backLabel}</span>
-              </button>
-            ) : (
-              <div />
-            )}
+          {!hideActionBar && (
+            <div className="journey-action-bar">
+              {backHref ? (
+                <Link href={backHref} prefetch={true} className="journey-back-btn">
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>{backLabel}</span>
+                </Link>
+              ) : onBack ? (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="journey-back-btn"
+                >
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>{backLabel}</span>
+                </button>
+              ) : (
+                <div />
+              )}
 
-            {onContinue && (
-              <button
-                type="button"
-                onClick={onContinue}
-                disabled={continueDisabled || continueLoading}
-                className={`journey-continue-btn ${
-                  continueDisabled ? "disabled" : ""
-                }`}
-              >
-                {continueLoading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                    <span>Processing…</span>
-                  </>
-                ) : (
-                  <>
-                    <span>{continueLabel}</span>
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+              {onContinue && (
+                <button
+                  type="button"
+                  onClick={onContinue}
+                  disabled={continueDisabled || continueLoading}
+                  className={`journey-continue-btn ${
+                    continueDisabled ? "disabled" : ""
+                  }`}
+                >
+                  {continueLoading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                      <span>Processing…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{continueLabel}</span>
+                      <ArrowRight size={16} aria-hidden="true" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Bottom "Leave study" link */}
           <div className="journey-leave-wrapper">

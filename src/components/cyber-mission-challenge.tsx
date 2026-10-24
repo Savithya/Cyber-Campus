@@ -111,42 +111,36 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
     // -----------------------------------------------------------------------
     case "PH01":
       return {
-        communicationType: "call",
-        channelTitle: "Incoming Phone Call · University IT Security Desk",
-        phoneNumber: "+94 11 234 5678 (Caller ID Spoofed)",
-        callerId: "CAMPUS-IT-SECURITY",
-        callStatus: "Connected · 00:48",
-        senderInitials: "IT",
-        senderName: scenario.senderName,
-        senderEmail: scenario.senderAddress,
-        recipient: "student@serendib.campus.example",
-        subject: "URGENT: Undergraduate Account Deactivation Warning",
-        timestamp: "Today, 10:14 AM",
-        department: "University IT Account Services",
+        communicationType: "email",
+        channelTitle: "Challenge inbox",
+        senderInitials: (scenario.senderName || "L")[0].toUpperCase(),
+        senderName: scenario.senderName || "Lakview Student Services",
+        senderEmail: scenario.senderAddress || "support@lakview-account.example",
+        recipient: "student@lakview.campus.example",
+        subject: scenario.title || "Action required: keep your student account active",
+        timestamp: "02 Oct 2026, 09:10 · Fictional timestamp",
+        department: "Lakview Student Services",
         scenarioIntro:
-          "You receive an urgent phone call claiming to be University IT Account Services warning your account will be deactivated within two hours. Listen to the caller's instructions carefully and decide what you would do next.",
-        callAudioTranscript: [
-          "[Caller — Officer Perera, Purported IT Security]: 'Hello, this is University IT Account Services. We have flagged your undergraduate single sign-on account for immediate deactivation within two hours due to a security audit failure.'",
-          "'To prevent cancellation of your exam admissions and LMS access, you must immediately confirm your student credentials on our emergency portal: serendib.campus.example.verify-login.example. Do you have access to your browser right now?'",
-        ],
+          "Examine each email carefully and decide what you would do.",
         bodyParagraphs: [
           "Dear Student,",
-          "Phone call from +94 11 234 5678: 'Our automated security auditing system has flagged your university account for non-compliance with the quarterly security policy.'",
-          "Your student single sign-on (SSO), examination timetable admissions, and LMS enrollment are scheduled for suspension within two hours unless credentials are re-validated immediately.",
-          "Please verify your credentials using the secure campus verification portal link below to maintain uninterrupted access.",
+          "Our student records system is being updated. To avoid an interruption to your learning portal, please confirm your account within the next two hours.",
+          "Use the secure verification button below to complete this short process. You will be asked to confirm your account details.",
+          "Thank you,",
+          "Lakview Student Services",
         ],
         linkCta: {
-          buttonText: "Verify Student Account Credentials",
-          destinationUrl: "https://serendib.campus.example.verify-login.example/security-gate",
-          hostDomain: "verify-login.example",
-          legitDomain: "serendib.campus.example",
+          buttonText: "Verify student account",
+          destinationUrl: "https://lakview-account.example/verify-student",
+          hostDomain: "lakview-account.example",
+          legitDomain: "lakview.edu.example",
         },
         rfcHeaders: {
-          returnPath: "<bounce@campus-serendib-verify.example>",
-          spfResult: "spf=neutral (sender IP not authorized for campus.example)",
-          dkimDomain: "campus-serendib-verify.example",
-          originatingIp: "203.0.113.195 (VoIP Trunk Gateway)",
-          messageId: "<ph01-audit@gateway-relay.example>",
+          returnPath: "<bounce@lakview-account.example>",
+          spfResult: "spf=softfail (envelope sender domain does not match university records)",
+          dkimDomain: "lakview-account.example",
+          originatingIp: "198.51.100.42 (External Relay)",
+          messageId: "<ph01-notice@lakview-account.example>",
         },
       };
 
@@ -1971,24 +1965,25 @@ export function ActionSelectionGroup({
 }: ActionSelectionGroupProps) {
   return (
     <section
-      className="action-selection-section"
+      className="action-selection-section space-y-3"
       role="region"
-      aria-label="Choose Your Next Action"
+      aria-label="Your Call Decision"
     >
-      <div className="action-selection-heading">
-        <div className="action-selection-eyebrow">
-          <ShieldAlert size={14} className="text-primary" aria-hidden="true" />
-          <span>DECISION POINT</span>
+      <div className="action-selection-heading space-y-1">
+        <div className="action-selection-eyebrow text-[11px] font-bold tracking-widest text-slate-500 uppercase">
+          YOUR CALL
         </div>
-        <h2 className="action-selection-title">What would you do next?</h2>
-        <p className="action-selection-sub">
-          Evaluate the communication and choose your immediate response.
+        <h2 className="action-selection-title text-2xl font-bold text-slate-900 dark:text-slate-100">
+          What would you do?
+        </h2>
+        <p className="action-selection-sub text-sm text-slate-500">
+          Choose the action closest to what you would actually do.
         </p>
       </div>
 
       {/* Accessible Interactive Selection Cards (A, B, C, D) */}
       <div
-        className="interactive-action-cards-grid"
+        className="interactive-action-cards-grid space-y-2.5 pt-1"
         role="radiogroup"
         aria-label="Action response options"
       >
@@ -2003,36 +1998,30 @@ export function ActionSelectionGroup({
               role="radio"
               aria-checked={isSelected}
               disabled={disabled}
-              className={`interactive-action-card ${isSelected ? "selected" : ""}`}
+              className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 ${
+                isSelected
+                  ? "selected border-[#21434a] ring-2 ring-[#21434a]/15 bg-[#21434a]/5"
+                  : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
+              }`}
               onClick={() => onSelectChoice(choice.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onSelectChoice(choice.id);
-                }
-              }}
             >
               {/* Option Letter Badge (A, B, C, D) */}
-              <div className="action-letter-badge" aria-hidden="true">
+              <div
+                className={`action-letter-badge w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 ${
+                  isSelected
+                    ? "bg-[#21434a] text-white border-[#21434a]"
+                    : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                }`}
+                aria-hidden="true"
+              >
                 {letter}
               </div>
 
               {/* Action Description */}
-              <div className="action-text-content">
-                <span className="action-label-text">{choice.label}</span>
-                {choice.reply && (
-                  <div className="action-reply-preview">
-                    <MessageSquare size={13} className="shrink-0 text-primary/70 mt-0.5" aria-hidden="true" />
-                    <span>&ldquo;{choice.reply}&rdquo;</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Radio Indicator */}
-              <div className="action-radio-indicator" aria-hidden="true">
-                <div className={`radio-outer ${isSelected ? "active" : ""}`}>
-                  {isSelected && <div className="radio-inner" />}
-                </div>
+              <div className="action-text-content flex-1">
+                <span className="action-label-text text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {choice.label}
+                </span>
               </div>
             </button>
           );
@@ -2044,7 +2033,6 @@ export function ActionSelectionGroup({
 
 // =========================================================================
 // PRIMARY NAVIGATION: NEXT CHALLENGE BUTTON
-// (Confirm My Answer button is completely removed!)
 // =========================================================================
 
 interface NextChallengeButtonProps {
@@ -2067,93 +2055,53 @@ export function NextChallengeButton({
   canGoPrevious = false,
 }: NextChallengeButtonProps) {
   return (
-    <div className="next-challenge-controls-panel">
+    <div className="next-challenge-controls-panel space-y-2 pt-2">
       {/* Friendly Error Banner with Retry */}
       {error && (
-        <div className="challenge-error-alert" role="alert">
-          <div className="error-alert-text">
-            <AlertCircle size={18} className="text-red" aria-hidden="true" />
+        <div className="challenge-error-alert p-2.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-700 flex items-center justify-between" role="alert">
+          <div className="error-alert-text flex items-center gap-1.5">
+            <AlertCircle size={15} className="text-red shrink-0" aria-hidden="true" />
             <span>{error}</span>
           </div>
           <button
             type="button"
-            className="button secondary small retry-btn"
+            className="text-red font-medium underline"
             onClick={onAdvance}
             disabled={isSubmitting}
           >
-            <RefreshCw
-              size={13}
-              className={isSubmitting ? "animate-spin" : ""}
-              aria-hidden="true"
-            />
-            <span>Retry</span>
+            Retry
           </button>
         </div>
       )}
 
-      {/* Primary Actions Row with feedback prompt */}
-      <div className="challenge-nav-row">
-        <div className="challenge-nav-left">
-          {hasSelectedAnswer ? (
-            <div className="challenge-selection-hint ready">
-              <CheckCircle2 size={16} className="text-emerald shrink-0" aria-hidden="true" />
-              <span>Action selected · Ready to proceed</span>
-            </div>
-          ) : (
-            <div className="challenge-selection-hint waiting">
-              <span className="hint-pulse-dot" aria-hidden="true" />
-              <span>Select an action above to proceed</span>
-            </div>
-          )}
-        </div>
+      {/* Primary Action Button: Lock decision & continue */}
+      <button
+        type="button"
+        className={`w-full py-3.5 px-4 rounded-xl font-medium text-sm text-white flex items-center justify-center gap-2 transition-all shadow-sm ${
+          !hasSelectedAnswer || isSubmitting
+            ? "bg-[#97abad] cursor-not-allowed opacity-80"
+            : "bg-[#708a8e] hover:bg-[#21434a] cursor-pointer"
+        }`}
+        disabled={!hasSelectedAnswer || isSubmitting}
+        onClick={onAdvance}
+        aria-label="Lock decision and continue"
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+            <span>Locking decision…</span>
+          </>
+        ) : (
+          <>
+            <span>Lock decision &amp; continue</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </>
+        )}
+      </button>
 
-        <div className="challenge-nav-right">
-          {/* Optional Previous Button */}
-          {canGoPrevious && onPrevious && (
-            <button
-              type="button"
-              className="button secondary medium prev-challenge-btn"
-              onClick={onPrevious}
-              disabled={isSubmitting}
-            >
-              <ArrowLeft size={16} aria-hidden="true" />
-              <span>Previous Challenge</span>
-            </button>
-          )}
-
-          {/* Primary Action Button: Next Challenge / Complete Mission */}
-          <button
-            type="button"
-            className={`button primary large primary-next-btn ${
-              !hasSelectedAnswer ? "btn-disabled" : ""
-            }`}
-            disabled={!hasSelectedAnswer || isSubmitting}
-            onClick={onAdvance}
-            aria-label={
-              isLastChallenge
-                ? "Complete Cyber Mission and Proceed"
-                : "Save Selection and Proceed to Next Challenge"
-            }
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 size={18} className="animate-spin" aria-hidden="true" />
-                <span>Saving Response…</span>
-              </>
-            ) : isLastChallenge ? (
-              <>
-                <span>Complete Mission</span>
-                <ArrowRight size={18} aria-hidden="true" />
-              </>
-            ) : (
-              <>
-                <span>Next Challenge</span>
-                <ArrowRight size={18} aria-hidden="true" />
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      <p className="text-[11px] text-center text-slate-400 mt-2 leading-normal">
+        Your actual choice is recorded. Explanations appear after final submission.
+      </p>
     </div>
   );
 }

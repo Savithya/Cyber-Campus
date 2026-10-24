@@ -10,7 +10,7 @@ export const sections: Section[] = [
     introduction:
       "This section collects basic background information about you. Your answers will help describe the profile of respondents without revealing your identity.",
     role: "Profile",
-    questions: ["Q1", "Q2", "Q3", "Q4", "Q5"],
+    questions: ["Q1", "Q2", "Q3", "Q4"],
   },
   {
     id: "B",
@@ -122,23 +122,6 @@ export const questions: Question[] = [
       { code: 8, label: "Other" },
     ],
   },
-  {
-    id: "Q5",
-    number: 5,
-    section: "A",
-    role: "Profile",
-    text: "Have you received any formal training or education about cybersecurity or phishing?",
-    type: "choice",
-    scale: null,
-    variable: "Cybersecurity Training",
-    dimension: null,
-    options: [
-      { code: 1, label: "Yes" },
-      { code: 2, label: "No" },
-      { code: 3, label: "Unsure / Self-taught" },
-      { code: 4, label: "Other" },
-    ],
-  },
 
   // =========================================================================
   // STEP 03: PHISHING INVESTIGATION (Q6 - Q10)
@@ -146,7 +129,7 @@ export const questions: Question[] = [
   // =========================================================================
   {
     id: "Q6",
-    number: 6,
+    number: 5,
     section: "B",
     role: "IV1",
     text: "You receive an email from 'it-support@campus-serendib-verify.example' stating your student inbox will be permanently deleted in 2 hours unless you confirm your password at an unverified link. How do you identify this?",
@@ -163,7 +146,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q7",
-    number: 7,
+    number: 6,
     section: "B",
     role: "IV1",
     text: "An SMS arrives on your phone: 'Campus Grant Notice: You have been awarded Rs. 45,000 in student aid. Tap http://serendib-edu-funds.xyz/claim immediately to enter your bank credentials and claim.' How do you identify this?",
@@ -180,7 +163,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q8",
-    number: 8,
+    number: 7,
     section: "B",
     role: "IV1",
     text: "You receive a phone call where caller ID displays 'UNIVERSITY IT DESK'. The caller claims they detected a virus on your student portal and insists you read aloud the 6-digit verification code just texted to your phone. How do you identify this?",
@@ -197,7 +180,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q9",
-    number: 9,
+    number: 8,
     section: "B",
     role: "IV1",
     text: "A campus cafeteria poster has a QR code claiming 'Scan here for 50% discount on student meal cards'. Scanning it opens a browser prompt warning that the link 'http://discount-pay-login.top' is insecure and demands your student login. How do you identify this?",
@@ -214,7 +197,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q10",
-    number: 10,
+    number: 9,
     section: "B",
     role: "IV1",
     text: "An email with subject 'Revised End-Semester Exam Schedule & Seating Plan' arrives from an external Gmail address. It contains an attachment named 'Exam_Timetable_Final.pdf.exe'. How do you identify this?",
@@ -236,7 +219,7 @@ export const questions: Question[] = [
   // =========================================================================
   {
     id: "Q11",
-    number: 11,
+    number: 10,
     section: "C",
     role: "IV2",
     text: "You receive an urgent phone call from an unknown number. A caller claiming to be a Campus Security Officer says: 'Your student ID card was found at a crime scene off-campus. You must immediately pay a Rs. 10,000 clearance fine via mobile money or face police arrest.' How do you identify this?",
@@ -253,7 +236,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q12",
-    number: 12,
+    number: 11,
     section: "C",
     role: "IV2",
     text: "A caller claiming to be from the University Examination Directorate calls you at 8:00 PM: 'A system crash erased your exam registration. I need your LMS username, password, and national ID number right now over the phone to restore your eligibility.' How do you identify this?",
@@ -270,7 +253,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q13",
-    number: 13,
+    number: 12,
     section: "C",
     role: "IV2",
     text: "You receive a WhatsApp message from an unknown number using the campus crest: 'Dear student, our scholarship donor wants to disburse Rs. 50,000 to you today, but you must first pay Rs. 3,500 processing fees through a digital gift card.' How do you identify this?",
@@ -287,7 +270,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q14",
-    number: 14,
+    number: 13,
     section: "C",
     role: "IV2",
     text: "Someone claiming to be a campus network technician calls your personal mobile: 'We are performing campus Wi-Fi maintenance. To keep your laptop connected, install this remote control tool (AnyDesk) and give me access.' How do you identify this?",
@@ -304,7 +287,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q15",
-    number: 15,
+    number: 14,
     section: "C",
     role: "IV2",
     text: "A direct message arrives from someone claiming: 'I am a postgraduate researcher at your university conducting an urgent survey. If you share photos of your student ID and NIC, I will send you Rs. 5,000.' How do you identify this?",
@@ -326,7 +309,7 @@ export const questions: Question[] = [
   // =========================================================================
   {
     id: "Q16",
-    number: 16,
+    number: 15,
     section: "D",
     role: "IV3",
     text: "You receive an email from 'prof.perera.dept.head@gmail.com' claiming to be your faculty Dean: 'I am in an urgent faculty meeting and cannot talk. Please buy Rs. 20,000 worth of Google Play gift cards and email the codes to me for campus guest speakers.' How do you identify this?",
@@ -343,7 +326,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q17",
-    number: 17,
+    number: 16,
     section: "D",
     role: "IV3",
     text: "You receive a message from your close classmate's real Instagram account: 'Hey! I'm stuck in an emergency and my banking app isn't working. Can you immediately transfer Rs. 15,000 to this unknown account? I will repay you tomorrow.' How do you identify this?",
@@ -360,7 +343,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q18",
-    number: 18,
+    number: 17,
     section: "D",
     role: "IV3",
     text: "You receive a phone call displaying a local commercial bank's customer service number. The caller says: 'This is Bank Fraud Prevention. We detected suspicious transactions on your student account. Please read your 16-digit debit card number, CVV code, and OTP to block the theft.' How do you identify this?",
@@ -377,7 +360,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q19",
-    number: 19,
+    number: 18,
     section: "D",
     role: "IV3",
     text: "A newly created Instagram profile named '@campus_official_students_union' with 12 followers sends you a DM claiming you won the annual university raffle and requests your student LMS credentials to credit the prize. How do you identify this?",
@@ -394,7 +377,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q20",
-    number: 20,
+    number: 19,
     section: "D",
     role: "IV3",
     text: "An SMS from sender 'TELECOM-SL' states: 'University distance learning concession: Your student SIM has been selected for 100GB free data. Call +94 71 000 0000 or click http://free-student-data.site to register your NIC.' How do you identify this?",
@@ -416,7 +399,7 @@ export const questions: Question[] = [
   // =========================================================================
   {
     id: "Q21",
-    number: 21,
+    number: 20,
     section: "E",
     role: "IV4",
     text: "A sponsored social media post advertises brand new Core i7 laptops for Rs. 15,000 (usually Rs. 200,000) under 'Campus Surplus Clearance'. The purchase link points to 'http://super-campus-deals.store/checkout'. How do you identify this?",
@@ -433,7 +416,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q22",
-    number: 22,
+    number: 21,
     section: "E",
     role: "IV4",
     text: "You see an online listing for luxury student accommodation 50m from campus for Rs. 5,000/month. The landlord says: 'Send a refundable Rs. 20,000 deposit via bank transfer before viewing because 10 students are waiting.' How do you identify this?",
@@ -450,7 +433,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q23",
-    number: 23,
+    number: 22,
     section: "E",
     role: "IV4",
     text: "When paying semester tuition online, a link redirects to 'http://pay-serendib-portal.online/checkout'. The URL bar displays 'Not Secure', the campus crest is blurry, and it prompts for your ATM card PIN. How do you identify this?",
@@ -467,7 +450,7 @@ export const questions: Question[] = [
   },
   {
     id: "Q24",
-    number: 24,
+    number: 23,
     section: "E",
     role: "IV4",
     text: "A link shared in your student batch chat labeled 'Final_Exam_Seating_Arrangements_2026.pdf' redirects to 'http://tinyurl.example/update-flash-player' displaying a virus alert and forcing an executable file download. How do you identify this?",

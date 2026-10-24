@@ -121,7 +121,7 @@ const JOURNEY_STEPS: JourneyStep[] = [
     ],
     privacyGuarantee: "Data sealed for academic research analysis only",
     directActionLabel: "Review Sample",
-    directActionHref: "/survey/complete",
+    directActionHref: "/survey/review",
   },
 ];
 

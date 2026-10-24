@@ -33,6 +33,7 @@ import {
 import { setResearcherSession } from "@/lib/researcher-auth.server";
 import { requireResearcher } from "@/lib/supabase.server";
 import { scenarios, answerKeys } from "@/content/scenarios.server";
+import { questions } from "@/content/questionnaire";
 import { filterSessions } from "@/lib/analytics";
 import {
   STANDARD_VARIABLES,
@@ -124,11 +125,10 @@ describe("Dynamic Anonymous ID & Automatic Research Workspace Updates", () => {
     expect(sub2?.status).toBe("submitted_complete");
     expect(sub2?.attempts.length).toBe(20);
 
-    // Verify all 25 questions are populated in answers
-    for (let q = 1; q <= 25; q++) {
-      const qid = `Q${q}`;
-      expect(sub2?.answers[qid]?.value).not.toBeNull();
-      expect(sub2?.answers[qid]?.status).toBe("answered");
+    // Verify all active questionnaire questions are populated in answers
+    for (const q of questions) {
+      expect(sub2?.answers[q.id]?.value).not.toBeNull();
+      expect(sub2?.answers[q.id]?.status).toBe("answered");
     }
 
     // 4. Verify all Research Workspace parts are updated

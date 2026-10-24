@@ -44,7 +44,7 @@ export function filterSessions(
       if (String(s.priorExposure) !== f.exposure) return false;
     }
 
-    // Demographic questions Q1..Q5
+    // Demographic questions Q1..Q5 (supports historical Q5 filters)
     const demoQuestions = ["Q1", "Q2", "Q3", "Q4", "Q5"] as const;
     for (const q of demoQuestions) {
       if (f[q] && f[q] !== "" && f[q] !== "all") {

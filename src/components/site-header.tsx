@@ -97,14 +97,76 @@ export function SiteHeader() {
           className="brand"
           aria-label="Cyber Campus Home - Return to Hero Section"
         >
-          <span className="brand-icon">
-            <ShieldCheck size={24} strokeWidth={2} aria-hidden="true" />
+          <span className="brand-icon" aria-hidden="true">
+            <span className="brand-icon-glow" />
+            <svg
+              className="brand-shield-svg"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M14 2L23 5.5V13C23 19 19.2 24 14 25.5C8.8 24 5 19 5 13V5.5L14 2Z"
+                fill="url(#brand-shield-grad)"
+                stroke="rgba(255, 255, 255, 0.45)"
+                strokeWidth="1.25"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M14 4.5L21 7.2V13C21 17.8 17.8 22 14 23.3C10.2 22 7 17.8 7 13V7.2L14 4.5Z"
+                fill="url(#brand-shield-inner)"
+                opacity="0.85"
+              />
+              <path
+                d="M9.5 13.5L12.8 16.8L18.5 10.5"
+                stroke="#ffffff"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="18.5" cy="10.5" r="1.3" fill="#38bdf8" />
+              <defs>
+                <linearGradient
+                  id="brand-shield-grad"
+                  x1="4"
+                  y1="2"
+                  x2="24"
+                  y2="26"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stopColor="#6366f1" />
+                  <stop offset="0.5" stopColor="#4f46e5" />
+                  <stop offset="1" stopColor="#3b82f6" />
+                </linearGradient>
+                <linearGradient
+                  id="brand-shield-inner"
+                  x1="7"
+                  y1="4.5"
+                  x2="21"
+                  y2="23.3"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stopColor="#ffffff" stopOpacity="0.25" />
+                  <stop offset="0.4" stopColor="#818cf8" stopOpacity="0.1" />
+                  <stop offset="1" stopColor="#1e1b4b" stopOpacity="0.35" />
+                </linearGradient>
+              </defs>
+            </svg>
           </span>
           <span className="brand-text">
-            <span className="brand-title">
-              cyber<span className="brand-light">campus</span>
+            <span className="brand-title-wrap">
+              <span className="brand-title">
+                cyber<span className="brand-light">campus</span>
+              </span>
+              <span className="brand-badge">
+                <span className="brand-badge-pulse" aria-hidden="true" />
+                <span className="brand-badge-text">RESEARCH</span>
+              </span>
             </span>
-            <small>Cybersecurity Research Platform</small>
+            <span className="brand-subtitle">
+              <span className="brand-subtitle-dot" aria-hidden="true" />
+              Cybersecurity Research Platform
+            </span>
           </span>
         </Link>
 
@@ -213,8 +275,16 @@ export function SiteHeader() {
           >
             <div className="mobile-menu-header">
               <span className="mobile-menu-title">
-                <ShieldCheck size={18} strokeWidth={2} aria-hidden="true" />
-                <span>CYBER CAMPUS</span>
+                <span className="brand-icon mobile-drawer-brand-icon" aria-hidden="true">
+                  <ShieldCheck size={18} strokeWidth={2.2} />
+                </span>
+                <span className="mobile-brand-title">
+                  cyber<span className="brand-light">campus</span>
+                </span>
+                <span className="brand-badge mobile-drawer-badge">
+                  <span className="brand-badge-pulse" aria-hidden="true" />
+                  <span>RESEARCH</span>
+                </span>
               </span>
               <button
                 type="button"

@@ -66,9 +66,7 @@ export function CyberMissionControl({
   const [scenarios, setScenarios] = useState<Scenario[]>(
     () => initialScenarios ?? cachedScenarios ?? []
   );
-  const [loadingScenarios, setLoadingScenarios] = useState<boolean>(
-    () => !initialScenarios && !cachedScenarios
-  );
+  const [loadingScenarios, setLoadingScenarios] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [startingPractice, setStartingPractice] = useState<boolean>(false);
 
@@ -238,7 +236,7 @@ export function CyberMissionControl({
         progressPercent={4}
         missionKicker="MISSION 1 OF 6"
         title="Complete Your Student Profile"
-        subtitle="Your demographic profile has not been submitted yet. Please complete the 5 required profile questions before starting the cyber missions."
+        subtitle="Your demographic profile has not been submitted yet. Please complete the 4 required profile questions before starting the cyber missions."
         noticePill="Step 02 of 04 Required · Sri Lanka"
         backHref="/consent"
         backLabel="Research Consent"
@@ -257,7 +255,7 @@ export function CyberMissionControl({
 
           <h2>Complete Your Student Profile</h2>
           <p className="cyber-access-desc">
-            Your demographic profile has not been submitted yet. Please complete the 5 required
+            Your demographic profile has not been submitted yet. Please complete the 4 required
             profile questions before starting the research scenarios, or switch to educational practice mode.
           </p>
 
@@ -348,6 +346,8 @@ export function CyberMissionControl({
       {
         stepKey: JourneyStepKey;
         stepKicker: string;
+        title: string;
+        subtitle: string;
         progress: number;
         backLabel: string;
         onBack: () => void;
@@ -358,6 +358,8 @@ export function CyberMissionControl({
       phishing: {
         stepKey: "phishing",
         stepKicker: "STEP 03 OF 07 · IV1",
+        title: "Phishing Investigation",
+        subtitle: "Examine each email carefully and decide what you would do.",
         progress: 30,
         backLabel: "Back to Step 02: About You",
         onBack: () => router.push("/demographics"),
@@ -371,6 +373,8 @@ export function CyberMissionControl({
       pretexting: {
         stepKey: "pretexting",
         stepKicker: "STEP 04 OF 07 · IV2",
+        title: "Pretexting Detection",
+        subtitle: "Examine each communication carefully and decide what you would do.",
         progress: 45,
         backLabel: "Back to Step 03: Phishing Investigation",
         onBack: () => {
@@ -388,6 +392,8 @@ export function CyberMissionControl({
       impersonation: {
         stepKey: "impersonation",
         stepKicker: "STEP 05 OF 07 · IV3",
+        title: "Impersonation Investigation",
+        subtitle: "Examine each identity and message carefully and decide what you would do.",
         progress: 60,
         backLabel: "Back to Step 04: Pretexting Detection",
         onBack: () => {
@@ -405,6 +411,8 @@ export function CyberMissionControl({
       links: {
         stepKey: "links",
         stepKicker: "STEP 06 OF 07 · IV4",
+        title: "Scam & Malicious Link Investigation",
+        subtitle: "Examine each offer and link carefully and decide what you would do.",
         progress: 75,
         backLabel: "Back to Step 05: Impersonation Investigation",
         onBack: () => {
@@ -424,9 +432,10 @@ export function CyberMissionControl({
         currentStep={currentConfig.stepKey}
         progressPercent={currentConfig.progress}
         missionKicker={currentConfig.stepKicker}
-        title={currentMission.name}
-        subtitle={currentMission.description}
-        noticePill={`Scenario ${activeScenarioIndex + 1} of ${missionScenarios.length} · ${activeScenario?.id} · Anonymous Simulation`}
+        title={currentConfig.title}
+        subtitle={currentConfig.subtitle}
+        hideProgressHeader={true}
+        hideActionBar={true}
         onBack={currentConfig.onBack}
         backLabel={currentConfig.backLabel}
         onContinue={currentConfig.onContinue}

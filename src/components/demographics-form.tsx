@@ -25,7 +25,6 @@ export function DemographicsForm() {
     Q2: null,
     Q3: null,
     Q4: null,
-    Q5: null,
   });
   const [saving, setSaving] = useState(false);
   const [, setSaveStatus] = useState<string>("Draft stored in session");
@@ -55,7 +54,6 @@ export function DemographicsForm() {
           Q2: null,
           Q3: null,
           Q4: null,
-          Q5: null,
         });
         setSaveStatus("New anonymous participant ready");
       }
@@ -71,7 +69,6 @@ export function DemographicsForm() {
   const q2 = questions.find((q) => q.id === "Q2")!;
   const q3 = questions.find((q) => q.id === "Q3")!;
   const q4 = questions.find((q) => q.id === "Q4")!;
-  const q5 = questions.find((q) => q.id === "Q5")!;
 
   useEffect(() => {
     router.prefetch("/play");
@@ -91,7 +88,6 @@ export function DemographicsForm() {
         Q2: sessionAnswers.Q2?.value ?? null,
         Q3: sessionAnswers.Q3?.value ?? null,
         Q4: sessionAnswers.Q4?.value ?? null,
-        Q5: sessionAnswers.Q5?.value ?? null,
       });
       if (state.session.status !== "draft") {
         setSaveStatus("Profile validated and submitted");
@@ -145,17 +141,16 @@ export function DemographicsForm() {
     answers.Q1 !== null &&
     answers.Q2 !== null &&
     answers.Q3 !== null &&
-    answers.Q4 !== null &&
-    answers.Q5 !== null;
+    answers.Q4 !== null;
 
   const handleProceed = async () => {
     if (!isComplete) {
-      const missing = ["Q1", "Q2", "Q3", "Q4", "Q5"].filter(
+      const missing = ["Q1", "Q2", "Q3", "Q4"].filter(
         (id) => answers[id] === null
       );
       setMissingQuestionIds(missing);
       setValidationError(
-        `Please answer all 5 demographic questions to continue (${missing.length} remaining).`
+        `Please answer all 4 demographic questions to continue (${missing.length} remaining).`
       );
       const firstMissing = document.getElementById(`${missing[0]?.toLowerCase()}-card`);
       firstMissing?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -286,7 +281,7 @@ export function DemographicsForm() {
         </div>
       )}
 
-      {/* Five Clean Demographic Question Cards matching Reference Design */}
+      {/* Four Clean Demographic Question Cards matching Reference Design */}
       {/* Question 01: Age Group */}
       <div
         id="q1-card"
@@ -295,7 +290,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 1 of 25</span>
+          <span className="journey-card-count">Question 1 of 24</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q1-title" className="journey-question-text">
@@ -335,7 +330,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 2 of 25</span>
+          <span className="journey-card-count">Question 2 of 24</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q2-title" className="journey-question-text">
@@ -375,7 +370,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 3 of 25</span>
+          <span className="journey-card-count">Question 3 of 24</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q3-title" className="journey-question-text">
@@ -415,7 +410,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 4 of 25</span>
+          <span className="journey-card-count">Question 4 of 24</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q4-title" className="journey-question-text">
@@ -436,46 +431,6 @@ export function DemographicsForm() {
                 aria-checked={isSelected}
                 className={`journey-option-pill ${isSelected ? "selected" : ""}`}
                 onClick={() => handleSelect("Q4", opt.code)}
-              >
-                <span className="journey-radio-circle" aria-hidden="true">
-                  {isSelected && <span className="journey-radio-dot" />}
-                </span>
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Question 05: Cybersecurity / University Background */}
-      <div
-        id="q5-card"
-        className={`journey-question-card ${
-          missingQuestionIds.includes("Q5") ? "validation-error" : ""
-        }`}
-      >
-        <div className="journey-card-top">
-          <span className="journey-card-count">Question 5 of 25</span>
-          <span className="journey-card-required">Required</span>
-        </div>
-        <h2 id="q5-title" className="journey-question-text">
-          {q5.text}
-        </h2>
-        <div
-          className="journey-options-grid"
-          role="radiogroup"
-          aria-labelledby="q5-title"
-        >
-          {q5.options.map((opt) => {
-            const isSelected = answers.Q5 === opt.code;
-            return (
-              <button
-                key={opt.code}
-                type="button"
-                role="radio"
-                aria-checked={isSelected}
-                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
-                onClick={() => handleSelect("Q5", opt.code)}
               >
                 <span className="journey-radio-circle" aria-hidden="true">
                   {isSelected && <span className="journey-radio-dot" />}

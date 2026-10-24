@@ -477,25 +477,31 @@ svg {
   gap: 16px;
 }
 
+/* ==========================================================================
+   REDESIGNED BRAND SPOT — CYBER CAMPUS LOGO MARK & IDENTITY
+   ========================================================================== */
+
 /* Brand Link */
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  font-size: 22px;
+  gap: 13px;
+  font-size: 21px;
   font-weight: 800;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.035em;
   line-height: 1.1;
   color: var(--ink);
   text-decoration: none;
   min-width: 0;
   cursor: pointer;
-  border-radius: 12px;
-  transition: opacity 180ms ease, transform 180ms ease;
+  padding: 4px 6px 4px 2px;
+  border-radius: 14px;
+  user-select: none;
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .brand:hover {
-  opacity: 0.95;
+  opacity: 1;
   transform: translateY(-1px);
 }
 
@@ -504,46 +510,304 @@ svg {
   outline-offset: 4px;
 }
 
+/* Brand Icon Badge */
 .brand-icon {
-  background: var(--primary);
-  color: #ffffff;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  box-shadow: var(--shadow-glow);
-  transition: transform 180ms ease;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 52%, #7c3aed 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 
+    0 4px 14px -1px rgba(79, 70, 229, 0.38),
+    0 1px 3px 0 rgba(15, 23, 42, 0.1),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms ease;
+  overflow: hidden;
+}
+
+/* Micro ambient cyber glow ring behind the icon */
+.brand-icon-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.35), transparent 70%);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Subtle holographic sheen sweep on hover */
+.brand-icon::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  transition: transform 600ms ease;
+  pointer-events: none;
+}
+
+.brand:hover .brand-icon::after {
+  transform: translateX(100%);
 }
 
 .brand:hover .brand-icon {
+  transform: translateY(-1.5px) scale(1.05);
+  box-shadow: 
+    0 8px 24px -2px rgba(79, 70, 229, 0.5),
+    0 0 14px 1px rgba(99, 102, 241, 0.35),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Shield SVG inside the Icon */
+.brand-shield-svg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.3));
+  position: relative;
+  z-index: 1;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand:hover .brand-shield-svg {
   transform: scale(1.04);
 }
 
+/* Dark Theme Badge Tokens */
+[data-theme="dark"] .brand-icon,
+.dark .brand-icon {
+  background: linear-gradient(135deg, #3730a3 0%, #4f46e5 50%, #6366f1 100%);
+  border-color: rgba(165, 180, 252, 0.35);
+  box-shadow: 
+    0 4px 20px -2px rgba(99, 102, 241, 0.45),
+    0 0 12px 0 rgba(99, 102, 241, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+[data-theme="dark"] .brand:hover .brand-icon,
+.dark .brand:hover .brand-icon {
+  box-shadow: 
+    0 8px 28px -2px rgba(99, 102, 241, 0.6),
+    0 0 20px 2px rgba(129, 140, 248, 0.45),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.65);
+  border-color: rgba(199, 210, 254, 0.6);
+}
+
+/* Cyber Matrix Theme Badge Tokens */
+[data-theme="cyber"] .brand-icon,
+.cyber .brand-icon {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%);
+  border-color: rgba(103, 232, 249, 0.45);
+  box-shadow: 
+    0 4px 22px -2px rgba(6, 182, 212, 0.55),
+    0 0 16px 0 rgba(6, 182, 212, 0.35),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="cyber"] .brand:hover .brand-icon,
+.cyber .brand:hover .brand-icon {
+  box-shadow: 
+    0 8px 30px -2px rgba(6, 182, 212, 0.75),
+    0 0 24px 3px rgba(34, 211, 238, 0.55),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.75);
+  border-color: rgba(165, 243, 252, 0.7);
+}
+
+/* Brand Text Container */
 .brand-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Brand Title Row (Title + Status Pill) */
+.brand-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
 }
 
 .brand-title {
   display: inline-flex;
   align-items: baseline;
   white-space: nowrap;
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  line-height: 1;
 }
 
 .brand-light {
-  font-weight: 400;
-  opacity: 0.9;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-left: 0.5px;
+  color: var(--primary);
+  transition: color 180ms ease;
 }
 
-.brand small {
-  display: block;
-  margin-top: 2px;
+[data-theme="dark"] .brand-light,
+.dark .brand-light {
+  color: #a5b4fc;
+}
+
+[data-theme="cyber"] .brand-light,
+.cyber .brand-light {
+  color: #22d3ee;
+}
+
+/* Research Status Pill Badge */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  background: rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(79, 70, 229, 0.22);
+  color: var(--primary);
+  line-height: 1.2;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.brand:hover .brand-badge {
+  background: rgba(79, 70, 229, 0.14);
+  border-color: rgba(79, 70, 229, 0.35);
+}
+
+[data-theme="dark"] .brand-badge,
+.dark .brand-badge {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #c7d2fe;
+}
+
+[data-theme="dark"] .brand:hover .brand-badge,
+.dark .brand:hover .brand-badge {
+  background: rgba(99, 102, 241, 0.24);
+  border-color: rgba(129, 140, 248, 0.5);
+}
+
+[data-theme="cyber"] .brand-badge,
+.cyber .brand-badge {
+  background: rgba(6, 182, 212, 0.16);
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #67e8f9;
+}
+
+[data-theme="cyber"] .brand:hover .brand-badge,
+.cyber .brand:hover .brand-badge {
+  background: rgba(6, 182, 212, 0.26);
+  border-color: rgba(34, 211, 238, 0.6);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+/* Pulsing radar dot inside the research badge */
+.brand-badge-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: brand-radar-pulse 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes brand-radar-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    transform: scale(0.95);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+    transform: scale(1.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    transform: scale(0.95);
+  }
+}
+
+/* Brand Subtitle (Platform Descriptor) */
+.brand small,
+.brand-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
   font-size: 10px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 650;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.brand-subtitle-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--primary);
+  opacity: 0.8;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .brand-subtitle-dot,
+.dark .brand-subtitle-dot {
+  background: #818cf8;
+}
+
+[data-theme="cyber"] .brand-subtitle-dot,
+.cyber .brand-subtitle-dot {
+  background: #22d3ee;
+  box-shadow: 0 0 4px #22d3ee;
+}
+
+/* Mobile Navigation Drawer Brand Elements */
+.mobile-drawer-brand-icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 9px !important;
+  display: inline-flex !important;
+}
+
+.mobile-brand-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.mobile-drawer-badge {
+  font-size: 8.5px !important;
+  padding: 1px 6px !important;
 }
 
 /* Center Gamified Pill Navigation */
@@ -4490,7 +4754,8 @@ tfoot {
     font-size: 19px;
     gap: 8px;
   }
-  .brand small {
+  .brand small,
+  .brand-subtitle {
     display: none;
   }
   .desktop-pill-nav,
@@ -4585,7 +4850,8 @@ tfoot {
   .brand {
     font-size: 20px;
   }
-  .brand small {
+  .brand small,
+  .brand-subtitle {
     font-size: 9px;
   }
   
@@ -4978,7 +5244,8 @@ tfoot {
     padding-inline: 14px;
   }
 
-  .brand small {
+  .brand small,
+  .brand-subtitle {
     display: none;
   }
 
@@ -19628,7 +19895,8 @@ img, svg {
     padding: 10px 16px;
     gap: 10px;
   }
-  .brand small {
+  .brand small,
+  .brand-subtitle {
     display: none;
   }
   .brand {
@@ -28496,5 +28764,29 @@ body {
   text-align: center;
   margin-top: 14px;
 }
+
+/* ==========================================================================
+   REDESIGNED STEPS 03 - 06: CYBER INVESTIGATION WORKSTATION
+   Matches the high-fidelity UI specifications from the reference design
+   ========================================================================== */
+
+.cyber-step-investigation-layout {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.cyber-metrics-banner {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .cyber-metrics-banner {
+  background-color: #141e33;
+  border-color: #1e293b;
+}
+
 
 

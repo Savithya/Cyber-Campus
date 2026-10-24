@@ -62,13 +62,12 @@ describe("Submit Answers to Research Workspace Integration", () => {
     });
     expect(started.code).toBeDefined();
 
-    // 2. Fill demographic profile Q1-Q5
+    // 2. Fill demographic profile Q1-Q4
     await saveDraft({
       Q1: { status: "answered", value: 2 },
       Q2: { status: "answered", value: 1 },
       Q3: { status: "answered", value: 3 },
       Q4: { status: "answered", value: 4 },
-      Q5: { status: "answered", value: 2 },
     });
 
     await submitBaseline(
@@ -77,7 +76,6 @@ describe("Submit Answers to Research Workspace Integration", () => {
         Q2: { status: "answered", value: 1 },
         Q3: { status: "answered", value: 3 },
         Q4: { status: "answered", value: 4 },
-        Q5: { status: "answered", value: 2 },
       },
       "test-idemp-workspace",
     );
