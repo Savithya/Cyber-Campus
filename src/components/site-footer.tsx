@@ -31,7 +31,7 @@ export function SiteFooter({ compact }: SiteFooterProps) {
     }
   };
 
-  if (pathname === "/") {
+  if (pathname === "/" || pathname === "/consent" || pathname === "/join") {
     return (
       <footer
         className="spot-site-footer"
@@ -40,7 +40,7 @@ export function SiteFooter({ compact }: SiteFooterProps) {
       >
         <div className="spot-footer-container">
           <div className="spot-footer-left">
-            <span>Cyber Campus · Student Cyber Privacy Research</span>
+            <span>Spot the Phish · AI Email Challenge</span>
           </div>
 
           <div className="spot-footer-center">

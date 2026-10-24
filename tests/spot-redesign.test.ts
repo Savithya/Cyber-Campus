@@ -1,12 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import Home from "@/app/page";
 import { SpotHero } from "@/components/spot-hero";
-import { SpotTrustBar } from "@/components/spot-trust-bar";
-import { SpotMissionSteps } from "@/components/spot-mission-steps";
 import { SpotResearchVariables } from "@/components/spot-research-variables";
-import { SpotPurposeCard } from "@/components/spot-purpose-card";
+import { ResearchProgressStepper } from "@/components/research-progress-stepper";
+import { ResearchConsentPage } from "@/components/research-consent-page";
+import { SessionProvider } from "@/lib/client";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    prefetch: vi.fn(),
+    replace: vi.fn(),
+  }),
+  usePathname: () => "/consent",
+}));
 
 describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
   it("renders the redesigned home page with all essential Spot-the-Phish components", () => {
@@ -69,5 +78,63 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     const html = renderToString(React.createElement(SpotResearchVariables));
     expect(html).toContain("LMS &amp; Student Portal Logins");
     expect(html).toContain("Four Threat Vectors. One Privacy Shield.");
+  });
+
+  it("verifies clicking Start Challenge directs to /consent Join Research page", () => {
+    const html = renderToString(React.createElement(SpotHero));
+    expect(html).toContain('href="/consent"');
+    expect(html).toContain("Start Challenge");
+  });
+
+  it("renders the 4-stage research progress stepper matching Image 2", () => {
+    const html = renderToString(React.createElement(ResearchProgressStepper, { currentStep: 1 }));
+    expect(html).toContain("STEP 01");
+    expect(html).toContain("Research Consent");
+    expect(html).toContain("STEP 02");
+    expect(html).toContain("Student Profile");
+    expect(html).toContain("STEP 03");
+    expect(html).toContain("Cyber Missions");
+    expect(html).toContain("STEP 04");
+    expect(html).toContain("Completion");
+  });
+
+  it("renders the redesigned Join Research page matching Image 1 layout & requirements", () => {
+    const html = renderToString(
+      React.createElement(
+        SessionProvider,
+        null,
+        React.createElement(ResearchConsentPage)
+      )
+    );
+
+    // Editorial Header
+    expect(html).toContain("BEFORE WE BEGIN");
+    expect(html).toContain("A little context.");
+    expect(html).toContain("Your choice to take part.");
+    expect(html).toContain("Read the study information, then decide whether you&#x27;d like to participate.");
+
+    // Research Information Card
+    expect(html).toContain("RESEARCH INFORMATION");
+    expect(html).toContain("An Analysis of Factors Influencing University Students&#x27; Vulnerability to AI-Generated Phishing Emails in Sri Lanka");
+    expect(html).toContain("The purpose of this Computing Research Project is to analyze factors that may influence university students&#x27; vulnerability to AI-generated phishing emails.");
+
+    // 4 Key Information Blocks (2x2 Grid)
+    expect(html).toContain("Around 12–18 minutes");
+    expect(html).toContain("Always your choice");
+    expect(html).toContain("Confidential research");
+    expect(html).toContain("A controlled simulation");
+
+    // Mint Callout Box
+    expect(html).toContain("How your responses are saved");
+    expect(html).toContain("Draft answers stay in this browser tab");
+
+    // Consent & Eligibility Checkboxes
+    expect(html).toContain("id=\"consent-checkbox\"");
+    expect(html).toContain("id=\"eligibility-checkbox\"");
+    expect(html).toContain("I have read the information above and voluntarily agree to participate in this research study.");
+
+    // Action Buttons
+    expect(html).toContain("I Agree &amp; Continue");
+    expect(html).toContain("I Do Not Agree");
   });
 });

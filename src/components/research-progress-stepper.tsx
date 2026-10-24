@@ -44,7 +44,7 @@ export function ResearchProgressStepper({
 
   return (
     <div
-      className={`research-progress-stepper-container ${className}`}
+      className={`research-progress-stepper-container research-progress-stepper ${className}`}
       role="region"
       aria-label="Research Participation Stages"
     >

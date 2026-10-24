@@ -5,18 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ShieldCheck,
-  HeartHandshake,
+  Heart,
   Clock,
-  GraduationCap,
   ArrowRight,
   ChevronDown,
   ChevronUp,
   RotateCcw,
   CheckCircle2,
   Check,
-  Gamepad2,
   Lock,
-  Sparkles,
   AlertCircle,
   Trash2,
   Loader2,
@@ -170,28 +167,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     }
   }
 
-  // Safe reset returning participant session to review consent briefing
-  async function handleResetSessionToConsent() {
-    setDiscarding(true);
-    setError("");
-    try {
-      clearParticipationStorage();
-      await api("session/clear", {}).catch(() => api("session/discard", {}));
-      state.setSession(null);
-      await state.reload();
-      setTimeout(() => {
-        const el = document.getElementById("consent-compact-card") || document.querySelector(".consent-compact-card");
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 100);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setDiscarding(false);
-    }
-  }
-
   const hasSession = Boolean(state.session);
   const sessionData = state.session;
   const isResumable =
@@ -199,355 +174,320 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     (sessionData?.status === "draft" || sessionData?.mode === "practice");
 
   const studyTitle =
-    config?.title ??
-    "Impact of Social Engineering Threats on User Privacy among University Students in Sri Lanka";
+    config?.title ||
+    "An Analysis of Factors Influencing University Students' Vulnerability to AI-Generated Phishing Emails in Sri Lanka";
 
   return (
-    <div className="consent-page-container container page-space">
-      {/* 4-Stage Reusable Stepper */}
-      <ResearchProgressStepper currentStep={1} />
+    <div className="spot-join-page-wrapper">
+      <div className="spot-join-container">
+        {/* Step Progression Bar (STEP 01 Research Consent, STEP 02 Student Profile, STEP 03 Cyber Missions, STEP 04 Completion) */}
+        <div className="spot-join-stepper-card">
+          <ResearchProgressStepper currentStep={1} />
+        </div>
 
-      {/* Resumable draft banner if user already started */}
-      {isResumable && sessionData?.status === "draft" && (
-        <div className="draft-session-banner-wrapper">
-          <div className="draft-session-banner" role="region" aria-label="Resume Draft">
-            <div className="draft-session-left">
-              <div className="draft-icon-box" aria-hidden="true">
-                <RotateCcw size={20} />
-              </div>
-              <div className="draft-info-content">
-                <div className="draft-title-row">
-                  <span className="draft-title-text">Draft Session In Progress</span>
-                  <span className="draft-status-pill">Saved Draft</span>
+        {/* Resumable draft banner if user already started */}
+        {isResumable && sessionData?.status === "draft" && (
+          <div className="draft-session-banner-wrapper mb-6">
+            <div className="draft-session-banner" role="region" aria-label="Resume Draft">
+              <div className="draft-session-left">
+                <div className="draft-icon-box" aria-hidden="true">
+                  <RotateCcw size={20} />
                 </div>
-                <p className="draft-meta-text">
-                  Anonymous Code: <span className="draft-id-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
-                </p>
+                <div className="draft-info-content">
+                  <div className="draft-title-row">
+                    <span className="draft-title-text">Draft Session In Progress</span>
+                    <span className="draft-status-pill">Saved Draft</span>
+                  </div>
+                  <p className="draft-meta-text">
+                    Anonymous Code: <span className="draft-id-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="draft-session-actions">
-              <Link href="/demographics" prefetch={true} className="btn-resume-primary">
-                <span>Resume Participation</span>
-                <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
-              </Link>
-              <button
-                type="button"
-                className="btn-discard-secondary"
-                onClick={handleDiscardDraft}
-                disabled={discarding}
-                title="Discard this draft and start over with a new Anonymous ID"
-              >
-                {discarding ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                    <span>Discarding...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 size={14} aria-hidden="true" />
-                    <span>Discard Draft (Start New ID)</span>
-                  </>
-                )}
-              </button>
+              <div className="draft-session-actions">
+                <Link href="/demographics" prefetch={true} className="btn-resume-primary">
+                  <span>Resume Participation</span>
+                  <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                </Link>
+                <button
+                  type="button"
+                  className="btn-discard-secondary"
+                  onClick={handleDiscardDraft}
+                  disabled={discarding}
+                  title="Discard this draft and start over with a new Anonymous ID"
+                >
+                  {discarding ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                      <span>Discarding...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={14} aria-hidden="true" />
+                      <span>Discard Draft (Start New ID)</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Completed research notice */}
-      {hasSession &&
-        (sessionData?.status === "submitted_complete" ||
-          sessionData?.status === "submitted_with_missing") && (
-        <div className="draft-session-banner-wrapper">
-          <div className="draft-session-banner completed-mode" role="region" aria-label="Completed Research">
-            <div className="draft-session-left">
-              <div className="draft-icon-box completed-icon" aria-hidden="true">
-                <CheckCircle2 size={20} />
-              </div>
-              <div className="draft-info-content">
-                <div className="draft-title-row">
-                  <span className="draft-title-text">Previous Research Completed</span>
-                  <span className="draft-status-pill completed-pill">Recorded</span>
+        {/* Completed research notice */}
+        {hasSession &&
+          (sessionData?.status === "submitted_complete" ||
+            sessionData?.status === "submitted_with_missing") && (
+          <div className="draft-session-banner-wrapper mb-6">
+            <div className="draft-session-banner completed-mode" role="region" aria-label="Completed Research">
+              <div className="draft-session-left">
+                <div className="draft-icon-box completed-icon" aria-hidden="true">
+                  <CheckCircle2 size={20} />
                 </div>
-                <p className="draft-meta-text">
-                  Anonymous ID: <span className="draft-id-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
-                </p>
+                <div className="draft-info-content">
+                  <div className="draft-title-row">
+                    <span className="draft-title-text">Previous Research Completed</span>
+                    <span className="draft-status-pill completed-pill">Recorded</span>
+                  </div>
+                  <p className="draft-meta-text">
+                    Anonymous ID: <span className="draft-id-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="draft-session-actions">
-              <button
-                type="button"
-                className="btn-join-fresh-primary"
-                onClick={handleJoinNewParticipant}
-                disabled={busy || discarding}
-                aria-label="Join as New Participant"
-              >
-                {busy ? (
-                  <>
-                    <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-                    <span>Starting New Session...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Join as New Participant</span>
-                    <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
-                  </>
-                )}
-              </button>
+              <div className="draft-session-actions">
+                <button
+                  type="button"
+                  className="btn-join-fresh-primary"
+                  onClick={handleJoinNewParticipant}
+                  disabled={busy || discarding}
+                  aria-label="Join as New Participant"
+                >
+                  {busy ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                      <span>Starting New Session...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Join as New Participant</span>
+                      <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {error && (
-        <div className="error-banner mb-6" role="alert">
-          <AlertCircle size={18} aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      )}
+        {error && (
+          <div className="error-banner mb-6" role="alert">
+            <AlertCircle size={18} aria-hidden="true" />
+            <span>{error}</span>
+          </div>
+        )}
 
-      {/* Modern, Compact & User-Friendly Briefing Card */}
-      <div className="consent-compact-wrapper">
-        <div className="consent-compact-card" id="consent-compact-card">
-          {/* Card Header */}
-          <div className="consent-compact-header">
-            <div className="hero-pill-badge mb-2">
-              <Sparkles size={13} className="text-primary" aria-hidden="true" />
-              <span>STUDENT RESEARCH BRIEFING · STEP 01 OF 04</span>
+        {/* Editorial Page Header matching Image 1 */}
+        <div className="spot-join-header">
+          <span className="spot-join-eyebrow">BEFORE WE BEGIN</span>
+          <h1 className="spot-join-title">
+            A little context.
+            <br />
+            Your choice to take part.
+          </h1>
+          <p className="spot-join-subtitle">
+            Read the study information, then decide whether you&apos;d like to participate.
+          </p>
+        </div>
+
+        {/* Main White Card matching Image 1 */}
+        <div className="spot-join-card" id="consent-compact-card">
+          {/* Card Top Eyebrow Badge */}
+          <div className="spot-join-card-badge">
+            <ShieldCheck size={16} className="spot-join-badge-icon" aria-hidden="true" />
+            <span>RESEARCH INFORMATION</span>
+          </div>
+
+          {/* Research Title */}
+          <h2 className="spot-join-card-title">
+            An Analysis of Factors Influencing University Students&apos; Vulnerability to AI-Generated Phishing Emails in Sri Lanka
+          </h2>
+
+          {/* Research Purpose Lead Paragraph */}
+          <p className="spot-join-card-lead">
+            The purpose of this Computing Research Project is to analyze factors that may influence university students&apos; vulnerability to AI-generated phishing emails. Please answer honestly based on your own knowledge, experience, and opinions.
+          </p>
+
+          {/* 4-Item Information Grid (2 columns x 2 rows) */}
+          <div className="spot-join-grid">
+            {/* 1. Time estimate */}
+            <div className="spot-join-grid-item">
+              <div className="spot-join-item-header">
+                <Clock size={19} className="spot-join-item-icon" aria-hidden="true" />
+                <h3 className="spot-join-item-title">Around 12–18 minutes</h3>
+              </div>
+              <p className="spot-join-item-desc">
+                A questionnaire, followed by ten fictional email scenarios. Take as long as you need.
+              </p>
             </div>
-            <h1 className="consent-compact-title">Before You Begin</h1>
-            <p className="consent-compact-subtitle">
-              Welcome! Please review the study briefing below and confirm your eligibility to participate in the Cyber Campus research study on social engineering awareness.
+
+            {/* 2. Voluntary choice */}
+            <div className="spot-join-grid-item">
+              <div className="spot-join-item-header">
+                <Heart size={19} className="spot-join-item-icon" aria-hidden="true" />
+                <h3 className="spot-join-item-title">Always your choice</h3>
+              </div>
+              <p className="spot-join-item-desc">
+                Participation is voluntary. You can stop without giving a reason before final submission.
+              </p>
+            </div>
+
+            {/* 3. Confidential research */}
+            <div className="spot-join-grid-item">
+              <div className="spot-join-item-header">
+                <Lock size={19} className="spot-join-item-icon" aria-hidden="true" />
+                <h3 className="spot-join-item-title">Confidential research</h3>
+              </div>
+              <p className="spot-join-item-desc">
+                We do not request your name, student number, passwords, banking details, or private credentials. Responses are accessible only to authorized researchers and used for academic research.
+              </p>
+            </div>
+
+            {/* 4. A controlled simulation */}
+            <div className="spot-join-grid-item">
+              <div className="spot-join-item-header">
+                <ShieldCheck size={19} className="spot-join-item-icon" aria-hidden="true" />
+                <h3 className="spot-join-item-title">A controlled simulation</h3>
+              </div>
+              <p className="spot-join-item-desc">
+                No real phishing attacks are performed. Links and attachments are inert. Scenario decision time is recorded as an additional game metric.
+              </p>
+            </div>
+          </div>
+
+          {/* Mint Highlight Callout Box: How your responses are saved */}
+          <div className="spot-join-saved-callout">
+            <h4 className="spot-saved-title">How your responses are saved</h4>
+            <p className="spot-saved-desc">
+              Draft answers stay in this browser tab. At the end of the questionnaire, you explicitly save your responses before starting the game. &apos;Leave study&apos; removes a saved incomplete response. After final submission, anonymous responses cannot be withdrawn through the participant interface. Game points do not alter your questionnaire answers.
             </p>
           </div>
 
-          {/* 4 Glanceable Stat Highlights */}
-          <div className="consent-glance-grid">
-            <div className="glance-item">
-              <div className="glance-icon-box cyan">
-                <Clock size={16} aria-hidden="true" />
-              </div>
-              <div className="glance-text">
-                <strong>15–20 Mins</strong>
-                <span>Self-paced · 20 missions</span>
-              </div>
-            </div>
+          {/* Consent Checkboxes */}
+          <div className="spot-join-consent-block">
+            {/* Student Eligibility Checkbox */}
+            <label htmlFor="eligibility-checkbox" className="spot-join-checkbox-label">
+              <input
+                id="eligibility-checkbox"
+                type="checkbox"
+                checked={eligible}
+                onChange={(e) => setEligible(e.target.checked)}
+                className="spot-join-checkbox-input"
+                aria-required="true"
+              />
+              <span className="spot-join-checkbox-custom" aria-hidden="true">
+                {eligible && <Check size={13} strokeWidth={3} />}
+              </span>
+              <span className="spot-join-checkbox-text">
+                I confirm that I am <strong>18 years of age or older</strong> and currently enrolled in a higher education institution in <strong>Sri Lanka</strong>.
+              </span>
+            </label>
 
-            <div className="glance-item">
-              <div className="glance-icon-box primary">
-                <Lock size={16} aria-hidden="true" />
-              </div>
-              <div className="glance-text">
-                <strong>100% Anonymous</strong>
-                <span>No IDs or personal data</span>
-              </div>
-            </div>
-
-            <div className="glance-item">
-              <div className="glance-icon-box emerald">
-                <ShieldCheck size={16} aria-hidden="true" />
-              </div>
-              <div className="glance-text">
-                <strong>Safe Sandbox</strong>
-                <span>Zero real passwords</span>
-              </div>
-            </div>
-
-            <div className="glance-item">
-              <div className="glance-icon-box purple">
-                <GraduationCap size={16} aria-hidden="true" />
-              </div>
-              <div className="glance-text">
-                <strong>Sri Lankan Students</strong>
-                <span>Age 18+ university enrolled</span>
-              </div>
-            </div>
+            {/* Voluntary Agreement Checkbox */}
+            <label htmlFor="consent-checkbox" className="spot-join-checkbox-label">
+              <input
+                id="consent-checkbox"
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => {
+                  const val = e.target.checked;
+                  setConsent(val);
+                  if (val && !eligible) {
+                    setEligible(true);
+                  }
+                }}
+                className="spot-join-checkbox-input"
+                aria-required="true"
+              />
+              <span className="spot-join-checkbox-custom" aria-hidden="true">
+                {consent && <Check size={13} strokeWidth={3} />}
+              </span>
+              <span className="spot-join-checkbox-text">
+                I have read the information above and voluntarily agree to participate in this research study.
+              </span>
+            </label>
           </div>
 
-          {/* Crisp 3-Step Walkthrough */}
-          <div className="consent-quick-steps">
-            <div className="quick-step-card">
-              <span className="step-badge-mini">1</span>
-              <div>
-                <strong>Student Profile</strong>
-                <p>5 quick non-identifying academic background questions</p>
-              </div>
-            </div>
-            <div className="quick-step-card">
-              <span className="step-badge-mini">2</span>
-              <div>
-                <strong>20 Cyber Missions</strong>
-                <p>Simulated phishing, pretexting &amp; scam scenarios in an inert sandbox</p>
-              </div>
-            </div>
-            <div className="quick-step-card">
-              <span className="step-badge-mini">3</span>
-              <div>
-                <strong>Immediate Debrief</strong>
-                <p>Instant educational safety feedback &amp; protective best practices</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Collapsible Research Ethics & Governance Accordion */}
-          <div className="consent-ethics-accordion">
+          {/* Primary & Secondary Action Buttons */}
+          <div className="spot-join-actions">
             <button
               type="button"
-              className="consent-ethics-toggle"
+              className="spot-join-btn-agree"
+              onClick={() => handleStart(false)}
+              disabled={!consent || !eligible || busy}
+              aria-label="I Agree & Continue · Continue to Student Profile · Consent and begin questionnaire"
+              title="Agree and continue to student profile"
+            >
+              {busy ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                  <span>Starting Session…</span>
+                </>
+              ) : (
+                <>
+                  <span>I Agree &amp; Continue</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="spot-join-btn-disagree"
+              onClick={() => router.push("/")}
+              disabled={busy}
+              aria-label="I Do Not Agree"
+            >
+              <span>I Do Not Agree</span>
+            </button>
+          </div>
+
+          {/* Optional Practice Link */}
+          <div className="spot-join-practice-row">
+            <span>Prefer to explore without recording research data?</span>
+            <button
+              type="button"
+              className="spot-join-practice-link"
+              onClick={() => handleStart(true)}
+              disabled={busy}
+              aria-label="Explore Practice Challenges Only · Decline & practise only"
+            >
+              Explore practice challenges only →
+            </button>
+          </div>
+
+          {/* Expandable Ethics & Governance Details */}
+          <div className="mt-6 pt-4 border-t border-slate-200/70">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
               onClick={() => setExpandedDetails(!expandedDetails)}
               aria-expanded={expandedDetails}
             >
-              <div className="flex items-center gap-2">
-                <HeartHandshake size={16} className="text-primary shrink-0" aria-hidden="true" />
-                <span className="font-semibold text-xs sm:text-sm text-ink">
-                  Research Ethics, Data Privacy &amp; Participant Rights
-                </span>
-              </div>
-              <span className="ethics-accordion-status">
-                {expandedDetails ? "Hide Protocol" : "View Protocol"}
-                {expandedDetails ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-              </span>
+              <span>Research Ethics, Data Privacy &amp; Participant Rights</span>
+              {expandedDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
 
             {expandedDetails && (
-              <div className="consent-ethics-body" role="region" aria-label="Detailed Research Terms">
-                <div className="ethics-study-title-pill">
-                  <span className="label">RESEARCH STUDY:</span>
-                  <span className="val">&ldquo;{studyTitle}&rdquo;</span>
-                </div>
-                <div className="ethics-points-grid">
-                  <div className="ethics-point-item">
-                    <CheckCircle2 size={15} className="text-emerald shrink-0 mt-0.5" />
-                    <div>
-                      <strong>Voluntary Participation</strong>
-                      <p>Participation is entirely voluntary. You may pause your session, skip scenarios, or withdraw completely at any point prior to final submission without any academic, institutional, or personal consequence.</p>
-                    </div>
-                  </div>
-                  <div className="ethics-point-item">
-                    <CheckCircle2 size={15} className="text-cyan shrink-0 mt-0.5" />
-                    <div>
-                      <strong>Privacy Act Compliance</strong>
-                      <p>Conducted under academic research ethics standards and adheres to Sri Lanka Personal Data Protection Act No. 9 of 2022 principles of data minimization and purpose specification.</p>
-                    </div>
-                  </div>
-                  <div className="ethics-point-item">
-                    <CheckCircle2 size={15} className="text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <strong>Anonymous Token &amp; Self-Service Withdrawal</strong>
-                      <p>An isolated random token governs your session. You can use this token anytime to review or permanently delete your unsubmitted or submitted data via the <Link href="/withdraw" className="underline font-semibold hover:text-primary">Withdrawal page</Link>.</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="mt-3 p-3 bg-slate-50 rounded-lg text-xs text-slate-600 space-y-2">
+                <p>
+                  <strong>Study Protocol:</strong> &ldquo;{studyTitle}&rdquo;
+                </p>
+                <p>
+                  <strong>Ethics Compliance:</strong> Conducted under academic research guidelines and adheres to Sri Lanka Personal Data Protection Act No. 9 of 2022 principles of data minimization and purpose specification.
+                </p>
+                <p>
+                  <strong>Self-Service Data Rights:</strong> A unique cryptographic session token manages your participation. You can manage or delete your data at any time via the <Link href="/withdraw" className="underline font-medium text-indigo-600">Withdrawal page</Link>.
+                </p>
               </div>
             )}
-          </div>
-
-          {/* Consent Checkboxes & Action Section */}
-          <div className="consent-decision-box" id="consent-decision-box">
-            <div className="consent-decision-header">
-              <span className="step-chip">STEP 1 OF 4</span>
-              <span className="ssl-chip">
-                <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
-                Secure &amp; Anonymous Consent
-              </span>
-            </div>
-
-            <div className="consent-checks-container">
-              {/* Mandatory Checkbox 1: Age & University Eligibility */}
-              <label
-                htmlFor="eligibility-checkbox"
-                className={`consent-toggle-card ${eligible ? "is-selected" : ""}`}
-              >
-                <input
-                  id="eligibility-checkbox"
-                  type="checkbox"
-                  checked={eligible}
-                  onChange={(e) => setEligible(e.target.checked)}
-                  className="sr-only"
-                  aria-required="true"
-                />
-                <span className="custom-check-box" aria-hidden="true">
-                  {eligible && <Check size={14} strokeWidth={3} className="text-white" />}
-                </span>
-                <div className="toggle-text-block">
-                  <span className="toggle-main-title">Age &amp; Student Eligibility</span>
-                  <span className="toggle-sub-copy">
-                    I confirm that I am <strong>18 years or older</strong> and currently enrolled at a higher education institution in <strong>Sri Lanka</strong>.
-                  </span>
-                </div>
-              </label>
-
-              {/* Mandatory Checkbox 2: Voluntary Agreement */}
-              <label
-                htmlFor="consent-checkbox"
-                className={`consent-toggle-card ${consent ? "is-selected" : ""}`}
-              >
-                <input
-                  id="consent-checkbox"
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="sr-only"
-                  aria-required="true"
-                />
-                <span className="custom-check-box" aria-hidden="true">
-                  {consent && <Check size={14} strokeWidth={3} className="text-white" />}
-                </span>
-                <div className="toggle-text-block">
-                  <span className="toggle-main-title">Voluntary Agreement</span>
-                  <span className="toggle-sub-copy">
-                    I have read and reviewed the research information and <strong>voluntarily agree to participate</strong> in this study.
-                  </span>
-                </div>
-              </label>
-            </div>
-
-            {/* Primary Action Button */}
-            <button
-              type="button"
-              className="button primary large consent-launch-button"
-              onClick={() => handleStart(false)}
-              disabled={!eligible || !consent || busy}
-              aria-label="Agree & Continue · Continue to Student Profile · Consent and begin questionnaire"
-            >
-              <span>{busy ? "Starting Research Session…" : "Agree & Begin Study"}</span>
-              <ArrowRight size={18} aria-hidden="true" />
-            </button>
-
-            {(!eligible || !consent) && (
-              <p className="consent-hint-v2">
-                <AlertCircle size={13} className="inline mr-1 text-primary" aria-hidden="true" />
-                Check both boxes above to unlock research participation.
-              </p>
-            )}
-
-            <div className="action-divider-v2">
-              <span>OR EXPLORE WITHOUT RECORDING</span>
-            </div>
-
-            {/* Practice Mode Alternative */}
-            <button
-              type="button"
-              className="button secondary consent-alt-btn"
-              onClick={() => handleStart(true)}
-              disabled={busy}
-              aria-label="Decline & practise only · Explore Practice Challenges Only"
-              title="Explore scenarios in educational mode without recording research data"
-            >
-              <Gamepad2 size={16} aria-hidden="true" />
-              <span>Explore Practice Challenges Only</span>
-            </button>
-            <span className="practice-subtext-v2">Purely educational simulation · no research data saved</span>
-
-            <div className="action-footer-row">
-              <Link href="/" prefetch={true} className="back-home-link">
-                ← Return Home
-              </Link>
-              <span className="irb-safe-label">
-                <Lock size={12} className="text-emerald inline mr-1" aria-hidden="true" />
-                IRB Protocol Protected
-              </span>
-            </div>
           </div>
         </div>
       </div>
