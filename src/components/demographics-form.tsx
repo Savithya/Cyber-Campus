@@ -2,28 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { AlertCircle, CheckCircle2, RotateCcw } from "lucide-react";
 import {
-  User,
-  GraduationCap,
-  Building2,
-  BookOpen,
-  Calendar,
-  ArrowRight,
-  ArrowLeft,
-  ShieldCheck,
-  Check,
-  AlertCircle,
-  Lock,
-  Layers,
-  Loader2,
-  RotateCcw,
-  CheckCircle2,
-} from "lucide-react";
-import { api, useSession, loadDraft, putDraft, randomToken, clearParticipationStorage } from "@/lib/client";
+  api,
+  useSession,
+  loadDraft,
+  putDraft,
+  randomToken,
+  clearParticipationStorage,
+} from "@/lib/client";
 import { questions } from "@/content/questionnaire";
 import type { Answers, Session } from "@/lib/types";
-import { ResearchProgressStepper } from "./research-progress-stepper";
+import { ResearchJourneyFrame } from "./research-journey-frame";
 import { Loading } from "./ui";
 
 export function DemographicsForm() {
@@ -38,8 +28,8 @@ export function DemographicsForm() {
     Q5: null,
   });
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string>("Draft stored in session");
-  const [error, setError] = useState<string>("");
+  const [, setSaveStatus] = useState<string>("Draft stored in session");
+  const [error, setError] = useState<string>("" );
   const [validationError, setValidationError] = useState<string>("");
   const [missingQuestionIds, setMissingQuestionIds] = useState<string[]>([]);
   const [resettingParticipant, setResettingParticipant] = useState(false);
@@ -167,8 +157,7 @@ export function DemographicsForm() {
       setValidationError(
         `Please answer all 5 demographic questions to continue (${missing.length} remaining).`
       );
-      // Smooth scroll to first missing question
-      const firstMissing = document.getElementById(`${missing[0]?.toLowerCase()}-title`);
+      const firstMissing = document.getElementById(`${missing[0]?.toLowerCase()}-card`);
       firstMissing?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -187,7 +176,6 @@ export function DemographicsForm() {
     setSaving(true);
     setValidationError("");
     try {
-      // Assemble full answers structure with Q1..Q5 as answered, Q6..Q25 as not_answered
       const fullAnswers: Answers = { ...state.session.answers };
       for (const [k, v] of Object.entries(answers)) {
         fullAnswers[k] = {
@@ -201,11 +189,9 @@ export function DemographicsForm() {
         }
       }
 
-      // Authoritative idempotency key
       const local = loadDraft(state.session.code);
       const submitKey = local?.submitKey ?? crypto.randomUUID();
 
-      // Submit demographic profile to backend authoritative repository
       const res = await api<{ session: Session }>("session/submit", {
         answers: fullAnswers,
         idempotencyKey: submitKey,
@@ -237,107 +223,39 @@ export function DemographicsForm() {
   const participantCode = state.session?.code ?? "ANON";
 
   return (
-    <div className="demographics-page-wrapper">
-      {/* 1. Four-Step Progress Stepper */}
-      <nav
-        className="research-progress-stepper"
-        aria-label="Research Participation Progress"
-      >
-        <div className="stepper-step completed">
-          <div className="stepper-dot">
-            <Check size={16} aria-hidden="true" />
-          </div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 01</span>
-            <span className="stepper-step-name">Research Consent</span>
-          </div>
+    <ResearchJourneyFrame
+      currentStep="profile"
+      progressPercent={answers.Q1 ? 25 : 4}
+      missionKicker="MISSION 1 OF 6"
+      title="About You"
+      subtitle="These questions help us understand the background of participants. There are no right or wrong answers."
+      noticePill={
+        answers.Q1
+          ? `Age group recorded in eligibility: ${
+              q1.options.find((o) => o.code === answers.Q1)?.label || "18 - 20"
+            }`
+          : "Age group recorded in eligibility: 18 - 20"
+      }
+      backHref="/consent"
+      onContinue={handleProceed}
+      continueLabel="Continue"
+      continueLoading={saving}
+      continueDisabled={!isComplete}
+    >
+      {/* Error Banner */}
+      {error && (
+        <div className="error-banner mb-4" role="alert">
+          <AlertCircle size={18} aria-hidden="true" />
+          <span>{error}</span>
         </div>
+      )}
 
-        <div className="stepper-connector completed" />
-
-        <div className="stepper-step active" aria-current="step">
-          <div className="stepper-dot">02</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 02</span>
-            <span className="stepper-step-name">Student Profile</span>
-          </div>
+      {validationError && (
+        <div className="error-banner mb-4" role="alert">
+          <AlertCircle size={18} aria-hidden="true" />
+          <span>{validationError}</span>
         </div>
-
-        <div className="stepper-connector" />
-
-        <div className="stepper-step">
-          <div className="stepper-dot">03</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 03</span>
-            <span className="stepper-step-name">Cyber Missions</span>
-          </div>
-        </div>
-
-        <div className="stepper-connector" />
-
-        <div className="stepper-step">
-          <div className="stepper-dot">04</div>
-          <div className="stepper-info">
-            <span className="stepper-step-num">STEP 04</span>
-            <span className="stepper-step-name">Completion</span>
-          </div>
-        </div>
-      </nav>
-
-      {/* 2. Main Header & Participation Information Bar */}
-      <header className="demographics-header">
-        <div className="eyebrow">
-          <span className="live-pulse-dot" aria-hidden="true" />
-          <span>STEP 02 OF 04 · PARTICIPANT PROFILE</span>
-        </div>
-        <h1 className="demographics-title">
-          Participant Profile
-        </h1>
-        <p className="demographics-subtitle">
-          Provide basic academic background information to support research analysis.
-        </p>
-
-        <div className="demographics-info-bar" role="status" aria-label="Participation Information">
-          <div className="info-bar-pill">
-            <Lock size={13} className="text-muted" aria-hidden="true" />
-            <span className="info-pill-label">Anonymous ID:</span>
-            <strong className="info-pill-value font-mono">{participantCode}</strong>
-          </div>
-          <div className="info-bar-divider" aria-hidden="true" />
-          <div className="info-bar-pill">
-            <ShieldCheck size={14} className="text-emerald" aria-hidden="true" />
-            <span className="info-pill-label">Draft Status:</span>
-            <strong className="info-pill-value">{saveStatus}</strong>
-          </div>
-          <div className="info-bar-divider" aria-hidden="true" />
-          <div className="info-bar-pill">
-            <Layers size={14} className="text-primary" aria-hidden="true" />
-            <span className="info-pill-label">Research Stage:</span>
-            <strong className="info-pill-value">Stage 02 of 04</strong>
-          </div>
-          <div className="info-bar-divider" aria-hidden="true" />
-          <button
-            type="button"
-            className="btn-new-participant-pill"
-            onClick={handleStartNewParticipant}
-            disabled={resettingParticipant}
-            title="Generate a new dynamic Anonymous ID and join as a new research participant"
-            aria-label="Generate new dynamic Anonymous ID"
-          >
-            {resettingParticipant ? (
-              <>
-                <Loader2 size={13} className="animate-spin" aria-hidden="true" />
-                <span>Assigning ID...</span>
-              </>
-            ) : (
-              <>
-                <RotateCcw size={13} aria-hidden="true" />
-                <span>New Anonymous ID</span>
-              </>
-            )}
-          </button>
-        </div>
-      </header>
+      )}
 
       {/* Previously Completed Profile Banner */}
       {state.session?.status !== "draft" && (
@@ -346,273 +264,227 @@ export function DemographicsForm() {
             <CheckCircle2 size={18} className="text-emerald shrink-0" aria-hidden="true" />
             <div className="banner-text">
               <strong>Previously Completed Profile (Anonymous ID: {participantCode})</strong>
-              <p>This profile was previously validated and recorded into the Research Workspace. Click below to start as a new participant with a fresh Anonymous ID.</p>
+              <p>This profile was previously recorded. Click below if you want to start as a new participant with a fresh Anonymous ID.</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleStartNewParticipant}
             disabled={resettingParticipant}
-            className="button secondary small"
+            className="button secondary small mt-2"
           >
-            {resettingParticipant ? "Assigning New ID..." : "Join as New Participant (Next ID)"}
-          </button>
-        </div>
-      )}
-
-      {/* Error Banner */}
-      {error && (
-        <div className="error-banner" role="alert" style={{ marginBottom: 24 }}>
-          <AlertCircle size={18} aria-hidden="true" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* 3. Five Demographic Question Cards */}
-      <main className="demographics-cards-grid" aria-label="Demographic Questions">
-        {/* Question 01: Age Group */}
-        <section
-          className={`demo-card ${missingQuestionIds.includes("Q1") ? "validation-error" : ""}`}
-          aria-labelledby="q1-title"
-        >
-          <div className="demo-card-header">
-            <span className="demo-icon-box lavender">
-              <Calendar size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <span className="demo-question-tag">QUESTION 01 — AGE GROUP</span>
-              <h2 id="q1-title" className="demo-question-heading">{q1.text}</h2>
-            </div>
-          </div>
-          <div className="demo-options-container grid-2" role="radiogroup" aria-labelledby="q1-title">
-            {q1.options.map((opt) => {
-              const isSelected = answers.Q1 === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`demo-option-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handleSelect("Q1", opt.code)}
-                >
-                  <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected ? (
-                      <Check size={13} strokeWidth={3} className="text-white" />
-                    ) : (
-                      <span className="demo-radio-dot" />
-                    )}
-                  </span>
-                  <span className="demo-option-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Question 02: Gender */}
-        <section
-          className={`demo-card ${missingQuestionIds.includes("Q2") ? "validation-error" : ""}`}
-          aria-labelledby="q2-title"
-        >
-          <div className="demo-card-header">
-            <span className="demo-icon-box teal">
-              <User size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <span className="demo-question-tag">QUESTION 02 — GENDER</span>
-              <h2 id="q2-title" className="demo-question-heading">{q2.text}</h2>
-            </div>
-          </div>
-          <div className="demo-options-container grid-2" role="radiogroup" aria-labelledby="q2-title">
-            {q2.options.map((opt) => {
-              const isSelected = answers.Q2 === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`demo-option-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handleSelect("Q2", opt.code)}
-                >
-                  <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected ? (
-                      <Check size={13} strokeWidth={3} className="text-white" />
-                    ) : (
-                      <span className="demo-radio-dot" />
-                    )}
-                  </span>
-                  <span className="demo-option-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Question 03: Current Year of Study */}
-        <section
-          className={`demo-card ${missingQuestionIds.includes("Q3") ? "validation-error" : ""}`}
-          aria-labelledby="q3-title"
-        >
-          <div className="demo-card-header">
-            <span className="demo-icon-box amber">
-              <GraduationCap size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <span className="demo-question-tag">QUESTION 03 — YEAR OF STUDY</span>
-              <h2 id="q3-title" className="demo-question-heading">{q3.text}</h2>
-            </div>
-          </div>
-          <div className="demo-options-container grid-2" role="radiogroup" aria-labelledby="q3-title">
-            {q3.options.map((opt) => {
-              const isSelected = answers.Q3 === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`demo-option-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handleSelect("Q3", opt.code)}
-                >
-                  <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected ? (
-                      <Check size={13} strokeWidth={3} className="text-white" />
-                    ) : (
-                      <span className="demo-radio-dot" />
-                    )}
-                  </span>
-                  <span className="demo-option-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Question 04: Main Field of Study */}
-        <section
-          className={`demo-card ${missingQuestionIds.includes("Q4") ? "validation-error" : ""}`}
-          aria-labelledby="q4-title"
-        >
-          <div className="demo-card-header">
-            <span className="demo-icon-box cyan">
-              <BookOpen size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <span className="demo-question-tag">QUESTION 04 — MAIN FIELD OF STUDY</span>
-              <h2 id="q4-title" className="demo-question-heading">{q4.text}</h2>
-            </div>
-          </div>
-          <div className="demo-options-container grid-2" role="radiogroup" aria-labelledby="q4-title">
-            {q4.options.map((opt) => {
-              const isSelected = answers.Q4 === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`demo-option-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handleSelect("Q4", opt.code)}
-                >
-                  <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected ? (
-                      <Check size={13} strokeWidth={3} className="text-white" />
-                    ) : (
-                      <span className="demo-radio-dot" />
-                    )}
-                  </span>
-                  <span className="demo-option-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Question 05: University Type */}
-        <section
-          className={`demo-card full-width ${missingQuestionIds.includes("Q5") ? "validation-error" : ""}`}
-          aria-labelledby="q5-title"
-        >
-          <div className="demo-card-header">
-            <span className="demo-icon-box peach">
-              <Building2 size={20} aria-hidden="true" />
-            </span>
-            <div>
-              <span className="demo-question-tag">QUESTION 05 — UNIVERSITY TYPE</span>
-              <h2 id="q5-title" className="demo-question-heading">{q5.text}</h2>
-            </div>
-          </div>
-          <div className="demo-options-container grid-2" role="radiogroup" aria-labelledby="q5-title">
-            {q5.options.map((opt) => {
-              const isSelected = answers.Q5 === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`demo-option-button ${isSelected ? "selected" : ""}`}
-                  onClick={() => handleSelect("Q5", opt.code)}
-                >
-                  <span className="demo-radio-circle" aria-hidden="true">
-                    {isSelected ? (
-                      <Check size={13} strokeWidth={3} className="text-white" />
-                    ) : (
-                      <span className="demo-radio-dot" />
-                    )}
-                  </span>
-                  <span className="demo-option-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      </main>
-
-      {/* 4. Bottom Navigation & Action Bar */}
-      <footer className="demographics-actions-bar">
-        <Link
-          href="/consent"
-          prefetch={true}
-          className="button secondary large demo-back-btn"
-          aria-label="Back to Research Consent"
-        >
-          <ArrowLeft size={18} aria-hidden="true" />
-          <span>Back to Research Consent</span>
-        </Link>
-
-        <div className="demo-actions-right">
-          {validationError && (
-            <div className="demo-validation-message" role="alert">
-              <AlertCircle size={16} aria-hidden="true" />
-              <span>{validationError}</span>
-            </div>
-          )}
-
-          <button
-            type="button"
-            className={`button primary large demo-continue-btn ${!isComplete ? "disabled-btn" : ""}`}
-            onClick={handleProceed}
-            disabled={saving}
-            aria-busy={saving}
-            aria-label="Save Profile & Enter Cyber Missions"
-          >
-            {saving ? (
-              <>
-                <Loader2 size={18} className="spin" aria-hidden="true" />
-                <span>Saving Profile…</span>
-              </>
+            {resettingParticipant ? (
+              <span>Assigning New ID...</span>
             ) : (
-              <>
-                <span>Save Profile &amp; Enter Cyber Missions</span>
-                <ArrowRight size={18} aria-hidden="true" />
-              </>
+              <span className="inline-flex items-center gap-1.5">
+                <RotateCcw size={12} aria-hidden="true" />
+                <span>Start as New Participant</span>
+              </span>
             )}
           </button>
         </div>
-      </footer>
-    </div>
+      )}
+
+      {/* Five Clean Demographic Question Cards matching Reference Design */}
+      {/* Question 01: Age Group */}
+      <div
+        id="q1-card"
+        className={`journey-question-card ${
+          missingQuestionIds.includes("Q1") ? "validation-error" : ""
+        }`}
+      >
+        <div className="journey-card-top">
+          <span className="journey-card-count">Question 1 of 27</span>
+          <span className="journey-card-required">Required</span>
+        </div>
+        <h2 id="q1-title" className="journey-question-text">
+          {q1.text}
+        </h2>
+        <div
+          className="journey-options-grid"
+          role="radiogroup"
+          aria-labelledby="q1-title"
+        >
+          {q1.options.map((opt) => {
+            const isSelected = answers.Q1 === opt.code;
+            return (
+              <button
+                key={opt.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
+                onClick={() => handleSelect("Q1", opt.code)}
+              >
+                <span className="journey-radio-circle" aria-hidden="true">
+                  {isSelected && <span className="journey-radio-dot" />}
+                </span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Question 02: Gender */}
+      <div
+        id="q2-card"
+        className={`journey-question-card ${
+          missingQuestionIds.includes("Q2") ? "validation-error" : ""
+        }`}
+      >
+        <div className="journey-card-top">
+          <span className="journey-card-count">Question 2 of 27</span>
+          <span className="journey-card-required">Required</span>
+        </div>
+        <h2 id="q2-title" className="journey-question-text">
+          {q2.text}
+        </h2>
+        <div
+          className="journey-options-grid"
+          role="radiogroup"
+          aria-labelledby="q2-title"
+        >
+          {q2.options.map((opt) => {
+            const isSelected = answers.Q2 === opt.code;
+            return (
+              <button
+                key={opt.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
+                onClick={() => handleSelect("Q2", opt.code)}
+              >
+                <span className="journey-radio-circle" aria-hidden="true">
+                  {isSelected && <span className="journey-radio-dot" />}
+                </span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Question 03: Current Year of Study */}
+      <div
+        id="q3-card"
+        className={`journey-question-card ${
+          missingQuestionIds.includes("Q3") ? "validation-error" : ""
+        }`}
+      >
+        <div className="journey-card-top">
+          <span className="journey-card-count">Question 3 of 27</span>
+          <span className="journey-card-required">Required</span>
+        </div>
+        <h2 id="q3-title" className="journey-question-text">
+          {q3.text}
+        </h2>
+        <div
+          className="journey-options-grid"
+          role="radiogroup"
+          aria-labelledby="q3-title"
+        >
+          {q3.options.map((opt) => {
+            const isSelected = answers.Q3 === opt.code;
+            return (
+              <button
+                key={opt.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
+                onClick={() => handleSelect("Q3", opt.code)}
+              >
+                <span className="journey-radio-circle" aria-hidden="true">
+                  {isSelected && <span className="journey-radio-dot" />}
+                </span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Question 04: Main Field of Study */}
+      <div
+        id="q4-card"
+        className={`journey-question-card ${
+          missingQuestionIds.includes("Q4") ? "validation-error" : ""
+        }`}
+      >
+        <div className="journey-card-top">
+          <span className="journey-card-count">Question 4 of 27</span>
+          <span className="journey-card-required">Required</span>
+        </div>
+        <h2 id="q4-title" className="journey-question-text">
+          {q4.text}
+        </h2>
+        <div
+          className="journey-options-grid"
+          role="radiogroup"
+          aria-labelledby="q4-title"
+        >
+          {q4.options.map((opt) => {
+            const isSelected = answers.Q4 === opt.code;
+            return (
+              <button
+                key={opt.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
+                onClick={() => handleSelect("Q4", opt.code)}
+              >
+                <span className="journey-radio-circle" aria-hidden="true">
+                  {isSelected && <span className="journey-radio-dot" />}
+                </span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Question 05: Cybersecurity / University Background */}
+      <div
+        id="q5-card"
+        className={`journey-question-card ${
+          missingQuestionIds.includes("Q5") ? "validation-error" : ""
+        }`}
+      >
+        <div className="journey-card-top">
+          <span className="journey-card-count">Question 5 of 27</span>
+          <span className="journey-card-required">Required</span>
+        </div>
+        <h2 id="q5-title" className="journey-question-text">
+          {q5.text}
+        </h2>
+        <div
+          className="journey-options-grid"
+          role="radiogroup"
+          aria-labelledby="q5-title"
+        >
+          {q5.options.map((opt) => {
+            const isSelected = answers.Q5 === opt.code;
+            return (
+              <button
+                key={opt.code}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`journey-option-pill ${isSelected ? "selected" : ""}`}
+                onClick={() => handleSelect("Q5", opt.code)}
+              >
+                <span className="journey-radio-circle" aria-hidden="true">
+                  {isSelected && <span className="journey-radio-dot" />}
+                </span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </ResearchJourneyFrame>
   );
 }

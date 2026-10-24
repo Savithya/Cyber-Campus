@@ -6,7 +6,10 @@ import { SpotHero } from "@/components/spot-hero";
 import { SpotResearchVariables } from "@/components/spot-research-variables";
 import { ResearchProgressStepper } from "@/components/research-progress-stepper";
 import { ResearchConsentPage } from "@/components/research-consent-page";
-import { SessionProvider } from "@/lib/client";
+import { DemographicsForm } from "@/components/demographics-form";
+import Review from "@/components/review";
+import { CyberMissionControl } from "@/components/cyber-mission-control";
+import { SessionProvider, SessionContext, type SessionContextType } from "@/lib/client";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -15,6 +18,7 @@ vi.mock("next/navigation", () => ({
     replace: vi.fn(),
   }),
   usePathname: () => "/consent",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
@@ -65,13 +69,14 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("Your perspective supports student research.");
   });
 
-  it("renders the interactive challenge inbox preview card inside SpotHero", () => {
+  it("renders the cyber hero visual image inside SpotHero", () => {
     const html = renderToString(React.createElement(SpotHero));
-    expect(html).toContain("YOUR CHALLENGE INBOX");
-    expect(html).toContain("Look a little closer");
-    expect(html).toContain("Safe space to explore");
-    expect(html).toContain("No real attacks. No credentials.");
-    expect(html).toContain("What would you do?");
+    expect(html).toContain("cyber-hero-lab-8x5");
+    expect(html).toContain("CYBER THREAT LAB · RESEARCH CONSOLE");
+    expect(html).toContain("User Privacy Shield");
+    expect(html).toContain("Phishing");
+    expect(html).toContain("Pretexting");
+    expect(html).toContain("Impersonation");
   });
 
   it("renders all 4 research variables with distinct targets and mechanisms", () => {
@@ -115,11 +120,11 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
 
     // Research Information Card
     expect(html).toContain("RESEARCH INFORMATION");
-    expect(html).toContain("An Analysis of Factors Influencing University Students&#x27; Vulnerability to AI-Generated Phishing Emails in Sri Lanka");
-    expect(html).toContain("The purpose of this Computing Research Project is to analyze factors that may influence university students&#x27; vulnerability to AI-generated phishing emails.");
+    expect(html).toContain("Impact of Social Engineering Threats on User Privacy among University Students in Sri Lanka");
+    expect(html).toContain("The purpose of this Computing Research Project is to examine the impact of social engineering threats");
 
     // 4 Key Information Blocks (2x2 Grid)
-    expect(html).toContain("Around 12–18 minutes");
+    expect(html).toContain("Around 12–15 minutes");
     expect(html).toContain("Always your choice");
     expect(html).toContain("Confidential research");
     expect(html).toContain("A controlled simulation");
@@ -136,5 +141,108 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     // Action Buttons
     expect(html).toContain("I Agree &amp; Continue");
     expect(html).toContain("I Do Not Agree");
+  });
+
+  it("renders the redesigned Student Profile page matching the Spot the Phish hero template", () => {
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "draft" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(DemographicsForm)
+      )
+    );
+    expect(html).toContain("YOUR RESEARCH JOURNEY");
+    expect(html).toContain("About You");
+    expect(html).toContain("What is your gender?");
+    expect(html).toContain("What is your current year of study?");
+    expect(html).toContain("What is your main field of study?");
+    expect(html).toContain("What type of university do you attend?");
+  });
+
+  it("renders the redesigned BEFORE THE INBOX Review & Save page matching the journey layout", () => {
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "draft" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {
+          Q1: { value: 1, status: "answered" as const },
+          Q2: { value: 1, status: "answered" as const },
+          Q3: { value: 1, status: "answered" as const },
+          Q4: { value: 1, status: "answered" as const },
+          Q5: { value: 1, status: "answered" as const },
+        },
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(Review)
+      )
+    );
+
+    expect(html).toContain("YOUR RESEARCH JOURNEY");
+    expect(html).toContain("BEFORE THE INBOX");
+    expect(html).toContain("Review &amp; save");
+    expect(html).toContain("Your questionnaire has no score");
+    expect(html).toContain("PARTICIPANT TELEMETRY");
+    expect(html).toContain("ANONYMOUS ID: 001");
+    expect(html).toContain("Does this reflect your experience?");
+    expect(html).toContain("Submit questionnaire &amp; save");
+    expect(html).toContain("Back to Cyber Missions");
+  });
+
+  it("renders the redesigned Cyber Missions page with journey sidebar and 4 threat modules", () => {
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "submitted_complete" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(CyberMissionControl, { initialScenarios: [] } as any)
+      )
+    );
+
+    expect(html).toContain("YOUR RESEARCH JOURNEY");
+    expect(html).toContain("MISSION 6 - PART A");
+    expect(html).toContain("Your Email Decisions");
+    expect(html).toContain("ANONYMOUS RESEARCH ID");
+    expect(html).toContain("001");
+    expect(html).toContain("BEFORE THE INBOX: Review &amp; Save");
   });
 });

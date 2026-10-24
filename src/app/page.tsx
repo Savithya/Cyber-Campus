@@ -17,9 +17,7 @@ export default function Home() {
       <SpotMissionSteps />
 
       {/* SECTION 4 — RESEARCH VARIABLES (IV1–IV4) & USER PRIVACY (DV) */}
-      <div id="challenges">
-        <SpotResearchVariables />
-      </div>
+      <SpotResearchVariables />
 
       {/* SECTION 5 — RESEARCH PURPOSE CALLOUT BANNER */}
       <SpotPurposeCard />

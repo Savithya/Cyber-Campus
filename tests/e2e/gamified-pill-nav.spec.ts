@@ -17,7 +17,7 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
 
     // Verify Center Navigation Pills
     const navPills = page.locator("nav.desktop-pill-nav .nav-pill");
-    await expect(navPills).toHaveCount(4);
+    await expect(navPills).toHaveCount(3);
 
     // 1. Home
     const homePill = navPills.nth(0);
@@ -26,18 +26,13 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     await expect(homePill).toHaveClass(/active/);
     await expect(homePill).toHaveAttribute("aria-current", "page");
 
-    // 2. Cyber Challenges
-    const challengesPill = navPills.nth(1);
-    await expect(challengesPill).toContainText("Cyber Challenges");
-    await expect(challengesPill).toHaveAttribute("href", "/#challenges");
-
-    // 3. Join Research
-    const joinPill = navPills.nth(2);
+    // 2. Join Research
+    const joinPill = navPills.nth(1);
     await expect(joinPill).toContainText("Join Research");
     await expect(joinPill).toHaveAttribute("href", "/consent");
 
-    // 4. About the Study
-    const aboutPill = navPills.nth(3);
+    // 3. About the Study
+    const aboutPill = navPills.nth(2);
     await expect(aboutPill).toContainText("About the Study");
     await expect(aboutPill).toHaveAttribute("href", "/privacy");
 
@@ -62,14 +57,14 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
     // On /privacy (About the Study)
     await page.goto("/privacy");
     const homePill = page.locator("nav.desktop-pill-nav .nav-pill").nth(0);
-    const aboutPill = page.locator("nav.desktop-pill-nav .nav-pill").nth(3);
+    const aboutPill = page.locator("nav.desktop-pill-nav .nav-pill").nth(2);
     await expect(homePill).not.toHaveClass(/active/);
     await expect(aboutPill).toHaveClass(/active/);
     await expect(aboutPill).toHaveAttribute("aria-current", "page");
 
     // On /consent (Join Research)
     await page.goto("/consent");
-    const joinPill = page.locator("nav.desktop-pill-nav .nav-pill").nth(2);
+    const joinPill = page.locator("nav.desktop-pill-nav .nav-pill").nth(1);
     await expect(homePill).not.toHaveClass(/active/);
     await expect(joinPill).toHaveClass(/active/);
     await expect(joinPill).toHaveAttribute("aria-current", "page");
@@ -159,15 +154,14 @@ test.describe("Design 02: Gamified Pill Navigation Verification", () => {
 
     // Verify links in exact order
     const mobileLinks = drawer.locator("nav.mobile-nav-links .mobile-nav-pill");
-    await expect(mobileLinks).toHaveCount(5);
+    await expect(mobileLinks).toHaveCount(4);
     await expect(mobileLinks.nth(0)).toContainText("Home");
-    await expect(mobileLinks.nth(1)).toContainText("Cyber Challenges");
-    await expect(mobileLinks.nth(2)).toContainText("Join Research");
-    await expect(mobileLinks.nth(3)).toContainText("About the Study");
-    await expect(mobileLinks.nth(4)).toContainText("Researcher Access");
+    await expect(mobileLinks.nth(1)).toContainText("Join Research");
+    await expect(mobileLinks.nth(2)).toContainText("About the Study");
+    await expect(mobileLinks.nth(3)).toContainText("Researcher Access");
 
     // Verify touch target height >= 44px
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const box = await mobileLinks.nth(i).boundingBox();
       expect(box).not.toBeNull();
       if (box) {

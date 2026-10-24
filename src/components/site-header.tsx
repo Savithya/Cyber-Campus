@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   ShieldCheck,
   House,
-  Trophy,
   ListChecks,
   Lightbulb,
   KeyRound,
@@ -16,11 +15,9 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
-import { useSession } from "@/lib/client";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
   const pathname = usePathname();
 
   // Close mobile menu on route change
@@ -47,56 +44,6 @@ export function SiteHeader() {
     }
   }, [mobileMenuOpen]);
 
-  // Track active section on the homepage
-  useEffect(() => {
-    if (pathname !== "/") {
-      setActiveSection(null);
-      return;
-    }
-
-    const checkHash = () => {
-      if (typeof window === "undefined") return;
-      if (window.location.hash === "#challenges") {
-        setActiveSection("challenges");
-      } else if (window.location.hash === "#home") {
-        setActiveSection("home");
-      }
-    };
-
-    checkHash();
-    window.addEventListener("hashchange", checkHash);
-
-    // Setup IntersectionObserver for sections on the homepage
-    const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -60% 0px",
-      threshold: 0,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          if (entry.target.id === "challenges") {
-            setActiveSection("challenges");
-          } else if (entry.target.id === "home") {
-            setActiveSection("home");
-          }
-        }
-      });
-    }, observerOptions);
-
-    const homeEl = document.getElementById("home");
-    const challengesEl = document.getElementById("challenges");
-
-    if (homeEl) observer.observe(homeEl);
-    if (challengesEl) observer.observe(challengesEl);
-
-    return () => {
-      window.removeEventListener("hashchange", checkHash);
-      observer.disconnect();
-    };
-  }, [pathname]);
-
   // Smooth scroll to Home Hero Section
   const handleHomeClick = useCallback(
     (e: React.MouseEvent) => {
@@ -121,57 +68,16 @@ export function SiteHeader() {
           });
           window.history.pushState(null, "", "/");
         }
-        setActiveSection("home");
       }
     },
     [pathname]
   );
 
-  const state = useSession();
-  const session = state.session;
-
   // Research onboarding portal always directs to consent where participants can start fresh or resume
   const joinHref = "/consent";
 
-  const hasAuthorizedPlaySession =
-    !!session && (session.status !== "draft" || session.mode === "practice");
-
-  const challengesHref = hasAuthorizedPlaySession
-    ? "/play"
-    : pathname === "/"
-    ? "/#challenges"
-    : "/challenges";
-
-  // Smooth scroll to Cyber Challenges Section on home page if unauthenticated
-  const handleChallengesClick = useCallback(
-    (e: React.MouseEvent) => {
-      setMobileMenuOpen(false);
-      if (challengesHref === "/#challenges" && pathname === "/") {
-        e.preventDefault();
-        const prefersReducedMotion =
-          typeof window !== "undefined" &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        const chalEl = document.getElementById("challenges");
-        if (chalEl) {
-          chalEl.scrollIntoView({
-            behavior: prefersReducedMotion ? "auto" : "smooth",
-            block: "start",
-          });
-          window.history.pushState(null, "", "/#challenges");
-          setActiveSection("challenges");
-        }
-      }
-    },
-    [pathname, challengesHref]
-  );
-
-  // Determine active states accurately based on route and section
-  const isHomeActive = pathname === "/" && activeSection !== "challenges";
-  const isChallengesActive =
-    pathname?.startsWith("/play") ||
-    pathname === "/challenges" ||
-    (pathname === "/" && activeSection === "challenges");
+  // Determine active states accurately based on route
+  const isHomeActive = pathname === "/";
   const isJoinActive =
     pathname === "/consent" ||
     pathname === "/demographics" ||
@@ -216,17 +122,6 @@ export function SiteHeader() {
           >
             <House size={18} strokeWidth={1.9} aria-hidden="true" />
             <span>Home</span>
-          </Link>
-
-          <Link
-            href={challengesHref}
-            onClick={handleChallengesClick}
-            prefetch={true}
-            className={`nav-pill ${isChallengesActive ? "active" : ""}`}
-            aria-current={isChallengesActive ? "page" : undefined}
-          >
-            <Trophy size={18} strokeWidth={1.9} aria-hidden="true" />
-            <span>Cyber Challenges</span>
           </Link>
 
           <Link
@@ -350,21 +245,7 @@ export function SiteHeader() {
                 <span>Home</span>
               </Link>
 
-              {/* 2. Trophy — Cyber Challenges */}
-              <Link
-                href={challengesHref}
-                onClick={handleChallengesClick}
-                prefetch={true}
-                className={`mobile-nav-item mobile-nav-pill ${
-                  isChallengesActive ? "active" : ""
-                }`}
-                aria-current={isChallengesActive ? "page" : undefined}
-              >
-                <Trophy size={18} strokeWidth={1.9} aria-hidden="true" />
-                <span>Cyber Challenges</span>
-              </Link>
-
-              {/* 3. ListChecks — Join Research */}
+              {/* 2. ListChecks — Join Research */}
               <Link
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
@@ -378,7 +259,7 @@ export function SiteHeader() {
                 <span>Join Research</span>
               </Link>
 
-              {/* 4. Lightbulb — About the Study */}
+              {/* 3. Lightbulb — About the Study */}
               <Link
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
@@ -392,7 +273,7 @@ export function SiteHeader() {
                 <span>About the Study</span>
               </Link>
 
-              {/* 5. KeyRound — Researcher Access */}
+              {/* 4. KeyRound — Researcher Access */}
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}

@@ -322,8 +322,10 @@ export function ResearchCompletion() {
 
   return (
     <div className="completion-redesign-container container page-space" role="region" aria-label="Research Participation Complete">
-      {/* 4-Stage Progress Stepper */}
-      <ResearchProgressStepper currentStep={4} completedSteps={[1, 2, 3, 4]} />
+      {/* 4-Stage Progress Stepper matching Spot the Phish template */}
+      <div className="spot-join-stepper-card">
+        <ResearchProgressStepper currentStep={4} completedSteps={[1, 2, 3, 4]} />
+      </div>
 
       {/* Main Completion Confirmation Header */}
       <header className="completion-minimal-header text-center my-8">

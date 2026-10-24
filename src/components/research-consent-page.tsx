@@ -28,6 +28,7 @@ import {
 import type { StudyConfig } from "@/lib/config.server";
 import type { Session } from "@/lib/types";
 import { ResearchProgressStepper } from "./research-progress-stepper";
+import { ResearchJourneyFrame } from "./research-journey-frame";
 
 interface ResearchConsentPageProps {
   initialConfig?: StudyConfig | null;
@@ -175,42 +176,55 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
 
   const studyTitle =
     config?.title ||
-    "An Analysis of Factors Influencing University Students' Vulnerability to AI-Generated Phishing Emails in Sri Lanka";
+    "Impact of Social Engineering Threats on User Privacy among University Students in Sri Lanka";
 
   return (
-    <div className="spot-join-page-wrapper">
+    <ResearchJourneyFrame
+      currentStep="consent"
+      progressPercent={0}
+      missionKicker="STEP 1 OF 6"
+      title="A little context. Your choice to take part."
+      subtitle="Read the study information, then decide whether you'd like to participate."
+      noticePill="Voluntary Academic Research · University Students in Sri Lanka (18+)"
+      backHref="/"
+      backLabel="Home"
+      onContinue={() => handleStart(false)}
+      continueLabel="I Agree & Continue"
+      continueDisabled={!consent || !eligible}
+      continueLoading={busy}
+    >
       <div className="spot-join-container">
-        {/* Step Progression Bar (STEP 01 Research Consent, STEP 02 Student Profile, STEP 03 Cyber Missions, STEP 04 Completion) */}
+        {/* Step Progression Bar */}
         <div className="spot-join-stepper-card">
           <ResearchProgressStepper currentStep={1} />
         </div>
 
-        {/* Resumable draft banner if user already started */}
+        {/* Resumable draft banner matching user screenshot */}
         {isResumable && sessionData?.status === "draft" && (
-          <div className="draft-session-banner-wrapper mb-6">
-            <div className="draft-session-banner" role="region" aria-label="Resume Draft">
-              <div className="draft-session-left">
-                <div className="draft-icon-box" aria-hidden="true">
+          <div className="spot-draft-banner-wrap mb-6">
+            <div className="spot-draft-banner" role="region" aria-label="Resume Draft">
+              <div className="spot-draft-left">
+                <div className="spot-draft-icon-box" aria-hidden="true">
                   <RotateCcw size={20} />
                 </div>
-                <div className="draft-info-content">
-                  <div className="draft-title-row">
-                    <span className="draft-title-text">Draft Session In Progress</span>
-                    <span className="draft-status-pill">Saved Draft</span>
+                <div className="spot-draft-info">
+                  <div className="spot-draft-title-row">
+                    <span className="spot-draft-heading">Draft Session In Progress</span>
+                    <span className="spot-draft-status-pill">SAVED DRAFT</span>
                   </div>
-                  <p className="draft-meta-text">
-                    Anonymous Code: <span className="draft-id-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
+                  <p className="spot-draft-subtext">
+                    Anonymous Code: <span className="spot-draft-code-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
                   </p>
                 </div>
               </div>
-              <div className="draft-session-actions">
-                <Link href="/demographics" prefetch={true} className="btn-resume-primary">
+              <div className="spot-draft-actions">
+                <Link href="/demographics" prefetch={true} className="spot-draft-btn-resume">
                   <span>Resume Participation</span>
-                  <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                  <ArrowRight size={15} aria-hidden="true" />
                 </Link>
                 <button
                   type="button"
-                  className="btn-discard-secondary"
+                  className="spot-draft-btn-discard"
                   onClick={handleDiscardDraft}
                   disabled={discarding}
                   title="Discard this draft and start over with a new Anonymous ID"
@@ -236,26 +250,26 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
         {hasSession &&
           (sessionData?.status === "submitted_complete" ||
             sessionData?.status === "submitted_with_missing") && (
-          <div className="draft-session-banner-wrapper mb-6">
-            <div className="draft-session-banner completed-mode" role="region" aria-label="Completed Research">
-              <div className="draft-session-left">
-                <div className="draft-icon-box completed-icon" aria-hidden="true">
+          <div className="spot-draft-banner-wrap mb-6">
+            <div className="spot-draft-banner completed-mode" role="region" aria-label="Completed Research">
+              <div className="spot-draft-left">
+                <div className="spot-draft-icon-box completed-icon" aria-hidden="true">
                   <CheckCircle2 size={20} />
                 </div>
-                <div className="draft-info-content">
-                  <div className="draft-title-row">
-                    <span className="draft-title-text">Previous Research Completed</span>
-                    <span className="draft-status-pill completed-pill">Recorded</span>
+                <div className="spot-draft-info">
+                  <div className="spot-draft-title-row">
+                    <span className="spot-draft-heading">Previous Research Completed</span>
+                    <span className="spot-draft-status-pill completed-pill">RECORDED</span>
                   </div>
-                  <p className="draft-meta-text">
-                    Anonymous ID: <span className="draft-id-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
+                  <p className="spot-draft-subtext">
+                    Anonymous ID: <span className="spot-draft-code-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
                   </p>
                 </div>
               </div>
-              <div className="draft-session-actions">
+              <div className="spot-draft-actions">
                 <button
                   type="button"
-                  className="btn-join-fresh-primary"
+                  className="spot-draft-btn-resume"
                   onClick={handleJoinNewParticipant}
                   disabled={busy || discarding}
                   aria-label="Join as New Participant"
@@ -268,7 +282,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                   ) : (
                     <>
                       <span>Join as New Participant</span>
-                      <ArrowRight size={15} className="arrow-icon" aria-hidden="true" />
+                      <ArrowRight size={15} aria-hidden="true" />
                     </>
                   )}
                 </button>
@@ -284,7 +298,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           </div>
         )}
 
-        {/* Editorial Page Header matching Image 1 */}
+        {/* Editorial Page Header matching Spot the Phish template */}
         <div className="spot-join-header">
           <span className="spot-join-eyebrow">BEFORE WE BEGIN</span>
           <h1 className="spot-join-title">
@@ -297,7 +311,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           </p>
         </div>
 
-        {/* Main White Card matching Image 1 */}
+        {/* Main White Card matching Image 1 & Topic */}
         <div className="spot-join-card" id="consent-compact-card">
           {/* Card Top Eyebrow Badge */}
           <div className="spot-join-card-badge">
@@ -305,14 +319,14 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
             <span>RESEARCH INFORMATION</span>
           </div>
 
-          {/* Research Title */}
+          {/* Research Topic Headline */}
           <h2 className="spot-join-card-title">
-            An Analysis of Factors Influencing University Students&apos; Vulnerability to AI-Generated Phishing Emails in Sri Lanka
+            Impact of Social Engineering Threats on User Privacy among University Students in Sri Lanka
           </h2>
 
-          {/* Research Purpose Lead Paragraph */}
+          {/* Research Purpose Lead Paragraph covering IV1–IV4 and DV */}
           <p className="spot-join-card-lead">
-            The purpose of this Computing Research Project is to analyze factors that may influence university students&apos; vulnerability to AI-generated phishing emails. Please answer honestly based on your own knowledge, experience, and opinions.
+            The purpose of this Computing Research Project is to examine the impact of social engineering threats—specifically Phishing (IV1), Pretexting (IV2), Impersonation (IV3), and Online Scams &amp; Malicious Links (IV4)—on user privacy (DV) among university students in Sri Lanka. Please answer honestly based on your own knowledge, experience, and opinions.
           </p>
 
           {/* 4-Item Information Grid (2 columns x 2 rows) */}
@@ -321,10 +335,10 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
             <div className="spot-join-grid-item">
               <div className="spot-join-item-header">
                 <Clock size={19} className="spot-join-item-icon" aria-hidden="true" />
-                <h3 className="spot-join-item-title">Around 12–18 minutes</h3>
+                <h3 className="spot-join-item-title">Around 12–15 minutes</h3>
               </div>
               <p className="spot-join-item-desc">
-                A questionnaire, followed by ten fictional email scenarios. Take as long as you need.
+                A short student profile, followed by 20 fictional email scenarios across IV1–IV4. Take as long as you need.
               </p>
             </div>
 
@@ -481,6 +495,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                   <strong>Study Protocol:</strong> &ldquo;{studyTitle}&rdquo;
                 </p>
                 <p>
+                  <strong>Research Variables:</strong> IV1 Phishing, IV2 Pretexting, IV3 Impersonation, IV4 Online Scams &amp; Malicious Links. Dependent Variable: User Privacy Impact &amp; Protective Behaviors.
+                </p>
+                <p>
                   <strong>Ethics Compliance:</strong> Conducted under academic research guidelines and adheres to Sri Lanka Personal Data Protection Act No. 9 of 2022 principles of data minimization and purpose specification.
                 </p>
                 <p>
@@ -491,6 +508,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           </div>
         </div>
       </div>
-    </div>
+    </ResearchJourneyFrame>
   );
 }

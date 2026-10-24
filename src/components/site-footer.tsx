@@ -157,17 +157,12 @@ export function SiteFooter({ compact }: SiteFooterProps) {
               </Link>
             </li>
             <li>
-              <Link href="/#challenges" prefetch={true} className="footer-nav-link">
-                Cyber Challenges
-              </Link>
-            </li>
-            <li>
               <Link href="/consent" prefetch={true} className="footer-nav-link">
                 Join Research
               </Link>
             </li>
             <li>
-              <Link href="/#about-study" prefetch={true} className="footer-nav-link">
+              <Link href="/privacy" prefetch={true} className="footer-nav-link">
                 About the Study
               </Link>
             </li>
