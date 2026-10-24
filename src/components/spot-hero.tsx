@@ -119,7 +119,7 @@ export function SpotHero() {
               </span>
             </h1>
             <span className="spot-subtitle-tag">
-              AI &amp; SOCIAL ENGINEERING CHALLENGE
+              SOCIAL ENGINEERING CHALLENGES
             </span>
           </div>
 

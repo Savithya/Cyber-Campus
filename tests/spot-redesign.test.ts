@@ -15,7 +15,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     // Verify Brand & Editorial Title
     expect(html).toContain("Spot the");
     expect(html).toContain("Threat");
-    expect(html).toContain("AI &amp; SOCIAL ENGINEERING CHALLENGE");
+    expect(html).toContain("SOCIAL ENGINEERING CHALLENGES");
 
     // Verify Core Question & Sri Lanka University Research Topic
     expect(html).toContain("Can you spot the signs before your privacy is compromised?");
