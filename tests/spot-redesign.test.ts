@@ -204,14 +204,14 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     );
 
     expect(html).toContain("YOUR RESEARCH JOURNEY");
-    expect(html).toContain("BEFORE THE INBOX");
-    expect(html).toContain("Review &amp; save");
+    expect(html).toContain("STEP 07");
+    expect(html).toContain("Review &amp; Save");
     expect(html).toContain("Your questionnaire has no score");
     expect(html).toContain("PARTICIPANT TELEMETRY");
     expect(html).toContain("ANONYMOUS ID: 001");
     expect(html).toContain("Does this reflect your experience?");
-    expect(html).toContain("Submit questionnaire &amp; save");
-    expect(html).toContain("Back to Cyber Missions");
+    expect(html).toContain("Submit Questionnaire &amp; Complete");
+    expect(html).toContain("Back to Step 06: Scam &amp; Malicious Link Investigation");
   });
 
   it("renders the redesigned Cyber Missions page with journey sidebar and 4 threat modules", () => {
@@ -239,10 +239,63 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     );
 
     expect(html).toContain("YOUR RESEARCH JOURNEY");
-    expect(html).toContain("MISSION 6 - PART A");
-    expect(html).toContain("Your Email Decisions");
+    expect(html).toContain("CYBER SIMULATION LABORATORY · STEPS 03–06");
+    expect(html).toContain("Social Engineering Threat Investigations");
     expect(html).toContain("ANONYMOUS RESEARCH ID");
     expect(html).toContain("001");
-    expect(html).toContain("BEFORE THE INBOX: Review &amp; Save");
+    expect(html).toContain("Continue to Step 07: Review &amp; Save");
+  });
+
+  it("verifies the exact sequential 7-step journey structure (STEP 01 to STEP 07)", () => {
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "submitted_complete" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(CyberMissionControl, { initialScenarios: [] } as any)
+      )
+    );
+
+    // 1. STEP 01: Research Consent
+    expect(html).toContain("STEP 01");
+    expect(html).toContain("Research Consent");
+
+    // 2. STEP 02: About You
+    expect(html).toContain("STEP 02");
+    expect(html).toContain("About You");
+
+    // 3. STEP 03: Phishing Investigation
+    expect(html).toContain("STEP 03");
+    expect(html).toContain("Phishing Investigation");
+
+    // 4. STEP 04: Pretexting Detection
+    expect(html).toContain("STEP 04");
+    expect(html).toContain("Pretexting Detection");
+
+    // 5. STEP 05: Impersonation Investigation
+    expect(html).toContain("STEP 05");
+    expect(html).toContain("Impersonation Investigation");
+
+    // 6. STEP 06: Scam & Malicious Link Investigation
+    expect(html).toContain("STEP 06");
+    expect(html).toContain("Scam &amp; Malicious Link Investigation");
+
+    // 7. STEP 07: Review & Save
+    expect(html).toContain("STEP 07");
+    expect(html).toContain("Review &amp; Save");
   });
 });

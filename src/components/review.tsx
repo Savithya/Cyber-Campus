@@ -86,12 +86,12 @@ export default function Review() {
       <ResearchJourneyFrame
         currentStep="review"
         progressPercent={95}
-        missionKicker="BEFORE THE INBOX"
-        title="Review & save"
+        missionKicker="STEP 07 OF 07"
+        title="Review & Save"
         subtitle="Review your responses and decisions before saving."
         noticePill="Your perspective counts · Honest answers are more valuable than a high score"
-        backHref="/play"
-        backLabel="Back to Cyber Missions"
+        backHref="/play?module=links"
+        backLabel="Back to Step 06: Scam & Malicious Link Investigation"
       >
         <ErrorBox message={state.error} retry={state.reload} />
       </ResearchJourneyFrame>
@@ -103,8 +103,8 @@ export default function Review() {
       <ResearchJourneyFrame
         currentStep="review"
         progressPercent={0}
-        missionKicker="BEFORE THE INBOX"
-        title="Review & save"
+        missionKicker="STEP 07 OF 07"
+        title="Review & Save"
         subtitle="Please begin by providing informed consent."
         noticePill="Research Session Required"
         backHref="/consent"
@@ -137,14 +137,14 @@ export default function Review() {
     <ResearchJourneyFrame
       currentStep="review"
       progressPercent={95}
-      missionKicker="BEFORE THE INBOX"
-      title="Review & save"
-      subtitle="Review your responses and simulation decisions before saving. After this step, your research baseline is locked."
+      missionKicker="STEP 07 OF 07"
+      title="Review & Save"
+      subtitle="Review your responses and simulation decisions across all previous steps before saving. After this step, your research baseline is locked."
       noticePill="Your perspective counts · Honest answers are more valuable than a high score"
-      backHref="/play"
-      backLabel="Back to Cyber Missions"
+      backHref="/play?module=links"
+      backLabel="Back to Step 06: Scam & Malicious Link Investigation"
       onContinue={submit}
-      continueLabel={busy ? "Submitting Baseline…" : "Submit questionnaire & save"}
+      continueLabel={busy ? "Submitting Baseline…" : "Submit Questionnaire & Complete"}
       continueDisabled={busy || !Object.keys(answers).length}
       continueLoading={busy}
     >

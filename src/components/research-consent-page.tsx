@@ -10,12 +10,9 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
-  RotateCcw,
-  CheckCircle2,
   Check,
   Lock,
   AlertCircle,
-  Trash2,
   Loader2,
 } from "lucide-react";
 import {
@@ -27,7 +24,6 @@ import {
 } from "@/lib/client";
 import type { StudyConfig } from "@/lib/config.server";
 import type { Session } from "@/lib/types";
-import { ResearchProgressStepper } from "./research-progress-stepper";
 import { ResearchJourneyFrame } from "./research-journey-frame";
 
 interface ResearchConsentPageProps {
@@ -45,7 +41,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
   const [prior, setPrior] = useState<boolean>(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [discarding, setDiscarding] = useState(false);
   const [expandedDetails, setExpandedDetails] = useState(false);
 
   // Load config & check practice exposure flag
@@ -105,75 +100,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     }
   }
 
-  // Safe discard draft handler for returning participants: generates new Anonymous ID
-  async function handleDiscardDraft() {
-    if (
-      !window.confirm(
-        "Are you sure you want to discard your saved draft and start fresh? A new Anonymous ID will be assigned."
-      )
-    ) {
-      return;
-    }
-    setDiscarding(true);
-    setError("");
-    try {
-      clearParticipationStorage();
-      const res = await api<{ session: Session }>("session/new-participant", {});
-      if (res.session) {
-        state.setSession(res.session);
-        putDraft({
-          code: res.session.code,
-          expires: res.session.draftExpiresAt,
-          answers: res.session.answers,
-          token: randomToken(),
-          submitKey: crypto.randomUUID(),
-        });
-        await state.reload();
-        router.push("/demographics");
-      }
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setDiscarding(false);
-    }
-  }
-
-  // Start fresh research session as a new participant from completed notice
-  async function handleJoinNewParticipant() {
-    setBusy(true);
-    setError("");
-    try {
-      clearParticipationStorage();
-      const token = randomToken();
-      const res = await api<{ session: Session; token?: string }>("session/new-participant", {
-        token,
-      });
-      if (res?.session) {
-        state.setSession(res.session);
-        putDraft({
-          code: res.session.code,
-          expires: res.session.draftExpiresAt,
-          answers: res.session.answers,
-          token: res.token || token,
-          submitKey: crypto.randomUUID(),
-        });
-        await state.reload();
-        router.push("/demographics");
-      } else {
-        throw new Error("Unable to create a new participant session. Please retry.");
-      }
-    } catch (e) {
-      setError((e as Error).message || "Failed to start new participant session. Please retry.");
-      setBusy(false);
-    }
-  }
-
-  const hasSession = Boolean(state.session);
-  const sessionData = state.session;
-  const isResumable =
-    hasSession &&
-    (sessionData?.status === "draft" || sessionData?.mode === "practice");
-
   const studyTitle =
     config?.title ||
     "Impact of Social Engineering Threats on User Privacy among University Students in Sri Lanka";
@@ -182,115 +108,18 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     <ResearchJourneyFrame
       currentStep="consent"
       progressPercent={0}
-      missionKicker="STEP 1 OF 6"
-      title="A little context. Your choice to take part."
-      subtitle="Read the study information, then decide whether you'd like to participate."
+      missionKicker="STEP 01 OF 07"
+      title="Research Consent"
+      subtitle="A little context. Your choice to take part in academic research."
       noticePill="Voluntary Academic Research · University Students in Sri Lanka (18+)"
       backHref="/"
       backLabel="Home"
       onContinue={() => handleStart(false)}
-      continueLabel="I Agree & Continue"
+      continueLabel="Continue to Step 02: About You"
       continueDisabled={!consent || !eligible}
       continueLoading={busy}
     >
       <div className="spot-join-container">
-        {/* Step Progression Bar */}
-        <div className="spot-join-stepper-card">
-          <ResearchProgressStepper currentStep={1} />
-        </div>
-
-        {/* Resumable draft banner matching user screenshot */}
-        {isResumable && sessionData?.status === "draft" && (
-          <div className="spot-draft-banner-wrap mb-6">
-            <div className="spot-draft-banner" role="region" aria-label="Resume Draft">
-              <div className="spot-draft-left">
-                <div className="spot-draft-icon-box" aria-hidden="true">
-                  <RotateCcw size={20} />
-                </div>
-                <div className="spot-draft-info">
-                  <div className="spot-draft-title-row">
-                    <span className="spot-draft-heading">Draft Session In Progress</span>
-                    <span className="spot-draft-status-pill">SAVED DRAFT</span>
-                  </div>
-                  <p className="spot-draft-subtext">
-                    Anonymous Code: <span className="spot-draft-code-tag">{sessionData?.code}</span> · Unsubmitted responses saved in browser
-                  </p>
-                </div>
-              </div>
-              <div className="spot-draft-actions">
-                <Link href="/demographics" prefetch={true} className="spot-draft-btn-resume">
-                  <span>Resume Participation</span>
-                  <ArrowRight size={15} aria-hidden="true" />
-                </Link>
-                <button
-                  type="button"
-                  className="spot-draft-btn-discard"
-                  onClick={handleDiscardDraft}
-                  disabled={discarding}
-                  title="Discard this draft and start over with a new Anonymous ID"
-                >
-                  {discarding ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                      <span>Discarding...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 size={14} aria-hidden="true" />
-                      <span>Discard Draft (Start New ID)</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Completed research notice */}
-        {hasSession &&
-          (sessionData?.status === "submitted_complete" ||
-            sessionData?.status === "submitted_with_missing") && (
-          <div className="spot-draft-banner-wrap mb-6">
-            <div className="spot-draft-banner completed-mode" role="region" aria-label="Completed Research">
-              <div className="spot-draft-left">
-                <div className="spot-draft-icon-box completed-icon" aria-hidden="true">
-                  <CheckCircle2 size={20} />
-                </div>
-                <div className="spot-draft-info">
-                  <div className="spot-draft-title-row">
-                    <span className="spot-draft-heading">Previous Research Completed</span>
-                    <span className="spot-draft-status-pill completed-pill">RECORDED</span>
-                  </div>
-                  <p className="spot-draft-subtext">
-                    Anonymous ID: <span className="spot-draft-code-tag">{sessionData.code}</span> · Your previous answers are safely saved. You can join as a new participant with a new ID below.
-                  </p>
-                </div>
-              </div>
-              <div className="spot-draft-actions">
-                <button
-                  type="button"
-                  className="spot-draft-btn-resume"
-                  onClick={handleJoinNewParticipant}
-                  disabled={busy || discarding}
-                  aria-label="Join as New Participant"
-                >
-                  {busy ? (
-                    <>
-                      <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-                      <span>Starting New Session...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Join as New Participant</span>
-                      <ArrowRight size={15} aria-hidden="true" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {error && (
           <div className="error-banner mb-6" role="alert">
             <AlertCircle size={18} aria-hidden="true" />
@@ -436,7 +265,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               className="spot-join-btn-agree"
               onClick={() => handleStart(false)}
               disabled={!consent || !eligible || busy}
-              aria-label="I Agree & Continue · Continue to Student Profile · Consent and begin questionnaire"
+              aria-label="I Agree & Continue to Step 02: About You · Continue to Student Profile · Consent and begin questionnaire"
               title="Agree and continue to student profile"
             >
               {busy ? (
@@ -446,7 +275,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
                 </>
               ) : (
                 <>
-                  <span>I Agree &amp; Continue</span>
+                  <span>I Agree &amp; Continue to Step 02</span>
                   <ArrowRight size={16} aria-hidden="true" />
                 </>
               )}

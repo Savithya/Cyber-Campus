@@ -7,9 +7,8 @@ import {
   User,
   Radio,
   BookOpen,
-  ShieldAlert,
   ShieldCheck,
-  Mail,
+  Link2,
   Check,
   Lock,
   ArrowLeft,
@@ -21,74 +20,86 @@ export type JourneyStepKey =
   | "consent"
   | "profile"
   | "phishing"
+  | "pretexting"
+  | "impersonation"
+  | "links"
+  | "review"
+  // Legacy & convenience aliases
+  | "step1"
+  | "step2"
+  | "step3"
+  | "step4"
+  | "step5"
+  | "step6"
+  | "step7"
   | "knowledge"
   | "risk"
   | "trust"
-  | "missions"
-  | "review";
+  | "missions";
 
 export interface JourneyStepItem {
   key: JourneyStepKey;
+  stepNumber: string;
   kicker: string;
   title: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   href: string;
 }
 
-const ALL_JOURNEY_STEPS: JourneyStepItem[] = [
+export const ALL_JOURNEY_STEPS: JourneyStepItem[] = [
   {
     key: "consent",
-    kicker: "STEP 1",
+    stepNumber: "01",
+    kicker: "STEP 01",
     title: "Research Consent",
     icon: FileText,
     href: "/consent",
   },
   {
     key: "profile",
-    kicker: "MISSION 1",
+    stepNumber: "02",
+    kicker: "STEP 02",
     title: "About You",
     icon: User,
     href: "/demographics",
   },
   {
     key: "phishing",
-    kicker: "MISSION 2",
-    title: "Phishing Radar",
+    stepNumber: "03",
+    kicker: "STEP 03",
+    title: "Phishing Investigation",
     icon: Radio,
     href: "/play?module=phishing",
   },
   {
-    key: "knowledge",
-    kicker: "MISSION 3",
-    title: "Cyber Knowledge",
+    key: "pretexting",
+    stepNumber: "04",
+    kicker: "STEP 04",
+    title: "Pretexting Detection",
     icon: BookOpen,
     href: "/play?module=pretexting",
   },
   {
-    key: "risk",
-    kicker: "MISSION 4",
-    title: "Risk Radar",
+    key: "impersonation",
+    stepNumber: "05",
+    kicker: "STEP 05",
+    title: "Impersonation Investigation",
     icon: ShieldCheck,
     href: "/play?module=impersonation",
   },
   {
-    key: "trust",
-    kicker: "MISSION 5",
-    title: "Trust Check",
-    icon: Mail,
+    key: "links",
+    stepNumber: "06",
+    kicker: "STEP 06",
+    title: "Scam & Malicious Link Investigation",
+    icon: Link2,
     href: "/play?module=links",
   },
   {
-    key: "missions",
-    kicker: "MISSION 6 - PART A",
-    title: "Your Email Decisions",
-    icon: ShieldAlert,
-    href: "/play",
-  },
-  {
     key: "review",
-    kicker: "BEFORE THE INBOX",
-    title: "Review & save",
+    stepNumber: "07",
+    kicker: "STEP 07",
+    title: "Review & Save",
     icon: Check,
     href: "/survey/review",
   },
@@ -127,11 +138,31 @@ export function ResearchJourneyFrame({
   continueLoading = false,
   children,
 }: ResearchJourneyFrameProps) {
+  // Normalize alias keys to canonical 7 steps so only ONE card is active
+  const normalizedKey =
+    currentStep === "step1"
+      ? "consent"
+      : currentStep === "step2"
+      ? "profile"
+      : currentStep === "step3"
+      ? "phishing"
+      : currentStep === "step4" || currentStep === "knowledge"
+      ? "pretexting"
+      : currentStep === "step5" || currentStep === "risk"
+      ? "impersonation"
+      : currentStep === "step6" || currentStep === "trust"
+      ? "links"
+      : currentStep === "step7"
+      ? "review"
+      : currentStep === "missions"
+      ? "phishing"
+      : currentStep;
+
   return (
     <div className="journey-layout-container">
       <div className="journey-layout-grid">
         {/* ===================================================================
-            LEFT SIDEBAR: YOUR RESEARCH JOURNEY (One mission at a time)
+            LEFT SIDEBAR: YOUR RESEARCH JOURNEY (7 Clear Steps)
             =================================================================== */}
         <aside className="journey-sidebar" aria-label="Research Journey Navigation">
           <div className="journey-sidebar-sticky">
@@ -145,11 +176,11 @@ export function ResearchJourneyFrame({
               </h2>
             </div>
 
-            {/* Stepper Navigation List matching Reference Image */}
-            <nav className="journey-stepper-list" aria-label="Stages">
+            {/* Stepper Navigation List: 7 Clean Step Cards */}
+            <nav className="journey-stepper-list" aria-label="7 Research Steps">
               {ALL_JOURNEY_STEPS.map((step) => {
                 const Icon = step.icon;
-                const isActive = currentStep === step.key;
+                const isActive = normalizedKey === step.key;
 
                 return (
                   <Link
@@ -158,9 +189,10 @@ export function ResearchJourneyFrame({
                     prefetch={true}
                     className={`journey-step-item ${isActive ? "active" : ""}`}
                     aria-current={isActive ? "step" : undefined}
+                    title={`${step.kicker}: ${step.title}`}
                   >
                     <div className="journey-step-icon-box">
-                      <Icon size={16} aria-hidden="true" />
+                      <Icon size={18} aria-hidden="true" />
                     </div>
                     <div className="journey-step-text">
                       <span className="journey-step-kicker">{step.kicker}</span>
@@ -207,7 +239,7 @@ export function ResearchJourneyFrame({
             <p className="journey-stage-subtitle">{subtitle}</p>
           </div>
 
-          {/* Optional Notice Banner (e.g. Age Group / Token) */}
+          {/* Optional Notice Banner */}
           {noticePill && (
             <div className="journey-notice-pill">
               <span>{noticePill}</span>

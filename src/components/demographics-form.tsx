@@ -169,7 +169,7 @@ export function DemographicsForm() {
 
     // If already validated and submitted, navigate directly
     if (state.session.status !== "draft") {
-      router.push("/play");
+      router.push("/play?module=phishing");
       return;
     }
 
@@ -209,7 +209,7 @@ export function DemographicsForm() {
       }
 
       setSaveStatus("Profile validated and submitted securely");
-      router.push("/play");
+      router.push("/play?module=phishing");
     } catch (e) {
       setError((e as Error).message || "Failed to submit profile. Please retry.");
       setSaving(false);
@@ -225,8 +225,8 @@ export function DemographicsForm() {
   return (
     <ResearchJourneyFrame
       currentStep="profile"
-      progressPercent={answers.Q1 ? 25 : 4}
-      missionKicker="MISSION 1 OF 6"
+      progressPercent={answers.Q1 ? 25 : 15}
+      missionKicker="STEP 02 OF 07"
       title="About You"
       subtitle="These questions help us understand the background of participants. There are no right or wrong answers."
       noticePill={
@@ -237,8 +237,9 @@ export function DemographicsForm() {
           : "Age group recorded in eligibility: 18 - 20"
       }
       backHref="/consent"
+      backLabel="Back to Step 01: Research Consent"
       onContinue={handleProceed}
-      continueLabel="Continue"
+      continueLabel="Continue to Step 03: Phishing Investigation"
       continueLoading={saving}
       continueDisabled={!isComplete}
     >
