@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { useSession } from "@/lib/client";
@@ -266,6 +267,11 @@ export function SiteHeader() {
               aria-hidden="true"
             />
             <span>Researcher Access</span>
+            <ArrowUpRight
+              size={14}
+              className="ml-1 opacity-70"
+              aria-hidden="true"
+            />
           </Link>
 
           <div className="header-theme-wrapper">
