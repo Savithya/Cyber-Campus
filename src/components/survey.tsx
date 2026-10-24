@@ -18,7 +18,7 @@ export default function Survey() {
     router = useRouter(),
     params = useSearchParams();
   const [index, setIndex] = useState(
-    Math.min(5, Math.max(0, Number(params.get("section")) || 0)),
+    Math.min(sections.length - 1, Math.max(0, Number(params.get("section")) || 0)),
   );
   const [answers, setAnswers] = useState<Answers>({}),
     [saving, setSaving] = useState("Loading draft…"),
@@ -201,7 +201,7 @@ export default function Survey() {
       </aside>
       <div className="survey-main">
         <div className="survey-topline">
-          <span>SECTION {s.id} OF F</span>
+          <span>SECTION {s.id} OF {sections[sections.length - 1]?.id ?? "E"}</span>
           <span>
             {reviewed} of 25 reviewed · {answered} answered
           </span>
@@ -305,20 +305,20 @@ export default function Survey() {
             Back
           </button>
           <span>
-            {index < 5
+            {index < sections.length - 1
               ? "You can review everything before submitting."
               : "Your answers are ready for review."}
           </span>
           <button
             className="button primary"
             onClick={() => {
-              if (index < 5) {
+              if (index < sections.length - 1) {
                 setIndex(index + 1);
                 window.scrollTo({ top: 0 });
               } else router.push("/survey/review");
             }}
           >
-            {index < 5 ? "Next section" : "Review answers"}
+            {index < sections.length - 1 ? "Next section" : "Review answers"}
           </button>
         </div>
       </div>

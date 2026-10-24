@@ -134,60 +134,53 @@ export function deriveSurveyAnswersFromAttempts(
   const overallSafeRatio = totalSafe / Math.max(1, firstAttempts.length);
   const overallAvgRisk = totalRiskSum / Math.max(1, firstAttempts.length);
 
-  // Section B: Phishing (IV1) — Q6, Q7, Q8, Q9
-  const q6Val = Math.min(5, Math.max(1, Math.round(1 + m1.safeRatio * 4)));
-  const q7Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m1.avgRisk * 2) % 3))));
-  const q8Val = Math.min(5, Math.max(1, Math.round(5 - m1.avgRisk)));
-  const q9Val = Math.min(5, Math.max(1, Math.round(3 + m1.safeRatio * 2)));
+  // Scenario to Question Map (STEP 03 - STEP 06: Q6 - Q25)
+  const scenarioToQuestionMap: Record<string, { qid: string; iv: string }> = {
+    // STEP 03: Phishing Investigation (IV1) -> Q6 - Q10
+    PH01: { qid: "Q6", iv: "IV1" },
+    PH02: { qid: "Q7", iv: "IV1" },
+    PH03: { qid: "Q8", iv: "IV1" },
+    PH04: { qid: "Q9", iv: "IV1" },
+    PH05: { qid: "Q10", iv: "IV1" },
+    // STEP 04: Pretexting Detection (IV2) -> Q11 - Q15
+    PT01: { qid: "Q11", iv: "IV2" },
+    PT02: { qid: "Q12", iv: "IV2" },
+    PT03: { qid: "Q13", iv: "IV2" },
+    PT04: { qid: "Q14", iv: "IV2" },
+    PT05: { qid: "Q15", iv: "IV2" },
+    // STEP 05: Impersonation Investigation (IV3) -> Q16 - Q20
+    IM01: { qid: "Q16", iv: "IV3" },
+    IM02: { qid: "Q17", iv: "IV3" },
+    IM03: { qid: "Q18", iv: "IV3" },
+    IM04: { qid: "Q19", iv: "IV3" },
+    IM05: { qid: "Q20", iv: "IV3" },
+    // STEP 06: Scam & Malicious Link Investigation (IV4) -> Q21 - Q25
+    SC01: { qid: "Q21", iv: "IV4" },
+    SC02: { qid: "Q22", iv: "IV4" },
+    SC03: { qid: "Q23", iv: "IV4" },
+    SC04: { qid: "Q24", iv: "IV4" },
+    SC05: { qid: "Q25", iv: "IV4" },
+  };
 
-  updated["Q6"] = { value: q6Val, status: "answered" };
-  updated["Q7"] = { value: q7Val, status: "answered" };
-  updated["Q8"] = { value: q8Val, status: "answered" };
-  updated["Q9"] = { value: q9Val, status: "answered" };
-
-  // Section C: Pretexting (IV2) — Q10, Q11, Q12
-  const q10Val = Math.min(5, Math.max(1, Math.round(1 + m2.safeRatio * 4)));
-  const q11Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m2.avgRisk) % 2))));
-  const q12Val = Math.min(5, Math.max(1, Math.round(5 - m2.avgRisk)));
-
-  updated["Q10"] = { value: q10Val, status: "answered" };
-  updated["Q11"] = { value: q11Val, status: "answered" };
-  updated["Q12"] = { value: q12Val, status: "answered" };
-
-  // Section D: Impersonation (IV3) — Q13, Q14, Q15
-  const q13Val = Math.min(5, Math.max(1, Math.round(1 + m3.safeRatio * 4)));
-  const q14Val = Math.min(5, Math.max(1, Math.round(2 + (Math.round(m3.avgRisk * 2) % 3))));
-  const q15Val = Math.min(5, Math.max(1, Math.round(5 - m3.avgRisk)));
-
-  updated["Q13"] = { value: q13Val, status: "answered" };
-  updated["Q14"] = { value: q14Val, status: "answered" };
-  updated["Q15"] = { value: q15Val, status: "answered" };
-
-  // Section E: Online Scams & Malicious Links (IV4) — Q16, Q17, Q18
-  const q16Val = Math.min(5, Math.max(1, Math.round(1 + m4.safeRatio * 4)));
-  const q17Val = Math.min(5, Math.max(1, Math.round(3 + (Math.round(m4.avgRisk) % 2))));
-  const q18Val = Math.min(5, Math.max(1, Math.round(5 - m4.avgRisk)));
-
-  updated["Q16"] = { value: q16Val, status: "answered" };
-  updated["Q17"] = { value: q17Val, status: "answered" };
-  updated["Q18"] = { value: q18Val, status: "answered" };
-
-  // Section F: User Privacy (DV) — Q19 to Q25
-  const q19Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
-  const q20Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
-  const q21Val = Math.min(5, Math.max(1, Math.round(4 + (overallSafeRatio >= 0.5 ? 1 : 0))));
-  const q22Val = Math.min(5, Math.max(1, Math.round(3 + overallSafeRatio * 2)));
-  const q23Val = Math.min(5, Math.max(1, Math.round(1 + overallSafeRatio * 4)));
-  const q24Val = Math.min(5, Math.max(1, Math.round(5 - overallAvgRisk)));
-  const q25Val = Math.min(5, Math.max(1, Math.round(2 + overallSafeRatio * 3)));
-
-  updated["Q19"] = { value: q19Val, status: "answered" };
-  updated["Q20"] = { value: q20Val, status: "answered" };
-  updated["Q21"] = { value: q21Val, status: "answered" };
-  updated["Q22"] = { value: q22Val, status: "answered" };
-  updated["Q23"] = { value: q23Val, status: "answered" };
-  updated["Q24"] = { value: q24Val, status: "answered" };
-  updated["Q25"] = { value: q25Val, status: "answered" };
+  for (const [scId, meta] of Object.entries(scenarioToQuestionMap)) {
+    const att = firstAttempts.find((a) => a.scenarioId === scId);
+    if (att && att.selectedAction !== null) {
+      let code = 1; // Option 1: Identified threat accurately
+      if (att.selectedAction === "proceed" || att.unsafe) {
+        code = 2; // Mistaken for legitimate or complied
+      } else if (att.selectedAction === "ignore") {
+        code = 4; // Ignored or not sure
+      } else {
+        code = 1;
+      }
+      updated[meta.qid] = { value: code, status: "answered" };
+    } else if (!updated[meta.qid] || updated[meta.qid].value === null) {
+      // Derive based on IV metrics if scenario not individually completed yet
+      const m = meta.iv === "IV1" ? m1 : meta.iv === "IV2" ? m2 : meta.iv === "IV3" ? m3 : m4;
+      const derivedCode = m.safeRatio >= 0.5 ? 1 : 2;
+      updated[meta.qid] = { value: derivedCode, status: "answered" };
+    }
+  }
 
   return updated;
 }

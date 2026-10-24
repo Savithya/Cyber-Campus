@@ -2,45 +2,38 @@
   "sections": [
     {
       "id": "A",
-      "title": "Participant Profile",
-      "introduction": "This section collects basic demographic information about you. Your answers will help describe the profile of respondents without revealing your identity.",
+      "title": "About You",
+      "introduction": "This section collects basic background information about you. Your answers will help describe the profile of respondents without revealing your identity.",
       "role": "Profile",
       "questions": ["Q1", "Q2", "Q3", "Q4", "Q5"]
     },
     {
       "id": "B",
-      "title": "Phishing",
-      "introduction": "This section asks about your awareness of, exposure to, and reactions to phishing attempts (fake emails or messages designed to trick you into revealing personal information).",
+      "title": "Phishing Investigation",
+      "introduction": "STEP 03: Inspect deceptive university emails, SMS alerts, scam calls, and malicious attachments to identify phishing threats.",
       "role": "IV1",
-      "questions": ["Q6", "Q7", "Q8", "Q9"]
+      "questions": ["Q6", "Q7", "Q8", "Q9", "Q10"]
     },
     {
       "id": "C",
-      "title": "Pretexting",
-      "introduction": "This section asks about situations where someone may create a false story, identity, or reason to persuade you to share personal information (often called “pretexting”).",
+      "title": "Pretexting Detection",
+      "introduction": "STEP 04: Detect fabricated emergency stories, fake authority claims, and social engineering pretexting calls.",
       "role": "IV2",
-      "questions": ["Q10", "Q11", "Q12"]
+      "questions": ["Q11", "Q12", "Q13", "Q14", "Q15"]
     },
     {
       "id": "D",
-      "title": "Impersonation",
-      "introduction": "This section asks about your experiences with people or accounts pretending to be someone else, such as fake university staff, bank representatives, customer-service agents, or fake social media profiles.",
+      "title": "Impersonation Investigation",
+      "introduction": "STEP 05: Identify impersonation of university faculty, compromised classmate accounts, fake bank representatives, and spoofed telecom SMS.",
       "role": "IV3",
-      "questions": ["Q13", "Q14", "Q15"]
+      "questions": ["Q16", "Q17", "Q18", "Q19", "Q20"]
     },
     {
       "id": "E",
-      "title": "Online Scams & Malicious Link Threats",
-      "introduction": "This section asks about your exposure to suspicious links, online scams, and deceptive advertisements, and how you usually respond to unfamiliar links.",
+      "title": "Scam & Malicious Link Investigation",
+      "introduction": "STEP 06: Identify fraudulent e-commerce deals, accommodation scams, fake payment links, malicious downloads, and fake internship offers.",
       "role": "IV4",
-      "questions": ["Q16", "Q17", "Q18"]
-    },
-    {
-      "id": "F",
-      "title": "User Privacy",
-      "introduction": "This section asks about your concerns regarding personal information, account security, and how social engineering threats may affect your privacy and online behaviour.",
-      "role": "DV",
-      "questions": ["Q19", "Q20", "Q21", "Q22", "Q23", "Q24", "Q25"]
+      "questions": ["Q21", "Q22", "Q23", "Q24", "Q25"]
     }
   ],
   "questions": [
@@ -55,22 +48,10 @@
       "variable": "Age Group",
       "dimension": null,
       "options": [
-        {
-          "code": 1,
-          "label": "18–20 years"
-        },
-        {
-          "code": 2,
-          "label": "21–23 years"
-        },
-        {
-          "code": 3,
-          "label": "24–26 years"
-        },
-        {
-          "code": 4,
-          "label": "27 years or above"
-        }
+        { "code": 1, "label": "18–20 years" },
+        { "code": 2, "label": "21–23 years" },
+        { "code": 3, "label": "24–26 years" },
+        { "code": 4, "label": "27 years or above" }
       ]
     },
     {
@@ -84,22 +65,10 @@
       "variable": "Gender",
       "dimension": null,
       "options": [
-        {
-          "code": 1,
-          "label": "Male"
-        },
-        {
-          "code": 2,
-          "label": "Female"
-        },
-        {
-          "code": 3,
-          "label": "Prefer not to say"
-        },
-        {
-          "code": 4,
-          "label": "Other"
-        }
+        { "code": 1, "label": "Male" },
+        { "code": 2, "label": "Female" },
+        { "code": 3, "label": "Prefer not to say" },
+        { "code": 4, "label": "Other" }
       ]
     },
     {
@@ -113,22 +82,10 @@
       "variable": "Year of Study",
       "dimension": null,
       "options": [
-        {
-          "code": 1,
-          "label": "Year 1"
-        },
-        {
-          "code": 2,
-          "label": "Year 2"
-        },
-        {
-          "code": 3,
-          "label": "Year 3"
-        },
-        {
-          "code": 4,
-          "label": "Year 4 or above"
-        }
+        { "code": 1, "label": "1st year" },
+        { "code": 2, "label": "2nd year" },
+        { "code": 3, "label": "3rd year" },
+        { "code": 4, "label": "4th year or above" }
       ]
     },
     {
@@ -142,30 +99,14 @@
       "variable": "Field of Study",
       "dimension": null,
       "options": [
-        {
-          "code": 1,
-          "label": "Computing / Information Technology"
-        },
-        {
-          "code": 2,
-          "label": "Engineering"
-        },
-        {
-          "code": 3,
-          "label": "Business / Management"
-        },
-        {
-          "code": 4,
-          "label": "Arts / Humanities / Social Sciences"
-        },
-        {
-          "code": 5,
-          "label": "Science"
-        },
-        {
-          "code": 6,
-          "label": "Other"
-        }
+        { "code": 1, "label": "Business / Management" },
+        { "code": 2, "label": "Computing / Information Technology" },
+        { "code": 3, "label": "Engineering" },
+        { "code": 4, "label": "Medicine / Healthcare" },
+        { "code": 5, "label": "Arts / Humanities" },
+        { "code": 6, "label": "Physical / Biological Sciences" },
+        { "code": 7, "label": "Law" },
+        { "code": 8, "label": "Other" }
       ]
     },
     {
@@ -173,28 +114,16 @@
       "number": 5,
       "section": "A",
       "role": "Profile",
-      "text": "What type of university do you attend?",
+      "text": "Have you received any formal training or education about cybersecurity or phishing?",
       "type": "choice",
       "scale": null,
-      "variable": "University Type",
+      "variable": "Cybersecurity Training",
       "dimension": null,
       "options": [
-        {
-          "code": 1,
-          "label": "State university in Sri Lanka"
-        },
-        {
-          "code": 2,
-          "label": "Private university in Sri Lanka"
-        },
-        {
-          "code": 3,
-          "label": "Foreign university branch campus in Sri Lanka"
-        },
-        {
-          "code": 4,
-          "label": "Other higher education institute in Sri Lanka"
-        }
+        { "code": 1, "label": "Yes" },
+        { "code": 2, "label": "No" },
+        { "code": 3, "label": "Unsure / Self-taught" },
+        { "code": 4, "label": "Other" }
       ]
     },
     {
@@ -202,32 +131,16 @@
       "number": 6,
       "section": "B",
       "role": "IV1",
-      "text": "How familiar are you with the term “phishing” (fake emails or messages that try to trick you into revealing personal information)?",
-      "type": "scale",
-      "scale": "FAMILIARITY",
-      "variable": "Phishing",
-      "dimension": "Phishing Awareness",
+      "text": "You receive an email from 'it-support@campus-serendib-verify.example' stating your student inbox will be permanently deleted in 2 hours unless you confirm your password at an unverified link. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Phishing Email Identification",
+      "dimension": "Email Phishing",
       "options": [
-        {
-          "code": 1,
-          "label": "Not at all familiar"
-        },
-        {
-          "code": 2,
-          "label": "Slightly familiar"
-        },
-        {
-          "code": 3,
-          "label": "Moderately familiar"
-        },
-        {
-          "code": 4,
-          "label": "Very familiar"
-        },
-        {
-          "code": 5,
-          "label": "Extremely familiar"
-        }
+        { "code": 1, "label": "Phishing email with credential harvesting link" },
+        { "code": 2, "label": "Legitimate university IT maintenance email" },
+        { "code": 3, "label": "Routine semester password expiry reminder" },
+        { "code": 4, "label": "Unsolicited commercial advertising email" }
       ]
     },
     {
@@ -235,32 +148,16 @@
       "number": 7,
       "section": "B",
       "role": "IV1",
-      "text": "In the past 12 months, how often have you received emails or messages that you suspected might be phishing attempts?",
+      "text": "An SMS arrives on your phone: 'Campus Grant Notice: You have been awarded Rs. 45,000 in student aid. Tap http://serendib-edu-funds.xyz/claim immediately to enter your bank credentials and claim.' How do you identify this?",
       "type": "choice",
       "scale": "FREQUENCY",
-      "variable": "Phishing",
-      "dimension": "Phishing Exposure",
+      "variable": "Phishing SMS / Link Identification",
+      "dimension": "SMS Phishing",
       "options": [
-        {
-          "code": 1,
-          "label": "Never"
-        },
-        {
-          "code": 2,
-          "label": "Once or twice"
-        },
-        {
-          "code": 3,
-          "label": "A few times"
-        },
-        {
-          "code": 4,
-          "label": "Often"
-        },
-        {
-          "code": 5,
-          "label": "Very often"
-        }
+        { "code": 1, "label": "Phishing SMS (Smishing) with a malicious financial link" },
+        { "code": 2, "label": "Official Ministry of Higher Education disbursement SMS" },
+        { "code": 3, "label": "Routine student bank account verification message" },
+        { "code": 4, "label": "Telecommunications rewards program notification" }
       ]
     },
     {
@@ -268,32 +165,16 @@
       "number": 8,
       "section": "B",
       "role": "IV1",
-      "text": "When you receive a suspicious email or message that looks like a phishing attempt, how likely are you to avoid clicking any links or downloading any attachments?",
-      "type": "scale",
-      "scale": "LIKELIHOOD",
-      "variable": "Phishing",
-      "dimension": "Phishing Response Behaviour",
+      "text": "You receive a phone call where caller ID displays 'UNIVERSITY IT DESK'. The caller claims they detected a virus on your student portal and insists you read aloud the 6-digit verification code just texted to your phone. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Phishing Scam Call Identification",
+      "dimension": "Voice Phishing / Vishing",
       "options": [
-        {
-          "code": 1,
-          "label": "Very unlikely"
-        },
-        {
-          "code": 2,
-          "label": "Unlikely"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Likely"
-        },
-        {
-          "code": 5,
-          "label": "Very likely"
-        }
+        { "code": 1, "label": "Phishing scam call (Vishing) attempting 2FA security code theft" },
+        { "code": 2, "label": "Official campus IT helpdesk security troubleshooting call" },
+        { "code": 3, "label": "Automated university telephone verification system" },
+        { "code": 4, "label": "Wrong number dialed by an off-campus department" }
       ]
     },
     {
@@ -301,65 +182,33 @@
       "number": 9,
       "section": "B",
       "role": "IV1",
-      "text": "To what extent do you agree with this statement: “I am worried that phishing messages could lead to my personal information being misused.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "Phishing",
-      "dimension": "Perceived Phishing Risk to Privacy",
+      "text": "A campus cafeteria poster has a QR code claiming 'Scan here for 50% discount on student meal cards'. Scanning it opens a browser prompt warning that the link 'http://discount-pay-login.top' is insecure and demands your student login. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Phishing QR Link Identification",
+      "dimension": "QR Phishing / Quishing",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Malicious QR code (Quishing) directing to a phishing login page" },
+        { "code": 2, "label": "Official cafeteria discount promotion portal" },
+        { "code": 3, "label": "Temporary campus Wi-Fi network registration page" },
+        { "code": 4, "label": "Broken university portal hyperlink" }
       ]
     },
     {
       "id": "Q10",
       "number": 10,
-      "section": "C",
-      "role": "IV2",
-      "text": "How familiar are you with situations where someone creates a false story, identity, or reason to persuade you to share personal information (often called “pretexting”)?",
-      "type": "scale",
-      "scale": "FAMILIARITY",
-      "variable": "Pretexting",
-      "dimension": "Pretexting Awareness",
+      "section": "B",
+      "role": "IV1",
+      "text": "An email with subject 'Revised End-Semester Exam Schedule & Seating Plan' arrives from an external Gmail address. It contains an attachment named 'Exam_Timetable_Final.pdf.exe'. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Malicious Attachment Identification",
+      "dimension": "Attachment Phishing",
       "options": [
-        {
-          "code": 1,
-          "label": "Not at all familiar"
-        },
-        {
-          "code": 2,
-          "label": "Slightly familiar"
-        },
-        {
-          "code": 3,
-          "label": "Moderately familiar"
-        },
-        {
-          "code": 4,
-          "label": "Very familiar"
-        },
-        {
-          "code": 5,
-          "label": "Extremely familiar"
-        }
+        { "code": 1, "label": "Phishing email carrying an executable malware payload" },
+        { "code": 2, "label": "Official examination branch schedule update" },
+        { "code": 3, "label": "Normal PDF document needing a specific reader" },
+        { "code": 4, "label": "Encrypted digital student receipt" }
       ]
     },
     {
@@ -367,28 +216,16 @@
       "number": 11,
       "section": "C",
       "role": "IV2",
-      "text": "In the past 12 months, have you encountered someone (online or by phone) who used a convincing story or false reason to try to get your personal information?",
+      "text": "You receive an urgent phone call from an unknown number. A caller claiming to be a Campus Security Officer says: 'Your student ID card was found at a crime scene off-campus. You must immediately pay a Rs. 10,000 clearance fine via mobile money or face police arrest.' How do you identify this?",
       "type": "choice",
-      "scale": "EXPERIENCE",
-      "variable": "Pretexting",
-      "dimension": "Pretexting Exposure",
+      "scale": null,
+      "variable": "Pretexting Authority Scam Call",
+      "dimension": "Authority Pretext",
       "options": [
-        {
-          "code": 1,
-          "label": "Yes, definitely"
-        },
-        {
-          "code": 2,
-          "label": "Yes, possibly"
-        },
-        {
-          "code": 3,
-          "label": "No"
-        },
-        {
-          "code": 4,
-          "label": "Not sure"
-        }
+        { "code": 1, "label": "Pretexting scam call using false authority and fear intimidation" },
+        { "code": 2, "label": "Official campus security incident report" },
+        { "code": 3, "label": "Sri Lanka Police emergency notification procedure" },
+        { "code": 4, "label": "Not sure" }
       ]
     },
     {
@@ -396,457 +233,237 @@
       "number": 12,
       "section": "C",
       "role": "IV2",
-      "text": "To what extent do you agree with this statement: “If someone gives a convincing reason, I might share personal information even if I am not completely sure about their identity.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "Pretexting",
-      "dimension": "Susceptibility to Pretexting",
+      "text": "A caller claiming to be from the University Examination Directorate calls you at 8:00 PM: 'A system crash erased your exam registration. I need your LMS username, password, and national ID number right now over the phone to restore your eligibility.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Pretexting Academic Crisis Call",
+      "dimension": "Urgency Pretext",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Pretexting telephone scam (Vishing) fabricating an urgent academic crisis" },
+        { "code": 2, "label": "Emergency university IT database recovery procedure" },
+        { "code": 3, "label": "Routine telephone verification by the exams division" },
+        { "code": 4, "label": "Genuine academic registrar assistance" }
       ]
     },
     {
       "id": "Q13",
       "number": 13,
-      "section": "D",
-      "role": "IV3",
-      "text": "How familiar are you with cases where someone pretends to be a trusted person, organisation, or official (for example, fake university staff, bank representatives, or customer-service accounts)?",
-      "type": "scale",
-      "scale": "FAMILIARITY",
-      "variable": "Impersonation",
-      "dimension": "Impersonation Awareness",
+      "section": "C",
+      "role": "IV2",
+      "text": "You receive a WhatsApp message from an unknown number using the campus crest: 'Dear student, our scholarship donor wants to disburse Rs. 50,000 to you today, but you must first pay Rs. 3,500 processing fees through a digital gift card.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Pretexting Advance Fee Message",
+      "dimension": "Financial Pretext",
       "options": [
-        {
-          "code": 1,
-          "label": "Not at all familiar"
-        },
-        {
-          "code": 2,
-          "label": "Slightly familiar"
-        },
-        {
-          "code": 3,
-          "label": "Moderately familiar"
-        },
-        {
-          "code": 4,
-          "label": "Very familiar"
-        },
-        {
-          "code": 5,
-          "label": "Extremely familiar"
-        }
+        { "code": 1, "label": "Pretexting advance-fee scam fabricating a fake scholarship donor" },
+        { "code": 2, "label": "Legitimate international student foundation award" },
+        { "code": 3, "label": "Standard university bursary administrative fee" },
+        { "code": 4, "label": "Official campus student charity campaign" }
       ]
     },
     {
       "id": "Q14",
       "number": 14,
-      "section": "D",
-      "role": "IV3",
-      "text": "In the past 12 months, have you encountered any fake social media profiles, accounts, or messages that pretended to be someone you know or a legitimate organisation?",
+      "section": "C",
+      "role": "IV2",
+      "text": "Someone claiming to be a campus network technician calls your personal mobile: 'We are performing campus Wi-Fi maintenance. To keep your laptop connected, install this remote control tool (AnyDesk) and give me access.' How do you identify this?",
       "type": "choice",
-      "scale": "EXPERIENCE",
-      "variable": "Impersonation",
-      "dimension": "Impersonation Exposure",
+      "scale": null,
+      "variable": "Pretexting Remote Access Scam Call",
+      "dimension": "Technical Pretext",
       "options": [
-        {
-          "code": 1,
-          "label": "Yes, definitely"
-        },
-        {
-          "code": 2,
-          "label": "Yes, possibly"
-        },
-        {
-          "code": 3,
-          "label": "No"
-        },
-        {
-          "code": 4,
-          "label": "Not sure"
-        }
+        { "code": 1, "label": "Pretexting technical support scam seeking unauthorized remote access" },
+        { "code": 2, "label": "Standard campus Wi-Fi speed optimization procedure" },
+        { "code": 3, "label": "University network firewall configuration call" },
+        { "code": 4, "label": "Legitimate university student helpdesk technician" }
       ]
     },
     {
       "id": "Q15",
       "number": 15,
-      "section": "D",
-      "role": "IV3",
-      "text": "To what extent do you agree with this statement: “I sometimes find it difficult to tell if an online account or message is from a real person or an impersonator.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "Impersonation",
-      "dimension": "Difficulty Recognising Impersonation",
+      "section": "C",
+      "role": "IV2",
+      "text": "A direct message arrives from someone claiming: 'I am a postgraduate researcher at your university conducting an urgent survey. If you share photos of your student ID and NIC, I will send you Rs. 5,000.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Pretexting Academic Research Trap",
+      "dimension": "Identity Pretext",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Pretexting identity-theft trap fabricating an academic research pretense" },
+        { "code": 2, "label": "Legitimate postgraduate research compensation process" },
+        { "code": 3, "label": "Official university student census survey" },
+        { "code": 4, "label": "Campus peer-to-peer tutoring program" }
       ]
     },
     {
       "id": "Q16",
       "number": 16,
-      "section": "E",
-      "role": "IV4",
-      "text": "In the past 12 months, how often have you seen suspicious links, offers, or advertisements online that you thought might be scams or malicious?",
+      "section": "D",
+      "role": "IV3",
+      "text": "You receive an email from 'prof.perera.dept.head@gmail.com' claiming to be your faculty Dean: 'I am in an urgent faculty meeting and cannot talk. Please buy Rs. 20,000 worth of Google Play gift cards and email the codes to me for campus guest speakers.' How do you identify this?",
       "type": "choice",
-      "scale": "FREQUENCY",
-      "variable": "Online Scams & Malicious Link Threats",
-      "dimension": "Exposure to Online Scams and Malicious Links",
+      "scale": null,
+      "variable": "Faculty Email Impersonation",
+      "dimension": "Authority Impersonation",
       "options": [
-        {
-          "code": 1,
-          "label": "Never"
-        },
-        {
-          "code": 2,
-          "label": "Once or twice"
-        },
-        {
-          "code": 3,
-          "label": "A few times"
-        },
-        {
-          "code": 4,
-          "label": "Often"
-        },
-        {
-          "code": 5,
-          "label": "Very often"
-        }
+        { "code": 1, "label": "Executive impersonation scam spoofing a senior university official" },
+        { "code": 2, "label": "Official faculty departmental expenditure request" },
+        { "code": 3, "label": "Legitimate emergency research grant purchase" },
+        { "code": 4, "label": "Routine campus event coordination email" }
       ]
     },
     {
       "id": "Q17",
       "number": 17,
-      "section": "E",
-      "role": "IV4",
-      "text": "When you receive an unfamiliar link (by email, message, or social media), how likely are you to check where the link leads before clicking it?",
-      "type": "scale",
-      "scale": "LIKELIHOOD",
-      "variable": "Online Scams & Malicious Link Threats",
-      "dimension": "Link Verification Behaviour",
+      "section": "D",
+      "role": "IV3",
+      "text": "You receive a message from your close classmate's real Instagram account: 'Hey! I'm stuck in an emergency and my banking app isn't working. Can you immediately transfer Rs. 15,000 to this unknown account? I will repay you tomorrow.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Compromised Peer Account Impersonation",
+      "dimension": "Peer Impersonation",
       "options": [
-        {
-          "code": 1,
-          "label": "Very unlikely"
-        },
-        {
-          "code": 2,
-          "label": "Unlikely"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Likely"
-        },
-        {
-          "code": 5,
-          "label": "Very likely"
-        }
+        { "code": 1, "label": "Compromised classmate account used for social engineering impersonation" },
+        { "code": 2, "label": "Genuine emergency request that you should immediately fund" },
+        { "code": 3, "label": "Automatic Instagram student loan assistance feature" },
+        { "code": 4, "label": "Regular social media financial promotion" }
       ]
     },
     {
       "id": "Q18",
       "number": 18,
-      "section": "E",
-      "role": "IV4",
-      "text": "To what extent do you agree with this statement: “I am concerned that clicking on a malicious link or online scam could expose my personal information.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "Online Scams & Malicious Link Threats",
-      "dimension": "Perceived Risk of Online Scams and Malicious Links to Privacy",
+      "section": "D",
+      "role": "IV3",
+      "text": "You receive a phone call displaying a local commercial bank's customer service number. The caller says: 'This is Bank Fraud Prevention. We detected suspicious transactions on your student account. Please read your 16-digit debit card number, CVV code, and OTP to block the theft.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Bank Impersonation Scam Call",
+      "dimension": "Financial Impersonation",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Bank impersonation scam call with caller ID spoofing" },
+        { "code": 2, "label": "Legitimate bank security intervention protecting your funds" },
+        { "code": 3, "label": "Automated central bank credit check" },
+        { "code": 4, "label": "Regular university student bank account update" }
       ]
     },
     {
       "id": "Q19",
       "number": 19,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I am worried that my personal information (such as name, email, phone number, or photos) could be exposed through online scams or deceptive messages.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Concern About Personal Information Exposure",
+      "section": "D",
+      "role": "IV3",
+      "text": "A newly created Instagram profile named '@campus_official_students_union' with 12 followers sends you a DM claiming you won the annual university raffle and requests your student LMS credentials to credit the prize. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Student Society Impersonation",
+      "dimension": "Organisation Impersonation",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Impersonation of a recognized campus student organisation" },
+        { "code": 2, "label": "Official student union lottery disbursement" },
+        { "code": 3, "label": "Valid inter-faculty student union voting contest" },
+        { "code": 4, "label": "University public relations promotional campaign" }
       ]
     },
     {
       "id": "Q20",
       "number": 20,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I am concerned that someone could access my online accounts (such as email, social media, or university accounts) without my permission.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Concern About Unauthorised Account Access",
+      "section": "D",
+      "role": "IV3",
+      "text": "An SMS from sender 'TELECOM-SL' states: 'University distance learning concession: Your student SIM has been selected for 100GB free data. Call +94 71 000 0000 or click http://free-student-data.site to register your NIC.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Telecom Provider Impersonation SMS",
+      "dimension": "Corporate Impersonation",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Telecom provider impersonation scam targeting student credentials and NIC" },
+        { "code": 2, "label": "Official government distance learning telecommunications package" },
+        { "code": 3, "label": "Standard mobile operator network upgrade notification" },
+        { "code": 4, "label": "Verified university e-learning data sponsorship" }
       ]
     },
     {
       "id": "Q21",
       "number": 21,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I worry that my personal information could be misused (for example, for fraud, identity theft, or unwanted contact) if I fall for a deceptive online message.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Concern About Misuse of Personal Information",
+      "section": "E",
+      "role": "IV4",
+      "text": "A sponsored social media post advertises brand new Core i7 laptops for Rs. 15,000 (usually Rs. 200,000) under 'Campus Surplus Clearance'. The purchase link points to 'http://super-campus-deals.store/checkout'. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "E-Commerce Scam Link Identification",
+      "dimension": "Deceptive Shopping Links",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "E-commerce scam with a fraudulent shopping and payment link" },
+        { "code": 2, "label": "Authentic clearance sale of university surplus equipment" },
+        { "code": 3, "label": "Special government subsidized student hardware scheme" },
+        { "code": 4, "label": "Standard commercial flash sale promotion" }
       ]
     },
     {
       "id": "Q22",
       "number": 22,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I feel that my privacy is at risk when I interact with unknown people or organisations online.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "General Online Privacy Risk Perception",
+      "section": "E",
+      "role": "IV4",
+      "text": "You see an online listing for luxury student accommodation 50m from campus for Rs. 5,000/month. The landlord says: 'Send a refundable Rs. 20,000 deposit via bank transfer before viewing because 10 students are waiting.' How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Student Accommodation Scam Identification",
+      "dimension": "Advance Fee Scams",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Student accommodation rental scam with an advance fee trap" },
+        { "code": 2, "label": "Standard campus boarding reservation procedure" },
+        { "code": 3, "label": "Legitimate private university hostel agreement" },
+        { "code": 4, "label": "Official campus student welfare housing placement" }
       ]
     },
     {
       "id": "Q23",
       "number": 23,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I have avoided sharing certain personal information online because I was worried about scams or deceptive messages.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Privacy Protection Behaviour (Information Sharing)",
+      "section": "E",
+      "role": "IV4",
+      "text": "When paying semester tuition online, a link redirects to 'http://pay-serendib-portal.online/checkout'. The URL bar displays 'Not Secure', the campus crest is blurry, and it prompts for your ATM card PIN. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Fake Payment Gateway Identification",
+      "dimension": "Malicious Payment Portals",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Fake malicious payment gateway designed to steal banking and PIN credentials" },
+        { "code": 2, "label": "Official university banking payment processor" },
+        { "code": 3, "label": "Temporary backup payment server configured by campus finance" },
+        { "code": 4, "label": "Standard third-party student installment portal" }
       ]
     },
     {
       "id": "Q24",
       "number": 24,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “I regularly check and adjust my privacy settings on social media and other online accounts to protect my personal information.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Privacy Protection Behaviour (Settings Management)",
+      "section": "E",
+      "role": "IV4",
+      "text": "A link shared in your student batch chat labeled 'Final_Exam_Seating_Arrangements_2026.pdf' redirects to 'http://tinyurl.example/update-flash-player' displaying a virus alert and forcing an executable file download. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Malicious Group Link Identification",
+      "dimension": "Drive-by Download Links",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Malicious deceptive link attempting drive-by malware installation" },
+        { "code": 2, "label": "Official document viewer plugin required for exam files" },
+        { "code": 3, "label": "Standard security patch for student web browsers" },
+        { "code": 4, "label": "Harmless web advertisement popup" }
       ]
     },
     {
       "id": "Q25",
       "number": 25,
-      "section": "F",
-      "role": "DV",
-      "text": "To what extent do you agree with this statement: “Overall, I feel that social engineering threats (such as phishing, pretexting, impersonation, and online scams) have reduced my sense of privacy online.”",
-      "type": "scale",
-      "scale": "AGREEMENT",
-      "variable": "User Privacy",
-      "dimension": "Overall Perceived Impact of Social Engineering on Privacy",
+      "section": "E",
+      "role": "IV4",
+      "text": "You receive a message on Telegram advertising a 'Guaranteed Work-From-Home Student Internship paying Rs. 80,000/month'. To register, you must tap a link and pay a Rs. 5,000 'mandatory onboarding documentation fee'. How do you identify this?",
+      "type": "choice",
+      "scale": null,
+      "variable": "Fake Internship Scam Link Identification",
+      "dimension": "Employment Scams",
       "options": [
-        {
-          "code": 1,
-          "label": "Strongly Disagree"
-        },
-        {
-          "code": 2,
-          "label": "Disagree"
-        },
-        {
-          "code": 3,
-          "label": "Neutral"
-        },
-        {
-          "code": 4,
-          "label": "Agree"
-        },
-        {
-          "code": 5,
-          "label": "Strongly Agree"
-        }
+        { "code": 1, "label": "Fraudulent student employment scam using an advance fee link" },
+        { "code": 2, "label": "Legitimate multinational corporate recruitment programme" },
+        { "code": 3, "label": "University career guidance internship placement" },
+        { "code": 4, "label": "Approved professional certification registration" }
       ]
     }
   ]

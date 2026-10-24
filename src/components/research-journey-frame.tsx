@@ -158,6 +158,11 @@ export function ResearchJourneyFrame({
       ? "phishing"
       : currentStep;
 
+  const activeStepIndex = Math.max(
+    0,
+    ALL_JOURNEY_STEPS.findIndex((s) => s.key === normalizedKey)
+  );
+
   return (
     <div className="journey-layout-container">
       <div className="journey-layout-grid">
@@ -170,29 +175,31 @@ export function ResearchJourneyFrame({
             <div className="journey-sidebar-header">
               <span className="journey-sidebar-kicker">YOUR RESEARCH JOURNEY</span>
               <h2 className="journey-sidebar-title">
-                One mission
-                <br />
-                at a time.
+                One mission at a time.
               </h2>
             </div>
 
             {/* Stepper Navigation List: 7 Clean Step Cards */}
             <nav className="journey-stepper-list" aria-label="7 Research Steps">
-              {ALL_JOURNEY_STEPS.map((step) => {
-                const Icon = step.icon;
+              {ALL_JOURNEY_STEPS.map((step, idx) => {
                 const isActive = normalizedKey === step.key;
+                const isCompleted = idx < activeStepIndex || normalizedKey === "review" || idx <= activeStepIndex;
 
                 return (
                   <Link
                     key={step.key}
                     href={step.href}
                     prefetch={true}
-                    className={`journey-step-item ${isActive ? "active" : ""}`}
+                    className={`journey-step-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
                     aria-current={isActive ? "step" : undefined}
                     title={`${step.kicker}: ${step.title}`}
                   >
-                    <div className="journey-step-icon-box">
-                      <Icon size={18} aria-hidden="true" />
+                    <div className="journey-step-checkbox">
+                      {isCompleted ? (
+                        <Check size={13} strokeWidth={2.5} className="journey-step-check" aria-hidden="true" />
+                      ) : (
+                        <span className="journey-step-blank" />
+                      )}
                     </div>
                     <div className="journey-step-text">
                       <span className="journey-step-kicker">{step.kicker}</span>

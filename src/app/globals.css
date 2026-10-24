@@ -14702,50 +14702,60 @@ tfoot {
 }
 
 /* Dual / Triple Column Workstation Grid */
-.challenge-workstation-grid {
+.challenge-workstation-grid,
+.challenge-workstation-grid.workstation-2col,
+.challenge-workstation-grid.workstation-3col {
   display: grid;
-  grid-template-columns: minmax(0, 1.38fr) minmax(340px, 420px);
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 380px);
   gap: 24px;
   align-items: start;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
-.challenge-workstation-grid.workstation-3col {
-  grid-template-columns: 270px minmax(0, 1fr) minmax(340px, 390px);
-  gap: 20px;
-}
-
 @media (max-width: 1200px) {
+  .challenge-workstation-grid,
+  .challenge-workstation-grid.workstation-2col,
   .challenge-workstation-grid.workstation-3col {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
-    gap: 18px;
-  }
-  .challenge-workspace-sidebar {
-    grid-column: 1 / -1;
-    width: 100%;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 350px);
+    gap: 20px;
   }
 }
 
 @media (max-width: 1024px) {
-  .challenge-workstation-grid.workstation-3col,
-  .challenge-workstation-grid {
-    grid-template-columns: 100%;
-    gap: 20px;
+  .challenge-workstation-grid,
+  .challenge-workstation-grid.workstation-2col,
+  .challenge-workstation-grid.workstation-3col {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    width: 100% !important;
   }
-  .challenge-workspace-sidebar,
+  .challenge-workspace-sidebar {
+    display: none !important;
+  }
   .challenge-investigation-stage,
   .challenge-decision-corner {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-width: 0;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+  .decision-corner-sticky-wrapper {
+    position: static !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    width: 100% !important;
   }
 }
 
 @media (max-width: 640px) {
-  .challenge-workstation-grid.workstation-3col,
-  .challenge-workstation-grid {
-    gap: 16px;
+  .challenge-workstation-grid,
+  .challenge-workstation-grid.workstation-2col,
+  .challenge-workstation-grid.workstation-3col {
+    gap: 16px !important;
   }
 }
 
@@ -27178,7 +27188,7 @@ body {
 
 .journey-layout-container {
   width: 100%;
-  max-width: 1220px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 36px clamp(16px, 3.5vw, 36px) 64px;
 }
@@ -27203,7 +27213,16 @@ body {
 }
 
 .journey-sidebar-header {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
+}
+
+.journey-sidebar-kicker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
 }
 
 .journey-sidebar-kicker {
@@ -27213,15 +27232,41 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted-light);
-  margin-bottom: 6px;
+  margin: 0;
+}
+
+.journey-sidebar-step-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 2px 9px;
+  border-radius: 9999px;
+  background-color: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="dark"] .journey-sidebar-step-badge,
+.dark .journey-sidebar-step-badge {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.35);
 }
 
 .journey-sidebar-title {
-  font-size: 28px;
-  font-weight: 850;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
   color: var(--ink);
+  margin: 0 0 6px 0;
+}
+
+.journey-sidebar-subtitle {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
   margin: 0;
 }
 
@@ -27234,89 +27279,107 @@ body {
 
 .journey-step-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 16px 12px;
-  border-radius: 14px;
-  background-color: #ffffff;
-  border: 1.5px solid #e9edf2;
-  color: #64748b;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #334155;
   text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease;
   user-select: none;
 }
 
 .journey-step-item:hover {
-  border-color: #cbd5e1;
-  background-color: #f8fafc;
-  transform: translateY(-1px);
+  background-color: #f1f5f3;
 }
 
 .journey-step-item.active {
-  background-color: #ffffff;
-  border-color: #6366f1;
-  color: #1e1b4b;
-  box-shadow: 0 0 0 1.5px #6366f1, 0 6px 18px -3px rgba(99, 102, 241, 0.2);
+  background-color: #ebf2ed;
+  border-color: #d1ded7;
+  color: #0f172a;
 }
 
 [data-theme="dark"] .journey-step-item {
-  background-color: #0c132b;
-  border-color: #1e355b;
   color: #94a3b8;
 }
 
 [data-theme="dark"] .journey-step-item:hover {
-  border-color: #38bdf8;
-  background-color: #111a3b;
+  background-color: #1e293b;
 }
 
 [data-theme="dark"] .journey-step-item.active {
-  border-color: #6366f1;
-  background-color: #131a3b;
-  color: #e0e7ff;
-  box-shadow: 0 0 0 1.5px #6366f1, 0 6px 20px -3px rgba(99, 102, 241, 0.35);
+  background-color: #132822;
+  border-color: #244b3f;
+  color: #e2e8f0;
 }
 
-.journey-step-icon-box {
-  width: 32px;
-  height: 32px;
+.journey-step-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
-  color: #64748b;
-  transition: color 0.15s ease;
+  color: #0f172a;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
 }
 
-.journey-step-item.active .journey-step-icon-box {
-  color: #6366f1;
+.journey-step-item.completed .journey-step-checkbox,
+.journey-step-item.active .journey-step-checkbox {
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
-[data-theme="dark"] .journey-step-item.active .journey-step-icon-box {
-  color: #a5b4fc;
+[data-theme="dark"] .journey-step-checkbox {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
 }
 
 .journey-step-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 1px;
   width: 100%;
 }
 
 .journey-step-kicker {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .journey-step-item.active .journey-step-kicker {
-  color: #6366f1;
+  color: #475569;
+}
+
+.journey-step-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.journey-step-item.active .journey-step-title {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .journey-step-title {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .journey-step-item.active .journey-step-title {
+  color: #ffffff;
 }
 
 [data-theme="dark"] .journey-step-item.active .journey-step-kicker {
@@ -27645,21 +27708,241 @@ body {
   font-size: 14px;
   font-weight: 750;
   color: #ffffff !important;
-  background-color: #607274;
+  background-color: #0e3b36 !important;
   border: none;
-  padding: 10px 22px;
+  padding: 11px 24px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .journey-continue-btn:hover:not(.disabled) {
-  background-color: #4a585a;
+  background-color: #092b27 !important;
 }
 
 .journey-continue-btn.disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ==========================================================================
+   JOURNEY REVIEW STYLES (MATCHING SCREENSHOT 1 & 2)
+   ========================================================================== */
+.journey-review-list-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .journey-review-list-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+.journey-review-row {
+  border-bottom: 1px solid #eef2f6;
+  padding: 16px 24px;
+  transition: background-color 0.15s ease;
+}
+
+.journey-review-row:last-child {
+  border-bottom: none;
+}
+
+.journey-review-row:hover {
+  background-color: #f8fafc;
+}
+
+[data-theme="dark"] .journey-review-row {
+  border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .journey-review-row:hover {
+  background-color: #131d33;
+}
+
+.journey-review-row-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.journey-review-row-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .journey-review-row-question {
+  color: #94a3b8;
+}
+
+.journey-review-row-number {
+  font-weight: 600;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .journey-review-row-number {
+  color: #cbd5e1;
+}
+
+.journey-review-row-text {
+  color: #475569;
+}
+
+[data-theme="dark"] .journey-review-row-text {
+  color: #cbd5e1;
+}
+
+.journey-review-row-answer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.journey-review-row-answer {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .journey-review-row-answer {
+  color: #f8fafc;
+}
+
+.journey-review-inline-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.journey-review-inline-edit:hover {
+  opacity: 1;
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .journey-review-inline-edit {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .journey-review-inline-edit:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+.journey-review-inline-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .journey-review-inline-selector {
+  background-color: #141e33;
+  border-color: #1e293b;
+}
+
+.journey-review-inline-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.journey-review-inline-opt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.journey-review-inline-opt-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.journey-review-inline-opt-btn.selected {
+  background-color: #0e3b36;
+  color: #ffffff;
+  border-color: #0e3b36;
+}
+
+.journey-review-inline-cancel {
+  align-self: flex-start;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+/* Save & Continue Notice Box (Exact match of Screenshot 2) */
+.journey-review-save-box {
+  background-color: #eef5f1;
+  border: 1px solid #d6e5dc;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .journey-review-save-box {
+  background-color: #11261f;
+  border-color: #1e4537;
+}
+
+.journey-review-save-box-title {
+  font-size: 15px;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+[data-theme="dark"] .journey-review-save-box-title {
+  color: #e2e8f0;
+}
+
+.journey-review-save-box-desc {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #334155;
+  margin: 0;
+}
+
+[data-theme="dark"] .journey-review-save-box-desc {
+  color: #94a3b8;
 }
 
 .journey-leave-wrapper {
@@ -27683,11 +27966,11 @@ body {
   text-decoration: underline;
 }
 
-/* Responsive */
+/* Responsive Stepper Navigation */
 @media (max-width: 900px) {
   .journey-layout-grid {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 24px;
   }
 
   .journey-sidebar-sticky {
@@ -27695,13 +27978,19 @@ body {
   }
 
   .journey-stepper-list {
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding-bottom: 12px;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 
   .journey-step-item {
-    padding: 8px 12px;
+    flex-shrink: 0;
+    min-width: 140px;
+    padding: 10px 14px;
   }
 }
 

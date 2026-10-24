@@ -6,7 +6,6 @@ import { missions } from "@/content/missions";
 import type { Scenario, Attempt } from "@/lib/types";
 import {
   CyberMissionHeader,
-  CyberMissionsPanel,
   ScenarioIntroduction,
   UniversityEmailSimulator,
   ActionSelectionGroup,
@@ -159,25 +158,14 @@ export function InteractiveChallengeRunner({
         missionIds={currentMission.ids}
       />
 
-      {/* 3-Column / Responsive Investigation Workstation Layout */}
-      <div className="challenge-workstation-grid workstation-3col">
-        {/* LEFT SIDEBAR: 4 Cyber Mission Categories & Live Progress */}
-        <aside className="challenge-workspace-sidebar" aria-label="Research Modules Navigator">
-          <CyberMissionsPanel
-            currentMissionId={missionId}
-            completedScenarioIds={completedScenarioIds}
-            totalOverall={totalOverall}
-            overallCompleted={overallCompleted}
-            onSelectMission={onSelectMission}
-          />
-        </aside>
-
-        {/* CENTER STAGE: Scenario Briefing & University Email Simulator */}
+      {/* 2-Column Responsive Investigation Workstation Layout */}
+      <div className="challenge-workstation-grid workstation-2col">
+        {/* PRIMARY STAGE: Scenario Briefing & University Evidence Simulator (Questions & Evidence) */}
         <main className="challenge-investigation-stage" aria-label="Scenario Evidence Stage">
           {/* SECTION B — SHORT SCENARIO INTRODUCTION */}
           <ScenarioIntroduction introText={emailData.scenarioIntro} />
 
-          {/* SECTION C — REALISTIC UNIVERSITY EMAIL SIMULATOR */}
+          {/* SECTION C — REALISTIC UNIVERSITY EVIDENCE SIMULATOR */}
           <UniversityEmailSimulator emailData={emailData} />
         </main>
 

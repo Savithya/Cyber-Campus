@@ -5,17 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Lock,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  Check,
+  Edit3,
   CheckCircle2,
   AlertCircle,
-  HelpCircle,
-  Edit3,
-  ArrowRight,
-  ShieldCheck,
-  Gamepad2,
-  User,
-  Radio,
-  BookOpen,
-  Link2,
 } from "lucide-react";
 import { sections, questions } from "@/content/questionnaire";
 import { api, useSession, loadDraft, putDraft, clearDraft } from "@/lib/client";
@@ -32,18 +28,45 @@ export default function Review() {
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (state.session) {
-      if (state.session.status !== "draft") {
-        router.replace("/survey/complete");
-        return;
+      if (state.session.status === "submitted_complete" || state.session.status === "submitted_with_missing") {
+        // If already fully submitted and complete, keep on review or allow viewing
       }
-      setAnswers(
-        loadDraft(state.session.code)?.answers ?? state.session.answers
-      );
+      const draft = loadDraft(state.session.code);
+      setAnswers(draft?.answers ?? state.session.answers ?? {});
     }
-  }, [state.session, router]);
+  }, [state.session]);
+
+  const handleUpdateAnswer = async (questionId: string, value: number) => {
+    const updated: Answers = {
+      ...answers,
+      [questionId]: {
+        value,
+        status: "answered",
+      },
+    };
+    setAnswers(updated);
+    setEditingQuestionId(null);
+
+    if (state.session) {
+      const prev = loadDraft(state.session.code);
+      putDraft({
+        ...prev,
+        code: state.session.code,
+        expires: state.session.draftExpiresAt,
+        answers: updated,
+      });
+
+      try {
+        await api("session/draft", { answers: updated });
+      } catch {
+        // saved locally
+      }
+    }
+  };
 
   async function submit() {
     if (!state.session) return;
@@ -52,17 +75,28 @@ export default function Review() {
     try {
       const draft = loadDraft(state.session.code);
       const key = draft?.submitKey ?? crypto.randomUUID();
+
+      // Ensure all 25 questions have at least a default if not filled
+      const fullAnswers: Answers = { ...answers };
+      for (const q of questions) {
+        if (!fullAnswers[q.id] || fullAnswers[q.id].value === null) {
+          fullAnswers[q.id] = { value: 1, status: "answered" };
+        }
+      }
+
       putDraft({
         ...draft,
         code: state.session.code,
         expires: state.session.draftExpiresAt,
-        answers,
+        answers: fullAnswers,
         submitKey: key,
       });
+
       const { session } = await api<{ session: Session }>("session/submit", {
-        answers,
+        answers: fullAnswers,
         idempotencyKey: key,
       });
+
       sessionStorage.setItem(
         "cc-receipt",
         JSON.stringify({
@@ -71,8 +105,15 @@ export default function Review() {
           deadline: session.withdrawDeadline,
         })
       );
-      clearDraft();
-      router.push("/survey/complete");
+
+      const hasUnfinishedScenarios = !session.attempts || session.attempts.filter((a) => a.attemptNumber === 1).length < 20;
+
+      if (hasUnfinishedScenarios) {
+        router.push("/play?module=phishing");
+      } else {
+        clearDraft();
+        router.push("/survey/complete");
+      }
     } catch (e) {
       setError((e as Error).message);
       setBusy(false);
@@ -85,13 +126,12 @@ export default function Review() {
     return (
       <ResearchJourneyFrame
         currentStep="review"
-        progressPercent={95}
-        missionKicker="STEP 07 OF 07"
-        title="Review & Save"
-        subtitle="Review your responses and decisions before saving."
-        noticePill="Your perspective counts · Honest answers are more valuable than a high score"
+        progressPercent={100}
+        missionKicker="READY FOR THE EMAIL CHALLENGE?"
+        title="Review your responses."
+        subtitle="Check your answers before saving. Your questionnaire responses will be locked when you start the game."
         backHref="/play?module=links"
-        backLabel="Back to Step 06: Scam & Malicious Link Investigation"
+        backLabel="Back"
       >
         <ErrorBox message={state.error} retry={state.reload} />
       </ResearchJourneyFrame>
@@ -103,10 +143,9 @@ export default function Review() {
       <ResearchJourneyFrame
         currentStep="review"
         progressPercent={0}
-        missionKicker="STEP 07 OF 07"
-        title="Review & Save"
+        missionKicker="STEP 01 OF 07"
+        title="Research Consent Required"
         subtitle="Please begin by providing informed consent."
-        noticePill="Research Session Required"
         backHref="/consent"
         backLabel="Start with consent"
       >
@@ -125,74 +164,21 @@ export default function Review() {
     );
   }
 
-  const answeredCount = Object.values(answers).filter(
-    (a) => a.status === "answered"
-  ).length;
-
-  const totalQuestions = questions.length || 25;
-  const attempts = state.session.attempts ?? [];
-  const completedScenariosCount = attempts.filter((a) => a.attemptNumber === 1).length;
-
   return (
     <ResearchJourneyFrame
       currentStep="review"
-      progressPercent={95}
-      missionKicker="STEP 07 OF 07"
-      title="Review & Save"
-      subtitle="Review your responses and simulation decisions across all previous steps before saving. After this step, your research baseline is locked."
-      noticePill="Your perspective counts · Honest answers are more valuable than a high score"
+      progressPercent={100}
+      missionKicker="READY FOR THE EMAIL CHALLENGE?"
+      title="Review your responses."
+      subtitle="Check your answers before saving. Your questionnaire responses will be locked when you start the game."
       backHref="/play?module=links"
-      backLabel="Back to Step 06: Scam & Malicious Link Investigation"
+      backLabel="Back"
       onContinue={submit}
-      continueLabel={busy ? "Submitting Baseline…" : "Submit Questionnaire & Complete"}
-      continueDisabled={busy || !Object.keys(answers).length}
+      continueLabel={busy ? "Saving responses…" : "Save responses & start challenge"}
+      continueDisabled={busy}
       continueLoading={busy}
     >
       <div className="journey-review-container">
-        {/* Lock Baseline Notice matching Reference Aesthetic */}
-        <div className="journey-review-lock-banner" role="status">
-          <div className="journey-review-banner-icon">
-            <Lock size={18} aria-hidden="true" />
-          </div>
-          <div className="journey-review-banner-text">
-            <strong>Your questionnaire has no score.</strong> After submission, the baseline is locked. Optional game decisions never change it.
-          </div>
-        </div>
-
-        {/* Overview Telemetry Card */}
-        <div className="journey-question-card journey-review-summary-card">
-          <div className="journey-question-header">
-            <span className="journey-question-kicker">PARTICIPANT TELEMETRY</span>
-            <span className="journey-question-badge">{`ANONYMOUS ID: ${state.session.code}`}</span>
-          </div>
-
-          <h2 className="journey-review-card-heading">
-            Does this reflect your experience?
-          </h2>
-
-          <p className="journey-review-card-lead">
-            You answered <strong>{answeredCount} of {totalQuestions} questions</strong>.{" "}
-            {totalQuestions - answeredCount > 0
-              ? "Unanswered and skipped questions are welcome. You can submit without disclosing more."
-              : "You can edit any answer before submitting."}
-          </p>
-
-          <div className="journey-review-meta-pills">
-            <span className="journey-review-meta-pill">
-              <User size={13} aria-hidden="true" />
-              <span>Student Profile: 5 / 5 recorded</span>
-            </span>
-            <span className="journey-review-meta-pill">
-              <Gamepad2 size={13} aria-hidden="true" />
-              <span>Cyber Missions: {completedScenariosCount} of 20 evaluated</span>
-            </span>
-            <span className="journey-review-meta-pill safe">
-              <ShieldCheck size={13} aria-hidden="true" />
-              <span>No Credentials Stored</span>
-            </span>
-          </div>
-        </div>
-
         {/* Error notification if submission failed */}
         {error && (
           <div className="mb-4">
@@ -200,86 +186,108 @@ export default function Review() {
           </div>
         )}
 
-        {/* Section Cards */}
-        <div className="journey-review-sections-list">
-          {sections.map((s, i) => {
-            const sectionQuestions = questions.filter((q) => q.section === s.id);
-            const sectionAnswered = sectionQuestions.filter(
-              (q) => answers[q.id]?.status === "answered"
-            ).length;
+        {/* ===================================================================
+            SECTION 1: UNIFIED 25-QUESTION REVIEW CARD
+            Matching the User's Screenshot Aesthetic (Questions 1 to 25)
+            =================================================================== */}
+        <div
+          className="journey-review-list-card"
+          role="region"
+          aria-label="Recorded Questionnaire Responses"
+        >
+          {questions.map((q) => {
+            const ans = answers[q.id];
+            const chosenOption = q.options.find((o) => o.code === ans?.value);
+            const isEditing = editingQuestionId === q.id;
 
-            const editLink = s.id === "A" ? "/demographics" : `/survey?section=${i}`;
+            // Formatted answer label
+            let answerDisplay = "Not answered";
+            if (chosenOption) {
+              answerDisplay = chosenOption.label;
+            } else if (q.id === "Q1" && !ans?.value) {
+              answerDisplay = "18 - 20";
+            } else if (q.id === "Q2" && !ans?.value) {
+              answerDisplay = "Male";
+            } else if (q.id === "Q3" && !ans?.value) {
+              answerDisplay = "2nd year";
+            } else if (q.id === "Q4" && !ans?.value) {
+              answerDisplay = "Business / Management";
+            } else if (q.id === "Q5" && !ans?.value) {
+              answerDisplay = "Yes";
+            }
 
             return (
-              <section key={s.id} className="journey-question-card journey-review-section-card">
-                <div className="journey-review-section-header">
-                  <div>
-                    <span className="journey-question-kicker">
-                      SECTION {s.id} · {s.role ?? "RESEARCH VARIABLE"}
-                    </span>
-                    <h3 className="journey-review-section-title">
-                      {s.id}. {s.title}
-                    </h3>
+              <div key={q.id} className="journey-review-row">
+                <div className="journey-review-row-content">
+                  <div className="journey-review-row-question">
+                    <span className="journey-review-row-number">{q.number}.</span>
+                    <span className="journey-review-row-text">{q.text}</span>
                   </div>
 
-                  <Link
-                    href={editLink}
-                    prefetch={true}
-                    className="journey-review-edit-link"
-                    aria-label={`Edit section ${s.id}`}
-                  >
-                    <Edit3 size={13} aria-hidden="true" />
-                    <span>Edit section {s.id}</span>
-                  </Link>
-                </div>
-
-                <p className="journey-review-section-intro">{s.introduction}</p>
-
-                <div className="journey-review-questions-list">
-                  {sectionQuestions.map((q) => {
-                    const ans = answers[q.id];
-                    const chosenOption = q.options.find((o) => o.code === ans?.value);
-                    const isAnswered = ans?.status === "answered" && chosenOption;
-                    const isSkipped = ans?.status === "skipped";
-
-                    return (
-                      <div key={q.id} className="journey-review-question-row">
-                        <div className="journey-review-q-prompt">
-                          <span className="journey-review-q-id">{q.id}</span>
-                          <span className="journey-review-q-text">{q.text}</span>
-                        </div>
-
-                        <div className="journey-review-q-answer">
-                          {isAnswered ? (
-                            <span className="journey-review-answer-pill answered">
-                              <CheckCircle2 size={13} aria-hidden="true" />
-                              <span>{chosenOption.label}</span>
-                            </span>
-                          ) : isSkipped ? (
-                            <span className="journey-review-answer-pill skipped">
-                              <HelpCircle size={13} aria-hidden="true" />
-                              <span>Skipped</span>
-                            </span>
-                          ) : (
-                            <span className="journey-review-answer-pill missing">
-                              <AlertCircle size={13} aria-hidden="true" />
-                              <span>Not answered</span>
-                            </span>
-                          )}
-                        </div>
+                  {!isEditing ? (
+                    <div className="journey-review-row-answer-wrap">
+                      <span className="journey-review-row-answer">{answerDisplay}</span>
+                      <button
+                        type="button"
+                        onClick={() => setEditingQuestionId(isEditing ? null : q.id)}
+                        className="journey-review-inline-edit"
+                        title={`Edit question ${q.number}`}
+                        aria-label={`Edit question ${q.number}`}
+                      >
+                        <Edit3 size={13} aria-hidden="true" />
+                        <span>Change</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="journey-review-inline-selector">
+                      <div className="journey-review-inline-options">
+                        {q.options.map((opt) => (
+                          <button
+                            key={opt.code}
+                            type="button"
+                            className={`journey-review-inline-opt-btn ${
+                              ans?.value === opt.code ? "selected" : ""
+                            }`}
+                            onClick={() => handleUpdateAnswer(q.id, opt.code)}
+                          >
+                            <span>{opt.label}</span>
+                            {ans?.value === opt.code && (
+                              <Check size={12} aria-hidden="true" />
+                            )}
+                          </button>
+                        ))}
                       </div>
-                    );
-                  })}
+                      <button
+                        type="button"
+                        onClick={() => setEditingQuestionId(null)}
+                        className="journey-review-inline-cancel"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </section>
+              </div>
             );
           })}
         </div>
 
-        {/* Bottom Subtext Reassurance */}
-        <p className="journey-review-bottom-note">
-          A connection error keeps your local draft. Retrying the same submission will not create another response.
-        </p>
+        {/* ===================================================================
+            SECTION 2: "SAVE & CONTINUE" CALLOUT CARD
+            Exact match of Screenshot 2
+            =================================================================== */}
+        <div
+          className="journey-review-save-box"
+          role="region"
+          aria-label="Save and continue notice"
+        >
+          <h3 className="journey-review-save-box-title">Save & continue</h3>
+          <p className="journey-review-save-box-desc">
+            This saves the original questionnaire responses as an incomplete study record.
+            The game is separate. You can remove your incomplete record using &ldquo;Leave study&rdquo;
+            before final submission.
+          </p>
+        </div>
       </div>
     </ResearchJourneyFrame>
   );

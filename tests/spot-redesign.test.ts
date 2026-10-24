@@ -9,6 +9,8 @@ import { ResearchConsentPage } from "@/components/research-consent-page";
 import { DemographicsForm } from "@/components/demographics-form";
 import Review from "@/components/review";
 import { CyberMissionControl } from "@/components/cyber-mission-control";
+import { InteractiveChallengeRunner } from "@/components/interactive-challenge-runner";
+import type { Scenario } from "@/lib/types";
 import { SessionProvider, SessionContext, type SessionContextType } from "@/lib/client";
 
 vi.mock("next/navigation", () => ({
@@ -170,7 +172,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("What is your gender?");
     expect(html).toContain("What is your current year of study?");
     expect(html).toContain("What is your main field of study?");
-    expect(html).toContain("What type of university do you attend?");
+    expect(html).toContain("Have you received any formal training or education about cybersecurity or phishing?");
   });
 
   it("renders the redesigned BEFORE THE INBOX Review & Save page matching the journey layout", () => {
@@ -205,13 +207,11 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
 
     expect(html).toContain("YOUR RESEARCH JOURNEY");
     expect(html).toContain("STEP 07");
-    expect(html).toContain("Review &amp; Save");
-    expect(html).toContain("Your questionnaire has no score");
-    expect(html).toContain("PARTICIPANT TELEMETRY");
-    expect(html).toContain("ANONYMOUS ID: 001");
-    expect(html).toContain("Does this reflect your experience?");
-    expect(html).toContain("Submit Questionnaire &amp; Complete");
-    expect(html).toContain("Back to Step 06: Scam &amp; Malicious Link Investigation");
+    expect(html).toContain("Review your responses.");
+    expect(html).toContain("READY FOR THE EMAIL CHALLENGE?");
+    expect(html).toContain("Save &amp; continue");
+    expect(html).toContain("Save responses &amp; start challenge");
+    expect(html).toContain("Leave study");
   });
 
   it("renders the redesigned Cyber Missions page with journey sidebar and 4 threat modules", () => {
@@ -297,5 +297,141 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     // 7. STEP 07: Review & Save
     expect(html).toContain("STEP 07");
     expect(html).toContain("Review &amp; Save");
+  });
+
+  it("renders InteractiveChallengeRunner in a spacious dual-column workstation layout with questions and simulators fully visible", () => {
+    const mockScenario: Scenario = {
+      id: "PH01",
+      mission: "phishing",
+      primaryIV: "IV1",
+      secondaryTags: [],
+      version: "1.0",
+      title: "The Suspicious University Email",
+      situation: "Urgent account deactivation warning",
+      senderName: "University IT Account Services",
+      senderAddress: "it-support@serendib.campus.example",
+      message: "Confirm your student credentials immediately.",
+      evidence: [],
+      choices: [
+        { id: "A", label: "Withhold details and report the email to campus IT security", unsafe: false, privacyRiskScore: 0, disclosedInfoCategory: "None" },
+        { id: "B", label: "Verify account status independently through your bookmarked campus portal", unsafe: false, privacyRiskScore: 0, disclosedInfoCategory: "None" },
+        { id: "C", label: "Ignore the message without checking or reporting", unsafe: true, privacyRiskScore: 3, disclosedInfoCategory: "None" },
+        { id: "D", label: "Proceed by clicking the link and submitting university credentials", unsafe: true, privacyRiskScore: 5, disclosedInfoCategory: "Account Credentials" },
+      ],
+      interaction: "email",
+    };
+
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "submitted_complete" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(InteractiveChallengeRunner, {
+          scenario: mockScenario,
+          missionId: "phishing",
+          scenarioIndex: 0,
+          totalInMission: 5,
+          overallCompleted: 0,
+          totalOverall: 20,
+          onCompleteScenario: vi.fn(),
+          onReturnToHub: vi.fn(),
+        })
+      )
+    );
+
+    // 1. Dual-column workstation layout (no redundant inner sidebar)
+    expect(html).toContain("workstation-2col");
+    expect(html).not.toContain("workstation-3col");
+    expect(html).not.toContain("challenge-workspace-sidebar");
+
+    // 2. Scenario Briefing & Question Evidence Simulator Stage
+    expect(html).toContain("challenge-investigation-stage");
+    expect(html).toContain("SCENARIO BRIEFING");
+    expect(html).toContain("Inspect the communication below before deciding");
+    expect(html).toContain("University IT Account Services");
+
+    // 3. Decision Point Question Stage
+    expect(html).toContain("challenge-decision-corner");
+    expect(html).toContain("DECISION POINT");
+    expect(html).toContain("What would you do next?");
+    expect(html).toContain("Withhold details and report the email to campus IT security");
+    expect(html).toContain("Verify account status independently through your bookmarked campus portal");
+    expect(html).toContain("Ignore the message without checking or reporting");
+    expect(html).toContain("Proceed by clicking the link and submitting university credentials");
+    expect(html).toContain("Next Challenge");
+  });
+
+  it("renders STEP 03 to STEP 06 investigation workstation with questions and journey sidebar", () => {
+    const mockScenarios: Scenario[] = [
+      {
+        id: "PH01",
+        mission: "phishing",
+        primaryIV: "IV1",
+        secondaryTags: [],
+        version: "1.0",
+        title: "The Suspicious University Email",
+        situation: "Urgent account deactivation warning",
+        senderName: "University IT Account Services",
+        senderAddress: "it-support@serendib.campus.example",
+        message: "Confirm your student credentials immediately.",
+        evidence: [],
+        choices: [
+          { id: "A", label: "Withhold details and report the email to campus IT security", unsafe: false, privacyRiskScore: 0, disclosedInfoCategory: "None" },
+          { id: "B", label: "Verify account status independently", unsafe: false, privacyRiskScore: 0, disclosedInfoCategory: "None" },
+        ],
+        interaction: "email",
+      },
+    ];
+
+    const mockContextValue = {
+      session: {
+        code: "001",
+        status: "submitted_complete" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(CyberMissionControl as any, {
+          initialMissionId: "phishing",
+          initialScenarios: mockScenarios,
+        })
+      )
+    );
+
+    // Sidebar has 7 steps with Step 03 marked active
+    expect(html).toContain("YOUR RESEARCH JOURNEY");
+    expect(html).toContain("STEP 03");
+    expect(html).toContain("Phishing Investigation");
+
+    // Questions and Decision Point are properly rendered
+    expect(html).toContain("SCENARIO BRIEFING");
+    expect(html).toContain("DECISION POINT");
+    expect(html).toContain("What would you do next?");
+    expect(html).toContain("Withhold details and report the email to campus IT security");
   });
 });

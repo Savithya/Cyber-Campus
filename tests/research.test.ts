@@ -16,20 +16,21 @@ describe("authoritative research instrument", () => {
       Array.from({ length: 25 }, (_, i) => "Q" + (i + 1)),
     );
   });
-  it("keeps exactly four IVs, one combined IV4 and the DV apart", () => {
-    expect(sections.map((s) => s.questions.length)).toEqual([5, 4, 3, 3, 3, 7]);
+  it("keeps exactly four IVs and demographic profile apart", () => {
+    expect(sections.map((s) => s.questions.length)).toEqual([5, 5, 5, 5, 5]);
     expect(sections.map((s) => s.role)).toEqual([
       "Profile",
       "IV1",
       "IV2",
       "IV3",
       "IV4",
-      "DV",
     ]);
     expect(questions.filter((q) => q.role === "IV4").map((q) => q.id)).toEqual([
-      "Q16",
-      "Q17",
-      "Q18",
+      "Q21",
+      "Q22",
+      "Q23",
+      "Q24",
+      "Q25",
     ]);
   });
   it("starts with no selected answers and accepts skipped/null, not zero or neutral", () => {

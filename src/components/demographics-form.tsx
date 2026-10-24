@@ -295,7 +295,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 1 of 27</span>
+          <span className="journey-card-count">Question 1 of 25</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q1-title" className="journey-question-text">
@@ -335,7 +335,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 2 of 27</span>
+          <span className="journey-card-count">Question 2 of 25</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q2-title" className="journey-question-text">
@@ -375,7 +375,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 3 of 27</span>
+          <span className="journey-card-count">Question 3 of 25</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q3-title" className="journey-question-text">
@@ -415,7 +415,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 4 of 27</span>
+          <span className="journey-card-count">Question 4 of 25</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q4-title" className="journey-question-text">
@@ -455,7 +455,7 @@ export function DemographicsForm() {
         }`}
       >
         <div className="journey-card-top">
-          <span className="journey-card-count">Question 5 of 27</span>
+          <span className="journey-card-count">Question 5 of 25</span>
           <span className="journey-card-required">Required</span>
         </div>
         <h2 id="q5-title" className="journey-question-text">

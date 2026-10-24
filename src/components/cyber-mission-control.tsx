@@ -335,6 +335,10 @@ export function CyberMissionControl({
       .filter((s): s is Scenario => Boolean(s));
     const activeScenario = missionScenarios[activeScenarioIndex] ?? missionScenarios[0];
 
+    if (!activeScenario || loadingScenarios) {
+      return <Loading />;
+    }
+
     const currentAttempt = attempts.find(
       (a) => a.scenarioId === activeScenario?.id && a.attemptNumber === 1,
     );
