@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle2, RotateCcw, Lock, ShieldCheck } from "lucide-react";
+import { AlertCircle, CheckCircle2, RotateCcw, Lock } from "lucide-react";
 import {
   api,
   useSession,
@@ -239,28 +239,28 @@ export function DemographicsForm() {
       continueDisabled={!isComplete}
     >
       {/* Prominent Anonymous ID Identification Card */}
-      <div className="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-4 sm:p-5 mb-6 shadow-lg backdrop-blur-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-start sm:items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+      <div className="bg-white dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4 sm:p-5 mb-6 shadow-sm dark:shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 transition-colors">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/80 dark:border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 shadow-2xs">
             <Lock size={20} aria-hidden="true" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs uppercase tracking-wider font-mono text-emerald-400 font-semibold">Active Research Participant</span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">Anonymous Session</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs uppercase tracking-wider font-mono text-emerald-700 dark:text-emerald-400 font-bold">Active Research Participant</span>
+              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-md border border-emerald-200 dark:border-emerald-500/30">Anonymous Session</span>
             </div>
-            <div className="text-xl font-bold font-mono text-white mt-0.5 tracking-tight flex items-center gap-2">
+            <div className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1 tracking-tight flex items-center gap-2">
               <span>Anonymous ID:</span>
-              <span className="text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-500/40">{participantCode}</span>
+              <span className="text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-md border border-emerald-300 dark:border-emerald-500/40 font-bold">{participantCode}</span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">Assigned automatically for non-identifiable research data collection under academic ethics protocol.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Assigned automatically for non-identifiable research data collection under academic ethics protocol.</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleStartNewParticipant}
           disabled={resettingParticipant}
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 rounded-lg transition-colors shrink-0"
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 rounded-lg shadow-2xs transition-colors shrink-0"
         >
           <RotateCcw size={14} className={resettingParticipant ? "animate-spin" : ""} aria-hidden="true" />
           <span>{resettingParticipant ? "Assigning Next ID..." : "Start as Next Participant"}</span>
