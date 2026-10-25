@@ -31,7 +31,6 @@ import {
   setResearcherSession,
   verifyPinConstantTime,
 } from "@/lib/researcher-auth.server";
-import { syntheticSessions } from "@/lib/fixtures.server";
 import { exportCsv, exportKinds, type ExportKind } from "@/lib/csv";
 import {
   exportDescriptiveStatsCsv,
@@ -115,7 +114,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           );
         const { getDemoSubmissions } = await import("@/lib/repository.server");
         const demoSubs = await getDemoSubmissions();
-        data = [...demoSubs, ...syntheticSessions()];
+        data = demoSubs.filter(
+          (s) =>
+            !s.id?.includes("synthetic") &&
+            !s.submissionId?.includes("synthetic") &&
+            !s.code?.includes("synthetic"),
+        );
       } else {
         const db = await requireResearcher();
         const result = await db.rpc("research_dataset");

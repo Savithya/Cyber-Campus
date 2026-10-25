@@ -270,16 +270,16 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
     expect(html).toContain("Researcher Access");
     expect(html).toContain('href="/admin/login"');
 
-    // Appearance Selector supporting all 3 themes
-    expect(html).toContain("Light");
-    expect(html).toContain("Dark");
-    expect(html).toContain("Cyber");
+    // Appearance Selector supporting Light and Dark themes
+    expect(html).toContain("Light mode");
+    expect(html).toContain("Dark mode");
+    expect(html).not.toContain("Cyber mode");
   });
 
-  it("verifies THEMES array contains light, dark, and cyber modes with correct icons", () => {
-    expect(THEMES).toHaveLength(3);
-    expect(THEMES.map((t) => t.id)).toEqual(["light", "dark", "cyber"]);
-    expect(THEMES.map((t) => t.label)).toEqual(["Light", "Dark", "Cyber"]);
+  it("verifies THEMES array contains light and dark modes with correct icons", () => {
+    expect(THEMES).toHaveLength(2);
+    expect(THEMES.map((t) => t.id)).toEqual(["light", "dark"]);
+    expect(THEMES.map((t) => t.label)).toEqual(["Light", "Dark"]);
   });
 
   it("renders the complete redesigned Home page without missing sections", () => {

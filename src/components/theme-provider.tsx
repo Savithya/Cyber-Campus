@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 
-export type Theme = "light" | "dark" | "cyber";
+export type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -24,7 +24,6 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const THEMES: { id: Theme; label: string; icon: string }[] = [
   { id: "light", label: "Light", icon: "sun" },
   { id: "dark", label: "Dark", icon: "moon" },
-  { id: "cyber", label: "Cyber", icon: "zap" },
 ];
 
 export function ThemeScript() {
@@ -32,7 +31,7 @@ export function ThemeScript() {
     try {
       var stored = localStorage.getItem("${THEME_STORAGE_KEY}");
       var theme = stored;
-      if (!theme || (theme !== "light" && theme !== "dark" && theme !== "cyber")) {
+      if (!theme || (theme !== "light" && theme !== "dark")) {
         theme = "light";
       }
       document.documentElement.setAttribute("data-theme", theme);
@@ -63,8 +62,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (stored && (stored === "dark" || stored === "light" || (stored as string) === "cyber")) {
-        setThemeState(stored as Theme);
+      if (stored && (stored === "dark" || stored === "light")) {
+        setThemeState(stored);
         applyTheme(stored);
       } else {
         // First-time visitors without a stored preference receive Light mode
@@ -88,7 +87,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     setThemeState((current) => {
-      const next: Theme = current === "light" ? "dark" : current === "dark" ? "cyber" : "light";
+      const next: Theme = current === "light" ? "dark" : "light";
 
       applyTheme(next);
       try {

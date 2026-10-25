@@ -259,16 +259,17 @@ export default function Admin({
     return () => window.removeEventListener("focus", handleFocus);
   }, [router]);
 
-  // When in Research Workspace (demo === false), strictly filter out any mock or synthetic fixture records
+  // Strictly filter out any mock or synthetic fixture records
   const realSessions = useMemo(() => {
-    if (demo) return sessions;
     return sessions.filter(
       (s) =>
         !s.id?.includes("synthetic") &&
         !s.submissionId?.includes("synthetic") &&
-        !s.code?.includes("synthetic"),
+        !s.code?.includes("synthetic") &&
+        !s.id?.includes("mock") &&
+        !s.submissionId?.includes("mock"),
     );
-  }, [sessions, demo]);
+  }, [sessions]);
 
   const filtered = filterSessions(realSessions, filters),
     all = filterSessions(realSessions, filters, false),
@@ -440,7 +441,7 @@ export default function Admin({
             <span className="admin-brand-title">Research Workspace</span>
             <span className="admin-brand-status">
               <span className="admin-status-dot online" />
-              {demo ? "Synthetic Fixtures" : "Active Research Study"}
+              Active Research Study
             </span>
           </div>
         </div>
@@ -499,27 +500,25 @@ export default function Admin({
             </div>
             <div className="admin-profile-info">
               <span className="admin-profile-name">
-                {demo ? "Synthetic Preview" : "Authorized Researcher"}
+                Authorized Researcher
               </span>
               <span className="admin-profile-meta">
-                {demo ? "48 Fixture Sessions" : `${counts.totalSubmissions} Submissions · UTC+05:30`}
+                {`${counts.totalSubmissions} Submissions · UTC+05:30`}
               </span>
             </div>
-            {!demo && (
-              <button
-                type="button"
-                className="admin-profile-logout"
-                onClick={async () => {
-                  await api("auth/logout", {});
-                  router.replace("/admin/login");
-                  router.refresh();
-                }}
-                title="Sign out of researcher session"
-                aria-label="Sign out of researcher session"
-              >
-                <LogOut size={14} />
-              </button>
-            )}
+            <button
+              type="button"
+              className="admin-profile-logout"
+              onClick={async () => {
+                await api("auth/logout", {});
+                router.replace("/admin/login");
+                router.refresh();
+              }}
+              title="Sign out of researcher session"
+              aria-label="Sign out of researcher session"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
         </div>
       </aside>
@@ -613,10 +612,8 @@ export default function Admin({
                                           : "Cyber Campus Research Workspace"
           }
         >
-          {demo
-            ? "Synthetic demonstration data · no actual participant findings."
-            : active === "statistics"
-              ? "Parametric and non-parametric statistical tests, correlation matrices, multiple regression, and reliability analysis."
+          {active === "statistics"
+            ? "Parametric and non-parametric statistical tests, correlation matrices, multiple regression, and reliability analysis."
             : active === "threats" || active === "iv-analysis"
               ? "Comparative analysis across the four social engineering threat categories (IV1–IV4) and their relationship with User Privacy."
             : active === "links-mission"
@@ -637,16 +634,6 @@ export default function Admin({
                             ? "Session records, timestamps, and validation statuses."
                             : "Descriptive, item-level findings from submitted research responses."}
         </PageHeading>
-
-        {demo && (
-          <div className="notice demo-notice">
-            <strong>DEMO DATA</strong>
-            <span>
-              All counts, charts, and exports in this preview are synthetic and
-              excluded from research totals. Real research totals: not connected.
-            </span>
-          </div>
-        )}
 
         {/* Global Filter Bar */}
         {/* Simplified Global Research Filters */}
@@ -1493,7 +1480,7 @@ export default function Admin({
               <p>
                 Exports use UTF-8 with a BOM for Excel, quoted text, numeric code columns,
                 and formula-injection protection for text. Active filters and inclusion rules are in each data export.
-                Withdrawn records, unsubmitted drafts, and practice-only sessions are excluded. Demo files are explicitly labelled synthetic.
+                Withdrawn records, unsubmitted drafts, and practice-only sessions are excluded.
               </p>
               <p>
                 No internal auth IDs, session tokens, or withdrawal secrets are exported. Baseline and game data remain separate;
@@ -1819,7 +1806,7 @@ export default function Admin({
                 <QuestionChart
                   q={selected}
                   sessions={filtered}
-                  filters={demo ? "Synthetic demo · " + filterText : filterText}
+                  filters={filterText}
                   onError={setError}
                 />
               </>
@@ -1838,9 +1825,7 @@ export default function Admin({
                           key={q.id}
                           q={q}
                           sessions={filtered}
-                          filters={
-                            demo ? "Synthetic demo · " + filterText : filterText
-                          }
+                          filters={filterText}
                           onError={setError}
                         />
                       ) : (

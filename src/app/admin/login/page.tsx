@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Database,
   Lock,
-  ExternalLink,
 } from "lucide-react";
 import { api } from "@/lib/client";
 import { ErrorBox } from "@/components/ui";
@@ -218,26 +217,6 @@ export default function Page() {
                 </p>
               </div>
             </form>
-          </div>
-
-          {/* Section 5: Synthetic Demo Preview */}
-          <div className="demo-preview-card">
-            <div className="demo-preview-header">
-              <div className="demo-preview-info">
-                <span className="demo-badge">SEPARATE ENVIRONMENT</span>
-                <p className="demo-copy">
-                  Looking to evaluate research analytical models or test survey datasets?
-                </p>
-              </div>
-              <Link href="/demo" className="demo-link-button">
-                <span>View Synthetic Demo</span>
-                <ExternalLink size={15} aria-hidden="true" />
-              </Link>
-            </div>
-            <p className="demo-disclaimer">
-              The synthetic demo operates in total isolation with artificial data fixtures
-              and does not connect to real study participants.
-            </p>
           </div>
         </section>
       </div>

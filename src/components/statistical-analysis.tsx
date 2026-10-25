@@ -154,9 +154,7 @@ export default function StatisticalAnalysis({
           <div>
             <div className="stats-badge-row">
               <span className="tag primary-tag">FEATURE 14 · ADVANCED STATISTICAL SUITE</span>
-              <span className="tag">
-                {demo ? "SYNTHETIC FIXTURE DATASET" : "ACTUAL RESEARCH DATASET"}
-              </span>
+              <span className="tag">ACTUAL RESEARCH DATASET</span>
               <span className="tag">Asia/Colombo</span>
             </div>
             <h1 className="stats-page-title">Advanced Statistical Analysis</h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Moon, Sun, Zap, Check, ChevronDown } from "lucide-react";
+import { Moon, Sun, Check, ChevronDown } from "lucide-react";
 import { useTheme, Theme, THEMES } from "./theme-provider";
 
 export function ThemeToggle({
@@ -50,8 +50,6 @@ export function ThemeToggle({
         return <Moon size={size} strokeWidth={1.9} aria-hidden="true" />;
       case "light":
         return <Sun size={size} strokeWidth={1.9} aria-hidden="true" />;
-      case "cyber":
-        return <Zap size={size} strokeWidth={1.9} aria-hidden="true" />;
       default:
         return <Sun size={size} strokeWidth={1.9} aria-hidden="true" />;
     }
@@ -63,8 +61,6 @@ export function ThemeToggle({
         return "Dark";
       case "light":
         return "Light";
-      case "cyber":
-        return "Cyber";
       default:
         return "Light";
     }
