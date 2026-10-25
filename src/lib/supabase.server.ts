@@ -15,7 +15,7 @@ export async function supabase() {
   return createServerClient(url, key, {
     cookies: {
       getAll: () => jar.getAll(),
-      setAll(values: any) {
+      setAll(values: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
         for (const { name, value, options } of values) {
           try {
             jar.set(name, value, {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterAll } from "vitest";
 import { readFile, writeFile } from "node:fs/promises";
 
 const TEST_PIN = "pR3xMfl3UUCTA2n1";
@@ -146,5 +146,19 @@ describe("Record 001 Integration & Visibility", () => {
     expect(r001?.code).toBe("001");
     expect(r001?.status).toBe("submitted_complete");
     expect(r001?.attempts.length).toBe(20);
+  });
+
+  afterAll(async () => {
+    try {
+      await writeFile(".demo-data/submissions.json", "[]\n", "utf-8");
+      await writeFile(
+        ".demo-data/participant_counter.json",
+        JSON.stringify({ counter: 0 }) + "\n",
+        "utf-8",
+      );
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
+    } catch {}
   });
 });

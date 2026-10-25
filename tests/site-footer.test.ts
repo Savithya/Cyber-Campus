@@ -3,7 +3,7 @@ import React from "react";
 import fs from "fs";
 import path from "path";
 import { renderToString } from "react-dom/server";
-import { SiteFooter } from "@/components/site-footer";
+import { SiteFooter, type SiteFooterProps } from "@/components/site-footer";
 
 describe("Cyber Campus — Site Footer Layout & Bottom Bar", () => {
   it("renders SiteFooter with full width and proper bottom bar layout", () => {
@@ -26,7 +26,7 @@ describe("Cyber Campus — Site Footer Layout & Bottom Bar", () => {
   });
 
   it("renders compact SiteFooter with clean responsive layout", () => {
-    const html = renderToString(React.createElement(SiteFooter, { compact: true }));
+    const html = renderToString(React.createElement<SiteFooterProps>(SiteFooter, { compact: true }));
 
     expect(html).toContain("CyberCampus");
     expect(html).toContain("Academic Cybersecurity Research · Sri Lanka");

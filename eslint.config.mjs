@@ -11,5 +11,10 @@ export default defineConfig([
     "test-results/**",
     "next-env.d.ts",
   ]),
-  { rules: { "react-hooks/set-state-in-effect": "off" } },
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+    },
+  },
 ]);

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowUpRight, ArrowUp, ShieldCheck } from "lucide-react";
 
-interface SiteFooterProps {
+export interface SiteFooterProps {
   compact?: boolean;
 }
 

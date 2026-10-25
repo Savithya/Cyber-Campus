@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -50,11 +50,65 @@ describe("Dynamic Anonymous ID & Automatic Research Workspace Updates", () => {
     try {
       const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
       const counterPath = path.join(process.cwd(), ".demo-data", "participant_counter.json");
-      const raw0 = await readFile(subPath, "utf-8");
-      const list0: Session[] = JSON.parse(raw0);
-      const cleaned = list0.filter((s) => s.code === "001");
+      let cleaned: Session[] = [];
+      try {
+        const raw0 = await readFile(subPath, "utf-8");
+        const list0: Session[] = JSON.parse(raw0);
+        cleaned = list0.filter((s) => s.code === "001");
+      } catch {}
+
+      if (cleaned.length === 0) {
+        const dummyAnswers: Answers = {};
+        for (const q of questions) {
+          let val = 4;
+          if (q.id === "Q1") val = 2;
+          else if (q.id === "Q2") val = 1;
+          else if (q.id === "Q3") val = 3;
+          else if (q.id === "Q4") val = 1;
+          else val = (q.number % 3) + 3;
+          dummyAnswers[q.id] = { value: val, status: "answered" };
+        }
+        cleaned = [
+          {
+            id: "test-rec-001",
+            submissionId: "test-rec-001",
+            participantId: "PART-001",
+            code: "001",
+            mode: "demo",
+            status: "submitted_complete",
+            createdAt: "2026-10-22T08:00:00.000Z",
+            submittedAt: "2026-10-22T08:24:30.000Z",
+            draftExpiresAt: "2026-10-29T08:00:00.000Z",
+            withdrawDeadline: "2026-11-21T08:00:00.000Z",
+            instrumentVersion: "1.0.0",
+            consentVersion: "1.0.0",
+            priorExposure: false,
+            assignedModuleOrder: ["phishing", "pretexting", "impersonation", "links"],
+            answers: dummyAnswers,
+            attempts: [],
+          },
+        ];
+      }
       await writeFile(subPath, JSON.stringify(cleaned, null, 2), "utf-8");
       await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+        for (const s of cleaned) {
+          globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
+        }
+      }
+    } catch {}
+  });
+
+  afterAll(async () => {
+    try {
+      const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
+      const counterPath = path.join(process.cwd(), ".demo-data", "participant_counter.json");
+      await writeFile(subPath, "[]\n", "utf-8");
+      await writeFile(counterPath, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
     } catch {}
   });
   it("changes Anonymous ID when a user joins research and automatically updates all Research Workspace parts upon mission completion", async () => {
@@ -198,13 +252,5 @@ describe("Dynamic Anonymous ID & Automatic Research Workspace Updates", () => {
     // 4) Friedman Test
     const friedman = calculateFriedmanTest(filtered);
     expect(friedman.n).toBeGreaterThanOrEqual(1);
-
-    // Clean up test records
-    const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
-    const counterPath = path.join(process.cwd(), ".demo-data", "participant_counter.json");
-    const allSubs = await getDemoSubmissions();
-    const cleaned = allSubs.filter((s) => s.code === "001");
-    await writeFile(subPath, JSON.stringify(cleaned, null, 2), "utf-8");
-    await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
   });
 });

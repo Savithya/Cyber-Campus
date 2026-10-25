@@ -8,7 +8,7 @@
     "start": "next start --hostname 127.0.0.1 --port 3005",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --fileParallelism false",
     "test:e2e": "playwright test",
     "test:db": "node scripts/test-database.mjs",
     "content:generate": "node --conditions=react-server --import tsx scripts/generate-content.ts",

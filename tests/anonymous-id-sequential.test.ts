@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import { readFile, writeFile } from "node:fs/promises";
 
 const cookieStore = new Map<string, { value: string; options?: Record<string, unknown> }>();
@@ -23,7 +23,6 @@ import {
   startSession,
   saveDraft,
   submitBaseline,
-  recordAttempt,
   getDemoSubmissions,
 } from "@/lib/repository.server";
 import { blankAnswers } from "@/lib/validation";
@@ -35,11 +34,53 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
 
   beforeEach(async () => {
     try {
-      const raw0 = await readFile(subPath, "utf-8");
-      const list0: Session[] = JSON.parse(raw0);
-      const cleaned = list0.filter((s) => s.code === "001");
+      let cleaned: Session[] = [];
+      try {
+        const raw0 = await readFile(subPath, "utf-8");
+        const list0: Session[] = JSON.parse(raw0);
+        cleaned = list0.filter((s) => s.code === "001");
+      } catch {}
+
+      if (cleaned.length === 0) {
+        cleaned = [
+          {
+            id: "test-rec-001",
+            submissionId: "test-rec-001",
+            participantId: "PART-001",
+            code: "001",
+            mode: "demo",
+            status: "submitted_complete",
+            createdAt: "2026-10-22T08:00:00.000Z",
+            submittedAt: "2026-10-22T08:24:30.000Z",
+            draftExpiresAt: "2026-10-29T08:00:00.000Z",
+            withdrawDeadline: "2026-11-21T08:00:00.000Z",
+            instrumentVersion: "1.0.0",
+            consentVersion: "1.0.0",
+            priorExposure: false,
+            assignedModuleOrder: ["phishing", "pretexting", "impersonation", "links"],
+            answers: {},
+            attempts: [],
+          },
+        ];
+      }
       await writeFile(subPath, JSON.stringify(cleaned, null, 2), "utf-8");
       await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+        for (const s of cleaned) {
+          globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
+        }
+      }
+    } catch {}
+  });
+
+  afterAll(async () => {
+    try {
+      await writeFile(subPath, "[]\n", "utf-8");
+      await writeFile(counterPath, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
     } catch {}
   });
 
@@ -133,10 +174,5 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
     expect(allCodes).toContain("002");
     expect(allCodes).toContain("003");
     expect(allCodes).toContain("004");
-
-    // Clean up test records (002, 003, 004) leaving clean base state for user
-    const cleaned = subsAfter4.filter((s) => s.code === "001");
-    await writeFile(subPath, JSON.stringify(cleaned, null, 2), "utf-8");
-    await writeFile(counterPath, JSON.stringify({ counter: 1 }), "utf-8");
   });
 });

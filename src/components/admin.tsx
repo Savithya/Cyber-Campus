@@ -55,7 +55,7 @@ import { downloadChart } from "@/lib/chart-download";
 import { exportKinds, toCsv } from "@/lib/csv";
 import { scoreSummary, computeThreatMetrics } from "@/lib/scoring";
 import { api } from "@/lib/client";
-import type { Session, Filters, Question, Scenario } from "@/lib/types";
+import type { Session, Filters, Question, Scenario, Attempt } from "@/lib/types";
 import { PageHeading, ErrorBox } from "./ui";
 import { GlobalResearchFilters } from "./global-research-filters";
 import StatisticalAnalysis from "./statistical-analysis";
@@ -1896,7 +1896,7 @@ function ThreatAnalysisPanel({
   missionCode: string;
   description: string;
   scenarioIds: readonly string[];
-  attempts: any[];
+  attempts: Attempt[];
   totalParticipants: number;
   insightsText: string;
 }) {
