@@ -1,104 +1,72 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Mail, MessagesSquare, UserRoundSearch, Link2, Lock } from "lucide-react";
+import { ShieldCheck, Activity } from "lucide-react";
 
 export function HeroCyberVisual() {
   return (
     <div
-      className="hero-full-visual-container"
+      className="hero-pro-visual-wrapper"
       role="region"
-      aria-label="Academic Cybersecurity Research Laboratory Animation"
+      aria-label="Academic Cybersecurity Research Workstation & Simulation Environment"
     >
-      {/* Background Ambient Neon Glows */}
-      <div className="hero-cyber-glow glow-primary" aria-hidden="true" />
-      <div className="hero-cyber-glow glow-secondary" aria-hidden="true" />
-      <div className="hero-cyber-glow glow-accent" aria-hidden="true" />
+      {/* Ambient soft glow */}
+      <div className="hero-pro-ambient-glow" aria-hidden="true" />
 
-      {/* Main Full-Image Animated Frame */}
-      <div className="hero-full-image-frame">
-        {/* Full Image Artwork */}
+      {/* Main Professional Image Frame */}
+      <div className="hero-pro-image-card">
+        {/* Crisp High-Resolution Professional Artwork */}
         <picture>
+          <source srcSet="/images/cyber-hero-professional.jpg" type="image/jpeg" />
           <source srcSet="/images/cyber-hero-lab-8x5.webp" type="image/webp" />
           <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
           <img
             src="/images/cyber-hero-lab-8x5.jpg"
-            alt="Futuristic Academic Cybersecurity Research Laboratory — Digital Research Console, Privacy Shield and Threat Telemetry"
-            className="hero-full-cyber-image"
+            alt="Professional University Cybersecurity Research Workstation — Live Threat Telemetry & Academic Privacy Simulation"
+            className="hero-pro-image"
             width={1200}
-            height={750}
+            height={675}
             loading="eager"
           />
         </picture>
 
-        {/* Animated Cyber Laser Scanner Beam */}
-        <div className="cyber-laser-scanner" aria-hidden="true">
-          <div className="laser-beam-line" />
-          <div className="laser-beam-glow" />
-        </div>
-
-        {/* Holographic Radial Grid Light Accent */}
-        <div className="cyber-holographic-overlay" aria-hidden="true" />
-
-        {/* Live Research Console Telemetry Badge (Top-Left) */}
-        <div className="hero-live-beacon-pill" aria-hidden="true">
-          <span className="live-pulse-emerald" />
+        {/* Refined Glassmorphic Status Header Pill (Top-Left) */}
+        <div className="hero-pro-live-pill" aria-hidden="true">
+          <span className="hero-pro-pulse-dot" />
           <span>CYBER THREAT LAB · RESEARCH CONSOLE</span>
         </div>
 
-        {/* Glowing Privacy Shield Indicator (Center-Top) */}
-        <div className="hero-floating-glass-chip top-center-shield">
-          <div className="chip-icon-circle cyan pulse-glow">
-            <ShieldCheck size={18} className="text-cyan" aria-hidden="true" />
-          </div>
-          <div className="chip-text-content">
-            <span className="chip-sup">DEPENDENT VARIABLE (DV)</span>
-            <strong className="chip-main">User Privacy Shield</strong>
-          </div>
+        {/* Dependent Variable Privacy Shield Badge (Top-Right) */}
+        <div className="hero-pro-shield-pill" aria-hidden="true">
+          <ShieldCheck size={14} className="text-emerald-400" />
+          <span>User Privacy Shield</span>
         </div>
 
-        {/* 4 Floating Threat-Category Indicators */}
-        {/* Indicator 1: IV1 Phishing */}
-        <div className="hero-floating-glass-chip chip-threat-iv1">
-          <div className="chip-icon-circle purple">
-            <Mail size={15} className="text-indigo-400" aria-hidden="true" />
-          </div>
-          <div className="chip-text-content">
-            <span className="chip-sup">IV1 · 5 CHALLENGES</span>
-            <strong className="chip-main">Phishing</strong>
-          </div>
-        </div>
+        {/* Elegant Bottom Glassmorphic Telemetry Ribbon */}
+        <div className="hero-pro-bottom-ribbon">
+          <div className="hero-pro-ribbon-content">
+            <div className="flex items-center gap-2">
+              <Activity size={14} className="text-teal-400 shrink-0" aria-hidden="true" />
+              <strong className="text-xs font-semibold text-white tracking-wide">
+                Social Engineering Threat Investigations
+              </strong>
+            </div>
 
-        {/* Indicator 2: IV2 Pretexting */}
-        <div className="hero-floating-glass-chip chip-threat-iv2">
-          <div className="chip-icon-circle emerald">
-            <MessagesSquare size={15} className="text-emerald" aria-hidden="true" />
-          </div>
-          <div className="chip-text-content">
-            <span className="chip-sup">IV2 · 5 CHALLENGES</span>
-            <strong className="chip-main">Pretexting</strong>
-          </div>
-        </div>
-
-        {/* Indicator 3: IV3 Impersonation */}
-        <div className="hero-floating-glass-chip chip-threat-iv3">
-          <div className="chip-icon-circle amber">
-            <UserRoundSearch size={15} className="text-amber" aria-hidden="true" />
-          </div>
-          <div className="chip-text-content">
-            <span className="chip-sup">IV3 · 5 CHALLENGES</span>
-            <strong className="chip-main">Impersonation</strong>
-          </div>
-        </div>
-
-        {/* Indicator 4: IV4 Online Scams & Malicious Links */}
-        <div className="hero-floating-glass-chip chip-threat-iv4">
-          <div className="chip-icon-circle cyan">
-            <Link2 size={15} className="text-cyan" aria-hidden="true" />
-          </div>
-          <div className="chip-text-content">
-            <span className="chip-sup">IV4 · 5 CHALLENGES</span>
-            <strong className="chip-main">Scams &amp; Links</strong>
+            {/* Clean 4 Threat Category Pills */}
+            <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-200">
+              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 font-medium">
+                Phishing
+              </span>
+              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 font-medium">
+                Pretexting
+              </span>
+              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 font-medium">
+                Impersonation
+              </span>
+              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 font-medium">
+                Scams &amp; Links
+              </span>
+            </div>
           </div>
         </div>
       </div>

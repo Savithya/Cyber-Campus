@@ -59,6 +59,7 @@ import type { Session, Filters, Question, Scenario } from "@/lib/types";
 import { PageHeading, ErrorBox } from "./ui";
 import { GlobalResearchFilters } from "./global-research-filters";
 import StatisticalAnalysis from "./statistical-analysis";
+import UserPrivacyDVSection from "./user-privacy-dv-section";
 
 interface NavItemDef {
   id: string;
@@ -1143,125 +1144,10 @@ export default function Admin({
             8. SUPPLEMENTARY ITEMS · USER PRIVACY (DV)
             ===================================================================== */}
         {(active === "supplementary" || active === "privacy-dv") && (
-          <div className="space-y-6">
-            <div className="card">
-              <div className="card-top">
-                <div>
-                  <span className="eyebrow text-cyan font-bold">DEPENDENT VARIABLE ANALYSIS</span>
-                  <h2 className="text-xl font-bold mt-1">User Privacy (DV) Operationalization &amp; Psychometric Items</h2>
-                  <p className="text-xs text-muted mt-1 max-w-3xl leading-relaxed">
-                    User Privacy is operationalized through standardized self-reported construct items (Section F, Q19–Q25)
-                    and compared against empirical simulated disclosure scores (0–4 scale).
-                  </p>
-                </div>
-                <span className="tag">Section F (7 Items)</span>
-              </div>
-
-              {/* Methodological separation banner */}
-              <div className="p-3.5 rounded bg-cyan/5 border border-cyan/20 mt-4 text-xs leading-relaxed text-muted">
-                <strong className="text-cyan font-semibold block flex items-center gap-1.5 mb-1">
-                  <ShieldCheck size={16} /> Important Methodological Principle:
-                </strong>
-                The primary research Dependent Variable (DV) is <strong>User Privacy</strong>. Gameplay challenge points
-                represent supplementary educational engagement and <strong>must not be conflated with the psychometric User Privacy construct</strong>.
-              </div>
-            </div>
-
-            {/* Severity Scale Definitions */}
-            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5 text-xs">
-              <div className="p-3 rounded border bg-emerald/5 border-emerald/20">
-                <span className="font-bold text-emerald block">Score 0: Protective</span>
-                <p className="text-muted text-[11px] mt-1">Withheld credentials, reported to IT, or verified out-of-band.</p>
-              </div>
-              <div className="p-3 rounded border bg-surface">
-                <span className="font-bold text-foreground block">Score 1: Minor Risk</span>
-                <p className="text-muted text-[11px] mt-1">Passive hesitation or non-sensitive preliminary inquiry.</p>
-              </div>
-              <div className="p-3 rounded border bg-surface">
-                <span className="font-bold text-amber block">Score 2: Moderate Risk</span>
-                <p className="text-muted text-[11px] mt-1">Engaged unverified sender; non-critical data exposed.</p>
-              </div>
-              <div className="p-3 rounded border bg-surface">
-                <span className="font-bold text-red block">Score 3: High Risk</span>
-                <p className="text-muted text-[11px] mt-1">Shared personal identifiers (NIC), student index, academic records.</p>
-              </div>
-              <div className="p-3 rounded border bg-red/5 border-red/20">
-                <span className="font-bold text-red block">Score 4: Critical Risk</span>
-                <p className="text-muted text-[11px] mt-1">Disclosed SSO login passwords, financial OTPs, or payment credentials.</p>
-              </div>
-            </div>
-
-            {/* Q19-Q25 Questionnaire Item Distribution */}
-            <div className="space-y-6">
-              {questions.slice(18, 25).map((q) => {
-                const agg = aggregateQuestion(q, filtered);
-                return (
-                  <div key={q.id} className="card">
-                    <div className="card-top">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="question-number">{q.id}</span>
-                          <span className="tag cyan">SECTION F · DEPENDENT VARIABLE</span>
-                        </div>
-                        <h3 className="text-lg font-bold mt-1">{q.text}</h3>
-                        <p className="text-xs text-muted mt-0.5">{q.dimension ?? q.variable}</p>
-                      </div>
-                      <div className="text-right text-xs text-muted">
-                        <div>Valid n: <strong className="text-foreground">{agg.validN}</strong></div>
-                        <div>Missing: <strong className="text-foreground">{agg.missingN}</strong></div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
-                      <div style={{ height: Math.max(160, agg.rows.length * 36), width: "100%" }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            layout="vertical"
-                            data={agg.rows}
-                            margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
-                            <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11 }} />
-                            <YAxis
-                              type="category"
-                              dataKey="label"
-                              tick={{ fontSize: 11 }}
-                              width={140}
-                            />
-                            <Tooltip formatter={(v) => [Number(v).toFixed(1) + "%", "Percentage"]} />
-                            <Bar dataKey="percentage" name="Percentage" fill="#786bd1" radius={[0, 4, 4, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-
-                      <div className="table-scroll">
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Response Option</th>
-                              <th>Code</th>
-                              <th>Count</th>
-                              <th>Percentage</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {agg.rows.map((r) => (
-                              <tr key={r.code}>
-                                <th>{r.label}</th>
-                                <td><code>{r.code}</code></td>
-                                <td>{r.count}</td>
-                                <td><strong>{r.percentage.toFixed(1)}%</strong></td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <UserPrivacyDVSection
+            questions={questions}
+            sessions={filtered}
+          />
         )}
 
         {/* =====================================================================

@@ -8,6 +8,7 @@ import { ResearchProgressStepper } from "@/components/research-progress-stepper"
 import { ResearchConsentPage } from "@/components/research-consent-page";
 import { DemographicsForm } from "@/components/demographics-form";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import Review from "@/components/review";
 import { CyberMissionControl } from "@/components/cyber-mission-control";
@@ -472,5 +473,28 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("Cybersecurity Research Platform");
     expect(html).toContain("brand-subtitle");
     expect(html).toContain("brand-subtitle-dot");
+  });
+
+  it("renders the universal Spot-the-Phish website bottom across the website", () => {
+    const html = renderToString(React.createElement(SiteFooter));
+
+    // Verify container and role
+    expect(html).toContain("spot-site-footer");
+    expect(html).toContain('role="contentinfo"');
+    expect(html).toContain("spot-footer-container");
+
+    // Verify Left Section
+    expect(html).toContain("Spot the Phish · AI Email Challenge");
+
+    // Verify Center Section
+    expect(html).toContain("An academic research activity · Sri Lanka");
+
+    // Verify Right Section Links
+    expect(html).toContain("Participation &amp; privacy");
+    expect(html).toContain('href="/privacy"');
+    expect(html).toContain("Withdrawal");
+    expect(html).toContain('href="/withdraw"');
+    expect(html).toContain("Researcher access");
+    expect(html).toContain('href="/admin/login"');
   });
 });

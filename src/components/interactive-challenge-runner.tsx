@@ -587,29 +587,32 @@ export function InteractiveChallengeRunner({
                     onClick={() => setShowLinkSimModal(!showLinkSimModal)}
                     aria-expanded={showLinkSimModal}
                     aria-label={`Simulated link: ${emailData.linkCta.buttonText}. Click to safely inspect destination.`}
-                    className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="simulated-safe-link-btn group inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold !text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer min-h-[44px] w-full sm:w-auto text-center break-words focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
-                    <span>{emailData.linkCta.buttonText}</span>
+                    <span className="break-words !text-white">
+                      {emailData.linkCta.buttonText}
+                    </span>
                     <ArrowRight
                       size={15}
-                      className="transition-transform group-hover:translate-x-0.5"
+                      className="shrink-0 transition-transform group-hover:translate-x-0.5 text-white"
                       aria-hidden="true"
                     />
                   </button>
 
                   {/* Simulated Link Safety Notice Popup */}
                   {showLinkSimModal && (
-                    <div className="mt-2.5 p-3 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                    <div className="mt-2.5 p-3 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-xs text-amber-900 dark:text-amber-200 space-y-1 break-words">
                       <div className="font-semibold flex items-center gap-1.5">
-                        <Lock size={13} /> Simulated Inactive Link
+                        <Lock size={13} className="shrink-0" /> Simulated
+                        Inactive Link
                       </div>
-                      <p className="text-[11px]">
+                      <p className="text-[11px] break-all">
                         Destination:{" "}
-                        <code className="font-mono">
+                        <code className="font-mono break-all">
                           {emailData.linkCta.destinationUrl}
                         </code>
                       </p>
-                      <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                      <p className="text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed">
                         This simulated link is disabled for participant safety.
                         In real cyber attacks, clicking this leads to credential
                         harvesting.
@@ -635,17 +638,17 @@ export function InteractiveChallengeRunner({
         {/* ===================================================================
             RIGHT COLUMN: "YOUR CALL" DECISION CONSOLE
             =================================================================== */}
-        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-7 shadow-sm sticky top-6 space-y-5">
+        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 lg:p-7 shadow-sm sticky top-6 space-y-4 sm:space-y-5">
           {/* Eyebrow & Title */}
           <div className="space-y-1">
             <span className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">
               DECISION POINT · YOUR CALL
             </span>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
               What would you do?
             </h3>
             <span className="sr-only">What would you do next?</span>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               Choose the action closest to what you would actually do.
             </p>
           </div>
@@ -668,17 +671,17 @@ export function InteractiveChallengeRunner({
                   aria-checked={isSelected}
                   disabled={isSubmitting}
                   onClick={() => handleSelectChoice(choice.id)}
-                  className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
+                  className={`interactive-action-card w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-h-[48px] ${
                     isSelected
-                      ? "border-indigo-600 dark:border-indigo-400 ring-2 ring-indigo-600/20 dark:ring-indigo-400/25 bg-indigo-50/70 dark:bg-indigo-950/30"
+                      ? "selected border-blue-600 dark:border-blue-400 ring-2 ring-blue-600/20 dark:ring-blue-400/25 bg-blue-50/70 dark:bg-blue-950/30"
                       : "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#141e33] hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
                   }`}
                 >
                   {/* Badge [ A ], [ B ], [ C ], [ D ] */}
                   <div
-                    className={`w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 transition-colors ${
+                    className={`action-letter-badge w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 transition-colors ${
                       isSelected
-                        ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white border-indigo-600 dark:border-indigo-500 shadow-xs"
+                        ? "bg-blue-600 !text-white dark:bg-blue-500 dark:!text-white border-blue-600 dark:border-blue-500 shadow-xs"
                         : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                     }`}
                     aria-hidden="true"
@@ -687,7 +690,7 @@ export function InteractiveChallengeRunner({
                   </div>
 
                   {/* Option Label */}
-                  <span className="text-sm font-medium text-slate-800 dark:text-slate-200 leading-snug flex-1">
+                  <span className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 leading-snug flex-1 break-words min-w-0">
                     {choice.label}
                   </span>
                 </button>
@@ -776,28 +779,28 @@ export function InteractiveChallengeRunner({
               disabled={!selectedChoiceId || isSubmitting}
               onClick={handleAdvance}
               aria-label="Lock decision and continue"
-              className={`group w-full py-3.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+              className={`primary-next-btn group w-full min-h-[48px] py-3.5 px-3 sm:px-4 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
                 !selectedChoiceId || isSubmitting
                   ? "bg-slate-100 hover:bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:hover:bg-slate-800/80 dark:text-slate-500 border border-slate-200 dark:border-slate-700/70 cursor-not-allowed shadow-none"
-                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:text-white shadow-md shadow-indigo-600/25 hover:shadow-lg hover:shadow-indigo-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 !text-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:!text-white shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
               }`}
             >
               {isSubmitting ? (
                 <>
                   <Loader2
                     size={16}
-                    className="animate-spin shrink-0"
+                    className="animate-spin shrink-0 text-white"
                     aria-hidden="true"
                   />
-                  <span>Locking decision...</span>
+                  <span className="!text-white">Locking decision...</span>
                 </>
               ) : (
                 <>
-                  <span>Lock decision &amp; continue</span>
+                  <span className="!text-white">Lock decision &amp; continue</span>
                   <span className="sr-only">Next Challenge</span>
                   <ArrowRight
                     size={16}
-                    className={`shrink-0 transition-transform ${
+                    className={`shrink-0 transition-transform text-white ${
                       selectedChoiceId
                         ? "group-hover:translate-x-0.5"
                         : "opacity-60"
@@ -809,7 +812,7 @@ export function InteractiveChallengeRunner({
             </button>
 
             {/* Microcopy disclaimer */}
-            <p className="text-[11px] text-center text-slate-400 dark:text-slate-500 mt-2.5 leading-normal">
+            <p className="text-[10px] sm:text-[11px] text-center text-slate-400 dark:text-slate-500 mt-2.5 leading-normal">
               Your actual choice is recorded. Explanations appear after final
               submission.
             </p>

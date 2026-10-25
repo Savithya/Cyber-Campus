@@ -1387,14 +1387,14 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
             <div className="link-button-wrapper">
               <button
                 type="button"
-                className="simulated-safe-link-btn"
+                className="simulated-safe-link-btn !text-white"
                 onMouseEnter={() => setLinkHovered(true)}
                 onMouseLeave={() => setLinkHovered(false)}
                 onClick={() => setLinkHovered(!linkHovered)}
                 aria-label="Inspect destination link safely"
               >
-                <ExternalLink size={15} aria-hidden="true" />
-                <span>{emailData.linkCta.buttonText}</span>
+                <ExternalLink size={15} className="text-white shrink-0" aria-hidden="true" />
+                <span className="!text-white">{emailData.linkCta.buttonText}</span>
               </button>
             </div>
 
@@ -1687,14 +1687,14 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
 
                   <button
                     type="button"
-                    className="simulated-safe-link-btn msg-link-btn"
+                    className="simulated-safe-link-btn msg-link-btn !text-white"
                     onMouseEnter={() => setLinkHovered(true)}
                     onMouseLeave={() => setLinkHovered(false)}
                     onClick={() => setLinkHovered(!linkHovered)}
                     aria-label="Inspect destination link safely"
                   >
-                    <Search size={14} aria-hidden="true" />
-                    <span>{emailData.linkCta.buttonText}</span>
+                    <Search size={14} className="text-white shrink-0" aria-hidden="true" />
+                    <span className="!text-white">{emailData.linkCta.buttonText}</span>
                   </button>
                 </div>
 
@@ -2039,14 +2039,14 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
             <div className="link-button-wrapper">
               <button
                 type="button"
-                className="simulated-safe-link-btn"
+                className="simulated-safe-link-btn !text-white"
                 onMouseEnter={() => setLinkHovered(true)}
                 onMouseLeave={() => setLinkHovered(false)}
                 onClick={() => setLinkHovered(!linkHovered)}
                 aria-label="Inspect destination link safely"
               >
-                <ExternalLink size={15} aria-hidden="true" />
-                <span>{emailData.linkCta.buttonText}</span>
+                <ExternalLink size={15} className="text-white shrink-0" aria-hidden="true" />
+                <span className="!text-white">{emailData.linkCta.buttonText}</span>
               </button>
             </div>
 
@@ -2247,9 +2247,9 @@ export function ActionSelectionGroup({
               role="radio"
               aria-checked={isSelected}
               disabled={disabled}
-              className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
+              className={`interactive-action-card w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-h-[48px] ${
                 isSelected
-                  ? "selected border-indigo-600 dark:border-indigo-400 ring-2 ring-indigo-600/20 dark:ring-indigo-400/25 bg-indigo-50/70 dark:bg-indigo-950/30"
+                  ? "selected border-blue-600 dark:border-blue-400 ring-2 ring-blue-600/20 dark:ring-blue-400/25 bg-blue-50/70 dark:bg-blue-950/30"
                   : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
               }`}
               onClick={() => onSelectChoice(choice.id)}
@@ -2258,7 +2258,7 @@ export function ActionSelectionGroup({
               <div
                 className={`action-letter-badge w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 transition-colors ${
                   isSelected
-                    ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white border-indigo-600 dark:border-indigo-500 shadow-xs"
+                    ? "bg-blue-600 !text-white dark:bg-blue-500 dark:!text-white border-blue-600 dark:border-blue-500 shadow-xs"
                     : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                 }`}
                 aria-hidden="true"
@@ -2267,8 +2267,8 @@ export function ActionSelectionGroup({
               </div>
 
               {/* Action Description */}
-              <div className="action-text-content flex-1">
-                <span className="action-label-text text-sm font-medium text-slate-800 dark:text-slate-200">
+              <div className="action-text-content flex-1 min-w-0">
+                <span className="action-label-text text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 leading-snug break-words">
                   {choice.label}
                 </span>
               </div>
@@ -2333,10 +2333,10 @@ export function NextChallengeButton({
       {/* Primary Action Button: Lock decision & continue */}
       <button
         type="button"
-        className={`group w-full py-3.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+        className={`primary-next-btn group w-full min-h-[48px] py-3.5 px-3 sm:px-4 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
           !hasSelectedAnswer || isSubmitting
             ? "bg-slate-100 hover:bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:hover:bg-slate-800/80 dark:text-slate-500 border border-slate-200 dark:border-slate-700/70 cursor-not-allowed shadow-none"
-            : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:text-white shadow-md shadow-indigo-600/25 hover:shadow-lg hover:shadow-indigo-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
+            : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800 !text-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:!text-white shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
         }`}
         disabled={!hasSelectedAnswer || isSubmitting}
         onClick={onAdvance}
@@ -2346,17 +2346,17 @@ export function NextChallengeButton({
           <>
             <Loader2
               size={16}
-              className="animate-spin shrink-0"
+              className="animate-spin shrink-0 text-white"
               aria-hidden="true"
             />
-            <span>Locking decision…</span>
+            <span className="!text-white">Locking decision…</span>
           </>
         ) : (
           <>
-            <span>Lock decision &amp; continue</span>
+            <span className="!text-white">Lock decision &amp; continue</span>
             <ArrowRight
               size={16}
-              className={`shrink-0 transition-transform ${
+              className={`shrink-0 transition-transform text-white ${
                 hasSelectedAnswer ? "group-hover:translate-x-0.5" : "opacity-60"
               }`}
               aria-hidden="true"
@@ -2365,7 +2365,7 @@ export function NextChallengeButton({
         )}
       </button>
 
-      <p className="text-[11px] text-center text-slate-400 mt-2 leading-normal">
+      <p className="text-[10px] sm:text-[11px] text-center text-slate-400 mt-2 leading-normal">
         Your actual choice is recorded. Explanations appear after final
         submission.
       </p>

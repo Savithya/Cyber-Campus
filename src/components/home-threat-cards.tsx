@@ -382,7 +382,7 @@ export function HomeThreatCards() {
                 <Link
                   href="/consent"
                   prefetch={true}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs hover:shadow-md transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 !text-white shadow-xs hover:shadow-md transition-all cursor-pointer"
                   title={`Participate in ${card.title} challenges`}
                 >
                   <span>Investigate Challenges</span>

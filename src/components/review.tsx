@@ -565,10 +565,10 @@ export default function Review() {
                 type="button"
                 onClick={handleFinalSubmit}
                 disabled={busy}
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-[#143d45] hover:bg-[#0c2a30] dark:bg-[#1d4c54] dark:hover:bg-[#153a40] text-white font-semibold text-sm sm:text-base shadow-sm transition-all hover:shadow-md cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 !text-white font-semibold text-sm sm:text-base shadow-sm transition-all hover:shadow-md cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <span>{busy ? "Submitting responses…" : "Submit & see my results"}</span>
-                <ArrowRight size={18} aria-hidden="true" />
+                <span className="!text-white">{busy ? "Submitting responses…" : "Submit & see my results"}</span>
+                <ArrowRight size={18} className="text-white shrink-0" aria-hidden="true" />
               </button>
             </div>
           </div>
