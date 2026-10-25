@@ -344,11 +344,21 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const raw = await req.text();
     if (raw.length > 40000) return json({ error: "Request too large." }, 413);
     const body = raw ? JSON.parse(raw) : {};
-    if (path === "session/start")
-      return json({ session: await startSession(startSchema.parse(body)) });
+    if (path === "session/start") {
+      const parsed = startSchema.parse(body);
+      const clientLastCode =
+        typeof body?.clientLastCode === "string" || typeof body?.clientLastCode === "number"
+          ? body.clientLastCode
+          : undefined;
+      return json({ session: await startSession({ ...parsed, clientLastCode }) });
+    }
     if (path === "session/new-participant") {
       const clientToken = typeof body?.token === "string" ? body.token : undefined;
-      return json({ session: await startNewParticipantSession({ token: clientToken }) });
+      const clientLastCode =
+        typeof body?.clientLastCode === "string" || typeof body?.clientLastCode === "number"
+          ? body.clientLastCode
+          : undefined;
+      return json({ session: await startNewParticipantSession({ token: clientToken, clientLastCode }) });
     }
     if (path === "session/clear" || path === "session/reset") {
       await clearActiveSession();

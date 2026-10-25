@@ -40,11 +40,10 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
       "Participate in interactive cybersecurity scenarios investigating how social engineering threats relate to user privacy among university students in Sri Lanka."
     );
 
-    // Primary & Secondary CTAs
+    // Primary CTA
     expect(html).toContain("Start Research");
     expect(html).toContain('href="/consent"');
-    expect(html).toContain("Explore Cyber Challenges");
-    expect(html).toContain('href="/play"');
+    expect(html).not.toContain("Explore Cyber Challenges");
 
     // 4 Trust Indicators
     expect(html).toContain("Voluntary Participation");
@@ -261,15 +260,14 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
     expect(html).toContain("campus");
     expect(html).toContain("Cybersecurity Research Platform");
 
-    // 4 central navigation items
+    // Central navigation items
     expect(html).toContain("Home");
     expect(html).toContain('href="/#home"');
-    expect(html).toContain("Cyber Challenges");
-    expect(html).toContain('href="/play"');
     expect(html).toContain("Join Research");
     expect(html).toContain('href="/consent"');
     expect(html).toContain("About the Study");
     expect(html).toContain('href="/privacy"');
+    expect(html).not.toContain("Cyber Challenges");
 
     // Right: Researcher Access
     expect(html).toContain("Researcher Access");

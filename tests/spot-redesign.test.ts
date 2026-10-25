@@ -39,7 +39,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("Participate in interactive cybersecurity scenarios");
     expect(html).toContain("university students in Sri Lanka");
     expect(html).toContain("Start Research");
-    expect(html).toContain("Explore Cyber Challenges");
+    expect(html).not.toContain("Explore Cyber Challenges");
 
     // Verify Trust Indicators
     expect(html).toContain("Voluntary Participation");
@@ -503,7 +503,8 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
 
     // Verify Column 2: Quick Navigation
     expect(html).toContain("Quick Navigation");
-    expect(html).toContain("Cyber Challenges");
+    expect(html).toContain("Join Research");
+    expect(html).not.toContain("Cyber Challenges");
 
     // Verify Column 3: Research & Ethics
     expect(html).toContain("Research &amp; Ethics");

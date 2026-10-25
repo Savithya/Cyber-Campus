@@ -6,7 +6,7 @@ import { ShieldCheck, Activity } from "lucide-react";
 export function HeroCyberVisual() {
   return (
     <div
-      className="hero-pro-visual-wrapper"
+      className="cyber-hero-image-wrapper hero-pro-visual-wrapper"
       role="region"
       aria-label="Academic Cybersecurity Research Workstation & Simulation Environment"
     >
@@ -23,9 +23,9 @@ export function HeroCyberVisual() {
           <img
             src="/images/cyber-hero-lab-8x5.jpg"
             alt="Professional University Cybersecurity Research Workstation — Live Threat Telemetry & Academic Privacy Simulation"
-            className="hero-pro-image"
-            width={1200}
-            height={675}
+            className="cyber-hero-image hero-pro-image"
+            width={1376}
+            height={768}
             loading="eager"
           />
         </picture>

@@ -36,21 +36,21 @@ export function ResearchCTA() {
             <Link
               href="/consent"
               prefetch={true}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-base focus-visible:outline-2 focus-visible:outline-indigo-500"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-base focus-visible:outline-2 focus-visible:outline-blue-500"
               aria-label="Start Your Research Journey"
             >
-              <span>Start Your Research Journey</span>
-              <ArrowRight size={18} aria-hidden="true" />
+              <span className="text-white font-bold">Start Your Research Journey</span>
+              <ArrowRight size={18} className="text-white" aria-hidden="true" />
             </Link>
 
             <Link
               href="/privacy"
               prefetch={true}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-base focus-visible:outline-2 focus-visible:outline-indigo-500"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 border border-blue-500 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-base focus-visible:outline-2 focus-visible:outline-blue-500"
               aria-label="Learn About the Study"
             >
-              <BookOpen size={18} className="text-indigo-600 dark:text-cyan-400" aria-hidden="true" />
-              <span>Learn About the Study</span>
+              <BookOpen size={18} className="text-white" aria-hidden="true" />
+              <span className="text-white font-bold">Learn About the Study</span>
             </Link>
           </div>
 

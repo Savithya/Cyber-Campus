@@ -23,7 +23,9 @@ build/
 dist/
 
 # Project temporary and generated data
-.demo-data/
+.demo-data/*
+!.demo-data/submissions.json
+!.demo-data/participant_counter.json
 artifacts/
 
 # TypeScript build info

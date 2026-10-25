@@ -66,12 +66,14 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
     setError("");
     try {
       const token = randomToken();
+      const lastCode = typeof window !== "undefined" ? localStorage.getItem("cc_last_participant_code") : null;
       const { session } = await api<{ session: Session }>("session/start", {
         consented: consent,
         eligible,
         priorExposure: prior,
         practice,
         token,
+        clientLastCode: lastCode,
       });
 
       if (practice) {
@@ -82,6 +84,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
         await state.reload();
         router.push("/play");
       } else {
+        if (typeof window !== "undefined" && session.code) {
+          localStorage.setItem("cc_last_participant_code", session.code);
+        }
         clearParticipationStorage();
         putDraft({
           code: session.code,

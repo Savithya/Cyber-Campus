@@ -218,16 +218,16 @@ export function ThreatCategories() {
                       <button
                         type="button"
                         onClick={() => toggleInspect(card.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                           isInspected
-                            ? "bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-700"
-                            : "bg-white text-slate-600 border border-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                            ? "bg-amber-600 hover:bg-amber-700 text-white shadow-xs"
+                            : "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
                         }`}
                         aria-pressed={isInspected}
                         title="Toggle red flag analysis"
                       >
-                        {isInspected ? <EyeOff size={12} /> : <Eye size={12} />}
-                        <span>{isInspected ? "Hide Red Flags" : "Spot Red Flags"}</span>
+                        {isInspected ? <EyeOff size={12} className="text-white" /> : <Eye size={12} className="text-white" />}
+                        <span className="text-white">{isInspected ? "Hide Red Flags" : "Spot Red Flags"}</span>
                       </button>
                     </div>
 
@@ -261,11 +261,11 @@ export function ThreatCategories() {
                   <Link
                     href={card.destinationHref}
                     prefetch={true}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-indigo-500"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-blue-500"
                     aria-label={`Participate in ${card.title} scenarios`}
                   >
-                    <span>{card.actionText}</span>
-                    <ArrowRight size={13} aria-hidden="true" />
+                    <span className="text-white font-bold">{card.actionText}</span>
+                    <ArrowRight size={13} className="text-white" aria-hidden="true" />
                   </Link>
                 </div>
               </article>

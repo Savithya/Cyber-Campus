@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   ShieldCheck,
   House,
-  Gamepad2,
   ListChecks,
   Lightbulb,
   KeyRound,
@@ -79,7 +78,6 @@ export function SiteHeader() {
 
   // Determine active states accurately based on route
   const isHomeActive = pathname === "/";
-  const isChallengesActive = pathname?.startsWith("/play");
   const isJoinActive =
     pathname === "/consent" ||
     pathname === "/demographics" ||
@@ -189,16 +187,6 @@ export function SiteHeader() {
           </Link>
 
           <Link
-            href="/play"
-            prefetch={true}
-            className={`nav-pill ${isChallengesActive ? "active" : ""}`}
-            aria-current={isChallengesActive ? "page" : undefined}
-          >
-            <Gamepad2 size={18} strokeWidth={1.9} aria-hidden="true" />
-            <span>Cyber Challenges</span>
-          </Link>
-
-          <Link
             href={joinHref}
             prefetch={true}
             className={`nav-pill ${isJoinActive ? "active" : ""}`}
@@ -224,21 +212,21 @@ export function SiteHeader() {
           <Link
             href="/admin/login"
             prefetch={true}
-            className={`nav-admin nav-researcher-pill ${
+            className={`nav-admin nav-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 shadow-sm transition-all duration-200 ${
               isResearcherActive ? "active" : ""
             }`}
             aria-current={isResearcherActive ? "page" : undefined}
           >
             <KeyRound
-              size={18}
-              strokeWidth={1.9}
-              className="researcher-icon"
+              size={16}
+              strokeWidth={2}
+              className="researcher-icon !text-white"
               aria-hidden="true"
             />
-            <span>Researcher Access</span>
+            <span className="!text-white font-bold">Researcher Access</span>
             <ArrowUpRight
               size={14}
-              className="ml-1 opacity-70"
+              className="ml-1 text-white/80"
               aria-hidden="true"
             />
           </Link>
@@ -327,21 +315,7 @@ export function SiteHeader() {
                 <span>Home</span>
               </Link>
 
-              {/* 2. Gamepad2 — Cyber Challenges */}
-              <Link
-                href="/play"
-                onClick={() => setMobileMenuOpen(false)}
-                prefetch={true}
-                className={`mobile-nav-item mobile-nav-pill ${
-                  isChallengesActive ? "active" : ""
-                }`}
-                aria-current={isChallengesActive ? "page" : undefined}
-              >
-                <Gamepad2 size={18} strokeWidth={1.9} aria-hidden="true" />
-                <span>Cyber Challenges</span>
-              </Link>
-
-              {/* 3. ListChecks — Join Research */}
+              {/* 2. ListChecks — Join Research */}
               <Link
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
@@ -355,7 +329,7 @@ export function SiteHeader() {
                 <span>Join Research</span>
               </Link>
 
-              {/* 4. Lightbulb — About the Study */}
+              {/* 3. Lightbulb — About the Study */}
               <Link
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
@@ -369,23 +343,23 @@ export function SiteHeader() {
                 <span>About the Study</span>
               </Link>
 
-              {/* 5. KeyRound — Researcher Access */}
+              {/* 4. KeyRound — Researcher Access */}
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
                 prefetch={true}
-                className={`mobile-nav-item mobile-nav-pill mobile-researcher-pill ${
+                className={`mobile-nav-item mobile-nav-pill mobile-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 font-bold ${
                   isResearcherActive ? "active" : ""
                 }`}
                 aria-current={isResearcherActive ? "page" : undefined}
               >
                 <KeyRound
                   size={18}
-                  strokeWidth={1.9}
-                  className="researcher-icon"
+                  strokeWidth={2}
+                  className="researcher-icon !text-white"
                   aria-hidden="true"
                 />
-                <span>Researcher Access</span>
+                <span className="!text-white font-bold">Researcher Access</span>
               </Link>
             </nav>
 

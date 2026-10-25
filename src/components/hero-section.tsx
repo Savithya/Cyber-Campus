@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  Gamepad2,
   ShieldCheck,
   Lock,
   HeartHandshake,
@@ -27,10 +26,10 @@ export function HeroSection() {
       <div className="absolute top-0 left-1/4 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: 55% width on desktop (7 of 12 cols) */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[1440px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-14 items-center">
+          {/* Left Column: Balanced Two-Column Hero Layout */}
+          <div className="space-y-6 text-left max-w-2xl">
             {/* Introductory Eyebrow Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-cyan-400 animate-pulse" />
@@ -51,26 +50,16 @@ export function HeroSection() {
               Participate in interactive cybersecurity scenarios investigating how social engineering threats relate to user privacy among university students in Sri Lanka.
             </p>
 
-            {/* Action Row: Primary & Secondary CTAs */}
+            {/* Action Row: Primary Research CTA */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
               <Link
                 href="/consent"
                 prefetch={true}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-indigo-500"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-blue-500 text-base"
                 aria-label="Start Research participation"
               >
-                <span>Start Research</span>
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-
-              <Link
-                href="/play"
-                prefetch={true}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-600 shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-indigo-500"
-                aria-label="Explore Cyber Challenges"
-              >
-                <Gamepad2 size={18} className="text-indigo-600 dark:text-cyan-400" aria-hidden="true" />
-                <span>Explore Cyber Challenges</span>
+                <span className="text-white font-bold">Start Research</span>
+                <ArrowRight size={18} className="text-white" aria-hidden="true" />
               </Link>
             </div>
 
@@ -97,26 +86,27 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: 45% width on desktop (5 of 12 cols) */}
-          <div className="lg:col-span-5 relative mt-6 lg:mt-0">
-            {/* Glow Aura */}
-            <div className="hero-pro-ambient-glow" aria-hidden="true" />
+          {/* Right Column: Balanced Two-Column Hero Layout (Max 650px, Right-Aligned on Desktop) */}
+          <div className="relative mt-8 lg:mt-0 flex justify-center lg:justify-end w-full">
+            <div className="cyber-hero-image-wrapper hero-pro-visual-wrapper relative w-full">
+              {/* Glow Aura */}
+              <div className="hero-pro-ambient-glow" aria-hidden="true" />
 
-            {/* Main Interactive Workstation Frame */}
-            <div className="hero-pro-image-card relative rounded-2xl lg:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900 overflow-hidden shadow-2xl transition-all duration-300 group">
-              {/* Responsive Picture Artwork */}
-              <picture>
-                <source srcSet="/images/cyber-hero-lab-8x5.webp" type="image/webp" />
-                <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
-                <img
-                  src="/images/cyber-hero-lab-8x5.jpg"
-                  alt="Cyber Campus Hybrid Cyber Research Lab — Cybersecurity Command Console & Simulation Environment"
-                  className="hero-pro-image w-full h-auto object-cover aspect-[16/10] sm:aspect-[16/10] transition-transform duration-700 group-hover:scale-102"
-                  width={1200}
-                  height={750}
-                  loading="eager"
-                />
-              </picture>
+              {/* Main Interactive Workstation Frame */}
+              <div className="hero-pro-image-card relative rounded-2xl lg:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900 overflow-hidden shadow-2xl transition-all duration-300 group w-full">
+                {/* Responsive Picture Artwork */}
+                <picture>
+                  <source srcSet="/images/cyber-hero-lab-8x5.webp" type="image/webp" />
+                  <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
+                  <img
+                    src="/images/cyber-hero-lab-8x5.jpg"
+                    alt="Cyber Campus Hybrid Cyber Research Lab — Cybersecurity Command Console & Simulation Environment"
+                    className="cyber-hero-image hero-pro-image w-full h-auto object-contain transition-transform duration-700 group-hover:scale-102"
+                    width={1376}
+                    height={768}
+                    loading="eager"
+                  />
+                </picture>
 
               {/* Scanning Laser Beam (Micro Animation) */}
               <div className="cyber-laser-scanner" aria-hidden="true" />
@@ -202,6 +192,7 @@ export function HeroSection() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

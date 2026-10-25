@@ -29,7 +29,6 @@ import {
   HelpCircle,
   Compass,
 } from "lucide-react";
-import { ResearchCyberIllustration } from "./research-cyber-illustration";
 import type { StudyConfig } from "@/lib/config.server";
 
 interface ResearchParticipationPageProps {
@@ -154,17 +153,17 @@ export function ResearchParticipationPage({
       )}
 
       {/* =========================================================================
-          1. HERO SECTION (Clear Alignments, High Visual Impact & Animated Image)
+          1. HERO SECTION (Clear Alignments, High Visual Impact)
           ========================================================================= */}
       <section
         className="research-hero-section"
         aria-label="About the Study Hero"
       >
-        <div className="research-container">
-          <div className="research-hero-grid">
-            {/* Left Column: Heading, Supporting Description, Buttons, Reassurance */}
+        <div className="research-container max-w-4xl mx-auto">
+          <div className="research-hero-single-col">
+            {/* Centered Column: Heading, Supporting Description, Buttons, Reassurance */}
             <motion.div
-              className="research-hero-copy"
+              className="research-hero-copy max-w-3xl mx-auto text-center items-center"
               initial={fadeIn.initial}
               animate={fadeIn.animate}
               transition={fadeIn.transition}
@@ -195,7 +194,7 @@ export function ResearchParticipationPage({
               </h1>
 
               {/* Hero Description */}
-              <p className="research-hero-desc">
+              <p className="research-hero-desc max-w-2xl mx-auto text-center">
                 Help us understand how social engineering threats affect user
                 privacy among university students in Sri Lanka. Your voluntary
                 participation provides foundational empirical evidence to
@@ -203,7 +202,7 @@ export function ResearchParticipationPage({
               </p>
 
               {/* Call to Action Buttons */}
-              <div className="research-hero-actions">
+              <div className="research-hero-actions justify-center">
                 <Link
                   href="/consent"
                   className="button primary large research-cta-btn"
@@ -225,7 +224,7 @@ export function ResearchParticipationPage({
               </div>
 
               {/* Reassurance Badges */}
-              <div className="research-trust-strip">
+              <div className="research-trust-strip justify-center flex-wrap">
                 <div className="trust-item">
                   <Clock
                     size={15}
@@ -252,11 +251,6 @@ export function ResearchParticipationPage({
                 </div>
               </div>
             </motion.div>
-
-            {/* Right Column: High-Tech Animated Cybersecurity Artwork Visual */}
-            <div className="research-hero-visual-col">
-              <ResearchCyberIllustration />
-            </div>
           </div>
         </div>
       </section>

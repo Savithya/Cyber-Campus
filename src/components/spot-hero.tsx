@@ -83,7 +83,7 @@ export function SpotHero() {
         </div>
 
         {/* Right Column: Cyber Visual Image Artwork */}
-        <div className="spot-hero-visual">
+        <div className="spot-hero-visual flex justify-center lg:justify-end w-full">
           <HeroCyberVisual />
         </div>
       </div>

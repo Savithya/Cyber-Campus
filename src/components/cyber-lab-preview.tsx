@@ -180,7 +180,7 @@ export function CyberLabPreview() {
               onClick={() => handleTabSwitch(scenario.id)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeScenarioId === scenario.id
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
                   : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
@@ -261,10 +261,10 @@ export function CyberLabPreview() {
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer shadow-2xs"
                   >
-                    <RotateCcw size={12} />
-                    <span>Reset</span>
+                    <RotateCcw size={12} className="text-white" />
+                    <span className="text-white">Reset</span>
                   </button>
                 )}
               </div>
@@ -349,10 +349,10 @@ export function CyberLabPreview() {
               </div>
               <Link
                 href="/consent"
-                className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs"
+                className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all"
               >
-                <span>Join Study</span>
-                <ArrowRight size={13} aria-hidden="true" />
+                <span className="text-white font-bold">Join Study</span>
+                <ArrowRight size={13} className="text-white" aria-hidden="true" />
               </Link>
             </div>
           </div>

@@ -90,23 +90,15 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/#home"
-                  className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
+                  className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   Home
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/play"
-                  className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
-                >
-                  Cyber Challenges
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/consent"
-                  className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
+                  className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   Join Research
                 </Link>
@@ -114,7 +106,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/privacy"
-                  className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
+                  className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   About the Study
                 </Link>

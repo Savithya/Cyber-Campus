@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CheckCircle2, RotateCcw } from "lucide-react";
+import { AlertCircle, CheckCircle2, RotateCcw, Lock, ShieldCheck } from "lucide-react";
 import {
   api,
   useSession,
@@ -38,9 +38,15 @@ export function DemographicsForm() {
     setError("");
     setValidationError("");
     try {
+      const currentCode = state.session?.code;
+      const storedLastCode = typeof window !== "undefined" ? localStorage.getItem("cc_last_participant_code") : null;
+      const clientLastCode = currentCode || storedLastCode;
       clearParticipationStorage();
-      const res = await api<{ session: Session }>("session/new-participant", {});
+      const res = await api<{ session: Session }>("session/new-participant", { clientLastCode });
       if (res.session) {
+        if (typeof window !== "undefined" && res.session.code) {
+          localStorage.setItem("cc_last_participant_code", res.session.code);
+        }
         state.setSession(res.session);
         putDraft({
           code: res.session.code,
@@ -224,13 +230,7 @@ export function DemographicsForm() {
       missionKicker="STEP 02 OF 07"
       title="About You"
       subtitle="These questions help us understand the background of participants. There are no right or wrong answers."
-      noticePill={
-        answers.Q1
-          ? `Age group recorded in eligibility: ${
-              q1.options.find((o) => o.code === answers.Q1)?.label || "18 - 20"
-            }`
-          : "Age group recorded in eligibility: 18 - 20"
-      }
+      noticePill={`Anonymous ID: ${participantCode} · Step 02 of 07`}
       backHref="/consent"
       backLabel="Back to Step 01: Research Consent"
       onContinue={handleProceed}
@@ -238,6 +238,35 @@ export function DemographicsForm() {
       continueLoading={saving}
       continueDisabled={!isComplete}
     >
+      {/* Prominent Anonymous ID Identification Card */}
+      <div className="bg-slate-900/90 border border-emerald-500/30 rounded-xl p-4 sm:p-5 mb-6 shadow-lg backdrop-blur-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <Lock size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase tracking-wider font-mono text-emerald-400 font-semibold">Active Research Participant</span>
+              <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">Anonymous Session</span>
+            </div>
+            <div className="text-xl font-bold font-mono text-white mt-0.5 tracking-tight flex items-center gap-2">
+              <span>Anonymous ID:</span>
+              <span className="text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-500/40">{participantCode}</span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Assigned automatically for non-identifiable research data collection under academic ethics protocol.</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleStartNewParticipant}
+          disabled={resettingParticipant}
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 rounded-lg transition-colors shrink-0"
+        >
+          <RotateCcw size={14} className={resettingParticipant ? "animate-spin" : ""} aria-hidden="true" />
+          <span>{resettingParticipant ? "Assigning Next ID..." : "Start as Next Participant"}</span>
+        </button>
+      </div>
+
       {/* Error Banner */}
       {error && (
         <div className="error-banner mb-4" role="alert">

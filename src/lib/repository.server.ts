@@ -12,6 +12,17 @@ import { isResearch, demoConfig, type StudyConfig } from "./config.server";
 import { supabase } from "./supabase.server";
 import { readLocal, writeLocal } from "./local-session.server";
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __CYBER_CAMPUS_COUNTER__: number | undefined;
+  // eslint-disable-next-line no-var
+  var __CYBER_CAMPUS_SUBMISSIONS__: Map<string, Session> | undefined;
+}
+
+if (!globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+  globalThis.__CYBER_CAMPUS_SUBMISSIONS__ = new Map<string, Session>();
+}
+
 function getDemoDataDir(): string {
   if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     return path.join(os.tmpdir(), ".demo-data");
@@ -19,55 +30,143 @@ function getDemoDataDir(): string {
   return path.join(process.cwd(), ".demo-data");
 }
 
+function getCwdDataDir(): string {
+  return path.join(process.cwd(), ".demo-data");
+}
+
+function getSeedFilePath(): string {
+  return path.join(process.cwd(), "src", "data", "seed-submissions.json");
+}
+
+async function readSubmissionsFromFile(filePath: string): Promise<Session[]> {
+  try {
+    const raw = await readFile(filePath, "utf-8");
+    const list = JSON.parse(raw);
+    if (Array.isArray(list)) return list;
+  } catch {}
+  return [];
+}
+
 let memoryParticipantCounter = 0;
 
-export async function nextLocalParticipantCode(): Promise<string> {
-  const dataDir = getDemoDataDir();
-  const counterPath = path.join(dataDir, "participant_counter.json");
-  const subPath = path.join(dataDir, "submissions.json");
-  try {
-    await mkdir(dataDir, { recursive: true });
-    let fileMax = 0;
+export async function nextLocalParticipantCode(options?: {
+  existingCode?: string | number | null;
+  clientHintCode?: string | number | null;
+}): Promise<string> {
+  let highestCodeFound = 0;
 
-    // Scan existing submissions for highest integer participant code
-    try {
-      const rawSubs = await readFile(subPath, "utf-8");
-      const list = JSON.parse(rawSubs);
-      if (Array.isArray(list)) {
-        for (const s of list) {
-          if (s.code && /^\d+$/.test(String(s.code).trim())) {
-            const num = parseInt(String(s.code).trim(), 10);
-            if (num > fileMax && num < 100000) {
-              fileMax = num;
-            }
-          }
-        }
-      }
-    } catch {
-      // Submissions file may not exist yet
+  // 1. Scan bundled seed submissions
+  const seedList = await readSubmissionsFromFile(getSeedFilePath());
+  for (const s of seedList) {
+    if (s.code && /^\d+$/.test(String(s.code).trim())) {
+      const n = parseInt(String(s.code).trim(), 10);
+      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
     }
-
-    // Scan counter file
-    try {
-      const rawCounter = await readFile(counterPath, "utf-8");
-      const parsed = JSON.parse(rawCounter);
-      if (typeof parsed.counter === "number" && parsed.counter > fileMax && parsed.counter < 100000) {
-        fileMax = parsed.counter;
-      }
-    } catch {
-      // Counter file may not exist yet
-    }
-
-    const maxNum = Math.max(fileMax, memoryParticipantCounter);
-    const nextVal = maxNum + 1;
-    memoryParticipantCounter = nextVal;
-    await writeFile(counterPath, JSON.stringify({ counter: nextVal }), "utf-8").catch(() => {});
-    return String(nextVal).padStart(3, "0");
-  } catch (err) {
-    console.error("Failed to generate participant code:", err);
-    memoryParticipantCounter++;
-    return String(memoryParticipantCounter).padStart(3, "0");
   }
+
+  // 2. Scan cwd submissions (repository baseline)
+  const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
+  for (const s of cwdList) {
+    if (s.code && /^\d+$/.test(String(s.code).trim())) {
+      const n = parseInt(String(s.code).trim(), 10);
+      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+    }
+  }
+
+  // 3. Scan runtime demo data directory (e.g. /tmp on Vercel)
+  const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
+  for (const s of demoList) {
+    if (s.code && /^\d+$/.test(String(s.code).trim())) {
+      const n = parseInt(String(s.code).trim(), 10);
+      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+    }
+  }
+
+  // 4. Scan in-memory store
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    for (const s of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.values()) {
+      if (s.code && /^\d+$/.test(String(s.code).trim())) {
+        const n = parseInt(String(s.code).trim(), 10);
+        if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+      }
+    }
+  }
+
+  // 5. Scan counter files in demo and cwd directories
+  const counterPaths = [
+    path.join(getDemoDataDir(), "participant_counter.json"),
+    path.join(getCwdDataDir(), "participant_counter.json"),
+  ];
+  for (const cp of counterPaths) {
+    try {
+      const raw = await readFile(cp, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.counter === "number" && parsed.counter > highestCodeFound && parsed.counter < 100000) {
+        highestCodeFound = parsed.counter;
+      }
+    } catch {}
+  }
+
+  // 6. Check global and module memory counters
+  if (globalThis.__CYBER_CAMPUS_COUNTER__ && globalThis.__CYBER_CAMPUS_COUNTER__ > highestCodeFound) {
+    highestCodeFound = globalThis.__CYBER_CAMPUS_COUNTER__;
+  }
+  if (memoryParticipantCounter > highestCodeFound) {
+    highestCodeFound = memoryParticipantCounter;
+  }
+
+  // 7. Check existing code from current session
+  if (options?.existingCode && /^\d+$/.test(String(options.existingCode).trim())) {
+    const n = parseInt(String(options.existingCode).trim(), 10);
+    if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+  }
+
+  // 8. Check client hint code (from browser localStorage)
+  if (options?.clientHintCode && /^\d+$/.test(String(options.clientHintCode).trim())) {
+    const n = parseInt(String(options.clientHintCode).trim(), 10);
+    if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+  }
+
+  // 9. Check long-lived cookie cc_last_code
+  try {
+    const jar = await cookies();
+    const lastCodeCookie = jar.get("cc_last_code")?.value;
+    if (lastCodeCookie && /^\d+$/.test(lastCodeCookie.trim())) {
+      const n = parseInt(lastCodeCookie.trim(), 10);
+      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+    }
+  } catch {}
+
+  const nextVal = highestCodeFound + 1;
+  memoryParticipantCounter = nextVal;
+  globalThis.__CYBER_CAMPUS_COUNTER__ = nextVal;
+
+  const nextCodeStr = String(nextVal).padStart(3, "0");
+
+  // Persist counter to files
+  const counterPayload = JSON.stringify({ counter: nextVal });
+  try {
+    await mkdir(getDemoDataDir(), { recursive: true });
+    await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+  } catch {}
+  try {
+    await mkdir(getCwdDataDir(), { recursive: true });
+    await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+  } catch {}
+
+  // Update cookie cc_last_code for the browser
+  try {
+    const jar = await cookies();
+    jar.set("cc_last_code", nextCodeStr, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 365 * 86400,
+    });
+  } catch {}
+
+  return nextCodeStr;
 }
 
 async function getOrCreateParticipantId(): Promise<string> {
@@ -187,18 +286,19 @@ export function deriveSurveyAnswersFromAttempts(
 
 export async function saveDemoSubmission(session: Session) {
   if (session.mode === "practice") return;
+
+  // 1. Update in-memory store
+  const key = session.code || session.id;
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(key, session);
+  }
+
+  // 2. Save to demo data directory
   const dataDir = getDemoDataDir();
   const subPath = path.join(dataDir, "submissions.json");
   try {
     await mkdir(dataDir, { recursive: true });
-    let list: Session[] = [];
-    try {
-      const raw = await readFile(subPath, "utf-8");
-      list = JSON.parse(raw);
-      if (!Array.isArray(list)) list = [];
-    } catch {
-      list = [];
-    }
+    const list = await readSubmissionsFromFile(subPath);
     const idx = list.findIndex(
       (x) => x.id === session.id || (session.code && x.code === session.code),
     );
@@ -211,50 +311,83 @@ export async function saveDemoSubmission(session: Session) {
   } catch (err) {
     console.error("Failed to save demo submission:", err);
   }
+
+  // 3. Save to cwd data directory if different and writable
+  if (getCwdDataDir() !== dataDir) {
+    const cwdPath = path.join(getCwdDataDir(), "submissions.json");
+    try {
+      await mkdir(getCwdDataDir(), { recursive: true });
+      const cwdList = await readSubmissionsFromFile(cwdPath);
+      const idx = cwdList.findIndex(
+        (x) => x.id === session.id || (session.code && x.code === session.code),
+      );
+      if (idx >= 0) {
+        cwdList[idx] = { ...cwdList[idx], ...session };
+      } else {
+        cwdList.unshift(session);
+      }
+      await writeFile(cwdPath, JSON.stringify(cwdList, null, 2), "utf-8").catch(() => {});
+    } catch {}
+  }
 }
 
 export async function getDemoSubmissions(): Promise<Session[]> {
-  const dataDir = getDemoDataDir();
-  const subPath = path.join(dataDir, "submissions.json");
-  let list: Session[] = [];
-  try {
-    const raw = await readFile(subPath, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      list = parsed;
-    }
-  } catch {
-    list = [];
+  const mergedMap = new Map<string, Session>();
+
+  // 1. Bundled seed submissions (always present across all lambdas & cold starts)
+  const seedList = await readSubmissionsFromFile(getSeedFilePath());
+  for (const s of seedList) {
+    const k = s.code || s.id;
+    mergedMap.set(k, s);
   }
 
-  // Synchronize active local session from cookie if present in current request
+  // 2. Repository cwd submissions
+  const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
+  for (const s of cwdList) {
+    const k = s.code || s.id;
+    const existing = mergedMap.get(k);
+    if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
+      mergedMap.set(k, { ...existing, ...s });
+    }
+  }
+
+  // 3. Runtime demo data directory (tmp in Vercel lambdas)
+  const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
+  for (const s of demoList) {
+    const k = s.code || s.id;
+    const existing = mergedMap.get(k);
+    if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
+      mergedMap.set(k, { ...existing, ...s });
+    }
+  }
+
+  // 4. In-memory submissions for warm lambda processes
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    for (const [k, s] of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.entries()) {
+      const existing = mergedMap.get(k);
+      if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
+        mergedMap.set(k, { ...existing, ...s });
+      }
+    }
+  }
+
+  // 5. Synchronize active local session from cookie if present in current request
   try {
     const local = await readLocal();
     if (local?.session) {
       const active = local.session;
-      const idx = list.findIndex(
-        (s: Session) => s.id === active.id || (active.code && s.code === active.code),
-      );
-      const activeDemo: Session = { ...active, mode: "demo" };
-      if (idx >= 0) {
-        list[idx] = { ...list[idx], ...activeDemo };
-      } else {
-        list.unshift(activeDemo);
-      }
-      if (
-        active.status === "submitted_complete" ||
-        active.status === "submitted_with_missing" ||
-        active.status === "draft" ||
-        Boolean(active.code)
-      ) {
-        await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
-      }
+      const k = active.code || active.id;
+      const existing = mergedMap.get(k);
+      const activeDemo: Session = { ...existing, ...active, mode: "demo" };
+      mergedMap.set(k, activeDemo);
     }
   } catch {
     // Outside request context or no cookie available
   }
 
-  // Ensure any submitted session with attempts has its survey answers populated
+  const list = Array.from(mergedMap.values());
+
+  // 6. Ensure any submitted session with attempts has its survey answers populated
   let updatedAny = false;
   for (let i = 0; i < list.length; i++) {
     const s = list[i];
@@ -266,11 +399,21 @@ export async function getDemoSubmissions(): Promise<Session[]> {
       }
     }
   }
-  if (updatedAny) {
-    await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
+
+  // 7. Update in-memory map & sync file
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    for (const s of list) {
+      globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
+    }
   }
 
-  // Filter out author synthetic fixtures
+  const subPath = path.join(getDemoDataDir(), "submissions.json");
+  try {
+    await mkdir(getDemoDataDir(), { recursive: true });
+    await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
+  } catch {}
+
+  // 8. Filter out author synthetic fixtures
   const filtered = list.filter(
     (s: Session) =>
       !s.id?.includes("synthetic") &&
@@ -375,6 +518,7 @@ export async function startSession(input: {
   priorExposure: boolean;
   practice: boolean;
   token: string;
+  clientLastCode?: string | number;
 }) {
   const existing = await getSession();
   const pid = await getOrCreateParticipantId();
@@ -387,11 +531,15 @@ export async function startSession(input: {
       "impersonation",
       "links",
     ];
+    const nextCode = await nextLocalParticipantCode({
+      existingCode: existing?.code,
+      clientHintCode: input.clientLastCode,
+    });
     const session: Session = {
       id: sessionId,
       submissionId: sessionId,
       participantId: pid,
-      code: await nextLocalParticipantCode(),
+      code: nextCode,
       mode: input.practice ? "practice" : "demo",
       status: input.practice ? "submitted_complete" : "draft",
       createdAt: now.toISOString(),
@@ -448,7 +596,9 @@ export async function startSession(input: {
 
 export async function startNewParticipantSession(input?: {
   token?: string;
+  clientLastCode?: string | number;
 }): Promise<Session> {
+  const existing = await getSession();
   const pid = "PART-" + randomUUID().slice(0, 10).toUpperCase();
   const token =
     input?.token && /^[a-f0-9]{64}$/.test(input.token)
@@ -492,7 +642,10 @@ export async function startNewParticipantSession(input?: {
     "impersonation",
     "links",
   ];
-  const nextCode = await nextLocalParticipantCode();
+  const nextCode = await nextLocalParticipantCode({
+    existingCode: existing?.code,
+    clientHintCode: input?.clientLastCode,
+  });
   const session: Session = {
     id: sessionId,
     submissionId: sessionId,

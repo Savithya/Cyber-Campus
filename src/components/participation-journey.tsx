@@ -148,8 +148,8 @@ export function ParticipationJourney() {
                         <span
                           className={`w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-sm transition-colors ${
                             isSelected
-                              ? "bg-indigo-600 text-white shadow-xs"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/50 group-hover:text-indigo-600"
+                              ? "bg-blue-600 text-white shadow-xs"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/50 group-hover:text-blue-600"
                           }`}
                         >
                           {s.step}
@@ -209,11 +209,11 @@ export function ParticipationJourney() {
           <Link
             href="/consent"
             prefetch={true}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-indigo-500"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500"
             aria-label="Begin Research Participation - Start with Step 01 Consent"
           >
-            <span>Begin Research Participation</span>
-            <ArrowRight size={18} aria-hidden="true" />
+            <span className="text-white font-bold">Begin Research Participation</span>
+            <ArrowRight size={18} className="text-white" aria-hidden="true" />
           </Link>
           <p className="mt-2.5 text-xs text-slate-500 dark:text-slate-400">
             Takes approximately 15–20 minutes · Completely voluntary &amp; self-paced
