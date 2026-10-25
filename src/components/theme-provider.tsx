@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 
-export type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "cyber";
 
 interface ThemeContextType {
   theme: Theme;
@@ -24,6 +24,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const THEMES: { id: Theme; label: string; icon: string }[] = [
   { id: "light", label: "Light", icon: "sun" },
   { id: "dark", label: "Dark", icon: "moon" },
+  { id: "cyber", label: "Cyber", icon: "zap" },
 ];
 
 export function ThemeScript() {
@@ -87,7 +88,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     setThemeState((current) => {
-      const next: Theme = current === "light" ? "dark" : "light";
+      const next: Theme = current === "light" ? "dark" : current === "dark" ? "cyber" : "light";
 
       applyTheme(next);
       try {

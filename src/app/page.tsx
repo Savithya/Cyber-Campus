@@ -1,26 +1,34 @@
-import { SpotHero } from "@/components/spot-hero";
-import { SpotTrustBar } from "@/components/spot-trust-bar";
-import { SpotMissionSteps } from "@/components/spot-mission-steps";
-import { SpotResearchVariables } from "@/components/spot-research-variables";
-import { SpotPurposeCard } from "@/components/spot-purpose-card";
+import { HeroSection } from "@/components/hero-section";
+import { ResearchMetrics } from "@/components/research-metrics";
+import { ThreatCategories } from "@/components/threat-categories";
+import { ParticipationJourney } from "@/components/participation-journey";
+import { CyberLabPreview } from "@/components/cyber-lab-preview";
+import { ResearchEthics } from "@/components/research-ethics";
+import { ResearchCTA } from "@/components/research-cta";
 
 export default function Home() {
   return (
-    <div id="home" className="spot-page-wrapper">
-      {/* SECTION 1 — HERO (SPOT THE THREAT EDITORIAL LAYOUT) */}
-      <SpotHero />
+    <div id="home" className="cyber-campus-home-wrapper">
+      {/* 1. Split-Screen Hero Section */}
+      <HeroSection />
 
-      {/* SECTION 2 — TRUST SAFEGUARDS (3-ITEM HORIZONTAL STRIP) */}
-      <SpotTrustBar />
+      {/* 2. Research Overview Metrics (4 Cards) */}
+      <ResearchMetrics />
 
-      {/* SECTION 3 — YOUR MISSION, SHOULD YOU ACCEPT IT (3 NUMBERED CARDS) */}
-      <SpotMissionSteps />
+      {/* 3. Four Social Engineering Threat Cards (IV1–IV4) */}
+      <ThreatCategories />
 
-      {/* SECTION 4 — RESEARCH VARIABLES (IV1–IV4) & USER PRIVACY (DV) */}
-      <SpotResearchVariables />
+      {/* 4. Four-Step Participation Journey */}
+      <ParticipationJourney />
 
-      {/* SECTION 5 — RESEARCH PURPOSE CALLOUT BANNER */}
-      <SpotPurposeCard />
+      {/* 5. Interactive Cyber Lab Preview (Educational Demo) */}
+      <CyberLabPreview />
+
+      {/* 6. Research Ethics & Privacy Section */}
+      <ResearchEthics />
+
+      {/* 7. Final Research Call-to-Action Banner */}
+      <ResearchCTA />
     </div>
   );
 }

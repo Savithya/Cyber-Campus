@@ -27,35 +27,34 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
-  it("renders the redesigned home page with all essential Spot-the-Phish components", () => {
+  it("renders the redesigned home page with all essential Hybrid Cyber Research Lab components", () => {
     const html = renderToString(React.createElement(Home));
 
-    // Verify Brand & Editorial Title
-    expect(html).toContain("Spot the");
-    expect(html).toContain("Threat");
-    expect(html).toContain("SOCIAL ENGINEERING CHALLENGES");
+    // Verify Brand & Hero Headline
+    expect(html).toContain("ACADEMIC CYBERSECURITY RESEARCH • SRI LANKA");
+    expect(html).toContain("Explore Cyber Threats.");
+    expect(html).toContain("Protect Your Digital Privacy.");
 
-    // Verify Core Question & Sri Lanka University Research Topic
-    expect(html).toContain("Can you spot the signs before your privacy is compromised?");
-    expect(html).toContain("Sri Lanka");
-    expect(html).toContain("university students");
-    expect(html).toContain("Around 12–15 minutes");
+    // Verify Sri Lanka University Research Topic & CTAs
+    expect(html).toContain("Participate in interactive cybersecurity scenarios");
+    expect(html).toContain("university students in Sri Lanka");
+    expect(html).toContain("Start Research");
+    expect(html).toContain("Explore Cyber Challenges");
 
-    // Verify 3 Trust Safeguards
-    expect(html).toContain("Anonymous participation");
-    expect(html).toContain("Fictional scenarios only (IV1–IV4)");
-    expect(html).toContain("For students in Sri Lanka, aged 18+");
+    // Verify Trust Indicators
+    expect(html).toContain("Voluntary Participation");
+    expect(html).toContain("Anonymous Research ID");
+    expect(html).toContain("Safe Simulated Scenarios");
+    expect(html).toContain("No Real Passwords");
 
-    // Verify 'YOUR MISSION, SHOULD YOU ACCEPT IT' 3-card steps
-    expect(html).toContain("YOUR MISSION, SHOULD YOU ACCEPT IT");
-    expect(html).toContain("A few questions.");
-    expect(html).toContain("A fresh challenge.");
-    expect(html).toContain("Tell us about you");
-    expect(html).toContain("Meet the threats");
-    expect(html).toContain("See how you did");
+    // Verify Research Overview Metrics (4 Cards)
+    expect(html).toContain("Threat Categories");
+    expect(html).toContain("Interactive Challenges");
+    expect(html).toContain("Estimated Participation Time");
+    expect(html).toContain("University Students");
 
     // Verify All 4 Research Variables (IV1–IV4)
-    expect(html).toContain("RESEARCH VARIABLES (IV1–IV4)");
+    expect(html).toContain("Explore the Four Social Engineering Threats");
     expect(html).toContain("IV1");
     expect(html).toContain("Phishing");
     expect(html).toContain("IV2");
@@ -65,13 +64,29 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("IV4");
     expect(html).toContain("Online Scams &amp; Malicious Links");
 
-    // Verify Dependent Variable (DV) User Privacy
-    expect(html).toContain("DEPENDENT VARIABLE (DV) IMPACT");
-    expect(html).toContain("User Privacy Risk");
+    // Verify Participation Journey (4 Steps)
+    expect(html).toContain("How Cyber Campus Works");
+    expect(html).toContain("Research Information &amp; Consent");
+    expect(html).toContain("Participant Demographics");
+    expect(html).toContain("Cyber Investigation Missions");
+    expect(html).toContain("Submit &amp; Complete");
+    expect(html).toContain("Begin Research Participation");
 
-    // Verify Purpose Card
-    expect(html).toContain("A CHALLENGE WITH A PURPOSE");
-    expect(html).toContain("Your perspective supports student research.");
+    // Verify Cyber Lab Preview Demo
+    expect(html).toContain("Think Like a Cyber Investigator");
+    expect(html).toContain("Optional Educational Demo — Not Part of Research Scoring");
+
+    // Verify Research Ethics & Privacy
+    expect(html).toContain("Research Ethics &amp; Your Privacy");
+    expect(html).toContain("Voluntary Participation");
+    expect(html).toContain("Data Minimization");
+    expect(html).toContain("Confidentiality &amp; Protection");
+    expect(html).toContain("Research Transparency");
+
+    // Verify Final Research CTA
+    expect(html).toContain("Contribute to Cybersecurity Research in Sri Lanka");
+    expect(html).toContain("Start Your Research Journey");
+    expect(html).toContain("Learn About the Study");
   });
 
   it("renders the cyber hero visual image inside SpotHero", () => {
@@ -241,7 +256,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
       React.createElement(
         SessionContext.Provider,
         { value: mockContextValue },
-        React.createElement(CyberMissionControl, { initialScenarios: [] } as any)
+        React.createElement<NonNullable<Parameters<typeof CyberMissionControl>[0]>>(CyberMissionControl, { initialScenarios: [] })
       )
     );
 
@@ -273,7 +288,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
       React.createElement(
         SessionContext.Provider,
         { value: mockContextValue },
-        React.createElement(CyberMissionControl, { initialScenarios: [] } as any)
+        React.createElement<NonNullable<Parameters<typeof CyberMissionControl>[0]>>(CyberMissionControl, { initialScenarios: [] })
       )
     );
 
@@ -423,7 +438,7 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
       React.createElement(
         SessionContext.Provider,
         { value: mockContextValue },
-        React.createElement(CyberMissionControl as any, {
+        React.createElement<NonNullable<Parameters<typeof CyberMissionControl>[0]>>(CyberMissionControl, {
           initialMissionId: "phishing",
           initialScenarios: mockScenarios,
         })
@@ -475,26 +490,36 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("brand-subtitle-dot");
   });
 
-  it("renders the universal Spot-the-Phish website bottom across the website", () => {
+  it("renders the redesigned Cyber Campus 4-column footer across the website", () => {
     const html = renderToString(React.createElement(SiteFooter));
 
     // Verify container and role
-    expect(html).toContain("spot-site-footer");
+    expect(html).toContain("site-footer");
     expect(html).toContain('role="contentinfo"');
-    expect(html).toContain("spot-footer-container");
+    expect(html).toContain("Cyber Campus Research Footer");
 
-    // Verify Left Section
-    expect(html).toContain("Spot the Phish · AI Email Challenge");
+    // Verify Platform Description
+    expect(html).toContain("An academic cybersecurity research platform exploring social engineering threats");
 
-    // Verify Center Section
-    expect(html).toContain("An academic research activity · Sri Lanka");
+    // Verify Column 2: Quick Navigation
+    expect(html).toContain("Quick Navigation");
+    expect(html).toContain("Cyber Challenges");
 
-    // Verify Right Section Links
-    expect(html).toContain("Participation &amp; privacy");
-    expect(html).toContain('href="/privacy"');
-    expect(html).toContain("Withdrawal");
-    expect(html).toContain('href="/withdraw"');
-    expect(html).toContain("Researcher access");
+    // Verify Column 3: Research & Ethics
+    expect(html).toContain("Research &amp; Ethics");
+    expect(html).toContain("Study Information");
+    expect(html).toContain("Participant Rights");
+    expect(html).toContain("Privacy Policy");
+
+    // Verify Column 4: Platform Access
+    expect(html).toContain("Platform Access");
+    expect(html).toContain("Researcher Access");
     expect(html).toContain('href="/admin/login"');
+    expect(html).toContain("Participant Withdrawal");
+    expect(html).toContain('href="/withdraw"');
+    expect(html).toContain("Back to Top");
+
+    // Verify Copyright Notice
+    expect(html).toContain("© 2026 Cyber Campus Research Initiative • Sri Lanka");
   });
 });

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   ShieldCheck,
   House,
+  Gamepad2,
   ListChecks,
   Lightbulb,
   KeyRound,
@@ -78,6 +79,7 @@ export function SiteHeader() {
 
   // Determine active states accurately based on route
   const isHomeActive = pathname === "/";
+  const isChallengesActive = pathname?.startsWith("/play");
   const isJoinActive =
     pathname === "/consent" ||
     pathname === "/demographics" ||
@@ -184,6 +186,16 @@ export function SiteHeader() {
           >
             <House size={18} strokeWidth={1.9} aria-hidden="true" />
             <span>Home</span>
+          </Link>
+
+          <Link
+            href="/play"
+            prefetch={true}
+            className={`nav-pill ${isChallengesActive ? "active" : ""}`}
+            aria-current={isChallengesActive ? "page" : undefined}
+          >
+            <Gamepad2 size={18} strokeWidth={1.9} aria-hidden="true" />
+            <span>Cyber Challenges</span>
           </Link>
 
           <Link
@@ -315,7 +327,21 @@ export function SiteHeader() {
                 <span>Home</span>
               </Link>
 
-              {/* 2. ListChecks — Join Research */}
+              {/* 2. Gamepad2 — Cyber Challenges */}
+              <Link
+                href="/play"
+                onClick={() => setMobileMenuOpen(false)}
+                prefetch={true}
+                className={`mobile-nav-item mobile-nav-pill ${
+                  isChallengesActive ? "active" : ""
+                }`}
+                aria-current={isChallengesActive ? "page" : undefined}
+              >
+                <Gamepad2 size={18} strokeWidth={1.9} aria-hidden="true" />
+                <span>Cyber Challenges</span>
+              </Link>
+
+              {/* 3. ListChecks — Join Research */}
               <Link
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
@@ -329,7 +355,7 @@ export function SiteHeader() {
                 <span>Join Research</span>
               </Link>
 
-              {/* 3. Lightbulb — About the Study */}
+              {/* 4. Lightbulb — About the Study */}
               <Link
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
@@ -343,7 +369,7 @@ export function SiteHeader() {
                 <span>About the Study</span>
               </Link>
 
-              {/* 4. KeyRound — Researcher Access */}
+              {/* 5. KeyRound — Researcher Access */}
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
