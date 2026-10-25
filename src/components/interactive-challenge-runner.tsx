@@ -24,7 +24,10 @@ import {
 import { api, useSession } from "@/lib/client";
 import { missions } from "@/content/missions";
 import type { Scenario, Attempt } from "@/lib/types";
-import { getScenarioEmailData, type EmailMetadata } from "./cyber-mission-challenge";
+import {
+  getScenarioEmailData,
+  type EmailMetadata,
+} from "./cyber-mission-challenge";
 
 export interface InteractiveChallengeRunnerProps {
   scenario: Scenario;
@@ -58,21 +61,24 @@ export function InteractiveChallengeRunner({
 
   // Active answer selection state
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(
-    previousAttempt?.selectedAction ?? null
+    previousAttempt?.selectedAction ?? null,
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [recordedAttempt, setRecordedAttempt] = useState<Attempt | null>(
-    previousAttempt ?? null
+    previousAttempt ?? null,
   );
   const [error, setError] = useState<string>("");
 
   // UI Interactive States
   const [isStarred, setIsStarred] = useState<boolean>(false);
-  const [showOptionsDropdown, setShowOptionsDropdown] = useState<boolean>(false);
+  const [showOptionsDropdown, setShowOptionsDropdown] =
+    useState<boolean>(false);
   const [showRFCHeaders, setShowRFCHeaders] = useState<boolean>(false);
   const [showLinkSimModal, setShowLinkSimModal] = useState<boolean>(false);
   const [showRedFlags, setShowRedFlags] = useState<boolean>(false);
-  const [checkedRedFlags, setCheckedRedFlags] = useState<Record<string, boolean>>({});
+  const [checkedRedFlags, setCheckedRedFlags] = useState<
+    Record<string, boolean>
+  >({});
 
   // Reset or initialize state when scenario changes
   useEffect(() => {
@@ -89,19 +95,20 @@ export function InteractiveChallengeRunner({
     }
   }, [scenario.id, previousAttempt]);
 
-  const currentMission = missions.find((m) => m.id === missionId) ?? missions[0];
+  const currentMission =
+    missions.find((m) => m.id === missionId) ?? missions[0];
   const emailData: EmailMetadata = getScenarioEmailData(scenario);
 
   // Session Attempts & Performance Calculations
   const allAttempts = state.session?.attempts ?? [];
   const firstAttempts = allAttempts.filter(
-    (a) => a.attemptNumber === 1 && a.selectedAction !== null
+    (a) => a.attemptNumber === 1 && a.selectedAction !== null,
   );
 
   // 1. Game Performance Score
-  const performanceScore = firstAttempts.filter(
-    (a) => a.correct === true || a.unsafe === false
-  ).length * 10;
+  const performanceScore =
+    firstAttempts.filter((a) => a.correct === true || a.unsafe === false)
+      .length * 10;
 
   // 2. Decision accuracy
   const correctCount = firstAttempts.filter((a) => a.correct === true).length;
@@ -113,7 +120,10 @@ export function InteractiveChallengeRunner({
   // 3. Current streak
   let currentStreak = 0;
   for (let i = firstAttempts.length - 1; i >= 0; i--) {
-    if (firstAttempts[i].correct === true || firstAttempts[i].unsafe === false) {
+    if (
+      firstAttempts[i].correct === true ||
+      firstAttempts[i].unsafe === false
+    ) {
       currentStreak++;
     } else {
       break;
@@ -122,7 +132,7 @@ export function InteractiveChallengeRunner({
 
   // 4. Scenarios saved in this mission
   const savedInMissionCount = currentMission.ids.filter((id) =>
-    firstAttempts.some((a) => a.scenarioId === id)
+    firstAttempts.some((a) => a.scenarioId === id),
   ).length;
 
   // Choice Selection
@@ -136,7 +146,10 @@ export function InteractiveChallengeRunner({
   const handleAdvance = async () => {
     if (!selectedChoiceId || isSubmitting) return;
 
-    if (recordedAttempt && recordedAttempt.selectedAction === selectedChoiceId) {
+    if (
+      recordedAttempt &&
+      recordedAttempt.selectedAction === selectedChoiceId
+    ) {
       onNextScenario?.();
       return;
     }
@@ -146,7 +159,7 @@ export function InteractiveChallengeRunner({
 
     const elapsedMs = Math.min(
       86400000,
-      Math.max(1000, Date.now() - (startTimeRef.current || Date.now()))
+      Math.max(1000, Date.now() - (startTimeRef.current || Date.now())),
     );
 
     try {
@@ -170,7 +183,7 @@ export function InteractiveChallengeRunner({
     } catch (e) {
       setError(
         (e as Error).message ||
-          "Failed to record response in study session. Please retry."
+          "Failed to record response in study session. Please retry.",
       );
     } finally {
       setIsSubmitting(false);
@@ -183,12 +196,12 @@ export function InteractiveChallengeRunner({
     scenario.mediaDetails.warningIndicators.length > 0
       ? scenario.mediaDetails.warningIndicators
       : scenario.evidence && scenario.evidence.length > 0
-      ? scenario.evidence.map((ev) => ev.label)
-      : [
-          "Domain address verification mismatch",
-          "Artificial deadline & psychological pressure",
-          "Unverified external link destination",
-        ];
+        ? scenario.evidence.map((ev) => ev.label)
+        : [
+            "Domain address verification mismatch",
+            "Artificial deadline & psychological pressure",
+            "Unverified external link destination",
+          ];
 
   // Helper for toggleable red flag checklist
   const toggleRedFlag = (flag: string) => {
@@ -203,16 +216,35 @@ export function InteractiveChallengeRunner({
   // Dynamic header icon based on communicationType
   const getHeaderIcon = () => {
     if (emailData.communicationType === "call") {
-      return <Phone size={18} className="text-slate-600 dark:text-slate-300" aria-hidden="true" />;
+      return (
+        <Phone
+          size={18}
+          className="text-slate-600 dark:text-slate-300"
+          aria-hidden="true"
+        />
+      );
     }
     if (emailData.communicationType === "message") {
-      return <MessagesSquare size={18} className="text-slate-600 dark:text-slate-300" aria-hidden="true" />;
+      return (
+        <MessagesSquare
+          size={18}
+          className="text-slate-600 dark:text-slate-300"
+          aria-hidden="true"
+        />
+      );
     }
-    return <Mail size={18} className="text-slate-600 dark:text-slate-300" aria-hidden="true" />;
+    return (
+      <Mail
+        size={18}
+        className="text-slate-600 dark:text-slate-300"
+        aria-hidden="true"
+      />
+    );
   };
 
   const getHeaderTitle = () => {
-    if (emailData.communicationType === "call") return "Challenge incoming call";
+    if (emailData.communicationType === "call")
+      return "Challenge incoming call";
     if (emailData.communicationType === "message") return "Challenge message";
     return "Challenge inbox";
   };
@@ -231,7 +263,11 @@ export function InteractiveChallengeRunner({
           {/* Metric 1: Game Performance Score */}
           <div className="p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <Trophy size={16} className="text-amber-500 shrink-0" aria-hidden="true" />
+              <Trophy
+                size={16}
+                className="text-amber-500 shrink-0"
+                aria-hidden="true"
+              />
               <span>Game Performance Score</span>
             </div>
             <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -242,7 +278,11 @@ export function InteractiveChallengeRunner({
           {/* Metric 2: Decision Accuracy */}
           <div className="p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <Target size={16} className="text-teal-600 dark:text-teal-400 shrink-0" aria-hidden="true" />
+              <Target
+                size={16}
+                className="text-teal-600 dark:text-teal-400 shrink-0"
+                aria-hidden="true"
+              />
               <span>Decision accuracy</span>
             </div>
             <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -253,7 +293,11 @@ export function InteractiveChallengeRunner({
           {/* Metric 3: Current Streak */}
           <div className="p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <Flame size={16} className="text-orange-500 shrink-0" aria-hidden="true" />
+              <Flame
+                size={16}
+                className="text-orange-500 shrink-0"
+                aria-hidden="true"
+              />
               <span>Current streak</span>
             </div>
             <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -264,7 +308,11 @@ export function InteractiveChallengeRunner({
           {/* Metric 4: Scenarios Saved */}
           <div className="p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <Mail size={16} className="text-sky-600 dark:text-sky-400 shrink-0" aria-hidden="true" />
+              <Mail
+                size={16}
+                className="text-sky-600 dark:text-sky-400 shrink-0"
+                aria-hidden="true"
+              />
               <span>Scenarios saved</span>
             </div>
             <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -277,7 +325,10 @@ export function InteractiveChallengeRunner({
       {/* =====================================================================
           2. SCENARIO PROGRESS BAR ROW
           ===================================================================== */}
-      <section className="scenario-progress-bar-row space-y-1.5" aria-label="Scenario progress">
+      <section
+        className="scenario-progress-bar-row space-y-1.5"
+        aria-label="Scenario progress"
+      >
         <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-400 px-0.5">
           <span>
             Scenario {scenarioIndex + 1} of {totalInMission}
@@ -311,10 +362,14 @@ export function InteractiveChallengeRunner({
             <div className="flex items-center gap-2.5">
               {getHeaderIcon()}
               <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
-                <span className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-2 font-bold">SCENARIO BRIEFING ·</span>
+                <span className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-2 font-bold">
+                  SCENARIO BRIEFING ·
+                </span>
                 {getHeaderTitle()}
               </span>
-              <span className="sr-only">Inspect the communication below before deciding</span>
+              <span className="sr-only">
+                Inspect the communication below before deciding
+              </span>
             </div>
 
             <div className="flex items-center gap-2 relative">
@@ -353,7 +408,11 @@ export function InteractiveChallengeRunner({
                     className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2"
                   >
                     <Info size={14} className="text-teal-600" />
-                    <span>{showRFCHeaders ? "Hide Security Headers" : "Inspect Security Headers"}</span>
+                    <span>
+                      {showRFCHeaders
+                        ? "Hide Security Headers"
+                        : "Inspect Security Headers"}
+                    </span>
                   </button>
                   <button
                     type="button"
@@ -375,7 +434,13 @@ export function InteractiveChallengeRunner({
           <div className="p-6 sm:p-7 space-y-4">
             {/* Kicker */}
             <div className="text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase font-mono">
-              SIMULATED {emailData.communicationType === "call" ? "CALL" : emailData.communicationType === "message" ? "SMS" : "EMAIL"} · {scenarioIndex + 1} / {totalInMission}
+              SIMULATED{" "}
+              {emailData.communicationType === "call"
+                ? "CALL"
+                : emailData.communicationType === "message"
+                  ? "SMS"
+                  : "EMAIL"}{" "}
+              · {scenarioIndex + 1} / {totalInMission}
             </div>
 
             {/* Subject / Title */}
@@ -438,15 +503,18 @@ export function InteractiveChallengeRunner({
                 <div className="pt-1 space-y-1 text-[11px] leading-relaxed">
                   <div>
                     <strong className="text-slate-500">Return-Path:</strong>{" "}
-                    {emailData.rfcHeaders?.returnPath || `<bounce@${scenario.senderAddress}>`}
+                    {emailData.rfcHeaders?.returnPath ||
+                      `<bounce@${scenario.senderAddress}>`}
                   </div>
                   <div>
                     <strong className="text-slate-500">Authentication:</strong>{" "}
-                    {emailData.rfcHeaders?.spfResult || "spf=softfail (mismatch)"}
+                    {emailData.rfcHeaders?.spfResult ||
+                      "spf=softfail (mismatch)"}
                   </div>
                   <div>
                     <strong className="text-slate-500">DKIM-Domain:</strong>{" "}
-                    {emailData.rfcHeaders?.dkimDomain || "unverified-relay.test"}
+                    {emailData.rfcHeaders?.dkimDomain ||
+                      "unverified-relay.test"}
                   </div>
                   <div>
                     <strong className="text-slate-500">Originating-IP:</strong>{" "}
@@ -461,7 +529,8 @@ export function InteractiveChallengeRunner({
 
             {/* Message Body Content */}
             <div className="space-y-3.5 text-sm md:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300">
-              {emailData.bodyParagraphs && emailData.bodyParagraphs.length > 0 ? (
+              {emailData.bodyParagraphs &&
+              emailData.bodyParagraphs.length > 0 ? (
                 emailData.bodyParagraphs.map((paragraph, pIdx) => (
                   <p key={pIdx} className="whitespace-pre-line">
                     {paragraph}
@@ -472,19 +541,23 @@ export function InteractiveChallengeRunner({
               )}
 
               {/* Call Transcript Audio Display if Call Scenario */}
-              {emailData.communicationType === "call" && emailData.callAudioTranscript && (
-                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 space-y-2 mt-3">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                    <PhoneIncoming size={14} className="text-teal-600" />
-                    <span>Call Audio Transcript</span>
+              {emailData.communicationType === "call" &&
+                emailData.callAudioTranscript && (
+                  <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 space-y-2 mt-3">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      <PhoneIncoming size={14} className="text-teal-600" />
+                      <span>Call Audio Transcript</span>
+                    </div>
+                    {emailData.callAudioTranscript.map((line, lIdx) => (
+                      <p
+                        key={lIdx}
+                        className="text-xs italic text-slate-600 dark:text-slate-300"
+                      >
+                        {line}
+                      </p>
+                    ))}
                   </div>
-                  {emailData.callAudioTranscript.map((line, lIdx) => (
-                    <p key={lIdx} className="text-xs italic text-slate-600 dark:text-slate-300">
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              )}
+                )}
 
               {/* Attachment preview if applicable */}
               {emailData.attachment && (
@@ -512,10 +585,16 @@ export function InteractiveChallengeRunner({
                   <button
                     type="button"
                     onClick={() => setShowLinkSimModal(!showLinkSimModal)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium bg-[#21434a] hover:bg-[#18343a] text-white shadow-sm transition-colors cursor-pointer"
+                    aria-expanded={showLinkSimModal}
+                    aria-label={`Simulated link: ${emailData.linkCta.buttonText}. Click to safely inspect destination.`}
+                    className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     <span>{emailData.linkCta.buttonText}</span>
-                    <ArrowRight size={15} />
+                    <ArrowRight
+                      size={15}
+                      className="transition-transform group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
                   </button>
 
                   {/* Simulated Link Safety Notice Popup */}
@@ -525,10 +604,15 @@ export function InteractiveChallengeRunner({
                         <Lock size={13} /> Simulated Inactive Link
                       </div>
                       <p className="text-[11px]">
-                        Destination: <code className="font-mono">{emailData.linkCta.destinationUrl}</code>
+                        Destination:{" "}
+                        <code className="font-mono">
+                          {emailData.linkCta.destinationUrl}
+                        </code>
                       </p>
                       <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                        This simulated link is disabled for participant safety. In real cyber attacks, clicking this leads to credential harvesting.
+                        This simulated link is disabled for participant safety.
+                        In real cyber attacks, clicking this leads to credential
+                        harvesting.
                       </p>
                     </div>
                   )}
@@ -539,7 +623,11 @@ export function InteractiveChallengeRunner({
 
           {/* Footer Notice */}
           <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-auto">
-            <Lock size={13} className="text-slate-400 shrink-0" aria-hidden="true" />
+            <Lock
+              size={13}
+              className="text-slate-400 shrink-0"
+              aria-hidden="true"
+            />
             <span>All links and attachments are fictional and inactive.</span>
           </div>
         </div>
@@ -563,7 +651,11 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* 4 Decision Choice Cards (A, B, C, D) */}
-          <div className="space-y-2.5 pt-1" role="radiogroup" aria-label="Action choices">
+          <div
+            className="space-y-2.5 pt-1"
+            role="radiogroup"
+            aria-label="Action choices"
+          >
             {scenario.choices.map((choice, cIndex) => {
               const letter = String.fromCharCode(65 + cIndex); // A, B, C, D
               const isSelected = selectedChoiceId === choice.id;
@@ -576,9 +668,9 @@ export function InteractiveChallengeRunner({
                   aria-checked={isSelected}
                   disabled={isSubmitting}
                   onClick={() => handleSelectChoice(choice.id)}
-                  className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
+                  className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
                     isSelected
-                      ? "border-[#21434a] dark:border-teal-400 ring-2 ring-[#21434a]/15 bg-[#21434a]/5 dark:bg-teal-950/20"
+                      ? "border-indigo-600 dark:border-indigo-400 ring-2 ring-indigo-600/20 dark:ring-indigo-400/25 bg-indigo-50/70 dark:bg-indigo-950/30"
                       : "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#141e33] hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
                   }`}
                 >
@@ -586,7 +678,7 @@ export function InteractiveChallengeRunner({
                   <div
                     className={`w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 transition-colors ${
                       isSelected
-                        ? "bg-[#21434a] text-white dark:bg-teal-500 dark:text-slate-950 border-[#21434a]"
+                        ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white border-indigo-600 dark:border-indigo-500 shadow-xs"
                         : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                     }`}
                     aria-hidden="true"
@@ -648,7 +740,9 @@ export function InteractiveChallengeRunner({
                         >
                           {isFound && <Check size={11} strokeWidth={3} />}
                         </div>
-                        <span className="text-xs leading-tight flex-1">{flag}</span>
+                        <span className="text-xs leading-tight flex-1">
+                          {flag}
+                        </span>
                       </button>
                     );
                   })}
@@ -681,29 +775,43 @@ export function InteractiveChallengeRunner({
               type="button"
               disabled={!selectedChoiceId || isSubmitting}
               onClick={handleAdvance}
-              className={`w-full py-3.5 px-4 rounded-xl font-medium text-sm text-white flex items-center justify-center gap-2 transition-all shadow-sm ${
+              aria-label="Lock decision and continue"
+              className={`group w-full py-3.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
                 !selectedChoiceId || isSubmitting
-                  ? "bg-[#97abad] dark:bg-slate-700 cursor-not-allowed opacity-80"
-                  : "bg-[#708a8e] hover:bg-[#21434a] cursor-pointer"
+                  ? "bg-slate-100 hover:bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:hover:bg-slate-800/80 dark:text-slate-500 border border-slate-200 dark:border-slate-700/70 cursor-not-allowed shadow-none"
+                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:text-white shadow-md shadow-indigo-600/25 hover:shadow-lg hover:shadow-indigo-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
               }`}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2
+                    size={16}
+                    className="animate-spin shrink-0"
+                    aria-hidden="true"
+                  />
                   <span>Locking decision...</span>
                 </>
               ) : (
                 <>
                   <span>Lock decision &amp; continue</span>
                   <span className="sr-only">Next Challenge</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight
+                    size={16}
+                    className={`shrink-0 transition-transform ${
+                      selectedChoiceId
+                        ? "group-hover:translate-x-0.5"
+                        : "opacity-60"
+                    }`}
+                    aria-hidden="true"
+                  />
                 </>
               )}
             </button>
 
             {/* Microcopy disclaimer */}
             <p className="text-[11px] text-center text-slate-400 dark:text-slate-500 mt-2.5 leading-normal">
-              Your actual choice is recorded. Explanations appear after final submission.
+              Your actual choice is recorded. Explanations appear after final
+              submission.
             </p>
           </div>
         </div>

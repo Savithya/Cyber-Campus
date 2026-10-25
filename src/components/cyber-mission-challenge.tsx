@@ -115,9 +115,11 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         channelTitle: "Challenge inbox",
         senderInitials: (scenario.senderName || "L")[0].toUpperCase(),
         senderName: scenario.senderName || "Lakview Student Services",
-        senderEmail: scenario.senderAddress || "support@lakview-account.example",
+        senderEmail:
+          scenario.senderAddress || "support@lakview-account.example",
         recipient: "student@lakview.campus.example",
-        subject: scenario.title || "Action required: keep your student account active",
+        subject:
+          scenario.title || "Action required: keep your student account active",
         timestamp: "02 Oct 2026, 09:10 · Fictional timestamp",
         department: "Lakview Student Services",
         scenarioIntro:
@@ -137,7 +139,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         },
         rfcHeaders: {
           returnPath: "<bounce@lakview-account.example>",
-          spfResult: "spf=softfail (envelope sender domain does not match university records)",
+          spfResult:
+            "spf=softfail (envelope sender domain does not match university records)",
           dkimDomain: "lakview-account.example",
           originatingIp: "198.51.100.42 (External Relay)",
           messageId: "<ph01-notice@lakview-account.example>",
@@ -167,7 +170,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Claim LKR 85,000 Grant Disbursement",
-          destinationUrl: "https://grant-claim-portal.example/disbursement?sid=94770001234",
+          destinationUrl:
+            "https://grant-claim-portal.example/disbursement?sid=94770001234",
           hostDomain: "grant-claim-portal.example",
           legitDomain: "mohe.gov.example",
         },
@@ -203,7 +207,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Access Pass & Voucher Registration Portal",
-          destinationUrl: "https://event-ticket-claim.example/student-voucher?ref=campus",
+          destinationUrl:
+            "https://event-ticket-claim.example/student-voucher?ref=campus",
           hostDomain: "event-ticket-claim.example",
           legitDomain: "soc.campus.example",
         },
@@ -219,7 +224,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
     case "PH04":
       return {
         communicationType: "call",
-        channelTitle: "Incoming Phone Call & Transferred File · Global Talent Recruiters",
+        channelTitle:
+          "Incoming Phone Call & Transferred File · Global Talent Recruiters",
         phoneNumber: "+94 71 987 6543 (Direct Recruiter Line)",
         callerId: "GLOBAL-TALENT-HR",
         callStatus: "Connected · 01:12",
@@ -227,7 +233,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Direct Internship Offer Letter & Employment Contract Agreement",
+        subject:
+          "Direct Internship Offer Letter & Employment Contract Agreement",
         timestamp: "Today, 08:45 AM",
         department: "Global Talent Recruiters — Regional Career Placement",
         scenarioIntro:
@@ -279,7 +286,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Log In to Examination Verification Gateway",
-          destinationUrl: "https://portal-campus.account-auth.example/exam-login",
+          destinationUrl:
+            "https://portal-campus.account-auth.example/exam-login",
           hostDomain: "portal-campus.account-auth.example",
           legitDomain: "portal.campus.example",
         },
@@ -301,7 +309,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Urgent IT Maintenance: Account Sync Errors & Credential Verification",
+        subject:
+          "Urgent IT Maintenance: Account Sync Errors & Credential Verification",
         timestamp: "Today, 02:15 PM",
         department: "Central Campus IT Support Helpdesk",
         scenarioIntro:
@@ -353,7 +362,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Official Academic Census: Student Registration Profile Verification",
+        subject:
+          "Official Academic Census: Student Registration Profile Verification",
         timestamp: "Today, 01:10 PM",
         department: "Office of the Registrar — Academic Census Desk",
         scenarioIntro:
@@ -379,7 +389,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: "noc-admin@campus-network-support.example",
         recipient: "student@serendib.campus.example",
-        subject: "Network Maintenance: High-Speed Campus Wi-Fi Verification Code",
+        subject:
+          "Network Maintenance: High-Speed Campus Wi-Fi Verification Code",
         timestamp: "Today, 03:45 PM",
         department: "Campus Network Operations Center (NOC)",
         scenarioIntro:
@@ -405,7 +416,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Emergency Student Assistance: Clinical Exam Materials Request",
+        subject:
+          "Emergency Student Assistance: Clinical Exam Materials Request",
         timestamp: "Today, 11:50 AM",
         department: "Faculty of Medicine — Student Peer Network",
         scenarioIntro:
@@ -447,7 +459,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         rfcHeaders: {
           returnPath: "<prof_wickramasinghe@faculty-computing-sl.example>",
-          spfResult: "spf=softfail (free external webmail gateway, not campus.ac.lk)",
+          spfResult:
+            "spf=softfail (free external webmail gateway, not campus.ac.lk)",
           dkimDomain: "faculty-computing-sl.example",
           originatingIp: "203.0.113.110",
           messageId: "<im01-prof-tutoring@external-mail.example>",
@@ -500,7 +513,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         rfcHeaders: {
           returnPath: "<proctor-office@serendib-academic.example>",
-          spfResult: "spf=softfail (unverified domain: serendib-academic.example)",
+          spfResult:
+            "spf=softfail (unverified domain: serendib-academic.example)",
           dkimDomain: "serendib-academic.example",
           originatingIp: "203.0.113.15",
           messageId: "<im03-proctor@disciplinary-cases.example>",
@@ -513,7 +527,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: "rotaract@campus-societies-sl.example",
         recipient: "student@serendib.campus.example",
-        subject: "Invitation to Join Executive Board & Annual Membership Confirmation",
+        subject:
+          "Invitation to Join Executive Board & Annual Membership Confirmation",
         timestamp: "Today, 05:15 PM",
         department: "Campus Rotaract Chapter — Executive Committee",
         scenarioIntro:
@@ -539,7 +554,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Official Student Telecom Partnership: 50GB Free Educational Data",
+        subject:
+          "Official Student Telecom Partnership: 50GB Free Educational Data",
         timestamp: "Today, 10:40 AM",
         department: "National Higher Education Telecommunications Initiative",
         scenarioIntro:
@@ -572,7 +588,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         senderName: scenario.senderName,
         senderEmail: scenario.senderAddress,
         recipient: "student@serendib.campus.example",
-        subject: "Campus Mega Electronics Clearance: 80% Discount on Laptops & Tablets",
+        subject:
+          "Campus Mega Electronics Clearance: 80% Discount on Laptops & Tablets",
         timestamp: "Today, 12:30 PM",
         department: "Campus Electronics Clearance Outlet",
         scenarioIntro:
@@ -584,7 +601,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Open Mega Clearance Store & Order Online",
-          destinationUrl: "https://sl-campus-clearance-outlet.example/checkout?deal=laptop80",
+          destinationUrl:
+            "https://sl-campus-clearance-outlet.example/checkout?deal=laptop80",
           hostDomain: "sl-campus-clearance-outlet.example",
           legitDomain: "store.campus.example",
         },
@@ -648,7 +666,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Proceed to Online Payment Gateway (HTTP)",
-          destinationUrl: "http://pay-secure.campus-billing.example/checkout?inv=8831",
+          destinationUrl:
+            "http://pay-secure.campus-billing.example/checkout?inv=8831",
           hostDomain: "pay-secure.campus-billing.example",
           legitDomain: "bursar.campus.example",
         },
@@ -683,7 +702,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
         ],
         linkCta: {
           buttonText: "Register Hackathon Team & Verify Student SSO",
-          destinationUrl: "https://hackathon-srilanka-2026.example/register-team",
+          destinationUrl:
+            "https://hackathon-srilanka-2026.example/register-team",
           hostDomain: "hackathon-srilanka-2026.example",
           legitDomain: "soc.campus.example",
         },
@@ -752,7 +772,8 @@ export function getScenarioEmailData(scenario: Scenario): EmailMetadata {
           ? {
               buttonText: "Open Associated Web Gateway",
               destinationUrl: scenario.mediaDetails.destinationUrl,
-              hostDomain: scenario.mediaDetails.hostDomain || "external.example",
+              hostDomain:
+                scenario.mediaDetails.hostDomain || "external.example",
               legitDomain: scenario.mediaDetails.legitDomain,
             }
           : undefined,
@@ -801,18 +822,31 @@ export function CyberMissionHeader({
       case "IV1":
         return <Mail size={22} className="text-primary" aria-hidden="true" />;
       case "IV2":
-        return <MessagesSquare size={22} className="text-teal" aria-hidden="true" />;
+        return (
+          <MessagesSquare size={22} className="text-teal" aria-hidden="true" />
+        );
       case "IV3":
-        return <UserRoundSearch size={22} className="text-amber" aria-hidden="true" />;
+        return (
+          <UserRoundSearch
+            size={22}
+            className="text-amber"
+            aria-hidden="true"
+          />
+        );
       case "IV4":
         return <Link2 size={22} className="text-primary" aria-hidden="true" />;
       default:
-        return <ShieldCheck size={22} className="text-primary" aria-hidden="true" />;
+        return (
+          <ShieldCheck size={22} className="text-primary" aria-hidden="true" />
+        );
     }
   };
 
   return (
-    <header className="cyber-mission-header-card" aria-label="Cyber Mission Header">
+    <header
+      className="cyber-mission-header-card"
+      aria-label="Cyber Mission Header"
+    >
       {/* Top Bar: Cyber Campus Brand + Return link + IV identifier + Session Telemetry */}
       <div className="mission-header-top-row">
         <div className="flex items-center gap-3">
@@ -836,11 +870,20 @@ export function CyberMissionHeader({
         <div className="mission-header-badges">
           <div className="mission-iv-badge">
             <span className="badge-pulse-dot" aria-hidden="true" />
-            <span>{missionName} ({ivCode})</span>
+            <span>
+              {missionName} ({ivCode})
+            </span>
           </div>
           <div className="mission-overall-badge">
-            <ShieldCheck size={13} className="text-emerald" aria-hidden="true" />
-            <span>{overallCompleted}/{totalOverall} Completed ({Math.round((overallCompleted / totalOverall) * 100)}%)</span>
+            <ShieldCheck
+              size={13}
+              className="text-emerald"
+              aria-hidden="true"
+            />
+            <span>
+              {overallCompleted}/{totalOverall} Completed (
+              {Math.round((overallCompleted / totalOverall) * 100)}%)
+            </span>
           </div>
           <div className="workspace-save-pill hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-mono text-muted bg-surface-subtle border border-border">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald inline-block" />
@@ -887,7 +930,11 @@ export function CyberMissionHeader({
         </div>
 
         {/* Challenge Selector Pills */}
-        <div className="challenge-jump-pills" role="tablist" aria-label="Challenge selector">
+        <div
+          className="challenge-jump-pills"
+          role="tablist"
+          aria-label="Challenge selector"
+        >
           {Array.from({ length: totalInMission }, (_, idx) => {
             const isCurrent = idx === challengeIndex;
             const targetId = missionIds[idx];
@@ -973,14 +1020,21 @@ export function CyberMissionsPanel({
         </div>
 
         <div className="missions-panel-meta">
-          <span className="missions-panel-progress-pill font-mono" title="Total Scenarios Completed">
+          <span
+            className="missions-panel-progress-pill font-mono"
+            title="Total Scenarios Completed"
+          >
             {overallCompleted} / {totalOverall}
           </span>
           <button
             type="button"
             className="missions-panel-toggle-btn"
             onClick={() => setIsExpanded(!isExpanded)}
-            aria-label={isExpanded ? "Collapse 4 Cyber Missions tracker" : "Expand 4 Cyber Missions tracker"}
+            aria-label={
+              isExpanded
+                ? "Collapse 4 Cyber Missions tracker"
+                : "Expand 4 Cyber Missions tracker"
+            }
             title={isExpanded ? "Collapse tracker" : "Expand tracker"}
           >
             <ChevronDown
@@ -994,10 +1048,16 @@ export function CyberMissionsPanel({
 
       {/* Expanded List of 4 Cyber Missions */}
       {isExpanded ? (
-        <div className="cyber-missions-nav-list" role="list" aria-label="Cyber Missions List">
+        <div
+          className="cyber-missions-nav-list"
+          role="list"
+          aria-label="Cyber Missions List"
+        >
           {activeMissionList.map((m, index) => {
             const isCurrent = m.id === currentMissionId;
-            const completedCount = m.ids.filter((id) => completedScenarioIds.includes(id)).length;
+            const completedCount = m.ids.filter((id) =>
+              completedScenarioIds.includes(id),
+            ).length;
             const totalCount = m.ids.length;
             const isDone = completedCount >= totalCount;
             const percent = Math.round((completedCount / totalCount) * 100);
@@ -1006,7 +1066,9 @@ export function CyberMissionsPanel({
               <>
                 <div className="mission-item-header">
                   <div className="mission-item-left">
-                    <span className={`mission-iv-tag iv-tag-${m.iv.toLowerCase()}`}>
+                    <span
+                      className={`mission-iv-tag iv-tag-${m.iv.toLowerCase()}`}
+                    >
                       {m.iv}
                     </span>
                     <span className="mission-item-name">
@@ -1075,10 +1137,16 @@ export function CyberMissionsPanel({
         </div>
       ) : (
         /* Collapsed Compact Pills */
-        <div className="cyber-missions-compact-row" role="list" aria-label="Cyber Missions Compact">
+        <div
+          className="cyber-missions-compact-row"
+          role="list"
+          aria-label="Cyber Missions Compact"
+        >
           {activeMissionList.map((m) => {
             const isCurrent = m.id === currentMissionId;
-            const completedCount = m.ids.filter((id) => completedScenarioIds.includes(id)).length;
+            const completedCount = m.ids.filter((id) =>
+              completedScenarioIds.includes(id),
+            ).length;
             const isDone = completedCount >= m.ids.length;
 
             return (
@@ -1095,7 +1163,9 @@ export function CyberMissionsPanel({
                 {isDone ? (
                   <Check size={11} strokeWidth={3} className="text-emerald" />
                 ) : (
-                  <span className="text-[11px] opacity-80">{completedCount}/5</span>
+                  <span className="text-[11px] opacity-80">
+                    {completedCount}/5
+                  </span>
                 )}
               </button>
             );
@@ -1126,7 +1196,9 @@ export function ScenarioIntroduction({ introText }: ScenarioIntroductionProps) {
           <Compass size={14} className="text-primary" aria-hidden="true" />
           <span>SCENARIO BRIEFING</span>
         </div>
-        <span className="scenario-intro-hint">Inspect the communication below before deciding</span>
+        <span className="scenario-intro-hint">
+          Inspect the communication below before deciding
+        </span>
       </div>
       <p className="scenario-intro-text">{introText}</p>
     </section>
@@ -1148,10 +1220,15 @@ interface UniversityEmailSimulatorProps {
 // -------------------------------------------------------------------------
 // 1. SMARTPHONE VOICE CALL & VISHING SIMULATOR (CALL TYPE)
 // -------------------------------------------------------------------------
-export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadata }) {
+export function SmartphoneCallSimulator({
+  emailData,
+}: {
+  emailData: EmailMetadata;
+}) {
   const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
   const [linkHovered, setLinkHovered] = useState<boolean>(false);
-  const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
+  const [attachmentModalOpen, setAttachmentModalOpen] =
+    useState<boolean>(false);
 
   return (
     <section
@@ -1170,7 +1247,9 @@ export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadat
         {/* Live Call Telemetry Badge */}
         <div className="call-status-pill">
           <span className="call-pulse-green" aria-hidden="true" />
-          <span className="font-mono">{emailData.callStatus || "Call Connected · 00:48"}</span>
+          <span className="font-mono">
+            {emailData.callStatus || "Call Connected · 00:48"}
+          </span>
         </div>
 
         <div className="call-sim-time font-mono">
@@ -1191,13 +1270,17 @@ export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadat
         <div className="call-caller-meta">
           <span className="call-type-badge">
             <Radio size={12} className="text-amber" aria-hidden="true" />
-            <span>{emailData.channelTitle || "INCOMING VOICE CALL (VISHING)"}</span>
+            <span>
+              {emailData.channelTitle || "INCOMING VOICE CALL (VISHING)"}
+            </span>
           </span>
           <h2 className="call-display-name">{emailData.senderName}</h2>
           <div className="call-phone-number font-mono">
             {emailData.phoneNumber || "+94 11 234 5678"}
           </div>
-          <span className="call-dept-tag text-muted">{emailData.department}</span>
+          <span className="call-dept-tag text-muted">
+            {emailData.department}
+          </span>
         </div>
 
         {/* Expandable Telecom & Caller ID Header Inspector */}
@@ -1209,7 +1292,11 @@ export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadat
           aria-label="Inspect Telecom Routing & Caller ID Spoofing Headers"
         >
           <Info size={13} aria-hidden="true" />
-          <span>{headersExpanded ? "Hide Caller ID Telemetry" : "Inspect Caller ID Telemetry"}</span>
+          <span>
+            {headersExpanded
+              ? "Hide Caller ID Telemetry"
+              : "Inspect Caller ID Telemetry"}
+          </span>
           <ChevronDown
             size={13}
             className={`chevron-icon transition-transform ${headersExpanded ? "rotate-180" : ""}`}
@@ -1220,13 +1307,17 @@ export function SmartphoneCallSimulator({ emailData }: { emailData: EmailMetadat
 
       {/* Expandable Telecom Inspection Drawer */}
       {headersExpanded && (
-        <div className="call-telecom-headers-drawer" role="region" aria-label="Telecom & VoIP Route Inspection">
+        <div
+          className="call-telecom-headers-drawer"
+          role="region"
+          aria-label="Telecom & VoIP Route Inspection"
+        >
           <div className="rfc-header-title">
             <ShieldAlert size={13} className="text-amber" aria-hidden="true" />
             <span>VoIP Gateway &amp; Caller ID Spoofing Telemetry</span>
           </div>
           <pre className="rfc-code-block font-mono">
-{`Inbound-Caller-ID: ${emailData.phoneNumber || "+94 11 234 5678"} (Purported Campus Line)
+            {`Inbound-Caller-ID: ${emailData.phoneNumber || "+94 11 234 5678"} (Purported Campus Line)
 Originating-SIP-Trunk: sip:relay@${emailData.rfcHeaders.dkimDomain}
 VoIP-Gateway-IP: [${emailData.rfcHeaders.originatingIp}]
 CLI-Spoofing-Risk: HIGH · Caller ID unauthenticated by originating carrier
@@ -1237,13 +1328,23 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
       )}
 
       {/* Live Audio Waveform Animation */}
-      <div className="call-audio-visualizer-container" aria-label="Audio Stream Waveform">
+      <div
+        className="call-audio-visualizer-container"
+        aria-label="Audio Stream Waveform"
+      >
         <div className="audio-live-tag">
-          <Volume2 size={13} className="text-cyan animate-pulse" aria-hidden="true" />
+          <Volume2
+            size={13}
+            className="text-cyan animate-pulse"
+            aria-hidden="true"
+          />
           <span>LIVE AUDIO WAVEFORM</span>
         </div>
         <div className="waveform-bars-row" aria-hidden="true">
-          {[40, 75, 55, 90, 60, 30, 85, 100, 65, 45, 95, 70, 80, 50, 88, 62, 40, 75, 90, 55].map((h, i) => (
+          {[
+            40, 75, 55, 90, 60, 30, 85, 100, 65, 45, 95, 70, 80, 50, 88, 62, 40,
+            75, 90, 55,
+          ].map((h, i) => (
             <span
               key={i}
               className="waveform-bar"
@@ -1263,17 +1364,26 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
           <strong>Caller Audio Transcript:</strong>
         </div>
         <div className="transcript-body">
-          {(emailData.callAudioTranscript || emailData.bodyParagraphs).map((paragraph, pIdx) => (
-            <p key={pIdx} className="call-transcript-p">
-              &ldquo;{paragraph.replace(/^Dear (Student|Candidate|Undergraduate)[,\.]?\s*/i, "")}&rdquo;
-            </p>
-          ))}
+          {(emailData.callAudioTranscript || emailData.bodyParagraphs).map(
+            (paragraph, pIdx) => (
+              <p key={pIdx} className="call-transcript-p">
+                &ldquo;
+                {paragraph.replace(
+                  /^Dear (Student|Candidate|Undergraduate)[,\.]?\s*/i,
+                  "",
+                )}
+                &rdquo;
+              </p>
+            ),
+          )}
         </div>
 
         {/* Action Link Demand if caller directed user to a website */}
         {emailData.linkCta && (
           <div className="call-action-link-box">
-            <span className="link-intro-label">Link mentioned by caller during phone call:</span>
+            <span className="link-intro-label">
+              Link mentioned by caller during phone call:
+            </span>
             <div className="link-button-wrapper">
               <button
                 type="button"
@@ -1291,25 +1401,36 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
             {linkHovered && (
               <div className="safe-link-inspection-tooltip" role="tooltip">
                 <div className="tooltip-head">
-                  <ShieldCheck size={13} className="text-primary" aria-hidden="true" />
+                  <ShieldCheck
+                    size={13}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
                   <strong>Simulated Link Destination (Safe Inspection)</strong>
                 </div>
                 <div className="tooltip-row">
                   <span className="tooltip-key">Full Destination URL:</span>
-                  <code className="tooltip-url font-mono">{emailData.linkCta.destinationUrl}</code>
+                  <code className="tooltip-url font-mono">
+                    {emailData.linkCta.destinationUrl}
+                  </code>
                 </div>
                 <div className="tooltip-row">
                   <span className="tooltip-key">Actual Root Host Domain:</span>
-                  <strong className="tooltip-host text-primary">{emailData.linkCta.hostDomain}</strong>
+                  <strong className="tooltip-host text-primary">
+                    {emailData.linkCta.hostDomain}
+                  </strong>
                 </div>
                 {emailData.linkCta.legitDomain && (
                   <div className="tooltip-row">
                     <span className="tooltip-key">Official Campus Domain:</span>
-                    <strong className="tooltip-legit text-emerald">{emailData.linkCta.legitDomain}</strong>
+                    <strong className="tooltip-legit text-emerald">
+                      {emailData.linkCta.legitDomain}
+                    </strong>
                   </div>
                 )}
                 <small className="tooltip-disclaimer text-muted">
-                  Note: All links remain safely contained inside the Cyber Campus research simulation platform.
+                  Note: All links remain safely contained inside the Cyber
+                  Campus research simulation platform.
                 </small>
               </div>
             )}
@@ -1323,8 +1444,12 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
               <FileText size={24} className="text-amber" aria-hidden="true" />
             </div>
             <div className="attachment-details">
-              <span className="attachment-label">File transferred during call:</span>
-              <strong className="attachment-filename">{emailData.attachment.name}</strong>
+              <span className="attachment-label">
+                File transferred during call:
+              </span>
+              <strong className="attachment-filename">
+                {emailData.attachment.name}
+              </strong>
               <span className="attachment-size text-muted">
                 {emailData.attachment.size} · {emailData.attachment.type}
               </span>
@@ -1364,11 +1489,24 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
 
       {/* Attachment Inspection Modal */}
       {attachmentModalOpen && emailData.attachment && (
-        <div className="modal-backdrop" onClick={() => setAttachmentModalOpen(false)} role="presentation">
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div
+          className="modal-backdrop"
+          onClick={() => setAttachmentModalOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-dialog"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <div className="modal-header">
               <div className="modal-title-group">
-                <AlertTriangle size={18} className="text-amber" aria-hidden="true" />
+                <AlertTriangle
+                  size={18}
+                  className="text-amber"
+                  aria-hidden="true"
+                />
                 <h3 className="modal-title">File Security Inspection</h3>
               </div>
               <button
@@ -1383,7 +1521,9 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
             <div className="modal-body font-mono text-sm">
               <div className="grid gap-2">
                 <div>
-                  <span className="text-muted text-xs block">Reported File Name:</span>
+                  <span className="text-muted text-xs block">
+                    Reported File Name:
+                  </span>
                   <strong>{emailData.attachment.name}</strong>
                 </div>
                 <div>
@@ -1391,12 +1531,20 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
                   <strong>{emailData.attachment.size}</strong>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">True Detected File Format:</span>
-                  <code className="text-primary font-mono">{emailData.attachment.type}</code>
+                  <span className="text-muted text-xs block">
+                    True Detected File Format:
+                  </span>
+                  <code className="text-primary font-mono">
+                    {emailData.attachment.type}
+                  </code>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">Security Sandbox Status:</span>
-                  <strong className="text-emerald">Safely Quarantined in Research Sandbox</strong>
+                  <span className="text-muted text-xs block">
+                    Security Sandbox Status:
+                  </span>
+                  <strong className="text-emerald">
+                    Safely Quarantined in Research Sandbox
+                  </strong>
                 </div>
               </div>
               <div className="modal-dialog-footer mt-4 text-right">
@@ -1419,10 +1567,15 @@ Call-Session-ID: ${emailData.rfcHeaders.messageId}`}
 // -------------------------------------------------------------------------
 // 2. MOBILE MESSAGE / SMS / CHAT SIMULATOR (MSG TYPE)
 // -------------------------------------------------------------------------
-export function MobileMessageSimulator({ emailData }: { emailData: EmailMetadata }) {
+export function MobileMessageSimulator({
+  emailData,
+}: {
+  emailData: EmailMetadata;
+}) {
   const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
   const [linkHovered, setLinkHovered] = useState<boolean>(false);
-  const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
+  const [attachmentModalOpen, setAttachmentModalOpen] =
+    useState<boolean>(false);
 
   return (
     <section
@@ -1474,13 +1627,17 @@ export function MobileMessageSimulator({ emailData }: { emailData: EmailMetadata
 
       {/* Expandable SMS / Telecom Route Drawer */}
       {headersExpanded && (
-        <div className="msg-route-headers-drawer" role="region" aria-label="SMS Routing & Gateway Telemetry">
+        <div
+          className="msg-route-headers-drawer"
+          role="region"
+          aria-label="SMS Routing & Gateway Telemetry"
+        >
           <div className="rfc-header-title">
             <Shield size={13} className="text-primary" aria-hidden="true" />
             <span>SMS Gateway &amp; Originating Route Telemetry</span>
           </div>
           <pre className="rfc-code-block font-mono">
-{`Sender-Number: ${emailData.phoneNumber || emailData.senderEmail}
+            {`Sender-Number: ${emailData.phoneNumber || emailData.senderEmail}
 SMS-Gateway-Trunk: ${emailData.rfcHeaders.returnPath}
 Authentication-Status: ${emailData.rfcHeaders.spfResult}
 Destination-Protocol: SMPP/HTTP Gateway v2.4
@@ -1517,10 +1674,16 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
               <div className="msg-link-preview-box">
                 <div className="msg-link-card-inner">
                   <div className="msg-link-badge">
-                    <ExternalLink size={14} className="text-primary" aria-hidden="true" />
+                    <ExternalLink
+                      size={14}
+                      className="text-primary"
+                      aria-hidden="true"
+                    />
                     <span>Attached Link Destination</span>
                   </div>
-                  <div className="msg-link-url font-mono">{emailData.linkCta.destinationUrl}</div>
+                  <div className="msg-link-url font-mono">
+                    {emailData.linkCta.destinationUrl}
+                  </div>
 
                   <button
                     type="button"
@@ -1536,27 +1699,47 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
                 </div>
 
                 {linkHovered && (
-                  <div className="safe-link-inspection-tooltip msg-tooltip" role="tooltip">
+                  <div
+                    className="safe-link-inspection-tooltip msg-tooltip"
+                    role="tooltip"
+                  >
                     <div className="tooltip-head">
-                      <ShieldCheck size={13} className="text-primary" aria-hidden="true" />
-                      <strong>Simulated Link Destination (Safe Inspection)</strong>
+                      <ShieldCheck
+                        size={13}
+                        className="text-primary"
+                        aria-hidden="true"
+                      />
+                      <strong>
+                        Simulated Link Destination (Safe Inspection)
+                      </strong>
                     </div>
                     <div className="tooltip-row">
                       <span className="tooltip-key">Full Destination URL:</span>
-                      <code className="tooltip-url font-mono">{emailData.linkCta.destinationUrl}</code>
+                      <code className="tooltip-url font-mono">
+                        {emailData.linkCta.destinationUrl}
+                      </code>
                     </div>
                     <div className="tooltip-row">
-                      <span className="tooltip-key">Actual Root Host Domain:</span>
-                      <strong className="tooltip-host text-primary">{emailData.linkCta.hostDomain}</strong>
+                      <span className="tooltip-key">
+                        Actual Root Host Domain:
+                      </span>
+                      <strong className="tooltip-host text-primary">
+                        {emailData.linkCta.hostDomain}
+                      </strong>
                     </div>
                     {emailData.linkCta.legitDomain && (
                       <div className="tooltip-row">
-                        <span className="tooltip-key">Official Campus Domain:</span>
-                        <strong className="tooltip-legit text-emerald">{emailData.linkCta.legitDomain}</strong>
+                        <span className="tooltip-key">
+                          Official Campus Domain:
+                        </span>
+                        <strong className="tooltip-legit text-emerald">
+                          {emailData.linkCta.legitDomain}
+                        </strong>
                       </div>
                     )}
                     <small className="tooltip-disclaimer text-muted">
-                      Note: All links remain safely contained inside the Cyber Campus research simulation platform.
+                      Note: All links remain safely contained inside the Cyber
+                      Campus research simulation platform.
                     </small>
                   </div>
                 )}
@@ -1567,10 +1750,16 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
             {emailData.attachment && (
               <div className="msg-attachment-box">
                 <div className="attachment-icon-tile">
-                  <FileText size={24} className="text-amber" aria-hidden="true" />
+                  <FileText
+                    size={24}
+                    className="text-amber"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="attachment-details">
-                  <strong className="attachment-filename">{emailData.attachment.name}</strong>
+                  <strong className="attachment-filename">
+                    {emailData.attachment.name}
+                  </strong>
                   <span className="attachment-size text-muted">
                     {emailData.attachment.size} · {emailData.attachment.type}
                   </span>
@@ -1589,7 +1778,9 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
 
             {/* Message Delivery Checkmarks */}
             <div className="msg-meta-footer" aria-hidden="true">
-              <span className="msg-time-pill">{emailData.timestamp.split(",")[1] || emailData.timestamp}</span>
+              <span className="msg-time-pill">
+                {emailData.timestamp.split(",")[1] || emailData.timestamp}
+              </span>
               <CheckCheck size={14} className="text-primary" />
             </div>
           </div>
@@ -1602,7 +1793,9 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
           <Paperclip size={18} className="text-muted" />
         </div>
         <div className="msg-input-fake-field">
-          <span className="placeholder-text">Select investigation response on right console...</span>
+          <span className="placeholder-text">
+            Select investigation response on right console...
+          </span>
         </div>
         <div className="msg-send-action-btn">
           <Send size={15} />
@@ -1611,11 +1804,24 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
 
       {/* Attachment Inspection Modal */}
       {attachmentModalOpen && emailData.attachment && (
-        <div className="modal-backdrop" onClick={() => setAttachmentModalOpen(false)} role="presentation">
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div
+          className="modal-backdrop"
+          onClick={() => setAttachmentModalOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-dialog"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
             <div className="modal-header">
               <div className="modal-title-group">
-                <AlertTriangle size={18} className="text-amber" aria-hidden="true" />
+                <AlertTriangle
+                  size={18}
+                  className="text-amber"
+                  aria-hidden="true"
+                />
                 <h3 className="modal-title">File Security Inspection</h3>
               </div>
               <button
@@ -1630,7 +1836,9 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
             <div className="modal-body font-mono text-sm">
               <div className="modal-meta-grid">
                 <div>
-                  <span className="text-muted text-xs block">Reported File Name:</span>
+                  <span className="text-muted text-xs block">
+                    Reported File Name:
+                  </span>
                   <strong>{emailData.attachment.name}</strong>
                 </div>
                 <div>
@@ -1638,12 +1846,20 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
                   <strong>{emailData.attachment.size}</strong>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">True Detected File Format:</span>
-                  <code className="text-primary font-mono">{emailData.attachment.type}</code>
+                  <span className="text-muted text-xs block">
+                    True Detected File Format:
+                  </span>
+                  <code className="text-primary font-mono">
+                    {emailData.attachment.type}
+                  </code>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">Security Sandbox Status:</span>
-                  <strong className="text-emerald">Safely Quarantined in Research Sandbox</strong>
+                  <span className="text-muted text-xs block">
+                    Security Sandbox Status:
+                  </span>
+                  <strong className="text-emerald">
+                    Safely Quarantined in Research Sandbox
+                  </strong>
                 </div>
               </div>
               <div className="modal-dialog-footer mt-4 text-right">
@@ -1669,7 +1885,8 @@ Carrier-Message-ID: ${emailData.rfcHeaders.messageId}`}
 export function WebmailSimulator({ emailData }: { emailData: EmailMetadata }) {
   const [headersExpanded, setHeadersExpanded] = useState<boolean>(false);
   const [linkHovered, setLinkHovered] = useState<boolean>(false);
-  const [attachmentModalOpen, setAttachmentModalOpen] = useState<boolean>(false);
+  const [attachmentModalOpen, setAttachmentModalOpen] =
+    useState<boolean>(false);
 
   return (
     <section
@@ -1714,12 +1931,18 @@ export function WebmailSimulator({ emailData }: { emailData: EmailMetadata }) {
           {/* Sender & Recipient Information */}
           <div className="email-sender-info">
             <div className="sender-primary-line">
-              <strong className="sender-display-name">{emailData.senderName}</strong>
-              <code className="sender-address-code">&lt;{emailData.senderEmail}&gt;</code>
+              <strong className="sender-display-name">
+                {emailData.senderName}
+              </strong>
+              <code className="sender-address-code">
+                &lt;{emailData.senderEmail}&gt;
+              </code>
             </div>
             <div className="sender-recipient-line">
               <span className="recipient-label">To:</span>
-              <span className="recipient-address font-mono">{emailData.recipient}</span>
+              <span className="recipient-address font-mono">
+                {emailData.recipient}
+              </span>
               <span className="dept-tag">{emailData.department}</span>
             </div>
           </div>
@@ -1733,7 +1956,9 @@ export function WebmailSimulator({ emailData }: { emailData: EmailMetadata }) {
             aria-label="Inspect Email RFC Security Headers"
           >
             <Info size={13} aria-hidden="true" />
-            <span>{headersExpanded ? "Hide RFC Headers" : "Inspect Headers"}</span>
+            <span>
+              {headersExpanded ? "Hide RFC Headers" : "Inspect Headers"}
+            </span>
             <ChevronDown
               size={13}
               className={`chevron-icon transition-transform ${
@@ -1746,13 +1971,17 @@ export function WebmailSimulator({ emailData }: { emailData: EmailMetadata }) {
 
         {/* Expandable RFC Header Drawer */}
         {headersExpanded && (
-          <div className="email-rfc-headers-drawer" role="region" aria-label="RFC Security Headers">
+          <div
+            className="email-rfc-headers-drawer"
+            role="region"
+            aria-label="RFC Security Headers"
+          >
             <div className="rfc-header-title">
               <Shield size={13} className="text-primary" aria-hidden="true" />
               <span>Envelope &amp; Authentication Results</span>
             </div>
             <pre className="rfc-code-block font-mono">
-{`Return-Path: ${emailData.rfcHeaders.returnPath}
+              {`Return-Path: ${emailData.rfcHeaders.returnPath}
 Authentication-Results: ${emailData.rfcHeaders.spfResult}
 DKIM-Signature: v=1; a=rsa-sha256; d=${emailData.rfcHeaders.dkimDomain}; s=mail
 X-Originating-IP: [${emailData.rfcHeaders.originatingIp}]
@@ -1784,7 +2013,9 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
               <FileText size={24} className="text-amber" aria-hidden="true" />
             </div>
             <div className="attachment-details">
-              <strong className="attachment-filename">{emailData.attachment.name}</strong>
+              <strong className="attachment-filename">
+                {emailData.attachment.name}
+              </strong>
               <span className="attachment-size text-muted">
                 {emailData.attachment.size} · {emailData.attachment.type}
               </span>
@@ -1823,7 +2054,11 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
             {linkHovered && (
               <div className="safe-link-inspection-tooltip" role="tooltip">
                 <div className="tooltip-head">
-                  <ShieldCheck size={13} className="text-primary" aria-hidden="true" />
+                  <ShieldCheck
+                    size={13}
+                    className="text-primary"
+                    aria-hidden="true"
+                  />
                   <strong>Simulated Link Destination (Safe Inspection)</strong>
                 </div>
                 <div className="tooltip-row">
@@ -1847,7 +2082,8 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
                   </div>
                 )}
                 <small className="tooltip-disclaimer text-muted">
-                  Note: All links remain safely contained inside the Cyber Campus research simulation platform.
+                  Note: All links remain safely contained inside the Cyber
+                  Campus research simulation platform.
                 </small>
               </div>
             )}
@@ -1862,7 +2098,8 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
           </p>
           <p className="signoff-dept text-muted">{emailData.department}</p>
           <p className="signoff-disclaimer text-xs text-muted mt-2 border-t pt-2">
-            This simulated message is delivered for the Cyber Campus academic research study.
+            This simulated message is delivered for the Cyber Campus academic
+            research study.
           </p>
         </div>
       </div>
@@ -1898,7 +2135,9 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
             <div className="modal-body">
               <div className="modal-meta-grid">
                 <div>
-                  <span className="text-muted text-xs block">Reported File Name:</span>
+                  <span className="text-muted text-xs block">
+                    Reported File Name:
+                  </span>
                   <strong>{emailData.attachment.name}</strong>
                 </div>
                 <div>
@@ -1906,12 +2145,20 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
                   <strong>{emailData.attachment.size}</strong>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">True Detected File Format:</span>
-                  <code className="text-primary font-mono">{emailData.attachment.type}</code>
+                  <span className="text-muted text-xs block">
+                    True Detected File Format:
+                  </span>
+                  <code className="text-primary font-mono">
+                    {emailData.attachment.type}
+                  </code>
                 </div>
                 <div>
-                  <span className="text-muted text-xs block">Security Sandbox Status:</span>
-                  <strong className="text-emerald">Safely Quarantined in Research Sandbox</strong>
+                  <span className="text-muted text-xs block">
+                    Security Sandbox Status:
+                  </span>
+                  <strong className="text-emerald">
+                    Safely Quarantined in Research Sandbox
+                  </strong>
                 </div>
               </div>
               <div className="modal-dialog-footer mt-4 text-right">
@@ -1934,7 +2181,9 @@ X-Mailer: Campus Webmail Gateway v4.8 (SSL/TLS Active)`}
 // -------------------------------------------------------------------------
 // 4. UNIFIED COMMUNICATION SIMULATOR SWITCHER
 // -------------------------------------------------------------------------
-export function UniversityEmailSimulator({ emailData }: UniversityEmailSimulatorProps) {
+export function UniversityEmailSimulator({
+  emailData,
+}: UniversityEmailSimulatorProps) {
   if (emailData.communicationType === "call") {
     return <SmartphoneCallSimulator emailData={emailData} />;
   }
@@ -1998,18 +2247,18 @@ export function ActionSelectionGroup({
               role="radio"
               aria-checked={isSelected}
               disabled={disabled}
-              className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 ${
+              className={`interactive-action-card w-full text-left p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer ${
                 isSelected
-                  ? "selected border-[#21434a] ring-2 ring-[#21434a]/15 bg-[#21434a]/5"
+                  ? "selected border-indigo-600 dark:border-indigo-400 ring-2 ring-indigo-600/20 dark:ring-indigo-400/25 bg-indigo-50/70 dark:bg-indigo-950/30"
                   : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
               }`}
               onClick={() => onSelectChoice(choice.id)}
             >
               {/* Option Letter Badge (A, B, C, D) */}
               <div
-                className={`action-letter-badge w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 ${
+                className={`action-letter-badge w-7 h-7 rounded-md border font-semibold text-xs flex items-center justify-center shrink-0 transition-colors ${
                   isSelected
-                    ? "bg-[#21434a] text-white border-[#21434a]"
+                    ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white border-indigo-600 dark:border-indigo-500 shadow-xs"
                     : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                 }`}
                 aria-hidden="true"
@@ -2058,9 +2307,16 @@ export function NextChallengeButton({
     <div className="next-challenge-controls-panel space-y-2 pt-2">
       {/* Friendly Error Banner with Retry */}
       {error && (
-        <div className="challenge-error-alert p-2.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-700 flex items-center justify-between" role="alert">
+        <div
+          className="challenge-error-alert p-2.5 rounded-xl border border-red-200 bg-red-50 text-xs text-red-700 flex items-center justify-between"
+          role="alert"
+        >
           <div className="error-alert-text flex items-center gap-1.5">
-            <AlertCircle size={15} className="text-red shrink-0" aria-hidden="true" />
+            <AlertCircle
+              size={15}
+              className="text-red shrink-0"
+              aria-hidden="true"
+            />
             <span>{error}</span>
           </div>
           <button
@@ -2077,10 +2333,10 @@ export function NextChallengeButton({
       {/* Primary Action Button: Lock decision & continue */}
       <button
         type="button"
-        className={`w-full py-3.5 px-4 rounded-xl font-medium text-sm text-white flex items-center justify-center gap-2 transition-all shadow-sm ${
+        className={`group w-full py-3.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
           !hasSelectedAnswer || isSubmitting
-            ? "bg-[#97abad] cursor-not-allowed opacity-80"
-            : "bg-[#708a8e] hover:bg-[#21434a] cursor-pointer"
+            ? "bg-slate-100 hover:bg-slate-100 text-slate-400 dark:bg-slate-800/80 dark:hover:bg-slate-800/80 dark:text-slate-500 border border-slate-200 dark:border-slate-700/70 cursor-not-allowed shadow-none"
+            : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 dark:text-white shadow-md shadow-indigo-600/25 hover:shadow-lg hover:shadow-indigo-600/35 active:scale-[0.99] cursor-pointer border border-transparent"
         }`}
         disabled={!hasSelectedAnswer || isSubmitting}
         onClick={onAdvance}
@@ -2088,19 +2344,30 @@ export function NextChallengeButton({
       >
         {isSubmitting ? (
           <>
-            <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+            <Loader2
+              size={16}
+              className="animate-spin shrink-0"
+              aria-hidden="true"
+            />
             <span>Locking decision…</span>
           </>
         ) : (
           <>
             <span>Lock decision &amp; continue</span>
-            <ArrowRight size={16} aria-hidden="true" />
+            <ArrowRight
+              size={16}
+              className={`shrink-0 transition-transform ${
+                hasSelectedAnswer ? "group-hover:translate-x-0.5" : "opacity-60"
+              }`}
+              aria-hidden="true"
+            />
           </>
         )}
       </button>
 
       <p className="text-[11px] text-center text-slate-400 mt-2 leading-normal">
-        Your actual choice is recorded. Explanations appear after final submission.
+        Your actual choice is recorded. Explanations appear after final
+        submission.
       </p>
     </div>
   );
