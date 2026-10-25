@@ -347,8 +347,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     if (path === "session/start") {
       const parsed = startSchema.parse(body);
       const clientLastCode =
-        typeof body?.clientLastCode === "string" || typeof body?.clientLastCode === "number"
-          ? body.clientLastCode
+        typeof parsed.clientLastCode === "string" || typeof parsed.clientLastCode === "number"
+          ? parsed.clientLastCode
           : undefined;
       return json({ session: await startSession({ ...parsed, clientLastCode }) });
     }

@@ -62,6 +62,7 @@ export const startSchema = z
     priorExposure: z.boolean(),
     practice: z.boolean(),
     token: z.string().regex(/^[a-f0-9]{64}$/),
+    clientLastCode: z.union([z.string(), z.number()]).nullish(),
   })
   .strict()
   .refine(

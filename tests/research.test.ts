@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { questions, sections } from "@/content/questionnaire";
 import original from "./fixtures/questionnaire.json";
-import { blankAnswers, answersSchema } from "@/lib/validation";
+import { blankAnswers, answersSchema, startSchema } from "@/lib/validation";
 import { filterSessions, aggregateQuestion } from "@/lib/analytics";
 import { scoreDecision, scoreSummary } from "@/lib/scoring";
 import { exportCsv, csvCell } from "@/lib/csv";
@@ -54,6 +54,20 @@ describe("authoritative research instrument", () => {
     delete a.Q26;
     a.Q2 = { value: 5, status: "answered" };
     expect(answersSchema.safeParse(a).success).toBe(false);
+  });
+  it("validates startSchema with clientLastCode as string, number, null, or undefined", () => {
+    const base = {
+      consented: true,
+      eligible: true,
+      priorExposure: false,
+      practice: false,
+      token: "a".repeat(64),
+    };
+    expect(startSchema.safeParse({ ...base, clientLastCode: null }).success).toBe(true);
+    expect(startSchema.safeParse({ ...base, clientLastCode: "001" }).success).toBe(true);
+    expect(startSchema.safeParse({ ...base, clientLastCode: 10 }).success).toBe(true);
+    expect(startSchema.safeParse(base).success).toBe(true);
+    expect(startSchema.safeParse({ ...base, unknownField: true }).success).toBe(false);
   });
 });
 describe("descriptive statistics and filters", () => {
