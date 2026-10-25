@@ -38,7 +38,7 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
       try {
         const raw0 = await readFile(subPath, "utf-8");
         const list0: Session[] = JSON.parse(raw0);
-        cleaned = list0.filter((s) => s.code === "001");
+        cleaned = list0.filter((s) => s.code === "01");
       } catch {}
 
       if (cleaned.length === 0) {
@@ -47,7 +47,7 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
             id: "test-rec-001",
             submissionId: "test-rec-001",
             participantId: "PART-001",
-            code: "001",
+            code: "01",
             mode: "demo",
             status: "submitted_complete",
             createdAt: "2026-10-22T08:00:00.000Z",
@@ -84,11 +84,11 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
     } catch {}
   });
 
-  it("assigns sequential Anonymous IDs: 001 -> 002 -> 003 -> 004 and records all in research area", async () => {
-    // 1. Verify 001 exists as the base record
+  it("assigns sequential Anonymous IDs: 01 -> 02 -> 03 -> 04 and records all in research area", async () => {
+    // 1. Verify 01 exists as the base record
     const raw0 = await readFile(subPath, "utf-8");
     const list0: Session[] = JSON.parse(raw0);
-    const sub001 = list0.find((s) => s.code === "001");
+    const sub001 = list0.find((s) => s.code === "01");
     expect(sub001).toBeDefined();
 
     // 2. User 2 joins research
@@ -101,15 +101,15 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
       token: "2".repeat(64),
     });
 
-    expect(session2.code).toBe("002");
+    expect(session2.code).toBe("02");
     expect(session2.status).toBe("draft");
 
     // Verify User 2 is immediately recorded in research submissions
     const rawSubs2 = await readFile(subPath, "utf-8");
     const listSubs2: Session[] = JSON.parse(rawSubs2);
-    const recorded2 = listSubs2.find((s) => s.code === "002");
+    const recorded2 = listSubs2.find((s) => s.code === "02");
     expect(recorded2).toBeDefined();
-    expect(recorded2?.code).toBe("002");
+    expect(recorded2?.code).toBe("02");
     expect(recorded2?.status).toBe("draft");
 
     // 3. User 2 saves draft demographic answers
@@ -120,14 +120,14 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
 
     const rawAfterDraft2 = await readFile(subPath, "utf-8");
     const listAfterDraft2: Session[] = JSON.parse(rawAfterDraft2);
-    const draft2 = listAfterDraft2.find((s) => s.code === "002");
+    const draft2 = listAfterDraft2.find((s) => s.code === "02");
     expect(draft2?.answers.Q1?.value).toBe(1);
     expect(draft2?.answers.Q2?.value).toBe(2);
 
     // 4. User 2 submits baseline
     await submitBaseline(answers2, "idemp-002-baseline");
     const subsAfterSubmit2 = await getDemoSubmissions();
-    const sub2Submitted = subsAfterSubmit2.find((s) => s.code === "002");
+    const sub2Submitted = subsAfterSubmit2.find((s) => s.code === "02");
     expect(sub2Submitted?.status).toBe("submitted_with_missing");
 
     // 5. User 3 joins research
@@ -140,14 +140,14 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
       token: "3".repeat(64),
     });
 
-    expect(session3.code).toBe("003");
+    expect(session3.code).toBe("03");
     expect(session3.status).toBe("draft");
 
     // Verify User 3 is immediately recorded in research area
     const subsAfter3 = await getDemoSubmissions();
-    const recorded3 = subsAfter3.find((s) => s.code === "003");
+    const recorded3 = subsAfter3.find((s) => s.code === "03");
     expect(recorded3).toBeDefined();
-    expect(recorded3?.code).toBe("003");
+    expect(recorded3?.code).toBe("03");
 
     // 6. User 4 joins research
     cookieStore.clear();
@@ -159,20 +159,20 @@ describe("Sequential Anonymous ID & Research Area Recording", () => {
       token: "4".repeat(64),
     });
 
-    expect(session4.code).toBe("004");
+    expect(session4.code).toBe("04");
     expect(session4.status).toBe("draft");
 
     // Verify User 4 is immediately recorded in research area
     const subsAfter4 = await getDemoSubmissions();
-    const recorded4 = subsAfter4.find((s) => s.code === "004");
+    const recorded4 = subsAfter4.find((s) => s.code === "04");
     expect(recorded4).toBeDefined();
-    expect(recorded4?.code).toBe("004");
+    expect(recorded4?.code).toBe("04");
 
     // Verify all 4 codes are recorded in order
     const allCodes = subsAfter4.map((s) => s.code);
-    expect(allCodes).toContain("001");
-    expect(allCodes).toContain("002");
-    expect(allCodes).toContain("003");
-    expect(allCodes).toContain("004");
+    expect(allCodes).toContain("01");
+    expect(allCodes).toContain("02");
+    expect(allCodes).toContain("03");
+    expect(allCodes).toContain("04");
   });
 });

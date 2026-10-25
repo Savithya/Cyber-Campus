@@ -52,8 +52,35 @@ let memoryParticipantCounter = 0;
 export async function nextLocalParticipantCode(options?: {
   existingCode?: string | number | null;
   clientHintCode?: string | number | null;
+  resetToStart?: boolean;
 }): Promise<string> {
+  if (options?.resetToStart) {
+    memoryParticipantCounter = 1;
+    globalThis.__CYBER_CAMPUS_COUNTER__ = 1;
+    const counterPayload = JSON.stringify({ counter: 1 });
+    try {
+      await mkdir(getDemoDataDir(), { recursive: true });
+      await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+    } catch {}
+    try {
+      await mkdir(getCwdDataDir(), { recursive: true });
+      await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+    } catch {}
+    try {
+      const jar = await cookies();
+      jar.set("cc_last_code", "01", {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 365 * 86400,
+      });
+    } catch {}
+    return "01";
+  }
+
   let highestCodeFound = 0;
+  let hasRealSubmissions = false;
 
   // 1. Scan bundled seed submissions
   const seedList = await readSubmissionsFromFile(getSeedFilePath());
@@ -61,6 +88,7 @@ export async function nextLocalParticipantCode(options?: {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const n = parseInt(String(s.code).trim(), 10);
       if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+      hasRealSubmissions = true;
     }
   }
 
@@ -70,6 +98,7 @@ export async function nextLocalParticipantCode(options?: {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const n = parseInt(String(s.code).trim(), 10);
       if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+      hasRealSubmissions = true;
     }
   }
 
@@ -79,6 +108,7 @@ export async function nextLocalParticipantCode(options?: {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const n = parseInt(String(s.code).trim(), 10);
       if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+      hasRealSubmissions = true;
     }
   }
 
@@ -88,11 +118,14 @@ export async function nextLocalParticipantCode(options?: {
       if (s.code && /^\d+$/.test(String(s.code).trim())) {
         const n = parseInt(String(s.code).trim(), 10);
         if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+        hasRealSubmissions = true;
       }
     }
   }
 
   // 5. Scan counter files in demo and cwd directories
+  let counterFileSpecified = false;
+  let counterFileVal = 0;
   const counterPaths = [
     path.join(getDemoDataDir(), "participant_counter.json"),
     path.join(getCwdDataDir(), "participant_counter.json"),
@@ -101,47 +134,63 @@ export async function nextLocalParticipantCode(options?: {
     try {
       const raw = await readFile(cp, "utf-8");
       const parsed = JSON.parse(raw);
-      if (typeof parsed?.counter === "number" && parsed.counter > highestCodeFound && parsed.counter < 100000) {
-        highestCodeFound = parsed.counter;
+      if (typeof parsed?.counter === "number" && parsed.counter < 100000) {
+        counterFileSpecified = true;
+        if (parsed.counter > counterFileVal) {
+          counterFileVal = parsed.counter;
+        }
       }
     } catch {}
   }
 
-  // 6. Check global and module memory counters
-  if (globalThis.__CYBER_CAMPUS_COUNTER__ && globalThis.__CYBER_CAMPUS_COUNTER__ > highestCodeFound) {
-    highestCodeFound = globalThis.__CYBER_CAMPUS_COUNTER__;
-  }
-  if (memoryParticipantCounter > highestCodeFound) {
-    highestCodeFound = memoryParticipantCounter;
-  }
-
-  // 7. Check existing code from current session
-  if (options?.existingCode && /^\d+$/.test(String(options.existingCode).trim())) {
-    const n = parseInt(String(options.existingCode).trim(), 10);
-    if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+  if (counterFileSpecified) {
+    if (counterFileVal > highestCodeFound) {
+      highestCodeFound = counterFileVal;
+    } else if (counterFileVal === 0 && !hasRealSubmissions) {
+      highestCodeFound = 0;
+      globalThis.__CYBER_CAMPUS_COUNTER__ = 0;
+      memoryParticipantCounter = 0;
+    }
   }
 
-  // 8. Check client hint code (from browser localStorage)
-  if (options?.clientHintCode && /^\d+$/.test(String(options.clientHintCode).trim())) {
-    const n = parseInt(String(options.clientHintCode).trim(), 10);
-    if (n > highestCodeFound && n < 100000) highestCodeFound = n;
-  }
+  // Only consider memory/client hints if we haven't explicitly reset to 0 with no submissions
+  if (highestCodeFound > 0 || hasRealSubmissions || !counterFileSpecified) {
+    // 6. Check global and module memory counters
+    if (globalThis.__CYBER_CAMPUS_COUNTER__ && globalThis.__CYBER_CAMPUS_COUNTER__ > highestCodeFound) {
+      highestCodeFound = globalThis.__CYBER_CAMPUS_COUNTER__;
+    }
+    if (memoryParticipantCounter > highestCodeFound) {
+      highestCodeFound = memoryParticipantCounter;
+    }
 
-  // 9. Check long-lived cookie cc_last_code
-  try {
-    const jar = await cookies();
-    const lastCodeCookie = jar.get("cc_last_code")?.value;
-    if (lastCodeCookie && /^\d+$/.test(lastCodeCookie.trim())) {
-      const n = parseInt(lastCodeCookie.trim(), 10);
+    // 7. Check existing code from current session
+    if (options?.existingCode && /^\d+$/.test(String(options.existingCode).trim())) {
+      const n = parseInt(String(options.existingCode).trim(), 10);
       if (n > highestCodeFound && n < 100000) highestCodeFound = n;
     }
-  } catch {}
+
+    // 8. Check client hint code (from browser localStorage)
+    if (options?.clientHintCode && /^\d+$/.test(String(options.clientHintCode).trim())) {
+      const n = parseInt(String(options.clientHintCode).trim(), 10);
+      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+    }
+
+    // 9. Check long-lived cookie cc_last_code
+    try {
+      const jar = await cookies();
+      const lastCodeCookie = jar.get("cc_last_code")?.value;
+      if (lastCodeCookie && /^\d+$/.test(lastCodeCookie.trim())) {
+        const n = parseInt(lastCodeCookie.trim(), 10);
+        if (n > highestCodeFound && n < 100000) highestCodeFound = n;
+      }
+    } catch {}
+  }
 
   const nextVal = highestCodeFound + 1;
   memoryParticipantCounter = nextVal;
   globalThis.__CYBER_CAMPUS_COUNTER__ = nextVal;
 
-  const nextCodeStr = String(nextVal).padStart(3, "0");
+  const nextCodeStr = String(nextVal).padStart(2, "0");
 
   // Persist counter to files
   const counterPayload = JSON.stringify({ counter: nextVal });
@@ -374,7 +423,7 @@ export async function getDemoSubmissions(): Promise<Session[]> {
   // 5. Synchronize active local session from cookie if present in current request
   try {
     const local = await readLocal();
-    if (local?.session) {
+    if (local?.session && local.session.mode !== "practice") {
       const active = local.session;
       const k = active.code || active.id;
       const existing = mergedMap.get(k);
@@ -413,12 +462,15 @@ export async function getDemoSubmissions(): Promise<Session[]> {
     await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
   } catch {}
 
-  // 8. Filter out author synthetic fixtures
+  // 8. Filter out mock records and synthetic fixtures
   const filtered = list.filter(
     (s: Session) =>
       !s.id?.includes("synthetic") &&
       !s.submissionId?.includes("synthetic") &&
-      !s.code?.includes("synthetic"),
+      !s.code?.includes("synthetic") &&
+      !s.id?.includes("mock") &&
+      !s.submissionId?.includes("mock") &&
+      s.mode !== "practice",
   );
 
   return filtered;
@@ -497,8 +549,44 @@ async function rpc<T>(
 }
 export async function getSession(): Promise<Session | null> {
   const local = await readLocal();
-  if (local && (!isResearch() || local.session.mode === "practice"))
-    return local.session;
+  if (local && (!isResearch() || local.session.mode === "practice")) {
+    let s = local.session;
+    if (s.code && /^\d+$/.test(String(s.code).trim())) {
+      const num = parseInt(String(s.code).trim(), 10);
+      const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
+      const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
+      let counterIsZero = false;
+      try {
+        const raw = await readFile(path.join(getDemoDataDir(), "participant_counter.json"), "utf-8");
+        const parsed = JSON.parse(raw);
+        if (parsed?.counter === 0) counterIsZero = true;
+      } catch {}
+
+      if (counterIsZero && cwdList.length === 0 && demoList.length === 0 && s.status === "draft") {
+        if (s.code !== "01") {
+          s = { ...s, code: "01" };
+          await writeLocal({ ...local, session: s });
+          try {
+            const jar = await cookies();
+            jar.set("cc_last_code", "01", {
+              httpOnly: false,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "lax",
+              path: "/",
+              maxAge: 365 * 86400,
+            });
+          } catch {}
+        }
+      } else {
+        const normalized = String(num).padStart(2, "0");
+        if (s.code !== normalized) {
+          s = { ...s, code: normalized };
+          await writeLocal({ ...local, session: s });
+        }
+      }
+    }
+    return s;
+  }
   if (!isResearch()) return null;
   const db = await supabase();
   const {
@@ -597,6 +685,7 @@ export async function startSession(input: {
 export async function startNewParticipantSession(input?: {
   token?: string;
   clientLastCode?: string | number;
+  resetToStart?: boolean;
 }): Promise<Session> {
   const existing = await getSession();
   const pid = "PART-" + randomUUID().slice(0, 10).toUpperCase();
@@ -643,8 +732,9 @@ export async function startNewParticipantSession(input?: {
     "links",
   ];
   const nextCode = await nextLocalParticipantCode({
-    existingCode: existing?.code,
-    clientHintCode: input?.clientLastCode,
+    existingCode: input?.resetToStart ? undefined : existing?.code,
+    clientHintCode: input?.resetToStart ? undefined : input?.clientLastCode,
+    resetToStart: input?.resetToStart,
   });
   const session: Session = {
     id: sessionId,
@@ -870,6 +960,10 @@ export async function clearActiveSession() {
     }
   }
   await writeLocal(null);
+  try {
+    const jar = await cookies();
+    jar.delete("cc_last_code");
+  } catch {}
 }
 
 export async function discardDraft() {

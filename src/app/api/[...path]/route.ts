@@ -118,7 +118,10 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           (s) =>
             !s.id?.includes("synthetic") &&
             !s.submissionId?.includes("synthetic") &&
-            !s.code?.includes("synthetic"),
+            !s.code?.includes("synthetic") &&
+            !s.id?.includes("mock") &&
+            !s.submissionId?.includes("mock") &&
+            s.mode !== "practice",
         );
       } else {
         const db = await requireResearcher();
@@ -129,7 +132,10 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           (s) =>
             !s.id?.includes("synthetic") &&
             !s.submissionId?.includes("synthetic") &&
-            !s.code?.includes("synthetic"),
+            !s.code?.includes("synthetic") &&
+            !s.id?.includes("mock") &&
+            !s.submissionId?.includes("mock") &&
+            s.mode !== "practice",
         );
       }
       if (path.endsWith("/data")) return json({ sessions: data });
@@ -362,7 +368,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         typeof body?.clientLastCode === "string" || typeof body?.clientLastCode === "number"
           ? body.clientLastCode
           : undefined;
-      return json({ session: await startNewParticipantSession({ token: clientToken, clientLastCode }) });
+      const resetToStart = Boolean(body?.resetToStart);
+      return json({ session: await startNewParticipantSession({ token: clientToken, clientLastCode, resetToStart }) });
     }
     if (path === "session/clear" || path === "session/reset") {
       await clearActiveSession();

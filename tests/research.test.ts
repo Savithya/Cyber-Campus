@@ -5,7 +5,7 @@ import { blankAnswers, answersSchema, startSchema } from "@/lib/validation";
 import { filterSessions, aggregateQuestion } from "@/lib/analytics";
 import { scoreDecision, scoreSummary } from "@/lib/scoring";
 import { exportCsv, csvCell } from "@/lib/csv";
-import { syntheticSessions } from "@/lib/fixtures.server";
+import { getTestSyntheticSessions as syntheticSessions } from "./fixtures/synthetic-sessions";
 import { scenarios, answerKeys } from "@/content/scenarios.server";
 import { missions } from "@/content/missions";
 describe("authoritative research instrument", () => {

@@ -267,7 +267,8 @@ export default function Admin({
         !s.submissionId?.includes("synthetic") &&
         !s.code?.includes("synthetic") &&
         !s.id?.includes("mock") &&
-        !s.submissionId?.includes("mock"),
+        !s.submissionId?.includes("mock") &&
+        s.mode !== "practice",
     );
   }, [sessions]);
 

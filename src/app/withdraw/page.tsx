@@ -61,7 +61,7 @@ export default function Page() {
               autoComplete="off"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="e.g. 001"
+              placeholder="e.g. 01"
               maxLength={15}
             />
           </label>

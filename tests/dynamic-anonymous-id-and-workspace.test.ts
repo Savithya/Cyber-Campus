@@ -56,7 +56,7 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
       try {
         const raw0 = await readFile(subPath, "utf-8");
         const list0: Session[] = JSON.parse(raw0);
-        cleaned = list0.filter((s) => s.code === "001");
+        cleaned = list0.filter((s) => s.code === "01");
       } catch {}
 
       if (cleaned.length === 0) {
@@ -75,7 +75,7 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
             id: "test-rec-001",
             submissionId: "test-rec-001",
             participantId: "PART-001",
-            code: "001",
+            code: "01",
             mode: "demo",
             status: "submitted_complete",
             createdAt: "2026-10-22T08:00:00.000Z",
@@ -113,15 +113,15 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
   });
 
   it("changes Anonymous ID when user joins research and updates all 9 Research Workspace parts automatically", async () => {
-    // Verify 001 exists as baseline
+    // Verify 01 exists as baseline
     const listBefore = await getDemoSubmissions();
-    expect(listBefore.some((s) => s.code === "001")).toBe(true);
+    expect(listBefore.some((s) => s.code === "01")).toBe(true);
 
-    // 1. User joins research via startNewParticipantSession -> Anonymous ID MUST change from 001 to 002
+    // 1. User joins research via startNewParticipantSession -> Anonymous ID MUST change from 01 to 02
     cookieStore.clear();
     const newParticipant = await startNewParticipantSession();
-    expect(newParticipant.code).not.toBe("001");
-    expect(newParticipant.code).toBe("002");
+    expect(newParticipant.code).not.toBe("01");
+    expect(newParticipant.code).toBe("02");
     expect(newParticipant.status).toBe("draft");
 
     // 2. User completes Demographic Profile (Q1-Q4)
@@ -132,12 +132,12 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
       Q4: { value: 2, status: "answered" }, // Engineering
     };
     const submittedBaseline = await submitBaseline(profileAnswers, "idemp-part002-profile");
-    expect(submittedBaseline.code).toBe("002");
+    expect(submittedBaseline.code).toBe("02");
     expect(submittedBaseline.status).toBe("submitted_complete");
 
-    // Verify Demographics in Research Workspace immediately includes Participant 002
+    // Verify Demographics in Research Workspace immediately includes Participant 02
     const subsAfterDemo = await getDemoSubmissions();
-    const p002InWorkspace = subsAfterDemo.find((s) => s.code === "002");
+    const p002InWorkspace = subsAfterDemo.find((s) => s.code === "02");
     expect(p002InWorkspace).toBeDefined();
     expect(p002InWorkspace?.answers.Q1?.value).toBe(3);
     expect(p002InWorkspace?.answers.Q2?.value).toBe(2);
@@ -158,7 +158,7 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     // Automatically record & sync complete dataset
     const workspaceSync = await recordSessionToWorkspace();
     expect(workspaceSync.ok).toBe(true);
-    expect(workspaceSync.session.code).toBe("002");
+    expect(workspaceSync.session.code).toBe("02");
     expect(workspaceSync.session.attempts.length).toBe(20);
 
     // Verify all 20 derived Likert survey answers (Q6-Q25) were automatically populated from mission attempts
@@ -180,10 +180,10 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     // Part 1: Overview
     const submitted = filterSessions(workspaceSessions, {});
     expect(submitted.length).toBeGreaterThanOrEqual(2);
-    expect(submitted.some((s) => s.code === "002")).toBe(true);
+    expect(submitted.some((s) => s.code === "02")).toBe(true);
 
     // Part 2: Responses Audit
-    const participant002 = submitted.find((s) => s.code === "002");
+    const participant002 = submitted.find((s) => s.code === "02");
     expect(participant002).toBeDefined();
     expect(Object.keys(participant002!.answers).length).toBe(24);
 
@@ -234,15 +234,15 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     const p002Attempts = participant002!.attempts;
     expect(p002Attempts.length).toBe(20);
 
-    // Part 8: Data Export includes 002
-    expect(workspaceSessions.some((s) => s.code === "002")).toBe(true);
+    // Part 8: Data Export includes 02
+    expect(workspaceSessions.some((s) => s.code === "02")).toBe(true);
 
-    // Part 9: Submission History includes 002
-    expect(submitted.some((s) => s.code === "002" && s.status === "submitted_complete")).toBe(true);
+    // Part 9: Submission History includes 02
+    expect(submitted.some((s) => s.code === "02" && s.status === "submitted_complete")).toBe(true);
 
-    // 5. Another user joins research -> Anonymous ID increments to 003
+    // 5. Another user joins research -> Anonymous ID increments to 03
     cookieStore.clear();
     const participant3 = await startNewParticipantSession();
-    expect(participant3.code).toBe("003");
+    expect(participant3.code).toBe("03");
   });
 });

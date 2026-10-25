@@ -20,7 +20,7 @@ import {
   STANDARD_VARIABLES,
   extractVariableValues,
 } from "@/lib/statistics";
-import { syntheticSessions } from "@/lib/fixtures.server";
+import { getTestSyntheticSessions as syntheticSessions } from "./fixtures/synthetic-sessions";
 import {
   exportDescriptiveStatsCsv,
   exportCorrelationMatrixCsv,

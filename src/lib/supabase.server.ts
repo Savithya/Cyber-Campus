@@ -70,7 +70,10 @@ export async function requireResearcher() {
             (s) =>
               !s.id?.includes("synthetic") &&
               !s.submissionId?.includes("synthetic") &&
-              !s.code?.includes("synthetic"),
+              !s.code?.includes("synthetic") &&
+              !s.id?.includes("mock") &&
+              !s.submissionId?.includes("mock") &&
+              s.mode !== "practice",
           );
           return { data: cleanSubs, error: null };
         }

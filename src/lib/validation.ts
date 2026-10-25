@@ -85,7 +85,7 @@ export const attemptSchema = z
 
 export const withdrawalSchema = z
   .object({
-    code: z.string().regex(/^(CC-[A-F0-9]{12}|CC-\d{3,}|\d{3,})$/i),
+    code: z.string().regex(/^(CC-[A-F0-9]{12}|CC-\d{2,}|\d{2,})$/i),
     token: z.string().regex(/^[a-f0-9]{64}$/),
   })
   .strict();

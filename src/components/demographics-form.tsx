@@ -71,6 +71,44 @@ export function DemographicsForm() {
     }
   };
 
+  const handleResetToStart = async () => {
+    setResettingParticipant(true);
+    setError("");
+    setValidationError("");
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("cc_last_participant_code");
+      }
+      clearParticipationStorage();
+      const res = await api<{ session: Session }>("session/new-participant", { resetToStart: true });
+      if (res.session) {
+        if (typeof window !== "undefined" && res.session.code) {
+          localStorage.setItem("cc_last_participant_code", res.session.code);
+        }
+        state.setSession(res.session);
+        putDraft({
+          code: res.session.code,
+          expires: res.session.draftExpiresAt,
+          answers: res.session.answers,
+          token: randomToken(),
+          submitKey: crypto.randomUUID(),
+        });
+        setAnswers({
+          Q1: null,
+          Q2: null,
+          Q3: null,
+          Q4: null,
+        });
+        setSaveStatus("Anonymous participant sequence reset to ID 01");
+      }
+      await state.reload();
+    } catch (e) {
+      setError((e as Error).message || "Failed to reset Anonymous ID. Please retry.");
+    } finally {
+      setResettingParticipant(false);
+    }
+  };
+
   const q1 = questions.find((q) => q.id === "Q1")!;
   const q2 = questions.find((q) => q.id === "Q2")!;
   const q3 = questions.find((q) => q.id === "Q3")!;
@@ -221,7 +259,12 @@ export function DemographicsForm() {
     return <Loading />;
   }
 
-  const participantCode = state.session?.code ?? "ANON";
+  const rawCode = state.session?.code;
+  const participantCode = rawCode
+    ? /^\d+$/.test(rawCode.trim())
+      ? String(parseInt(rawCode.trim(), 10)).padStart(2, "0")
+      : rawCode
+    : "01";
 
   return (
     <ResearchJourneyFrame
@@ -256,15 +299,26 @@ export function DemographicsForm() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Assigned automatically for non-identifiable research data collection under academic ethics protocol.</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleStartNewParticipant}
-          disabled={resettingParticipant}
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 rounded-lg shadow-2xs transition-colors shrink-0"
-        >
-          <RotateCcw size={14} className={resettingParticipant ? "animate-spin" : ""} aria-hidden="true" />
-          <span>{resettingParticipant ? "Assigning Next ID..." : "Start as Next Participant"}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleStartNewParticipant}
+            disabled={resettingParticipant}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 rounded-lg shadow-2xs transition-colors"
+          >
+            <RotateCcw size={14} className={resettingParticipant ? "animate-spin" : ""} aria-hidden="true" />
+            <span>{resettingParticipant ? "Assigning Next ID..." : "Start as Next Participant"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleResetToStart}
+            disabled={resettingParticipant}
+            title="Reset participant ID sequence back to 01"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:text-emerald-800 dark:hover:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-300 dark:border-emerald-500/40 rounded-lg shadow-2xs transition-colors"
+          >
+            <span>Reset to 01</span>
+          </button>
+        </div>
       </div>
 
       {/* Error Banner */}

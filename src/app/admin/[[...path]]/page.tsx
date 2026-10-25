@@ -21,7 +21,10 @@ export default async function Page({
       (s) =>
         !s.id?.includes("synthetic") &&
         !s.submissionId?.includes("synthetic") &&
-        !s.code?.includes("synthetic"),
+        !s.code?.includes("synthetic") &&
+        !s.id?.includes("mock") &&
+        !s.submissionId?.includes("mock") &&
+        s.mode !== "practice",
     );
   } catch {
     return (

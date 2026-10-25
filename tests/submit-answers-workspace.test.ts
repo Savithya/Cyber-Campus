@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from "vitest";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -35,7 +35,9 @@ import type { Session } from "../src/lib/types";
 
 describe("Submit Answers to Research Workspace Integration", () => {
   const submissionsFile = path.join(process.cwd(), ".demo-data", "submissions.json");
+  const counterFile = path.join(process.cwd(), ".demo-data", "participant_counter.json");
   let backupData: string | null = null;
+  let backupCounter: string | null = null;
 
   beforeEach(async () => {
     try {
@@ -43,11 +45,19 @@ describe("Submit Answers to Research Workspace Integration", () => {
     } catch {
       backupData = null;
     }
+    try {
+      backupCounter = await readFile(counterFile, "utf-8");
+    } catch {
+      backupCounter = null;
+    }
   });
 
   afterEach(async () => {
     if (backupData !== null) {
       await writeFile(submissionsFile, backupData, "utf-8").catch(() => {});
+    }
+    if (backupCounter !== null) {
+      await writeFile(counterFile, backupCounter, "utf-8").catch(() => {});
     }
   });
 
@@ -102,5 +112,15 @@ describe("Submit Answers to Research Workspace Integration", () => {
     expect(found?.status).toBe("submitted_complete");
     expect(found?.answers.Q1.value).toBe(2);
     expect(found?.answers.Q6.status).toBe("answered");
+  });
+
+  afterAll(async () => {
+    try {
+      await writeFile(submissionsFile, "[]\n", "utf-8");
+      await writeFile(counterFile, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
+    } catch {}
   });
 });

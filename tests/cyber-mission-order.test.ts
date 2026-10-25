@@ -1,4 +1,6 @@
-import { beforeEach, describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi, afterAll } from "vitest";
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
 
 const mocks = vi.hoisted(() => ({
   readLocal: vi.fn(),
@@ -63,5 +65,17 @@ describe("Cyber Mission Canonical Order (IV1 -> IV2 -> IV3 -> IV4)", () => {
       "impersonation",
       "links",
     ]);
+  });
+
+  afterAll(async () => {
+    try {
+      const counterFile = path.join(process.cwd(), ".demo-data", "participant_counter.json");
+      const subsFile = path.join(process.cwd(), ".demo-data", "submissions.json");
+      await writeFile(counterFile, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      await writeFile(subsFile, "[]\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
+    } catch {}
   });
 });
