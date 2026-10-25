@@ -8,11 +8,7 @@ import {
   Lock,
   HeartHandshake,
   KeyRound,
-  Activity,
-  Mail,
-  MessagesSquare,
-  UserRoundSearch,
-  Link2,
+  Database,
 } from "lucide-react";
 
 export function HeroSection() {

@@ -193,9 +193,11 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
         </div>
 
         {/* Footer Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© 2026 Cyber Campus Research Initiative • Sri Lanka</p>
-          <p className="text-center sm:text-right">
+        <div className="mt-12 pt-6 border-t border-slate-200/90 dark:border-slate-800/90 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400 w-full">
+          <p className="text-center sm:text-left font-medium leading-relaxed">
+            © 2026 Cyber Campus Research Initiative • Sri Lanka
+          </p>
+          <p className="text-center sm:text-right font-medium leading-relaxed">
             Voluntary Higher Education Study · Empirical Research Protocol Aligned
           </p>
         </div>
