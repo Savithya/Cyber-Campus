@@ -163,19 +163,19 @@ export function ResearchParticipationPage({
           <div className="research-hero-single-col">
             {/* Centered Column: Heading, Supporting Description, Buttons, Reassurance */}
             <motion.div
-              className="research-hero-copy max-w-3xl mx-auto text-center items-center"
+              className="research-hero-copy max-w-3xl mx-auto text-center items-center justify-center flex flex-col w-full"
               initial={fadeIn.initial}
               animate={fadeIn.animate}
               transition={fadeIn.transition}
             >
               {/* Eyebrow badge */}
-              <div className="research-hero-eyebrow">
+              <div className="research-hero-eyebrow mx-auto">
                 <span className="pulse-indicator" aria-hidden="true" />
                 <span>ACADEMIC COMPUTING RESEARCH · SRI LANKA</span>
               </div>
 
               {/* Research Title Badge */}
-              <div className="research-title-chip">
+              <div className="research-title-chip mx-auto">
                 <GraduationCap
                   size={16}
                   className="text-primary flex-shrink-0"
@@ -188,7 +188,7 @@ export function ResearchParticipationPage({
               </div>
 
               {/* Main Hero Heading */}
-              <h1 className="research-hero-title">
+              <h1 className="research-hero-title text-center mx-auto">
                 Your Voice Matters in{" "}
                 <span className="gradient-text">Digital Privacy</span>
               </h1>
@@ -202,7 +202,7 @@ export function ResearchParticipationPage({
               </p>
 
               {/* Call to Action Buttons */}
-              <div className="research-hero-actions justify-center">
+              <div className="research-hero-actions flex items-center justify-center gap-3.5 flex-wrap w-full mx-auto">
                 <Link
                   href="/consent"
                   className="button primary large research-cta-btn"
@@ -224,7 +224,7 @@ export function ResearchParticipationPage({
               </div>
 
               {/* Reassurance Badges */}
-              <div className="research-trust-strip justify-center flex-wrap">
+              <div className="research-trust-strip flex items-center justify-center gap-5 flex-wrap w-full mx-auto">
                 <div className="trust-item">
                   <Clock
                     size={15}
