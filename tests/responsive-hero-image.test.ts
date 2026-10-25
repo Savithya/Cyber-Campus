@@ -16,23 +16,19 @@ describe("Cyber Campus — Final Responsive Hero Image Enhancement", () => {
     expect(html).toContain("cyber-hero-image");
 
     // Verify image attributes
-    expect(html).toContain('src="/images/cyber-hero-lab-8x5.jpg"');
-    expect(html).toContain('width="1376"');
-    expect(html).toContain('height="768"');
-    expect(html).toContain("object-contain");
+    expect(html).toContain('src="/images/cyber-research-node.png"');
+    expect(html).toContain('width="436"');
+    expect(html).toContain('height="437"');
 
     // Verify balanced two-column hero layout
     expect(html).toContain("lg:grid-cols-2");
     expect(html).toContain("max-w-[1440px]");
 
     // Verify console badges and overlay text
-    expect(html).toContain("CYBER THREAT LAB · CONSOLE");
-    expect(html).toContain("User Privacy Shield");
-    expect(html).toContain("Threat Telemetry &amp; Privacy Simulation");
-    expect(html).toContain("Phishing");
-    expect(html).toContain("Pretexting");
-    expect(html).toContain("Impersonation");
-    expect(html).toContain("Online Scams");
+    expect(html).toContain("Research Intelligence Node - Active &amp; Protected");
+    expect(html).toContain("AES-256 Session Encryption");
+    expect(html).toContain("Rate-Limited Gateway");
+    expect(html).toContain("IRB Ethics Protocol Compliant");
 
     // Verify CTA and research trust markers
     expect(html).toContain("Start Research");

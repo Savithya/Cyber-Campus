@@ -51,15 +51,12 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
     expect(html).toContain("Safe Simulated Scenarios");
     expect(html).toContain("No Real Passwords");
 
-    // Right-hand visual console artwork & threat panels
-    expect(html).toContain("cyber-hero-lab-8x5");
-    expect(html).toContain("CYBER THREAT LAB · CONSOLE");
-    expect(html).toContain("User Privacy Shield");
-    expect(html).toContain("Phishing");
-    expect(html).toContain("Pretexting");
-    expect(html).toContain("Impersonation");
-    expect(html).toContain("Online Scams");
-    expect(html).toContain("Threat Telemetry &amp; Privacy Simulation");
+    // Right-hand Research Intelligence Node Card
+    expect(html).toContain("cyber-research-node");
+    expect(html).toContain("Research Intelligence Node - Active &amp; Protected");
+    expect(html).toContain("AES-256 Session Encryption");
+    expect(html).toContain("Rate-Limited Gateway");
+    expect(html).toContain("IRB Ethics Protocol Compliant");
   });
 
   it("renders the 4 compact ResearchMetrics cards with accurate study metrics", () => {

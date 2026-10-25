@@ -82,113 +82,61 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Balanced Two-Column Hero Layout (Max 650px, Right-Aligned on Desktop) */}
+          {/* Right Column: Research Intelligence Node Card (Matching Reference Design) */}
           <div className="relative mt-8 lg:mt-0 flex justify-center lg:justify-end w-full">
-            <div className="cyber-hero-image-wrapper hero-pro-visual-wrapper relative w-full">
-              {/* Glow Aura */}
-              <div className="hero-pro-ambient-glow" aria-hidden="true" />
+            {/* Ambient Background Glow */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/15 via-cyan-500/20 to-blue-500/15 rounded-3xl blur-2xl pointer-events-none -z-10" />
 
-              {/* Main Interactive Workstation Frame */}
-              <div className="hero-pro-image-card relative rounded-2xl lg:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-slate-900 overflow-hidden shadow-2xl transition-all duration-300 group w-full">
-                {/* Responsive Picture Artwork */}
+            {/* Outer Card: White in Light Mode, Slate in Dark/Cyber Mode */}
+            <div className="hero-intelligence-card cyber-hero-image-wrapper relative w-full max-w-[480px] rounded-3xl p-3.5 sm:p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xl transition-all duration-300 hover:shadow-cyan-500/10 group">
+              {/* Top: Dark Cybersecurity Console Visual */}
+              <div className="relative rounded-2xl overflow-hidden bg-[#0c1428] border border-slate-800/90 shadow-inner">
                 <picture>
-                  <source srcSet="/images/cyber-hero-lab-8x5.webp" type="image/webp" />
-                  <source srcSet="/images/cyber-hero-lab-8x5.png" type="image/png" />
+                  <source srcSet="/images/cyber-research-node.png" type="image/png" />
                   <img
-                    src="/images/cyber-hero-lab-8x5.jpg"
-                    alt="Cyber Campus Hybrid Cyber Research Lab — Cybersecurity Command Console & Simulation Environment"
-                    className="cyber-hero-image hero-pro-image w-full h-auto object-contain transition-transform duration-700 group-hover:scale-102"
-                    width={1376}
-                    height={768}
+                    src="/images/cyber-research-node.png"
+                    alt="Cyber Campus Research Intelligence Node - Cybersecurity Research Simulation Environment"
+                    className="cyber-hero-image w-full h-auto object-cover aspect-square transition-transform duration-700 group-hover:scale-[1.02]"
+                    width={436}
+                    height={437}
                     loading="eager"
                   />
                 </picture>
 
-              {/* Scanning Laser Beam (Micro Animation) */}
-              <div className="cyber-laser-scanner" aria-hidden="true" />
+                {/* Subtle Laser Sweep Micro-Animation */}
+                <div className="cyber-laser-scanner" aria-hidden="true" />
 
-              {/* Top-Left: Live Console Status Pill */}
-              <div className="hero-pro-live-pill absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-white shadow-lg">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="tracking-wide">CYBER THREAT LAB · CONSOLE</span>
-              </div>
-
-              {/* Top-Right: User Privacy Shield Badge */}
-              <div className="hero-pro-shield-pill absolute top-3 sm:top-4 right-3 sm:right-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/30 text-[11px] font-bold text-emerald-300 shadow-lg">
-                <ShieldCheck size={14} className="text-emerald-400" aria-hidden="true" />
-                <span>User Privacy Shield</span>
-              </div>
-
-              {/* Floating Holographic Threat Panels */}
-              <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-center gap-2 z-10 hidden sm:flex">
-                <div className="flex justify-between items-center">
-                  {/* Panel 1: Phishing */}
-                  <div className="px-2.5 py-1.5 rounded-lg bg-slate-950/85 backdrop-blur-md border border-indigo-500/40 text-[11px] text-white flex items-center gap-2 shadow-xl animate-float-slow">
-                    <div className="w-5 h-5 rounded-md bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                      <Mail size={12} />
-                    </div>
-                    <div>
-                      <span className="font-bold block leading-tight">Phishing</span>
-                      <span className="text-[9px] text-indigo-300">IV1 · 5 Scenarios</span>
-                    </div>
-                  </div>
-
-                  {/* Panel 2: Pretexting */}
-                  <div className="px-2.5 py-1.5 rounded-lg bg-slate-950/85 backdrop-blur-md border border-cyan-500/40 text-[11px] text-white flex items-center gap-2 shadow-xl animate-float-medium">
-                    <div className="w-5 h-5 rounded-md bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                      <MessagesSquare size={12} />
-                    </div>
-                    <div>
-                      <span className="font-bold block leading-tight">Pretexting</span>
-                      <span className="text-[9px] text-cyan-300">IV2 · 5 Scenarios</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center mt-6">
-                  {/* Panel 3: Impersonation */}
-                  <div className="px-2.5 py-1.5 rounded-lg bg-slate-950/85 backdrop-blur-md border border-violet-500/40 text-[11px] text-white flex items-center gap-2 shadow-xl animate-float-medium">
-                    <div className="w-5 h-5 rounded-md bg-violet-500/20 flex items-center justify-center text-violet-400">
-                      <UserRoundSearch size={12} />
-                    </div>
-                    <div>
-                      <span className="font-bold block leading-tight">Impersonation</span>
-                      <span className="text-[9px] text-violet-300">IV3 · 5 Scenarios</span>
-                    </div>
-                  </div>
-
-                  {/* Panel 4: Online Scams & Malicious Links */}
-                  <div className="px-2.5 py-1.5 rounded-lg bg-slate-950/85 backdrop-blur-md border border-rose-500/40 text-[11px] text-white flex items-center gap-2 shadow-xl animate-float-slow">
-                    <div className="w-5 h-5 rounded-md bg-rose-500/20 flex items-center justify-center text-rose-400">
-                      <Link2 size={12} />
-                    </div>
-                    <div>
-                      <span className="font-bold block leading-tight">Online Scams</span>
-                      <span className="text-[9px] text-rose-300">IV4 · 5 Scenarios</span>
-                    </div>
-                  </div>
+                {/* Overlay Node Badge (Matching Reference) */}
+                <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-950/85 backdrop-blur-md border border-white/10 text-xs font-semibold text-white shadow-lg">
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400" />
+                  </span>
+                  <span className="tracking-wide text-[11px] sm:text-xs font-semibold text-white">
+                    Research Intelligence Node - Active &amp; Protected
+                  </span>
                 </div>
               </div>
 
-              {/* Bottom Glassmorphic Telemetry Ribbon */}
-              <div className="hero-pro-bottom-ribbon absolute bottom-0 inset-x-0 bg-slate-950/85 backdrop-blur-md border-t border-white/10 p-3 sm:p-3.5 z-10">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-white text-xs font-semibold">
-                    <Activity size={14} className="text-cyan-400 shrink-0" aria-hidden="true" />
-                    <span className="tracking-wide">Threat Telemetry &amp; Privacy Simulation</span>
-                  </div>
+              {/* Bottom: 3 Security & Governance Trust Tags */}
+              <div className="pt-3.5 flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs">
+                  <ShieldCheck size={14} className="text-cyan-500 shrink-0" aria-hidden="true" />
+                  <span>AES-256 Session Encryption</span>
+                </div>
 
-                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-300 font-mono">
-                    <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10">Phishing</span>
-                    <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10">Pretexting</span>
-                    <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10">Impersonation</span>
-                    <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10">Scams</span>
-                  </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs">
+                  <Lock size={14} className="text-indigo-500 shrink-0" aria-hidden="true" />
+                  <span>Rate-Limited Gateway</span>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 border border-slate-200/90 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 shadow-2xs">
+                  <Database size={14} className="text-teal-500 shrink-0" aria-hidden="true" />
+                  <span>IRB Ethics Protocol Compliant</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </section>
