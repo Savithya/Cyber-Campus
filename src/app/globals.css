@@ -1868,27 +1868,11 @@ a.button.primary:hover * {
    ========================================================================== */
 
 .site-footer {
-  border-top: 1px solid var(--border);
   width: 100%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 28px 32px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 11px;
+  display: block;
+  position: relative;
+  font-size: 12px;
   color: var(--muted);
-}
-
-.site-footer > span,
-.site-footer > div {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.site-footer > span {
-  gap: 8px;
 }
 
 .site-footer a:hover {
