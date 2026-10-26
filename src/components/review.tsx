@@ -608,14 +608,14 @@ export default function Review() {
 
           {/* Light-green notice callout pill matching Image 2 */}
           <div className="pt-2">
-            <div className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[#ebf4ed] dark:bg-[#163628] border border-[#d3e7da] dark:border-[#21523c] text-[#24523e] dark:text-[#88d6aa] text-xs sm:text-sm font-medium">
+            <div className="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-[#ebf4ed] dark:bg-[#163628] border border-[#d3e7da] dark:border-[#21523c] text-[#24523e] dark:text-[#88d6aa] text-xs sm:text-sm font-medium max-w-full text-center break-words">
               <span>Your responses have been securely recorded for academic research.</span>
             </div>
           </div>
 
           {/* Anonymous Participant Code */}
           <div className="pt-1">
-            <div className="inline-flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+            <div className="inline-flex items-center justify-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400 max-w-full flex-wrap">
               <span>{`Anonymous participant code: ${state.session.code}`}</span>
               <button
                 type="button"

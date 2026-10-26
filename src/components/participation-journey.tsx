@@ -85,23 +85,23 @@ export function ParticipationJourney() {
   return (
     <section
       id="how-it-works"
-      className="participation-journey-section py-12 lg:py-20 relative bg-slate-50/60 dark:bg-slate-950/40 border-y border-slate-200/80 dark:border-slate-800/80"
+      className="participation-journey-section py-10 sm:py-12 lg:py-20 relative bg-slate-50/60 dark:bg-slate-950/40 border-y border-slate-200/80 dark:border-slate-800/80"
       aria-labelledby="journey-heading"
     >
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 mb-3 shadow-2xs">
-            <Sparkles size={14} aria-hidden="true" />
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-16">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 mb-3 shadow-2xs max-w-full flex-wrap break-words">
+            <Sparkles size={14} aria-hidden="true" className="shrink-0" />
             <span>PARTICIPATION JOURNEY</span>
           </div>
           <h2
             id="journey-heading"
-            className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white break-words"
           >
             How Cyber Campus Works
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
             A simple four-step research experience designed for university students in Sri Lanka.
           </p>
         </div>
@@ -115,7 +115,7 @@ export function ParticipationJourney() {
           />
 
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative z-10"
             role="list"
             aria-label="Four Participation Steps"
           >
@@ -135,7 +135,7 @@ export function ParticipationJourney() {
                       setActiveStep(s.number);
                     }
                   }}
-                  className={`group relative rounded-2xl p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
+                  className={`group relative rounded-2xl p-4 sm:p-5 lg:p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
                     isSelected
                       ? "bg-white dark:bg-slate-900 border-indigo-500 shadow-xl shadow-indigo-500/10 -translate-y-1 ring-2 ring-indigo-500/20"
                       : "bg-white/80 dark:bg-slate-900/60 border-slate-200/90 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md"
@@ -143,10 +143,10 @@ export function ParticipationJourney() {
                 >
                   <div>
                     {/* Top Row: Number & Badge */}
-                    <div className="flex items-center justify-between gap-2 mb-5">
+                    <div className="flex items-center justify-between gap-2 mb-4 sm:mb-5">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-sm transition-colors ${
+                          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-extrabold text-sm transition-colors shrink-0 ${
                             isSelected
                               ? "bg-blue-600 text-white shadow-xs"
                               : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/50 group-hover:text-blue-600"
@@ -155,23 +155,23 @@ export function ParticipationJourney() {
                           {s.step}
                         </span>
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-colors ${
+                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border transition-colors shrink-0 ${
                             isSelected
                               ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400"
                               : "bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/80 text-slate-500 dark:text-slate-400"
                           }`}
                         >
-                          <Icon size={18} aria-hidden="true" />
+                          <Icon size={17} aria-hidden="true" />
                         </div>
                       </div>
 
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shrink-0">
                         {s.badge}
                       </span>
                     </div>
 
                     {/* Step Title */}
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-indigo-600 dark:group-hover:text-cyan-400 transition-colors">
+                    <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-indigo-600 dark:group-hover:text-cyan-400 transition-colors break-words">
                       {s.title}
                     </h3>
 
@@ -184,8 +184,8 @@ export function ParticipationJourney() {
                     <ul className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
                       {s.details.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-1.5 leading-snug">
-                          <span className="text-indigo-500 dark:text-cyan-400 font-bold">•</span>
-                          <span>{item}</span>
+                          <span className="text-indigo-500 dark:text-cyan-400 font-bold shrink-0">•</span>
+                          <span className="break-words">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -193,7 +193,7 @@ export function ParticipationJourney() {
 
                   {/* Active Indicator Bar */}
                   {isSelected && (
-                    <div className="mt-5 pt-3 border-t border-indigo-100 dark:border-indigo-950/80 flex items-center justify-between text-[11px] font-bold text-indigo-600 dark:text-cyan-400">
+                    <div className="mt-4 sm:mt-5 pt-3 border-t border-indigo-100 dark:border-indigo-950/80 flex items-center justify-between text-[11px] font-bold text-indigo-600 dark:text-cyan-400">
                       <span>Active Step</span>
                       <ShieldCheck size={14} aria-hidden="true" />
                     </div>
@@ -205,15 +205,15 @@ export function ParticipationJourney() {
         </div>
 
         {/* Clear CTA beneath the workflow */}
-        <div className="mt-12 text-center">
+        <div className="mt-10 sm:mt-12 text-center">
           <Link
             href="/consent"
             prefetch={true}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[48px]"
             aria-label="Begin Research Participation - Start with Step 01 Consent"
           >
             <span className="text-white font-bold">Begin Research Participation</span>
-            <ArrowRight size={18} className="text-white" aria-hidden="true" />
+            <ArrowRight size={18} className="text-white shrink-0" aria-hidden="true" />
           </Link>
           <p className="mt-2.5 text-xs text-slate-500 dark:text-slate-400">
             Takes approximately 15–20 minutes · Completely voluntary &amp; self-paced

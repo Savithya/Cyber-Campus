@@ -261,61 +261,61 @@ export function InteractiveChallengeRunner({
       >
         <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800/80">
           {/* Metric 1: Game Performance Score */}
-          <div className="p-4 sm:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Trophy
-                size={16}
+                size={15}
                 className="text-amber-500 shrink-0"
                 aria-hidden="true"
               />
-              <span>Game Performance Score</span>
+              <span className="truncate sm:whitespace-normal">Game Performance Score</span>
             </div>
-            <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {performanceScore}
             </div>
           </div>
 
           {/* Metric 2: Decision Accuracy */}
-          <div className="p-4 sm:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Target
-                size={16}
+                size={15}
                 className="text-teal-600 dark:text-teal-400 shrink-0"
                 aria-hidden="true"
               />
-              <span>Decision accuracy</span>
+              <span className="truncate sm:whitespace-normal">Decision accuracy</span>
             </div>
-            <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {decisionAccuracy}
             </div>
           </div>
 
           {/* Metric 3: Current Streak */}
-          <div className="p-4 sm:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Flame
-                size={16}
+                size={15}
                 className="text-orange-500 shrink-0"
                 aria-hidden="true"
               />
-              <span>Current streak</span>
+              <span className="truncate sm:whitespace-normal">Current streak</span>
             </div>
-            <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {currentStreak}
             </div>
           </div>
 
           {/* Metric 4: Scenarios Saved */}
-          <div className="p-4 sm:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Mail
-                size={16}
+                size={15}
                 className="text-sky-600 dark:text-sky-400 shrink-0"
                 aria-hidden="true"
               />
-              <span>Scenarios saved</span>
+              <span className="truncate sm:whitespace-normal">Scenarios saved</span>
             </div>
-            <div className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {savedInMissionCount} / {totalInMission}
             </div>
           </div>
@@ -358,13 +358,14 @@ export function InteractiveChallengeRunner({
             =================================================================== */}
         <div className="lg:col-span-7 challenge-investigation-stage bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
-            <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
+            <div className="flex items-center gap-2.5 min-w-0">
               {getHeaderIcon()}
-              <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
-                <span className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-2 font-bold">
+              <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate">
+                <span className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-2 font-bold hidden xs:inline sm:inline">
                   SCENARIO BRIEFING ·
                 </span>
+                <span className="sr-only">SCENARIO BRIEFING · </span>
                 {getHeaderTitle()}
               </span>
               <span className="sr-only">
@@ -372,11 +373,11 @@ export function InteractiveChallengeRunner({
               </span>
             </div>
 
-            <div className="flex items-center gap-2 relative">
+            <div className="flex items-center gap-2 relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsStarred(!isStarred)}
-                className="p-1 text-slate-400 hover:text-amber-500 transition-colors rounded focus:outline-none"
+                className="p-1 text-slate-400 hover:text-amber-500 transition-colors rounded focus:outline-none min-h-[36px] min-w-[36px] flex items-center justify-center"
                 aria-label={isStarred ? "Unstar scenario" : "Star scenario"}
                 title="Star scenario"
               >
@@ -389,7 +390,7 @@ export function InteractiveChallengeRunner({
               <button
                 type="button"
                 onClick={() => setShowOptionsDropdown(!showOptionsDropdown)}
-                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors rounded focus:outline-none"
+                className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors rounded focus:outline-none min-h-[36px] min-w-[36px] flex items-center justify-center"
                 aria-label="Simulation options"
                 title="More options"
               >
@@ -431,7 +432,7 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Email / Evidence Content Body */}
-          <div className="p-6 sm:p-7 space-y-4">
+          <div className="p-4 sm:p-6 lg:p-7 space-y-4">
             {/* Kicker */}
             <div className="text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase font-mono">
               SIMULATED{" "}
@@ -444,7 +445,7 @@ export function InteractiveChallengeRunner({
             </div>
 
             {/* Subject / Title */}
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 leading-snug">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 leading-snug break-words">
               {emailData.subject}
             </h2>
 
@@ -458,16 +459,16 @@ export function InteractiveChallengeRunner({
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <strong className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
+                  <strong className="text-sm font-semibold text-slate-900 dark:text-slate-100 break-words">
                     {emailData.senderName}
                   </strong>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 break-all">
                     {emailData.senderEmail}
                     <button
                       type="button"
                       onClick={() => setShowRFCHeaders(!showRFCHeaders)}
-                      className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                      className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors shrink-0"
                       title="Inspect envelope domain and security headers"
                       aria-label="Inspect envelope domain and security headers"
                     >
@@ -484,7 +485,7 @@ export function InteractiveChallengeRunner({
             {/* Technical Header Inspector Drawer */}
             {showRFCHeaders && (
               <div
-                className="mt-3 p-3.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/20 text-xs font-mono text-slate-700 dark:text-slate-300 space-y-1.5"
+                className="mt-3 p-3.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/20 text-xs font-mono text-slate-700 dark:text-slate-300 space-y-1.5 break-all"
                 role="region"
                 aria-label="RFC Security Header Telemetry"
               >
@@ -500,25 +501,25 @@ export function InteractiveChallengeRunner({
                     Hide
                   </button>
                 </div>
-                <div className="pt-1 space-y-1 text-[11px] leading-relaxed">
+                <div className="pt-1 space-y-1 text-[11px] leading-relaxed break-all">
                   <div>
                     <strong className="text-slate-500">Return-Path:</strong>{" "}
-                    {emailData.rfcHeaders?.returnPath ||
-                      `<bounce@${scenario.senderAddress}>`}
+                    <span className="break-all">{emailData.rfcHeaders?.returnPath ||
+                      `<bounce@${scenario.senderAddress}>`}</span>
                   </div>
                   <div>
                     <strong className="text-slate-500">Authentication:</strong>{" "}
-                    {emailData.rfcHeaders?.spfResult ||
-                      "spf=softfail (mismatch)"}
+                    <span className="break-all">{emailData.rfcHeaders?.spfResult ||
+                      "spf=softfail (mismatch)"}</span>
                   </div>
                   <div>
                     <strong className="text-slate-500">DKIM-Domain:</strong>{" "}
-                    {emailData.rfcHeaders?.dkimDomain ||
-                      "unverified-relay.test"}
+                    <span className="break-all">{emailData.rfcHeaders?.dkimDomain ||
+                      "unverified-relay.test"}</span>
                   </div>
                   <div>
                     <strong className="text-slate-500">Originating-IP:</strong>{" "}
-                    {emailData.rfcHeaders?.originatingIp || "198.51.100.42"}
+                    <span className="break-all">{emailData.rfcHeaders?.originatingIp || "198.51.100.42"}</span>
                   </div>
                 </div>
               </div>
@@ -625,7 +626,7 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Footer Notice */}
-          <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-auto">
+          <div className="px-4 sm:px-6 py-3 sm:py-3.5 bg-slate-50/70 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-auto">
             <Lock
               size={13}
               className="text-slate-400 shrink-0"

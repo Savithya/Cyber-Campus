@@ -141,29 +141,29 @@ export function ThreatCategories() {
   return (
     <section
       id="threat-categories"
-      className="threat-categories-section py-12 lg:py-20 relative"
+      className="threat-categories-section py-10 sm:py-12 lg:py-20 relative"
       aria-labelledby="threats-heading"
     >
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 mb-3 shadow-2xs">
-            <ShieldAlert size={14} aria-hidden="true" />
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-16">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 mb-3 shadow-2xs max-w-full flex-wrap break-words">
+            <ShieldAlert size={14} aria-hidden="true" className="shrink-0" />
             <span>INDEPENDENT VARIABLES (IV1–IV4)</span>
           </div>
           <h2
             id="threats-heading"
-            className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white break-words"
           >
             Explore the Four Social Engineering Threats
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
             Discover the deceptive techniques explored in this study through realistic digital scenarios.
           </p>
         </div>
 
         {/* 4 Cards Grid (2x2 layout on desktop, 1 col on mobile) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
           {THREAT_CARDS.map((card) => {
             const Icon = card.icon;
             const isInspected = !!inspectedCards[card.id];
@@ -193,7 +193,7 @@ export function ThreatCategories() {
                             {card.targetAsset}
                           </span>
                         </div>
-                        <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
+                        <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug break-words">
                           {card.title}
                         </h3>
                       </div>
@@ -205,20 +205,20 @@ export function ThreatCategories() {
                   </div>
 
                   {/* Short Description */}
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4 sm:mb-5">
                     {card.description}
                   </p>
 
                   {/* Simulated Visual Artifact Box */}
-                  <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60 p-4 mb-5 shadow-2xs transition-all">
-                    <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-xs">
+                  <div className="rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60 p-3.5 sm:p-4 mb-4 sm:mb-5 shadow-2xs transition-all">
+                    <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-xs flex-wrap">
                       <span className="font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                         {card.visualType}
                       </span>
                       <button
                         type="button"
                         onClick={() => toggleInspect(card.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer min-h-[32px] ${
                           isInspected
                             ? "bg-amber-600 hover:bg-amber-700 text-white shadow-xs"
                             : "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
@@ -226,12 +226,12 @@ export function ThreatCategories() {
                         aria-pressed={isInspected}
                         title="Toggle red flag analysis"
                       >
-                        {isInspected ? <EyeOff size={12} className="text-white" /> : <Eye size={12} className="text-white" />}
+                        {isInspected ? <EyeOff size={12} className="text-white shrink-0" /> : <Eye size={12} className="text-white shrink-0" />}
                         <span className="text-white">{isInspected ? "Hide Red Flags" : "Spot Red Flags"}</span>
                       </button>
                     </div>
 
-                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mb-2 truncate" title={card.sender}>
+                    <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mb-2 break-all sm:truncate" title={card.sender}>
                       From: {card.sender}
                     </div>
 
@@ -252,20 +252,20 @@ export function ThreatCategories() {
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <ShieldCheck size={14} aria-hidden="true" />
+                    <ShieldCheck size={14} aria-hidden="true" className="shrink-0" />
                     <span>Safe Simulation</span>
                   </div>
 
                   <Link
                     href={card.destinationHref}
                     prefetch={true}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-blue-500"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[44px] text-center"
                     aria-label={`Participate in ${card.title} scenarios`}
                   >
                     <span className="text-white font-bold">{card.actionText}</span>
-                    <ArrowRight size={13} className="text-white" aria-hidden="true" />
+                    <ArrowRight size={13} className="text-white shrink-0" aria-hidden="true" />
                   </Link>
                 </div>
               </article>

@@ -142,28 +142,28 @@ export function CyberLabPreview() {
   return (
     <section
       id="cyber-lab-preview"
-      className="cyber-lab-preview-section py-12 lg:py-20 relative"
+      className="cyber-lab-preview-section py-10 sm:py-12 lg:py-20 relative"
       aria-labelledby="lab-preview-heading"
     >
       <div className="container mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 mb-3 shadow-2xs">
-            <Sparkles size={14} aria-hidden="true" />
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 lg:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 mb-3 shadow-2xs max-w-full flex-wrap break-words">
+            <Sparkles size={14} aria-hidden="true" className="shrink-0" />
             <span>INTERACTIVE DEMO ENVIRONMENT</span>
           </div>
           <h2
             id="lab-preview-heading"
-            className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white break-words"
           >
             Think Like a Cyber Investigator
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
             Explore a sample digital scenario and discover how online deception can threaten your privacy.
           </p>
 
           {/* Critical Research Validity Notice */}
-          <div className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200">
+          <div className="mt-4 inline-flex items-center justify-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 max-w-full flex-wrap text-center break-words">
             <Info size={14} className="text-amber-600 dark:text-amber-400 shrink-0" aria-hidden="true" />
             <span>Optional Educational Demo — Not Part of Research Scoring</span>
           </div>
@@ -178,7 +178,7 @@ export function CyberLabPreview() {
               role="tab"
               aria-selected={activeScenarioId === scenario.id}
               onClick={() => handleTabSwitch(scenario.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer min-h-[40px] ${
                 activeScenarioId === scenario.id
                   ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
                   : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
@@ -190,16 +190,16 @@ export function CyberLabPreview() {
         </div>
 
         {/* Two-Column Interactive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start max-w-6xl mx-auto">
           {/* Left Column (7 of 12 cols): Simulated Digital Message */}
           <div className="lg:col-span-7 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
             {/* Mock Email Window Header */}
-            <div className="px-4 py-3 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+            <div className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-400 inline-block" aria-hidden="true" />
-                <span className="w-3 h-3 rounded-full bg-amber-400 inline-block" aria-hidden="true" />
-                <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" aria-hidden="true" />
-                <span className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400 ml-2">
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400 inline-block" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400 inline-block" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400 inline-block" aria-hidden="true" />
+                <span className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400 ml-1 sm:ml-2">
                   Campus Mail Client · Simulation
                 </span>
               </div>
@@ -251,10 +251,10 @@ export function CyberLabPreview() {
 
           {/* Right Column (5 of 12 cols): Interactive Decision Panel */}
           <div className="lg:col-span-5 space-y-5">
-            <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl">
+            <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-xl">
               <div className="flex items-center justify-between gap-2 mb-4">
-                <h3 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <ShieldAlert size={18} className="text-indigo-600 dark:text-cyan-400" aria-hidden="true" />
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <ShieldAlert size={18} className="text-indigo-600 dark:text-cyan-400 shrink-0" aria-hidden="true" />
                   <span>What Would You Do?</span>
                 </h3>
                 {selectedChoiceId && (
@@ -285,7 +285,7 @@ export function CyberLabPreview() {
                       role="radio"
                       aria-checked={isSelected}
                       onClick={() => setSelectedChoiceId(choice.id)}
-                      className={`w-full text-left p-3.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-start gap-3 ${
+                      className={`w-full text-left p-3 sm:p-3.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-start gap-3 min-h-[44px] ${
                         isSelected
                           ? choice.isProtective
                             ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 ring-2 ring-emerald-500/20"
@@ -304,7 +304,7 @@ export function CyberLabPreview() {
                           <span className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 inline-block" />
                         )}
                       </span>
-                      <span className="leading-snug">{choice.label}</span>
+                      <span className="leading-snug break-words flex-1 min-w-0">{choice.label}</span>
                     </button>
                   );
                 })}
@@ -313,7 +313,7 @@ export function CyberLabPreview() {
               {/* Instant Educational Feedback */}
               {currentChoice && (
                 <div
-                  className={`mt-5 p-4 rounded-xl border text-xs animate-fadeIn ${
+                  className={`mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-xl border text-xs animate-fadeIn ${
                     currentChoice.isProtective
                       ? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200"
                       : "bg-red-50 dark:bg-red-950/50 border-red-300 dark:border-red-800 text-red-900 dark:text-red-200"
@@ -322,12 +322,12 @@ export function CyberLabPreview() {
                   <div className="font-bold text-sm mb-1 flex items-center gap-1.5">
                     {currentChoice.isProtective ? (
                       <>
-                        <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+                        <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <span>Protective Action Identified</span>
                       </>
                     ) : (
                       <>
-                        <AlertTriangle size={16} className="text-red-600 dark:text-red-400" />
+                        <AlertTriangle size={16} className="text-red-600 dark:text-red-400 shrink-0" />
                         <span>Privacy Risk Identified</span>
                       </>
                     )}
@@ -338,7 +338,7 @@ export function CyberLabPreview() {
             </div>
 
             {/* Link to Full Research Challenges */}
-            <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 p-5 flex items-center justify-between gap-4">
+            <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50 p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
               <div className="text-xs">
                 <span className="font-bold text-slate-900 dark:text-white block">
                   Curious about the actual research study?
@@ -349,10 +349,10 @@ export function CyberLabPreview() {
               </div>
               <Link
                 href="/consent"
-                className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all text-center min-h-[44px]"
               >
                 <span className="text-white font-bold">Join Study</span>
-                <ArrowRight size={13} className="text-white" aria-hidden="true" />
+                <ArrowRight size={13} className="text-white shrink-0" aria-hidden="true" />
               </Link>
             </div>
           </div>
