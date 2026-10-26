@@ -39,6 +39,7 @@ import {
   ChevronRight,
   Filter,
   RotateCcw,
+  Trash2,
   Check,
   X,
   Lock,
@@ -249,6 +250,28 @@ export default function Admin({
 
   // History table pagination
   const [historyPage, setHistoryPage] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetWorkspace = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently remove ALL participant responses and reset the Research Workspace to zero?\n\nThis will clear all submitted responses, challenge decisions, and research metrics.",
+    );
+    if (!confirmed) return;
+
+    setIsResetting(true);
+    try {
+      await api("admin/reset", {});
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      router.refresh();
+      window.location.reload();
+    } catch (err) {
+      alert("Reset failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      setIsResetting(false);
+    }
+  };
 
   // Live auto-refresh when tab gains focus so completed participant missions immediately reflect
   useEffect(() => {
@@ -556,6 +579,18 @@ export default function Admin({
             >
               <RotateCcw size={13} />
               <span>Refresh</span>
+            </button>
+            <button
+              type="button"
+              className="admin-refresh-btn"
+              style={{ color: "var(--red, #ef4444)", borderColor: "rgba(239, 68, 68, 0.3)" }}
+              onClick={handleResetWorkspace}
+              disabled={isResetting}
+              title="Remove all mock/test responses and reset workspace to zero"
+              aria-label="Reset workspace data"
+            >
+              <Trash2 size={13} />
+              <span>{isResetting ? "Resetting..." : "Reset Data"}</span>
             </button>
             {!demo && (
               <button

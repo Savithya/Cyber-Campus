@@ -422,13 +422,28 @@ export async function getDemoSubmissions(): Promise<Session[]> {
 
   // 5. Synchronize active local session from cookie if present in current request
   try {
-    const local = await readLocal();
-    if (local?.session && local.session.mode !== "practice") {
-      const active = local.session;
-      const k = active.code || active.id;
-      const existing = mergedMap.get(k);
-      const activeDemo: Session = { ...existing, ...active, mode: "demo" };
-      mergedMap.set(k, activeDemo);
+    let counterIsZero = false;
+    try {
+      const raw = await readFile(path.join(getDemoDataDir(), "participant_counter.json"), "utf-8");
+      const parsed = JSON.parse(raw);
+      if (parsed?.counter === 0) counterIsZero = true;
+    } catch {}
+
+    const hasStoredSubmissions = seedList.length > 0 || cwdList.length > 0 || demoList.length > 0;
+
+    // Do NOT resurrect stale cookie sessions if the workspace has been reset to zero with no stored submissions
+    if (!counterIsZero || hasStoredSubmissions) {
+      const local = await readLocal();
+      if (local?.session && local.session.mode !== "practice") {
+        const active = local.session;
+        const k = active.code || active.id;
+        const existing = mergedMap.get(k);
+        const activeDemo: Session = { ...existing, ...active, mode: "demo" };
+        mergedMap.set(k, activeDemo);
+      }
+    } else {
+      // Data was reset to zero. Clean stale local cookie so ghost session is not resurrected.
+      await writeLocal(null);
     }
   } catch {
     // Outside request context or no cookie available
@@ -488,6 +503,66 @@ export async function removeDemoSubmission(code: string) {
   } catch {
     // silent
   }
+}
+
+export async function resetResearchData(): Promise<{ ok: boolean; message: string }> {
+  // 1. Reset in-memory stores
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+  }
+  globalThis.__CYBER_CAMPUS_COUNTER__ = 0;
+  memoryParticipantCounter = 0;
+
+  // 2. Clear disk submissions and counter files
+  const emptyList = "[]\n";
+  const zeroCounter = JSON.stringify({ counter: 0 }, null, 2) + "\n";
+
+  try {
+    await mkdir(getDemoDataDir(), { recursive: true });
+    await writeFile(path.join(getDemoDataDir(), "submissions.json"), emptyList, "utf-8");
+    await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), zeroCounter, "utf-8");
+  } catch {}
+
+  try {
+    await mkdir(getCwdDataDir(), { recursive: true });
+    await writeFile(path.join(getCwdDataDir(), "submissions.json"), emptyList, "utf-8");
+    await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), zeroCounter, "utf-8");
+  } catch {}
+
+  try {
+    await writeFile(getSeedFilePath(), emptyList, "utf-8");
+  } catch {}
+
+  // 3. Clear active browser session cookie & tracking identifiers
+  await clearActiveSession();
+  try {
+    const jar = await cookies();
+    jar.delete("cc_last_code");
+    jar.delete("cc_pid");
+  } catch {}
+
+  // 4. In research mode, clear remote Supabase participant tables if configured
+  if (isResearch()) {
+    const { serverAdminSupabase } = await import("./supabase.server");
+    const admin = serverAdminSupabase();
+    if (admin) {
+      try {
+        await admin.from("questionnaire_answers").delete().neq("missing_status", "none");
+        await admin.from("questionnaire_submissions").delete().neq("status", "none");
+        await admin.from("game_attempts").delete().neq("primary_iv", "none");
+        await admin.from("game_runs").delete().neq("scoring_version", "none");
+        await admin.from("participant_sessions").delete().neq("mode", "none");
+        await admin.from("admin_audit_events").delete().eq("event", "participant_withdrawal");
+      } catch (err) {
+        console.error("Supabase reset error:", err);
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    message: "All participant responses have been permanently removed and Research Workspace statistics reset to zero.",
+  };
 }
 
 import { blankAnswers } from "./validation";

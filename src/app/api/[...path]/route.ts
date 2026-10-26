@@ -375,6 +375,12 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       await clearActiveSession();
       return json({ ok: true });
     }
+    if (path === "admin/reset" || path === "admin/reset-workspace") {
+      await requireResearcher();
+      const { resetResearchData } = await import("@/lib/repository.server");
+      const res = await resetResearchData();
+      return json(res);
+    }
     if (path === "session/draft")
       return json({ session: await saveDraft(saveSchema.parse(body).answers) });
     if (path === "session/submit") {

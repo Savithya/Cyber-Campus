@@ -15,6 +15,8 @@ export async function api<T = Record<string, unknown>>(
     path === "session/new-participant" ||
     path === "session/clear" ||
     path === "session/reset" ||
+    path === "admin/reset" ||
+    path === "admin/reset-workspace" ||
     path === "auth/logout";
   const method = body !== undefined || isMutation ? "POST" : "GET";
 
