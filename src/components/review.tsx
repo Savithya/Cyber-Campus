@@ -458,7 +458,7 @@ export default function Review() {
                   aria-hidden="true"
                 />
                 <div className="min-w-0">
-                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 break-words leading-tight">
                     Game Performance Score
                   </span>
                   <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
@@ -475,7 +475,7 @@ export default function Review() {
                   aria-hidden="true"
                 />
                 <div className="min-w-0">
-                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 break-words leading-tight">
                     Decision accuracy
                   </span>
                   <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
@@ -492,7 +492,7 @@ export default function Review() {
                   aria-hidden="true"
                 />
                 <div className="min-w-0">
-                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 break-words leading-tight">
                     Current streak
                   </span>
                   <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
@@ -509,7 +509,7 @@ export default function Review() {
                   aria-hidden="true"
                 />
                 <div className="min-w-0">
-                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 break-words leading-tight">
                     Scenarios saved
                   </span>
                   <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
@@ -749,7 +749,7 @@ export default function Review() {
 
                       {/* Title & Subtitle */}
                       <div className="min-w-0">
-                        <strong className="block text-sm sm:text-base font-bold text-[#0e2a36] dark:text-slate-100 truncate">
+                        <strong className="block text-sm sm:text-base font-bold text-[#0e2a36] dark:text-slate-100 break-words sm:truncate">
                           {story.storyTitle}
                         </strong>
                         <span className="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">

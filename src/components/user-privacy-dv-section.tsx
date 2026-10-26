@@ -174,7 +174,7 @@ export default function UserPrivacyDVSection({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
             <div className="p-2.5 rounded-lg border bg-emerald/5 border-emerald/20 transition-all hover:border-emerald/40">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-emerald text-[11px]">Score 0: Protective</span>

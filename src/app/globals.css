@@ -30147,6 +30147,32 @@ code {
   }
 }
 
+@media (max-width: 480px) {
+  .call-audio-visualizer-container {
+    padding: 10px 12px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .waveform-bars-row {
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .dv-tab-btn {
+    padding: 6px 8px !important;
+    min-height: 44px !important;
+    justify-content: center !important;
+  }
+
+  .dv-tab-btn span {
+    white-space: normal !important;
+    word-break: break-word !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+}
+
 /* --------------------------------------------------------------------------
    08. MICRO MOBILE PHONES (320PX - 360PX) SPECIALIZED TUNING
    -------------------------------------------------------------------------- */
@@ -30193,6 +30219,16 @@ code {
   .reassurance-pill {
     font-size: 10px !important;
     padding: 4px 6px !important;
+  }
+
+  .dv-iv-tabs {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+
+  .survey-sidebar nav {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
   }
 }
 

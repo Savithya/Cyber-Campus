@@ -218,7 +218,7 @@ export function ThreatCategories() {
                       <button
                         type="button"
                         onClick={() => toggleInspect(card.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer min-h-[32px] ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold transition-all cursor-pointer min-h-[38px] sm:min-h-[32px] ${
                           isInspected
                             ? "bg-amber-600 hover:bg-amber-700 text-white shadow-xs"
                             : "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
