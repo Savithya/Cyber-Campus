@@ -171,35 +171,35 @@ export function ThreatCategories() {
             return (
               <article
                 key={card.id}
-                className="group relative rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all duration-300 flex flex-col justify-between"
+                className="group relative rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 sm:p-6 lg:p-7 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all duration-300 flex flex-col justify-between"
                 aria-label={`${card.iv}: ${card.title}`}
               >
                 <div>
                   {/* Card Header */}
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 mb-4">
+                    <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                       <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 ${card.accentBg} ${card.accentBorder} ${card.colorTheme} shadow-2xs group-hover:scale-105 transition-transform`}
+                        className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center border shrink-0 ${card.accentBg} ${card.accentBorder} ${card.colorTheme} shadow-2xs group-hover:scale-105 transition-transform`}
                       >
-                        <Icon size={24} aria-hidden="true" />
+                        <Icon size={22} className="sm:w-6 sm:h-6" aria-hidden="true" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                           <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             {card.iv}
                           </span>
                           <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">·</span>
-                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate sm:whitespace-normal">
                             {card.targetAsset}
                           </span>
                         </div>
-                        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
+                        <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
                           {card.title}
                         </h3>
                       </div>
                     </div>
 
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+                    <span className="self-start sm:self-auto text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
                       {card.badge}
                     </span>
                   </div>

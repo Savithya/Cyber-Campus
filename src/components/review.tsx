@@ -451,68 +451,68 @@ export default function Review() {
           >
             <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
               {/* Tile 1: Game Performance Score */}
-              <div className="p-4 sm:p-5 flex items-start gap-3.5">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
                 <Trophy
-                  size={24}
+                  size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="min-w-0">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                     Game Performance Score
                   </span>
-                  <strong className="block text-2xl sm:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
+                  <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
                     {score}
                   </strong>
                 </div>
               </div>
 
               {/* Tile 2: Decision accuracy */}
-              <div className="p-4 sm:p-5 flex items-start gap-3.5">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
                 <Target
-                  size={24}
+                  size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="min-w-0">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                     Decision accuracy
                   </span>
-                  <strong className="block text-2xl sm:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
+                  <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
                     {`${accuracy}%`}
                   </strong>
                 </div>
               </div>
 
               {/* Tile 3: Current streak */}
-              <div className="p-4 sm:p-5 flex items-start gap-3.5">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
                 <Flame
-                  size={24}
+                  size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="min-w-0">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                     Current streak
                   </span>
-                  <strong className="block text-2xl sm:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
+                  <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
                     {currentStreak}
                   </strong>
                 </div>
               </div>
 
               {/* Tile 4: Scenarios saved */}
-              <div className="p-4 sm:p-5 flex items-start gap-3.5">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
                 <Mail
-                  size={24}
+                  size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
-                <div>
-                  <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="min-w-0">
+                  <span className="block text-[10.5px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                     Scenarios saved
                   </span>
-                  <strong className="block text-2xl sm:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
+                  <strong className="block text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0e2a36] dark:text-slate-100 mt-1">
                     {`${completedCount} / 20`}
                   </strong>
                 </div>

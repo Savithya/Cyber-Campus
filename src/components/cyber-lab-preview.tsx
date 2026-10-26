@@ -209,21 +209,21 @@ export function CyberLabPreview() {
             </div>
 
             {/* Email Metadata */}
-            <div className="p-5 sm:p-6 space-y-4">
-              <div className="space-y-1.5 pb-4 border-b border-slate-100 dark:border-slate-800 text-xs">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-bold text-slate-500 dark:text-slate-400">From:</span>
-                  <span className="font-mono text-slate-800 dark:text-slate-200 text-right truncate max-w-sm sm:max-w-md">
+            <div className="p-4 sm:p-6 space-y-4">
+              <div className="space-y-2 pb-4 border-b border-slate-100 dark:border-slate-800 text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-2 min-w-0">
+                  <span className="font-bold text-slate-500 dark:text-slate-400 shrink-0">From:</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-200 text-left sm:text-right break-words sm:truncate max-w-full sm:max-w-md min-w-0">
                     {activeScenario.sender}
                   </span>
                 </div>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-bold text-slate-500 dark:text-slate-400">Subject:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white text-right">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-2 min-w-0">
+                  <span className="font-bold text-slate-500 dark:text-slate-400 shrink-0">Subject:</span>
+                  <span className="font-semibold text-slate-900 dark:text-white text-left sm:text-right break-words min-w-0">
                     {activeScenario.subject}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-slate-400 text-[11px]">
+                <div className="flex flex-wrap items-center justify-between text-slate-400 text-[11px] gap-1 pt-1">
                   <span>Date: {activeScenario.date}</span>
                   <span>Encryption: TLS (External Host)</span>
                 </div>

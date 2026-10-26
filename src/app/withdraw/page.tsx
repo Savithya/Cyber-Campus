@@ -63,6 +63,7 @@ export default function Page() {
               onChange={(e) => setCode(e.target.value)}
               placeholder="e.g. 01"
               maxLength={15}
+              className="w-full"
             />
           </label>
           <label>
@@ -75,6 +76,7 @@ export default function Page() {
               onChange={(e) => setToken(e.target.value)}
               minLength={64}
               maxLength={64}
+              className="w-full font-mono text-xs sm:text-sm"
             />
           </label>
           <label className="checkbox-row">
@@ -89,7 +91,7 @@ export default function Page() {
             </span>
           </label>
           {error && <ErrorBox message={error} />}
-          <button disabled={!confirmed || busy} className="button danger">
+          <button disabled={!confirmed || busy} className="button danger w-full sm:w-auto min-h-[46px] justify-center">
             {busy ? "Deleting…" : "Delete my response"}
           </button>
           <p className="small-copy">
