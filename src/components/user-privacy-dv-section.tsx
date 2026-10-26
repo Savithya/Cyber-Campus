@@ -98,6 +98,19 @@ export default function UserPrivacyDVSection({
     }
   }
 
+  if (sessions.length === 0) {
+    return (
+      <div className="card empty-state-box text-center p-8 border-dashed">
+        <ShieldCheck size={48} className="mx-auto text-cyan mb-4" />
+        <h2 className="text-lg font-bold">No research responses available yet</h2>
+        <p className="text-xs text-muted max-w-lg mx-auto mt-2">
+          Standardized psychometric measurement of the research Dependent Variable (Section F, Q19–Q25)
+          requires participant submissions. Once survey responses are recorded, threat recognition and disclosure vulnerability statistics will be computed here.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* =========================================================================

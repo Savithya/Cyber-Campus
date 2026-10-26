@@ -92,8 +92,8 @@ describe("Comprehensive Multi-Device Responsiveness Across All Pages & Screen Si
             backLabel: "Back to Home",
             continueLabel: "Continue to Student Profile",
             onContinue: () => {},
-            children: React.createElement("div", { className: "test-content" }, "Form Content"),
-          }
+          },
+          React.createElement("div", { className: "test-content" }, "Form Content")
         )
       );
 

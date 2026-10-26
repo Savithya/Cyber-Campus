@@ -4,6 +4,8 @@ const config: NextConfig = {
   turbopack: { root: process.cwd() },
   devIndicators: false,
   experimental: {
+    cpus: 1,
+    workerThreads: false,
     staleTimes: {
       dynamic: 30,
       static: 180,

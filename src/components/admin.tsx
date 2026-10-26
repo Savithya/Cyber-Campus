@@ -775,17 +775,25 @@ export default function Admin({
                 <p className="small-copy">
                   Daily research submission velocity recorded under Asia/Colombo timezone.
                 </p>
-                <div style={{ height: 240, width: "100%", marginTop: "1rem" }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={trendData.length ? trendData : [{ date: "Today", count: counts.totalSubmissions }]}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
-                      <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                      <Tooltip />
-                      <Bar dataKey="count" name="Submissions" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                {counts.totalSubmissions === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-52 border border-dashed rounded-lg text-muted text-xs p-4 mt-4">
+                    <Clock size={28} className="mb-2 opacity-40 text-cyan" />
+                    <p className="font-semibold text-foreground text-sm">No research responses available yet</p>
+                    <p className="text-[11px] text-muted mt-1">Submission velocity and daily trends will display as participant data arrives.</p>
+                  </div>
+                ) : (
+                  <div style={{ height: 240, width: "100%", marginTop: "1rem" }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={trendData.length ? trendData : [{ date: "Today", count: counts.totalSubmissions }]}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
+                        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                        <Tooltip />
+                        <Bar dataKey="count" name="Submissions" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </section>
 
               <section className="card">
@@ -798,29 +806,37 @@ export default function Admin({
                 <p className="small-copy">
                   Empirical simulated privacy risk across the four independent variables.
                 </p>
-                <div className="space-y-3 mt-3">
-                  {threatSummary.metrics.map((m) => (
-                    <div
-                      key={m.threatKey}
-                      className="p-2.5 rounded bg-surface border flex items-center justify-between text-xs"
-                    >
-                      <div>
-                        <strong className="block text-foreground font-semibold">
-                          {m.primaryIV}: {m.threatName}
-                        </strong>
-                        <span className="text-muted text-[11px]">
-                          {m.completedAttempts} Evaluations · Unsafe Rate: {m.unsafeRate}%
-                        </span>
+                {allAttempts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-52 border border-dashed rounded-lg text-muted text-xs p-4 mt-4">
+                    <ShieldCheck size={28} className="mb-2 opacity-40 text-cyan" />
+                    <p className="font-semibold text-foreground text-sm">No research responses available yet</p>
+                    <p className="text-[11px] text-muted mt-1">Threat drivers will be calculated automatically when participants evaluate challenges.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 mt-3">
+                    {threatSummary.metrics.map((m) => (
+                      <div
+                        key={m.threatKey}
+                        className="p-2.5 rounded bg-surface border flex items-center justify-between text-xs"
+                      >
+                        <div>
+                          <strong className="block text-foreground font-semibold">
+                            {m.primaryIV}: {m.threatName}
+                          </strong>
+                          <span className="text-muted text-[11px]">
+                            {m.completedAttempts} Evaluations · Unsafe Rate: {m.unsafeRate}%
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <strong className="text-sm font-mono text-cyan block">
+                            {m.privacyRiskScore}%
+                          </strong>
+                          <span className="text-[10px] text-muted">Risk Score</span>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <strong className="text-sm font-mono text-cyan block">
-                          {m.privacyRiskScore}%
-                        </strong>
-                        <span className="text-[10px] text-muted">Risk Score</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
 
@@ -895,75 +911,85 @@ export default function Admin({
               </div>
             </div>
 
-            <div className="space-y-6">
-              {questions.slice(0, 5).map((q) => {
-                const agg = aggregateQuestion(q, filtered);
-                return (
-                  <div key={q.id} className="card">
-                    <div className="card-top">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="question-number">{q.id}</span>
-                          <span className="tag">SECTION A · PROFILE</span>
+            {filtered.length === 0 ? (
+              <div className="card text-center p-8 border-dashed">
+                <Users size={40} className="mx-auto text-cyan mb-3" />
+                <h3 className="text-base font-bold">No research responses available yet</h3>
+                <p className="text-xs text-muted max-w-md mx-auto mt-1">
+                  Participant demographic summaries and distributions across age, gender, university, and academic faculty will automatically appear here once research participants submit Section A.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {questions.slice(0, 5).map((q) => {
+                  const agg = aggregateQuestion(q, filtered);
+                  return (
+                    <div key={q.id} className="card">
+                      <div className="card-top">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="question-number">{q.id}</span>
+                            <span className="tag">SECTION A · PROFILE</span>
+                          </div>
+                          <h3 className="text-lg font-bold mt-1">{q.text}</h3>
+                          <p className="text-xs text-muted mt-0.5">{q.variable}</p>
                         </div>
-                        <h3 className="text-lg font-bold mt-1">{q.text}</h3>
-                        <p className="text-xs text-muted mt-0.5">{q.variable}</p>
-                      </div>
-                      <div className="text-right text-xs text-muted">
-                        <div>Valid Responses: <strong className="text-foreground">{agg.validN}</strong></div>
-                        <div>Missing: <strong className="text-foreground">{agg.missingN}</strong></div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
-                      <div style={{ height: Math.max(180, agg.rows.length * 40), width: "100%" }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            layout="vertical"
-                            data={agg.rows}
-                            margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
-                            <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11 }} />
-                            <YAxis
-                              type="category"
-                              dataKey="label"
-                              tick={{ fontSize: 11 }}
-                              width={140}
-                            />
-                            <Tooltip formatter={(v) => [Number(v).toFixed(1) + "%", "Percentage"]} />
-                            <Bar dataKey="percentage" name="Percentage" fill="#06b6d4" radius={[0, 4, 4, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
+                        <div className="text-right text-xs text-muted">
+                          <div>Valid Responses: <strong className="text-foreground">{agg.validN}</strong></div>
+                          <div>Missing: <strong className="text-foreground">{agg.missingN}</strong></div>
+                        </div>
                       </div>
 
-                      <div className="table-scroll">
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Category</th>
-                              <th>Code</th>
-                              <th>Count (n)</th>
-                              <th>Percentage (%)</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {agg.rows.map((r) => (
-                              <tr key={r.code}>
-                                <th>{r.label}</th>
-                                <td><code>{r.code}</code></td>
-                                <td>{r.count}</td>
-                                <td><strong>{r.percentage.toFixed(1)}%</strong></td>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
+                        <div style={{ height: Math.max(180, agg.rows.length * 40), width: "100%" }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              layout="vertical"
+                              data={agg.rows}
+                              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
+                              <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11 }} />
+                              <YAxis
+                                type="category"
+                                dataKey="label"
+                                tick={{ fontSize: 11 }}
+                                width={140}
+                              />
+                              <Tooltip formatter={(v) => [Number(v).toFixed(1) + "%", "Percentage"]} />
+                              <Bar dataKey="percentage" name="Percentage" fill="#06b6d4" radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        <div className="table-scroll">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Category</th>
+                                <th>Code</th>
+                                <th>Count (n)</th>
+                                <th>Percentage (%)</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {agg.rows.map((r) => (
+                                <tr key={r.code}>
+                                  <th>{r.label}</th>
+                                  <td><code>{r.code}</code></td>
+                                  <td>{r.count}</td>
+                                  <td><strong>{r.percentage.toFixed(1)}%</strong></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -1206,8 +1232,8 @@ export default function Admin({
                         <td>{m.completedAttempts}</td>
                         <td>{m.completedAttempts - m.unsafeCount}</td>
                         <td>
-                          <span className={100 - m.unsafeRate > 60 ? "text-emerald font-semibold" : ""}>
-                            {100 - m.unsafeRate}%
+                          <span className={m.completedAttempts > 0 && 100 - m.unsafeRate > 60 ? "text-emerald font-semibold" : ""}>
+                            {m.completedAttempts > 0 ? `${100 - m.unsafeRate}%` : "0%"}
                           </span>
                         </td>
                         <td>
@@ -1409,7 +1435,7 @@ export default function Admin({
               </div>
 
               {!filteredAuditAttempts.length && (
-                <p className="empty-copy">No recorded responses match these audit filters.</p>
+                <p className="empty-copy">No research responses available yet.</p>
               )}
 
               {/* Audit Pagination */}
@@ -1551,7 +1577,7 @@ export default function Admin({
               </div>
 
               {!historySessions.length && (
-                <p className="empty-copy">No sessions match these filters.</p>
+                <p className="empty-copy">No research responses available yet.</p>
               )}
 
               <div className="pagination">
@@ -1687,27 +1713,35 @@ export default function Admin({
               <div className="card-top">
                 <h2>Threat Impact Comparison: Simulated Privacy Risk &amp; Unsafe Rate</h2>
               </div>
-              <div style={{ height: 320, width: "100%", marginTop: "1rem" }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    layout="vertical"
-                    data={threatSummary.metrics.map((m) => ({
-                      name: m.threatName,
-                      code: m.primaryIV,
-                      riskScore: m.privacyRiskScore,
-                      unsafeRate: m.unsafeRate,
-                    }))}
-                    margin={{ top: 10, right: 30, left: 140, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} horizontal={false} />
-                    <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={130} />
-                    <Tooltip />
-                    <Bar dataKey="riskScore" name="Simulated Privacy Risk Score (%)" fill="#06b6d4" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="unsafeRate" name="Unsafe Decision Rate (%)" fill="#f43f5e" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {allAttempts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-52 border border-dashed rounded-lg text-muted text-xs p-4 mt-4">
+                  <ShieldAlert size={28} className="mb-2 opacity-40 text-cyan" />
+                  <p className="font-semibold text-foreground text-sm">No research responses available yet</p>
+                  <p className="text-[11px] text-muted mt-1">Threat impact comparison will appear once participant challenge evaluations are recorded.</p>
+                </div>
+              ) : (
+                <div style={{ height: 320, width: "100%", marginTop: "1rem" }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      layout="vertical"
+                      data={threatSummary.metrics.map((m) => ({
+                        name: m.threatName,
+                        code: m.primaryIV,
+                        riskScore: m.privacyRiskScore,
+                        unsafeRate: m.unsafeRate,
+                      }))}
+                      margin={{ top: 10, right: 30, left: 140, bottom: 20 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} horizontal={false} />
+                      <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={130} />
+                      <Tooltip />
+                      <Bar dataKey="riskScore" name="Simulated Privacy Risk Score (%)" fill="#06b6d4" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="unsafeRate" name="Unsafe Decision Rate (%)" fill="#f43f5e" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
 
             {/* Tabular Comparative Breakdown */}
@@ -1893,7 +1927,7 @@ function ThreatAnalysisPanel({
   const unsafeRate = attemptedOnly.length
     ? Math.round((unsafeCount / attemptedOnly.length) * 100)
     : 0;
-  const protectiveRate = 100 - unsafeRate;
+  const protectiveRate = attemptedOnly.length ? Math.max(0, 100 - unsafeRate) : 0;
   const totalRisk = attemptedOnly.reduce(
     (sum, a) => sum + (a.privacyRiskScore ?? 0),
     0,
@@ -1970,56 +2004,72 @@ function ThreatAnalysisPanel({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card">
           <h3 className="text-sm font-semibold mb-3">Decision Action Distribution</h3>
-          <div style={{ height: 220, width: "100%" }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={[
-                  { action: "Report to IT", count: actionCounts.report, fill: "#10b981" },
-                  { action: "Verify Channel", count: actionCounts.verify, fill: "#06b6d4" },
-                  { action: "Ignore / Delete", count: actionCounts.ignore, fill: "#f59e0b" },
-                  { action: "Proceed (Unsafe)", count: actionCounts.proceed, fill: "#f43f5e" },
-                ]}
-                margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
-                <XAxis dataKey="action" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Bar dataKey="count" name="Decisions" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {attemptedOnly.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-52 border border-dashed rounded-lg text-muted text-xs p-4">
+              <Gamepad2 size={24} className="mb-2 opacity-40 text-cyan" />
+              <p className="font-semibold text-foreground text-sm">No research responses available yet</p>
+              <p className="text-[11px] text-muted mt-1">Decision actions will be tracked when participants take this challenge.</p>
+            </div>
+          ) : (
+            <div style={{ height: 220, width: "100%" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    { action: "Report to IT", count: actionCounts.report, fill: "#10b981" },
+                    { action: "Verify Channel", count: actionCounts.verify, fill: "#06b6d4" },
+                    { action: "Ignore / Delete", count: actionCounts.ignore, fill: "#f59e0b" },
+                    { action: "Proceed (Unsafe)", count: actionCounts.proceed, fill: "#f43f5e" },
+                  ]}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
+                  <XAxis dataKey="action" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="count" name="Decisions" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         <div className="card">
           <h3 className="text-sm font-semibold mb-3">Disclosed Information Categories</h3>
-          <div className="space-y-2 mt-2">
-            {Object.entries(infoCounts).map(([cat, count]) => {
-              const pct = attemptedOnly.length
-                ? Math.round((count / attemptedOnly.length) * 100)
-                : 0;
-              const isSafe = cat === "None";
-              return (
-                <div
-                  key={cat}
-                  className="p-2.5 rounded bg-surface border flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <span className={`font-semibold ${isSafe ? "text-emerald" : "text-red"}`}>
-                      {cat}
-                    </span>
-                    <span className="text-muted block text-[11px]">
-                      {isSafe ? "Protected: No credentials or info disclosed" : "Simulated personal info exposure"}
-                    </span>
+          {attemptedOnly.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-52 border border-dashed rounded-lg text-muted text-xs p-4">
+              <ShieldCheck size={24} className="mb-2 opacity-40 text-cyan" />
+              <p className="font-semibold text-foreground text-sm">No research responses available yet</p>
+              <p className="text-[11px] text-muted mt-1">Disclosed information risk categories will appear once decisions are submitted.</p>
+            </div>
+          ) : (
+            <div className="space-y-2 mt-2">
+              {Object.entries(infoCounts).map(([cat, count]) => {
+                const pct = attemptedOnly.length
+                  ? Math.round((count / attemptedOnly.length) * 100)
+                  : 0;
+                const isSafe = cat === "None";
+                return (
+                  <div
+                    key={cat}
+                    className="p-2.5 rounded bg-surface border flex items-center justify-between text-xs"
+                  >
+                    <div>
+                      <span className={`font-semibold ${isSafe ? "text-emerald" : "text-red"}`}>
+                        {cat}
+                      </span>
+                      <span className="text-muted block text-[11px]">
+                        {isSafe ? "Protected: No credentials or info disclosed" : "Simulated personal info exposure"}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <strong className="font-mono text-sm">{count}</strong>
+                      <span className="text-muted block text-[11px]">{pct}%</span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <strong className="font-mono text-sm">{count}</strong>
-                    <span className="text-muted block text-[11px]">{pct}%</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

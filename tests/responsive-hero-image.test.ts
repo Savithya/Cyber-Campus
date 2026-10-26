@@ -90,8 +90,24 @@ describe("Cyber Campus — Final Responsive Hero Image Enhancement", () => {
     expect(css).toContain('[data-theme="cyber"] .hero-pro-ambient-glow');
   });
 
-  it("validates responsive calculations for all 8 required test breakpoints", () => {
-    const BREAKPOINTS = [320, 375, 430, 768, 1024, 1280, 1440, 1920];
+  it("validates responsive calculations for all 14 required test breakpoints", () => {
+    const BREAKPOINTS = [
+      320, // Small Android phones
+      360, // Common Android phones
+      375, // Small iPhones
+      390, // Modern iPhones
+      414, // Large phones
+      430, // Large iPhones (Pro Max)
+      600, // Small tablets
+      768, // Tablets portrait
+      820, // Larger tablets
+      1024, // Tablets landscape / small laptops
+      1280, // Laptops
+      1366, // Standard laptop displays
+      1440, // Desktop displays
+      1920, // Full HD monitors
+      2560, // Large monitors
+    ];
     const imageAspect = 1376 / 768; // 1.7916666...
 
     BREAKPOINTS.forEach((width) => {
@@ -122,11 +138,11 @@ describe("Cyber Campus — Final Responsive Hero Image Enhancement", () => {
         expect(expectedWrapperMaxWidth).toBe(650);
         expect(layout).toBe("desktop-2col");
       }
-      if (width === 768) {
+      if (width === 768 || width === 820) {
         expect(expectedWrapperMaxWidth).toBe(550);
         expect(layout).toBe("tablet-stacked");
       }
-      if (width <= 430) {
+      if (width <= 600) {
         expect(layout).toBe("mobile-stacked");
       }
     });

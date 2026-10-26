@@ -130,12 +130,11 @@ export default function StatisticalAnalysis({
   // Empty state handling
   if (validSampleCount === 0) {
     return (
-      <div className="card empty-state-box">
-        <ShieldAlert size={48} className="text-amber-500 mb-4" />
-        <h2>Insufficient Research Data</h2>
-        <p>
-          Statistical computations require authentic submitted survey responses.
-          No participant submissions match your current filters.
+      <div className="card empty-state-box text-center p-8">
+        <ShieldAlert size={48} className="mx-auto text-amber-500 mb-4" />
+        <h2 className="text-xl font-bold">No research responses available yet</h2>
+        <p className="text-sm text-muted mt-2">
+          Statistical computations and hypothesis testing require authentic submitted survey responses.
         </p>
         <p className="small-copy mt-2">
           Clear your search filters or wait for research participants to submit

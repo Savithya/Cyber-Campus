@@ -121,7 +121,7 @@ interface ResearchJourneyFrameProps {
   continueLoading?: boolean;
   hideProgressHeader?: boolean;
   hideActionBar?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function ResearchJourneyFrame({
