@@ -250,12 +250,12 @@ export function InteractiveChallengeRunner({
   };
 
   return (
-    <div className="cyber-step-investigation-layout w-full max-w-6xl mx-auto space-y-6">
+    <div className="cyber-step-investigation-layout w-full max-w-6xl mx-auto space-y-5 sm:space-y-6 min-w-0 overflow-hidden box-border">
       {/* =====================================================================
           1. 4-METRIC TOP STATS BANNER
           ===================================================================== */}
       <section
-        className="cyber-metrics-banner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden"
+        className="cyber-metrics-banner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden w-full max-w-full min-w-0"
         role="region"
         aria-label="Simulation Performance Telemetry"
       >
@@ -352,11 +352,11 @@ export function InteractiveChallengeRunner({
       {/* =====================================================================
           3. TWO-COLUMN INVESTIGATION WORKSTATION
           ===================================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start workstation-2col">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start workstation-2col w-full max-w-full min-w-0 box-border">
         {/* ===================================================================
             LEFT COLUMN: THE SIMULATED CHALLENGE INBOX / EVIDENCE ARTIFACT
             =================================================================== */}
-        <div className="lg:col-span-7 challenge-investigation-stage bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <div className="lg:col-span-7 challenge-investigation-stage bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col w-full max-w-full min-w-0 box-border">
           {/* Header Bar */}
           <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-900/30">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -642,7 +642,7 @@ export function InteractiveChallengeRunner({
         {/* ===================================================================
             RIGHT COLUMN: "YOUR CALL" DECISION CONSOLE
             =================================================================== */}
-        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-6 lg:p-7 shadow-sm lg:sticky lg:top-6 space-y-3.5 sm:space-y-5">
+        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-6 lg:p-7 shadow-sm lg:sticky lg:top-6 space-y-3.5 sm:space-y-5 w-full max-w-full min-w-0 box-border">
           {/* Eyebrow & Title */}
           <div className="space-y-1">
             <span className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">

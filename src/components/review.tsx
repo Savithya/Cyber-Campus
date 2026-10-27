@@ -430,8 +430,8 @@ export default function Review() {
   // =========================================================================
   if (!isSubmitted) {
     return (
-      <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c1322] text-slate-800 dark:text-slate-200 py-10 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c1322] text-slate-800 dark:text-slate-200 py-10 px-3.5 sm:px-6 w-full max-w-full overflow-x-hidden box-border">
+        <div className="max-w-4xl mx-auto space-y-6 w-full min-w-0">
           {/* Top instruction text matching Image 1 */}
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-normal">
             Examine each email carefully and decide what you would do.
@@ -585,8 +585,8 @@ export default function Review() {
   // Exact visual match of user Image 2
   // =========================================================================
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c1322] text-slate-800 dark:text-slate-200 py-12 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto space-y-10">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c1322] text-slate-800 dark:text-slate-200 py-12 px-3.5 sm:px-6 w-full max-w-full overflow-x-hidden box-border">
+      <div className="max-w-3xl mx-auto space-y-10 w-full min-w-0">
         {/* Top Header Badge & Text matching Image 2 */}
         <header className="text-center space-y-3">
           {/* Shield Check Icon in mint circle */}

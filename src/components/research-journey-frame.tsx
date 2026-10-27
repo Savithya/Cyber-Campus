@@ -168,14 +168,24 @@ export function ResearchJourneyFrame({
   );
 
   const activeStepRef = React.useRef<HTMLAnchorElement | null>(null);
+  const stepperListRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
-    if (activeStepRef.current) {
-      activeStepRef.current.scrollIntoView({
+    // Scroll the horizontal stepper list safely WITHOUT scrolling the parent window/document
+    if (activeStepRef.current && stepperListRef.current) {
+      const container = stepperListRef.current;
+      const activeEl = activeStepRef.current;
+      const targetScroll =
+        activeEl.offsetLeft - container.clientWidth / 2 + activeEl.clientWidth / 2;
+      container.scrollTo({
+        left: Math.max(0, targetScroll),
         behavior: "smooth",
-        inline: "center",
-        block: "nearest",
       });
+    }
+
+    // Guarantee the viewport horizontal scroll position is strictly locked to 0
+    if (typeof window !== "undefined" && window.scrollX !== 0) {
+      window.scrollTo({ left: 0, top: window.scrollY });
     }
   }, [normalizedKey]);
 
@@ -196,7 +206,11 @@ export function ResearchJourneyFrame({
             </div>
 
             {/* Stepper Navigation List: 7 Clean Step Cards */}
-            <nav className="journey-stepper-list" aria-label="7 Research Steps">
+            <nav
+              ref={stepperListRef}
+              className="journey-stepper-list"
+              aria-label="7 Research Steps"
+            >
               {ALL_JOURNEY_STEPS.map((step, idx) => {
                 const isActive = normalizedKey === step.key;
                 const isCompleted = idx < activeStepIndex || normalizedKey === "review" || idx <= activeStepIndex;
