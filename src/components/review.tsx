@@ -449,9 +449,9 @@ export default function Review() {
             role="region"
             aria-label="Challenge Telemetry Summary"
           >
-            <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-slate-100 dark:divide-slate-800">
               {/* Tile 1: Game Performance Score */}
-              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 border-r border-b sm:border-b-0 border-slate-100 dark:border-slate-800 min-w-0">
                 <Trophy
                   size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
@@ -468,7 +468,7 @@ export default function Review() {
               </div>
 
               {/* Tile 2: Decision accuracy */}
-              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 min-w-0">
                 <Target
                   size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
@@ -485,7 +485,7 @@ export default function Review() {
               </div>
 
               {/* Tile 3: Current streak */}
-              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 min-w-0">
+              <div className="p-3 sm:p-5 flex items-start gap-2.5 sm:gap-3.5 border-r border-slate-100 dark:border-slate-800 min-w-0">
                 <Flame
                   size={22}
                   className="text-slate-400 dark:text-slate-500 shrink-0 mt-0.5"
@@ -539,7 +539,7 @@ export default function Review() {
 
           {/* Centered White "Ready to finish?" Card matching Image 1 */}
           <div className="pt-6 sm:pt-10">
-            <div className="max-w-xl mx-auto bg-white dark:bg-[#141e33] rounded-3xl border border-slate-200/90 dark:border-slate-800 p-8 sm:p-12 shadow-sm text-center">
+            <div className="max-w-xl mx-auto bg-white dark:bg-[#141e33] rounded-3xl border border-slate-200/90 dark:border-slate-800 p-5 sm:p-8 md:p-12 shadow-sm text-center">
               {/* Checkmark in mint circle */}
               <div className="w-16 h-16 rounded-full bg-[#e8f3ed] dark:bg-[#1b3d30] flex items-center justify-center mx-auto mb-6">
                 <Check size={28} strokeWidth={2.5} className="text-[#2e6950] dark:text-[#52c286]" />
@@ -565,7 +565,7 @@ export default function Review() {
                 type="button"
                 onClick={handleFinalSubmit}
                 disabled={busy}
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 !text-white font-semibold text-sm sm:text-base shadow-sm transition-all hover:shadow-md cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 !text-white font-semibold text-sm sm:text-base shadow-sm transition-all hover:shadow-md cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed min-h-[48px]"
               >
                 <span className="!text-white">{busy ? "Submitting responses…" : "Submit & see my results"}</span>
                 <ArrowRight size={18} className="text-white shrink-0" aria-hidden="true" />

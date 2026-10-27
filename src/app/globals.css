@@ -29930,13 +29930,206 @@ code {
 
 /* --------------------------------------------------------------------------
    04. RESEARCH JOURNEY FRAME & ACTION BAR MULTI-DEVICE ADAPTATION
+   (Consent, About You, Phishing, Pretexting, Impersonation, Scams, Review)
    -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .journey-layout-container {
+    padding: 24px 16px 56px !important;
+  }
+
+  .journey-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .journey-sidebar {
+    width: 100% !important;
+    margin-bottom: 4px !important;
+  }
+
+  .journey-sidebar-sticky {
+    position: static !important;
+  }
+
+  .journey-sidebar-header {
+    margin-bottom: 8px !important;
+  }
+
+  .journey-sidebar-title {
+    display: none !important;
+  }
+
+  .journey-sidebar-kicker {
+    font-size: 10.5px !important;
+  }
+
+  .journey-stepper-list {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 8px !important;
+    gap: 8px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    scroll-behavior: smooth !important;
+  }
+
+  .journey-stepper-list::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .journey-step-item {
+    flex-shrink: 0 !important;
+    min-width: 125px !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .journey-step-kicker {
+    font-size: 9.5px !important;
+  }
+
+  .journey-step-title {
+    font-size: 11.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  .journey-sidebar-footer {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
   .brand small,
   .brand-subtitle {
     display: none !important;
   }
 
+  .journey-layout-container {
+    padding: 16px 12px 48px !important;
+  }
+
+  .journey-stage-header {
+    margin-bottom: 14px !important;
+  }
+
+  .journey-stage-title {
+    font-size: clamp(20px, 5vw, 26px) !important;
+    line-height: 1.2 !important;
+  }
+
+  .journey-stage-subtitle {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+  }
+
+  /* Consent Page (Step 01) Mobile Adaptation */
+  .spot-join-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .spot-join-card {
+    padding: 18px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .spot-join-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+
+  .spot-join-subtitle {
+    font-size: 13.5px !important;
+  }
+
+  .spot-join-card-title {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+  }
+
+  .spot-join-card-lead {
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .spot-join-grid {
+    grid-template-columns: 1fr !important;
+    row-gap: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .spot-join-saved-callout {
+    padding: 14px 14px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .spot-join-consent-block {
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .spot-join-checkbox-label {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  .spot-join-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .spot-join-btn-agree,
+  .spot-join-btn-disagree {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+    text-align: center !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+  }
+
+  .spot-join-practice-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    font-size: 12.5px !important;
+  }
+
+  /* About You (Step 02) Mobile Adaptation */
+  .journey-question-card {
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .journey-question-text {
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 12px !important;
+  }
+
+  .journey-options-grid {
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .journey-option-pill {
+    width: 100% !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+    padding: 10px 14px !important;
+    font-size: 13.5px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* Universal Journey Action Bar */
   .journey-action-bar {
     flex-direction: column-reverse !important;
     align-items: stretch !important;
@@ -29953,51 +30146,19 @@ code {
     text-align: center !important;
   }
 
-  .journey-stage-title {
-    font-size: clamp(22px, 5.5vw, 28px) !important;
+  /* Investigation Workstations (Steps 03 - 06: Phishing, Pretexting, Impersonation, Scams & Links) */
+  .challenge-investigation-stage,
+  .challenge-decision-corner {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
   }
 
-  .journey-stage-subtitle {
-    font-size: 13.5px !important;
+  .workstation-2col {
+    gap: 14px !important;
   }
 
-  .journey-options-grid {
-    flex-direction: column !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
-  .journey-option-pill {
-    width: 100% !important;
-    min-height: 44px !important;
-    box-sizing: border-box !important;
-    justify-content: flex-start !important;
-    padding: 10px 14px !important;
-    font-size: 14px !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-  }
-}
-
-@media (max-width: 900px) {
-  .journey-stepper-list {
-    display: flex !important;
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    padding-bottom: 12px !important;
-    gap: 8px !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-  }
-
-  .journey-stepper-list::-webkit-scrollbar {
-    display: none;
-  }
-
-  .journey-step-item {
-    flex-shrink: 0 !important;
-    min-width: 130px !important;
-    padding: 8px 12px !important;
+  .cyber-metrics-banner {
+    border-radius: 12px !important;
   }
 }
 

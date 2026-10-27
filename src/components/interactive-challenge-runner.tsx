@@ -259,16 +259,16 @@ export function InteractiveChallengeRunner({
         role="region"
         aria-label="Simulation Performance Telemetry"
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800/80">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-slate-100 dark:divide-slate-800/80">
           {/* Metric 1: Game Performance Score */}
-          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-2.5 sm:p-4 md:p-5 flex flex-col justify-between border-r border-b lg:border-b-0 border-slate-100 dark:border-slate-800/80 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] xs:text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Trophy
                 size={15}
                 className="text-amber-500 shrink-0"
                 aria-hidden="true"
               />
-              <span className="truncate sm:whitespace-normal">Game Performance Score</span>
+              <span className="break-words sm:truncate leading-tight">Game Performance Score</span>
             </div>
             <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {performanceScore}
@@ -276,14 +276,14 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Metric 2: Decision Accuracy */}
-          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-2.5 sm:p-4 md:p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800/80 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] xs:text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Target
                 size={15}
                 className="text-teal-600 dark:text-teal-400 shrink-0"
                 aria-hidden="true"
               />
-              <span className="truncate sm:whitespace-normal">Decision accuracy</span>
+              <span className="break-words sm:truncate leading-tight">Decision accuracy</span>
             </div>
             <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {decisionAccuracy}
@@ -291,14 +291,14 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Metric 3: Current Streak */}
-          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-2.5 sm:p-4 md:p-5 flex flex-col justify-between border-r border-slate-100 dark:border-slate-800/80 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] xs:text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Flame
                 size={15}
                 className="text-orange-500 shrink-0"
                 aria-hidden="true"
               />
-              <span className="truncate sm:whitespace-normal">Current streak</span>
+              <span className="break-words sm:truncate leading-tight">Current streak</span>
             </div>
             <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {currentStreak}
@@ -306,14 +306,14 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Metric 4: Scenarios Saved */}
-          <div className="p-3 sm:p-4 md:p-5 flex flex-col justify-between">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="p-2.5 sm:p-4 md:p-5 flex flex-col justify-between min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] xs:text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
               <Mail
                 size={15}
                 className="text-sky-600 dark:text-sky-400 shrink-0"
                 aria-hidden="true"
               />
-              <span className="truncate sm:whitespace-normal">Scenarios saved</span>
+              <span className="break-words sm:truncate leading-tight">Scenarios saved</span>
             </div>
             <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {savedInMissionCount} / {totalInMission}
@@ -432,7 +432,7 @@ export function InteractiveChallengeRunner({
           </div>
 
           {/* Email / Evidence Content Body */}
-          <div className="p-4 sm:p-6 lg:p-7 space-y-4">
+          <div className="p-3.5 sm:p-6 lg:p-7 space-y-3.5 sm:space-y-4">
             {/* Kicker */}
             <div className="text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase font-mono">
               SIMULATED{" "}
@@ -639,7 +639,7 @@ export function InteractiveChallengeRunner({
         {/* ===================================================================
             RIGHT COLUMN: "YOUR CALL" DECISION CONSOLE
             =================================================================== */}
-        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 lg:p-7 shadow-sm sticky top-6 space-y-4 sm:space-y-5">
+        <div className="lg:col-span-5 challenge-decision-corner bg-white dark:bg-[#141e33] border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-6 lg:p-7 shadow-sm lg:sticky lg:top-6 space-y-3.5 sm:space-y-5">
           {/* Eyebrow & Title */}
           <div className="space-y-1">
             <span className="text-[11px] font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">

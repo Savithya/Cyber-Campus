@@ -167,6 +167,18 @@ export function ResearchJourneyFrame({
     ALL_JOURNEY_STEPS.findIndex((s) => s.key === normalizedKey)
   );
 
+  const activeStepRef = React.useRef<HTMLAnchorElement | null>(null);
+
+  React.useEffect(() => {
+    if (activeStepRef.current) {
+      activeStepRef.current.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [normalizedKey]);
+
   return (
     <div className="journey-layout-container">
       <div className="journey-layout-grid">
@@ -192,6 +204,7 @@ export function ResearchJourneyFrame({
                 return (
                   <Link
                     key={step.key}
+                    ref={isActive ? activeStepRef : undefined}
                     href={step.href}
                     prefetch={true}
                     className={`journey-step-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}

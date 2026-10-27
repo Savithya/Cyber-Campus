@@ -210,6 +210,29 @@ describe("CYBER CAMPUS — Complete 14-Viewport Responsiveness & Accessibility A
       expect(html).toContain("journey-action-bar");
       expect(html).toContain("content-slot");
     });
+
+    it("verifies responsive CSS rules for all 7 Research Journey pages (Consent -> Review)", () => {
+      // Step 1: Consent
+      expect(css).toContain(".spot-join-card");
+      expect(css).toContain(".spot-join-actions");
+      expect(css).toContain(".spot-join-btn-agree");
+      expect(css).toContain(".spot-join-btn-disagree");
+
+      // Step 2: About You (Demographics)
+      expect(css).toContain(".journey-question-card");
+      expect(css).toContain(".journey-options-grid");
+      expect(css).toContain(".journey-option-pill");
+
+      // Steps 3 - 6: Investigation Workstations (Phishing, Pretexting, Impersonation, Scams & Links)
+      expect(css).toContain(".challenge-investigation-stage");
+      expect(css).toContain(".challenge-decision-corner");
+      expect(css).toContain(".workstation-2col");
+      expect(css).toContain(".cyber-metrics-banner");
+
+      // Step 7: Review & Save
+      expect(css).toContain(".journey-review-list-card");
+      expect(css).toContain(".journey-review-row");
+    });
   });
 
   describe("6. Researcher Access Portal & Login", () => {
