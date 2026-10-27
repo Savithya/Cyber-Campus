@@ -2,7 +2,6 @@ import { HeroSection } from "@/components/hero-section";
 import { ResearchMetrics } from "@/components/research-metrics";
 import { ThreatCategories } from "@/components/threat-categories";
 import { ParticipationJourney } from "@/components/participation-journey";
-import { CyberLabPreview } from "@/components/cyber-lab-preview";
 import { ResearchEthics } from "@/components/research-ethics";
 import { ResearchCTA } from "@/components/research-cta";
 
@@ -21,13 +20,10 @@ export default function Home() {
       {/* 4. Four-Step Participation Journey */}
       <ParticipationJourney />
 
-      {/* 5. Interactive Cyber Lab Preview (Educational Demo) */}
-      <CyberLabPreview />
-
-      {/* 6. Research Ethics & Privacy Section */}
+      {/* 5. Research Ethics & Privacy Section */}
       <ResearchEthics />
 
-      {/* 7. Final Research Call-to-Action Banner */}
+      {/* 6. Final Research Call-to-Action Banner */}
       <ResearchCTA />
     </div>
   );

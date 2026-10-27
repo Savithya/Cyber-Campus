@@ -72,9 +72,9 @@ describe("Cyber Campus Spot-the-Phish Redesign Verification", () => {
     expect(html).toContain("Submit &amp; Complete");
     expect(html).toContain("Begin Research Participation");
 
-    // Verify Cyber Lab Preview Demo
-    expect(html).toContain("Think Like a Cyber Investigator");
-    expect(html).toContain("Optional Educational Demo — Not Part of Research Scoring");
+    // Verify Cyber Lab Preview Demo (Removed from Home page)
+    expect(html).not.toContain("cyber-lab-preview-section");
+    expect(html).not.toContain("Think Like a Cyber Investigator");
 
     // Verify Research Ethics & Privacy
     expect(html).toContain("Research Ethics &amp; Your Privacy");

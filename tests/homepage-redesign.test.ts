@@ -301,9 +301,9 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
     expect(html).toContain("participation-journey-section");
     expect(html).toContain("How Cyber Campus Works");
 
-    // Section 5: Demo Lab
-    expect(html).toContain("cyber-lab-preview-section");
-    expect(html).toContain("Think Like a Cyber Investigator");
+    // Section 5: Demo Lab (Removed from Home page)
+    expect(html).not.toContain("cyber-lab-preview-section");
+    expect(html).not.toContain("Think Like a Cyber Investigator");
 
     // Section 6: Ethics
     expect(html).toContain("research-ethics-section");
