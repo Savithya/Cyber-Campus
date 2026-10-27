@@ -221,6 +221,9 @@ export function ResearchJourneyFrame({
                     <div className="journey-step-text">
                       <span className="journey-step-kicker">{step.kicker}</span>
                       <strong className="journey-step-title">{step.title}</strong>
+                      <span className="sr-only">
+                        {isActive ? " (Current step)" : isCompleted ? " (Completed)" : " (Upcoming)"}
+                      </span>
                     </div>
                   </Link>
                 );
@@ -249,7 +252,14 @@ export function ResearchJourneyFrame({
                 <span className="journey-progress-title">Questionnaire progress</span>
                 <span className="journey-progress-percent">{progressPercent}%</span>
               </div>
-              <div className="journey-progress-bar-track">
+              <div
+                className="journey-progress-bar-track"
+                role="progressbar"
+                aria-label="Questionnaire progress"
+                aria-valuenow={Math.min(100, Math.max(0, progressPercent))}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
                 <div
                   className="journey-progress-bar-fill"
                   style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
@@ -267,7 +277,7 @@ export function ResearchJourneyFrame({
 
           {/* Optional Notice Banner */}
           {noticePill && (
-            <div className="journey-notice-pill">
+            <div className="journey-notice-pill" role="status">
               <span>{noticePill}</span>
             </div>
           )}
@@ -279,7 +289,12 @@ export function ResearchJourneyFrame({
           {!hideActionBar && (
             <div className="journey-action-bar">
               {backHref ? (
-                <Link href={backHref} prefetch={true} className="journey-back-btn">
+                <Link
+                  href={backHref}
+                  prefetch={true}
+                  className="journey-back-btn"
+                  aria-label={backLabel}
+                >
                   <ArrowLeft size={16} aria-hidden="true" />
                   <span>{backLabel}</span>
                 </Link>
@@ -288,6 +303,7 @@ export function ResearchJourneyFrame({
                   type="button"
                   onClick={onBack}
                   className="journey-back-btn"
+                  aria-label={backLabel}
                 >
                   <ArrowLeft size={16} aria-hidden="true" />
                   <span>{backLabel}</span>
@@ -301,6 +317,8 @@ export function ResearchJourneyFrame({
                   type="button"
                   onClick={onContinue}
                   disabled={continueDisabled || continueLoading}
+                  aria-busy={continueLoading}
+                  aria-disabled={continueDisabled || continueLoading}
                   className={`journey-continue-btn ${
                     continueDisabled ? "disabled" : ""
                   }`}
@@ -323,7 +341,12 @@ export function ResearchJourneyFrame({
 
           {/* Bottom "Leave study" link */}
           <div className="journey-leave-wrapper">
-            <Link href="/withdraw" prefetch={true} className="journey-leave-link">
+            <Link
+              href="/withdraw"
+              prefetch={true}
+              className="journey-leave-link"
+              aria-label="Leave study and withdraw record"
+            >
               <ArrowLeft size={14} aria-hidden="true" />
               <span>Leave study</span>
             </Link>

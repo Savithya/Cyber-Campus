@@ -383,6 +383,7 @@ export function DemographicsForm() {
           className="journey-options-grid"
           role="radiogroup"
           aria-labelledby="q1-title"
+          aria-required="true"
         >
           {q1.options.map((opt) => {
             const isSelected = answers.Q1 === opt.code;
@@ -392,6 +393,7 @@ export function DemographicsForm() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : answers.Q1 === null ? 0 : -1}
                 className={`journey-option-pill ${isSelected ? "selected" : ""}`}
                 onClick={() => handleSelect("Q1", opt.code)}
               >
@@ -423,6 +425,7 @@ export function DemographicsForm() {
           className="journey-options-grid"
           role="radiogroup"
           aria-labelledby="q2-title"
+          aria-required="true"
         >
           {q2.options.map((opt) => {
             const isSelected = answers.Q2 === opt.code;
@@ -432,6 +435,7 @@ export function DemographicsForm() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : answers.Q2 === null ? 0 : -1}
                 className={`journey-option-pill ${isSelected ? "selected" : ""}`}
                 onClick={() => handleSelect("Q2", opt.code)}
               >
@@ -463,6 +467,7 @@ export function DemographicsForm() {
           className="journey-options-grid"
           role="radiogroup"
           aria-labelledby="q3-title"
+          aria-required="true"
         >
           {q3.options.map((opt) => {
             const isSelected = answers.Q3 === opt.code;
@@ -472,6 +477,7 @@ export function DemographicsForm() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : answers.Q3 === null ? 0 : -1}
                 className={`journey-option-pill ${isSelected ? "selected" : ""}`}
                 onClick={() => handleSelect("Q3", opt.code)}
               >
@@ -503,6 +509,7 @@ export function DemographicsForm() {
           className="journey-options-grid"
           role="radiogroup"
           aria-labelledby="q4-title"
+          aria-required="true"
         >
           {q4.options.map((opt) => {
             const isSelected = answers.Q4 === opt.code;
@@ -512,6 +519,7 @@ export function DemographicsForm() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={isSelected ? 0 : answers.Q4 === null ? 0 : -1}
                 className={`journey-option-pill ${isSelected ? "selected" : ""}`}
                 onClick={() => handleSelect("Q4", opt.code)}
               >

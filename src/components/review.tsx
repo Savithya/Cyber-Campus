@@ -364,9 +364,10 @@ export default function Review() {
                         <button
                           type="button"
                           onClick={() => setEditingQuestionId(isEditing ? null : q.id)}
-                          className="journey-review-inline-edit"
+                          className="journey-review-inline-edit min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                           title={`Edit question ${q.number}`}
                           aria-label={`Edit question ${q.number}`}
+                          aria-expanded={isEditing}
                         >
                           <Edit3 size={13} aria-hidden="true" />
                           <span>Change</span>
@@ -565,6 +566,8 @@ export default function Review() {
                 type="button"
                 onClick={handleFinalSubmit}
                 disabled={busy}
+                aria-disabled={busy}
+                aria-busy={busy}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 !text-white font-semibold text-sm sm:text-base shadow-sm transition-all hover:shadow-md cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed min-h-[48px]"
               >
                 <span className="!text-white">{busy ? "Submitting responses…" : "Submit & see my results"}</span>
@@ -620,11 +623,11 @@ export default function Review() {
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1.5 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded"
                 title="Copy participant code"
                 aria-label="Copy participant code"
               >
-                {copiedCode ? <CheckCheck size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                {copiedCode ? <CheckCheck size={14} className="text-emerald-600" /> : <Copy size={14} />}
               </button>
             </div>
           </div>
@@ -737,8 +740,9 @@ export default function Review() {
                   <button
                     type="button"
                     onClick={() => setExpandedScenarioId(isExpanded ? null : story.id)}
-                    className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                    className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer focus:outline-none min-h-[48px]"
                     aria-expanded={isExpanded}
+                    aria-controls={`debrief-content-${story.id}`}
                     aria-label={`${story.orderNumber} ${story.storyTitle} - ${outcomeSubtitle}`}
                   >
                     <div className="flex items-center gap-4 min-w-0">
@@ -770,7 +774,12 @@ export default function Review() {
 
                   {/* Expanded Interactive Educational Debrief Drawer */}
                   {isExpanded && (
-                    <div className="border-t border-slate-100 dark:border-slate-800/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-900/40 space-y-5 text-sm">
+                    <div
+                      id={`debrief-content-${story.id}`}
+                      role="region"
+                      aria-label={`Debrief for ${story.storyTitle}`}
+                      className="border-t border-slate-100 dark:border-slate-800/80 p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-900/40 space-y-5 text-sm"
+                    >
                       {/* 1. Email Context Box */}
                       <div className="bg-white dark:bg-[#101827] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 space-y-2">
                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2 text-xs">

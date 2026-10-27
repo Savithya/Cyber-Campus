@@ -270,7 +270,9 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               className="spot-join-btn-agree"
               onClick={() => handleStart(false)}
               disabled={!consent || !eligible || busy}
-              aria-label="I Agree & Continue to Step 02: About You · Continue to Student Profile · Consent and begin questionnaire"
+              aria-disabled={!consent || !eligible || busy}
+              aria-busy={busy}
+              aria-label="I Agree & Continue to Step 02: About You"
               title="Agree and continue to student profile"
             >
               {busy ? (
@@ -291,6 +293,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               className="spot-join-btn-disagree"
               onClick={() => router.push("/")}
               disabled={busy}
+              aria-disabled={busy}
               aria-label="I Do Not Agree"
             >
               <span>I Do Not Agree</span>
@@ -305,26 +308,31 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
               className="spot-join-practice-link"
               onClick={() => handleStart(true)}
               disabled={busy}
-              aria-label="Explore Practice Challenges Only · Decline & practise only"
+              aria-disabled={busy}
+              aria-label="Explore practice challenges only"
             >
               Explore practice challenges only →
             </button>
           </div>
 
           {/* Expandable Ethics & Governance Details */}
-          <div className="mt-6 pt-4 border-t border-slate-200/70">
+          <div className="mt-6 pt-4 border-t border-slate-200/70 dark:border-slate-800">
             <button
               type="button"
-              className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+              className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors min-h-[44px] py-2"
               onClick={() => setExpandedDetails(!expandedDetails)}
               aria-expanded={expandedDetails}
+              aria-controls="ethics-governance-details"
             >
               <span>Research Ethics, Data Privacy &amp; Participant Rights</span>
               {expandedDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
 
             {expandedDetails && (
-              <div className="mt-3 p-3 bg-slate-50 rounded-lg text-xs text-slate-600 space-y-2">
+              <div
+                id="ethics-governance-details"
+                className="mt-3 p-3 bg-slate-50 dark:bg-slate-900/80 border border-transparent dark:border-slate-800 rounded-lg text-xs text-slate-600 dark:text-slate-300 space-y-2"
+              >
                 <p>
                   <strong>Study Protocol:</strong> &ldquo;{studyTitle}&rdquo;
                 </p>

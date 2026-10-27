@@ -209,6 +209,10 @@ describe("CYBER CAMPUS — Complete 14-Viewport Responsiveness & Accessibility A
       expect(html).toContain("journey-stepper-list");
       expect(html).toContain("journey-action-bar");
       expect(html).toContain("content-slot");
+      expect(html).toContain('role="progressbar"');
+      expect(html).toContain('aria-label="Questionnaire progress"');
+      expect(html).toContain('aria-valuenow="0"');
+      expect(html).toContain("Current step");
     });
 
     it("verifies responsive CSS rules for all 7 Research Journey pages (Consent -> Review)", () => {
@@ -217,6 +221,8 @@ describe("CYBER CAMPUS — Complete 14-Viewport Responsiveness & Accessibility A
       expect(css).toContain(".spot-join-actions");
       expect(css).toContain(".spot-join-btn-agree");
       expect(css).toContain(".spot-join-btn-disagree");
+      expect(css).toContain(".spot-join-checkbox-label");
+      expect(css).toContain(".spot-join-checkbox-custom");
 
       // Step 2: About You (Demographics)
       expect(css).toContain(".journey-question-card");
@@ -232,6 +238,16 @@ describe("CYBER CAMPUS — Complete 14-Viewport Responsiveness & Accessibility A
       // Step 7: Review & Save
       expect(css).toContain(".journey-review-list-card");
       expect(css).toContain(".journey-review-row");
+    });
+
+    it("verifies 100% mobile accessibility touch targets and semantic indicators", () => {
+      // Checkbox touch target compliance: >= 44px height container and 22px checkbox
+      expect(css).toMatch(/\.spot-join-checkbox-label\s*\{[^}]*min-height:\s*44px/);
+      expect(css).toMatch(/\.spot-join-checkbox-custom\s*\{[^}]*width:\s*22px/);
+      expect(css).toMatch(/\.spot-join-checkbox-custom\s*\{[^}]*height:\s*22px/);
+
+      // Option pills touch target compliance: >= 44px
+      expect(css).toMatch(/\.journey-option-pill\s*\{[^}]*min-height:\s*44px/);
     });
   });
 

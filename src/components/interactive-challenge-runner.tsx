@@ -468,11 +468,13 @@ export function InteractiveChallengeRunner({
                     <button
                       type="button"
                       onClick={() => setShowRFCHeaders(!showRFCHeaders)}
-                      className="p-0.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors shrink-0"
+                      className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors shrink-0 min-h-[36px] min-w-[36px] inline-flex items-center justify-center rounded"
                       title="Inspect envelope domain and security headers"
                       aria-label="Inspect envelope domain and security headers"
+                      aria-expanded={showRFCHeaders}
+                      aria-controls="rfc-headers-drawer"
                     >
-                      <Search size={13} />
+                      <Search size={14} />
                     </button>
                   </span>
                 </div>
@@ -485,6 +487,7 @@ export function InteractiveChallengeRunner({
             {/* Technical Header Inspector Drawer */}
             {showRFCHeaders && (
               <div
+                id="rfc-headers-drawer"
                 className="mt-3 p-3.5 rounded-xl border border-teal-200 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/20 text-xs font-mono text-slate-700 dark:text-slate-300 space-y-1.5 break-all"
                 role="region"
                 aria-label="RFC Security Header Telemetry"
@@ -659,6 +662,7 @@ export function InteractiveChallengeRunner({
             className="space-y-2.5 pt-1"
             role="radiogroup"
             aria-label="Action choices"
+            aria-required="true"
           >
             {scenario.choices.map((choice, cIndex) => {
               const letter = String.fromCharCode(65 + cIndex); // A, B, C, D
@@ -670,6 +674,7 @@ export function InteractiveChallengeRunner({
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
+                  tabIndex={isSelected ? 0 : !selectedChoiceId && cIndex === 0 ? 0 : -1}
                   disabled={isSubmitting}
                   onClick={() => handleSelectChoice(choice.id)}
                   className={`interactive-action-card w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all flex items-center gap-2.5 sm:gap-3.5 cursor-pointer min-h-[48px] ${
@@ -704,7 +709,9 @@ export function InteractiveChallengeRunner({
             <button
               type="button"
               onClick={() => setShowRedFlags(!showRedFlags)}
-              className="w-full flex items-center justify-between text-xs py-2 px-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer"
+              aria-expanded={showRedFlags}
+              aria-controls="red-flags-drawer"
+              className="w-full flex items-center justify-between text-xs py-2 px-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer min-h-[44px]"
             >
               <span className="flex items-center gap-1.5 font-medium">
                 <Search size={14} className="text-slate-500" />
@@ -717,7 +724,10 @@ export function InteractiveChallengeRunner({
 
             {/* Expandable Red Flag Hunt Checklist */}
             {showRedFlags && (
-              <div className="mt-2 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2 text-xs">
+              <div
+                id="red-flags-drawer"
+                className="mt-2 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2 text-xs"
+              >
                 <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">
                   Can you spot the suspicious indicators in this scenario?
                 </p>
@@ -728,8 +738,10 @@ export function InteractiveChallengeRunner({
                       <button
                         key={fIdx}
                         type="button"
+                        role="checkbox"
+                        aria-checked={isFound}
                         onClick={() => toggleRedFlag(flag)}
-                        className={`w-full text-left p-2 rounded-lg border flex items-center gap-2.5 transition-colors cursor-pointer ${
+                        className={`w-full text-left p-2.5 rounded-lg border flex items-center gap-2.5 transition-colors cursor-pointer min-h-[44px] ${
                           isFound
                             ? "border-teal-300 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/30 text-teal-900 dark:text-teal-200"
                             : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-slate-100/60"
@@ -778,6 +790,8 @@ export function InteractiveChallengeRunner({
             <button
               type="button"
               disabled={!selectedChoiceId || isSubmitting}
+              aria-disabled={!selectedChoiceId || isSubmitting}
+              aria-busy={isSubmitting}
               onClick={handleAdvance}
               aria-label="Lock decision and continue"
               className={`primary-next-btn group w-full min-h-[48px] py-3.5 px-3 sm:px-4 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
