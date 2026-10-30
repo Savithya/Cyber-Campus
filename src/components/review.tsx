@@ -594,11 +594,6 @@ export default function Review() {
             <ShieldCheck size={32} className="text-[#2e6950] dark:text-[#52c286]" aria-hidden="true" />
           </div>
 
-          {/* Eyebrow */}
-          <span className="block text-xs font-bold tracking-widest text-[#41695c] dark:text-[#78b39d] uppercase">
-            MISSION ACCOMPLISHED
-          </span>
-
           {/* Title */}
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0e2a36] dark:text-slate-100 tracking-tight">
             Challenge Complete!
@@ -871,18 +866,30 @@ export default function Review() {
         <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+            className="button secondary"
           >
             <Home size={16} />
-            <span>Return to Cyber Campus Home</span>
+            Return to Cyber Campus Home
           </Link>
 
-          <Link
-            href="/withdraw"
-            className="text-xs text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+          <button
+            type="button"
+            onClick={handleFinalSubmit}
+            disabled={busy}
+            className="button primary inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Leave study &amp; withdraw record
-          </Link>
+            {busy ? (
+              <>
+                <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" aria-hidden="true" />
+                Submitting…
+              </>
+            ) : (
+              <>
+                <CheckCheck size={16} />
+                Submit Responses
+              </>
+            )}
+          </button>
         </footer>
       </div>
     </div>

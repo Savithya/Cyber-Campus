@@ -907,6 +907,36 @@ export async function recordSessionToWorkspace(): Promise<{
     throw new Error("Practice mode sessions are simulated and not recorded into the Research Workspace.");
   }
 
+  // In research mode, participant data is already persisted to Supabase via
+  // submit_baseline and record_attempt RPCs. Sync any derived survey answers
+  // (Q6–Q25 from game attempts) back to Supabase if the session is still a draft,
+  // then return the live session so the completion page reflects the real state.
+  if (isResearch() && s.mode === "research") {
+    let updatedAnswers = s.answers || {};
+    if (s.attempts && s.attempts.length > 0) {
+      updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
+    }
+
+    // Persist derived answers back to Supabase when the session is still in draft
+    if (s.status === "draft") {
+      try {
+        await rpc<Session>("save_draft", { p_answers: updatedAnswers });
+      } catch {
+        // save_draft may reject if the session is already submitted — that is fine.
+      }
+    }
+
+    // Re-fetch the authoritative session state from Supabase
+    const liveSession = (await rpc<Session | null>("current_session")) ?? s;
+
+    return {
+      ok: true,
+      session: liveSession,
+      message: `Participant answers (Anonymous ID: ${liveSession.code}) successfully recorded into the Research Workspace.`,
+    };
+  }
+
+  // Demo / local mode: derive answers from attempts and persist to local storage.
   let updatedAnswers = s.answers || {};
   if (s.attempts && s.attempts.length > 0) {
     updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
