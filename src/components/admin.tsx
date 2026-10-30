@@ -43,6 +43,16 @@ import {
   Check,
   X,
   Lock,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Calendar,
+  Timer,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import { questions, sections } from "@/content/questionnaire";
 import { missions, activeMissions } from "@/content/missions";
@@ -127,6 +137,65 @@ const SCENARIO_TITLES: Record<string, string> = {
   SC04: "Malicious QR Code at Campus Canteen",
   SC05: "Shortened Link for Exam Paper Leak",
 };
+
+export interface ChallengeDefinition {
+  id: string;
+  iv: string;
+  missionCode: string;
+  missionName: string;
+  title: string;
+}
+
+export const ALL_RESEARCH_CHALLENGES: ChallengeDefinition[] = [
+  // IV1: Phishing Investigation
+  { id: "PH01", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Suspicious University Email" },
+  { id: "PH02", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Fake LMS Notification" },
+  { id: "PH03", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Urgent Library Account Renewal" },
+  { id: "PH04", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Impending Grade Appeal Notice" },
+  { id: "PH05", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Scholarship Grant Verification" },
+  // IV2: Pretexting Detection
+  { id: "PT01", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Urgent Research Survey Pretext" },
+  { id: "PT02", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Fake Dean's Office Audit" },
+  { id: "PT03", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Career Counselor Inquiry" },
+  { id: "PT04", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Lost Student ID Card Pretext" },
+  { id: "PT05", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Emergency Blood Donor Registry" },
+  // IV3: Impersonation Investigation
+  { id: "IM01", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Spoofed Lecturer Profile" },
+  { id: "IM02", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Fake Student Union Representative" },
+  { id: "IM03", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Cloned Department WhatsApp Group" },
+  { id: "IM04", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Impersonated IT Support Desk" },
+  { id: "IM05", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Bogus Alumni Mentor" },
+  // IV4: Online Scams & Malicious Links
+  { id: "SC01", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Fake Online Shopping Store" },
+  { id: "SC02", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Bogus Student Grant Link" },
+  { id: "SC03", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Deceptive Room Rental Listing" },
+  { id: "SC04", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Malicious QR Code at Campus Canteen" },
+  { id: "SC05", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Shortened Link for Exam Paper Leak" },
+];
+
+function getScenarioIv(id: string): string {
+  if (id.startsWith("PH")) return "IV1";
+  if (id.startsWith("PT")) return "IV2";
+  if (id.startsWith("IM")) return "IV3";
+  if (id.startsWith("SC")) return "IV4";
+  return "IV1";
+}
+
+function formatDuration(startIso: string | null, endIso: string | null): string {
+  if (!startIso) return "—";
+  if (!endIso) return "In Progress";
+  const start = new Date(startIso).getTime();
+  const end = new Date(endIso).getTime();
+  if (isNaN(start) || isNaN(end) || end < start) return "—";
+  const diffSec = Math.floor((end - start) / 1000);
+  const minutes = Math.floor(diffSec / 60);
+  const seconds = diffSec % 60;
+  if (minutes === 0) return `${seconds}s`;
+  if (minutes < 60) return `${minutes}m ${seconds}s`;
+  const hours = Math.floor(minutes / 60);
+  const remMinutes = minutes % 60;
+  return `${hours}h ${remMinutes}m`;
+}
 
 const SC_FALLBACK_DEFINITIONS = [
   {
@@ -243,13 +312,26 @@ export default function Admin({
     [error, setError] = useState("");
 
   // Response audit table filters
-  const [auditSearch, setAuditSearch] = useState("");
+  const [auditSearch, setAuditSearch] = useState(params.get("code") || "");
   const [auditIvFilter, setAuditIvFilter] = useState("all");
   const [auditSafetyFilter, setAuditSafetyFilter] = useState("all");
   const [auditPage, setAuditPage] = useState(0);
 
-  // History table pagination
+  // History table state & filters
   const [historyPage, setHistoryPage] = useState(0);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatusFilter, setHistoryStatusFilter] = useState("all");
+  const [historyChallengeFilter, setHistoryChallengeFilter] = useState("all");
+  const [expandedParticipantId, setExpandedParticipantId] = useState<string | null>(null);
+  const [historyDetailTab, setHistoryDetailTab] = useState<"challenges" | "survey">("challenges");
+  const [historyMissionFilter, setHistoryMissionFilter] = useState<string>("all");
+
+  // Responses view modes
+  const [auditViewMode, setAuditViewMode] = useState<"participants" | "table">("participants");
+  const [auditCompletionFilter, setAuditCompletionFilter] = useState("all");
+  const [auditParticipantPage, setAuditParticipantPage] = useState(0);
+  const [expandedAuditParticipantId, setExpandedAuditParticipantId] = useState<string | null>(null);
+
   const [isResetting, setIsResetting] = useState(false);
 
   const handleResetWorkspace = async () => {
@@ -379,29 +461,132 @@ export default function Admin({
       .map(([date, count]) => ({ date, count }));
   }, [all]);
 
+  const scenarioMap = useMemo(() => {
+    const map: Record<string, Scenario> = {};
+    for (const sc of scenarios) {
+      if (sc && sc.id) {
+        map[sc.id] = sc;
+      }
+    }
+    return map;
+  }, [scenarios]);
+
+  const getParticipantChallenges = (s: Session) => {
+    return ALL_RESEARCH_CHALLENGES.map((ch) => {
+      const sc = scenarioMap[ch.id];
+      const attempt = (s.attempts || []).find(
+        (a) => a.scenarioId === ch.id && a.attemptNumber === 1 && a.selectedAction !== null,
+      ) || (s.attempts || []).find(
+        (a) => a.scenarioId === ch.id && a.attemptNumber === 1,
+      );
+
+      if (!attempt) {
+        return {
+          id: ch.id,
+          iv: ch.iv,
+          missionCode: ch.missionCode,
+          missionName: ch.missionName,
+          title: sc?.title || ch.title,
+          status: "pending" as const,
+          selectedAction: null,
+          isSafe: null,
+          riskScore: null,
+          disclosedCategory: "None",
+          elapsedSec: null,
+          createdAt: null,
+        };
+      }
+
+      const matchedChoice = sc?.choices?.find(
+        (c) => c.id === attempt.selectedAction || c.label === attempt.selectedAction,
+      );
+      const actionText = matchedChoice?.label || attempt.selectedAction || "No decision recorded";
+      const isSafe =
+        attempt.unsafe !== undefined
+          ? !attempt.unsafe
+          : matchedChoice
+            ? !matchedChoice.unsafe
+            : (attempt.correct ?? true);
+      const riskScore =
+        attempt.privacyRiskScore ??
+        matchedChoice?.privacyRiskScore ??
+        (isSafe ? 0 : 3);
+      const disclosedCategory =
+        attempt.disclosedInfoCategory ||
+        matchedChoice?.disclosedInfoCategory ||
+        (isSafe ? "None" : "Personal / Account Data");
+
+      return {
+        id: ch.id,
+        iv: ch.iv,
+        missionCode: ch.missionCode,
+        missionName: ch.missionName,
+        title: sc?.title || ch.title,
+        status: "completed" as const,
+        selectedAction: actionText,
+        rawAction: attempt.selectedAction,
+        isSafe,
+        riskScore,
+        disclosedCategory,
+        elapsedSec: attempt.elapsedMs ? (attempt.elapsedMs / 1000).toFixed(1) : "—",
+        createdAt: attempt.createdAt,
+      };
+    });
+  };
+
   // Flattened responses for Original Responses audit table
   const auditAttempts = useMemo(() => {
     return filtered.flatMap((s) => {
       const participantId = s.code || s.participantId || "ANON";
       const status = s.status;
+      const joinedAt = s.createdAt;
+      const submittedAt = s.submittedAt;
       return (s.attempts || [])
         .filter((a) => a.attemptNumber === 1 && a.selectedAction !== null)
-        .map((a) => ({
-          participantId,
-          submissionId: s.submissionId || s.id,
-          scenarioId: a.scenarioId,
-          scenarioTitle: SCENARIO_TITLES[a.scenarioId] || a.scenarioId,
-          primaryIV: a.primaryIV,
-          selectedAction: a.selectedAction || "—",
-          correct: a.correct,
-          unsafe: a.unsafe,
-          privacyRiskScore: a.privacyRiskScore ?? (a.unsafe ? 3 : 0),
-          elapsedMs: a.elapsedMs,
-          timestamp: s.submittedAt || s.createdAt,
-          status,
-        }));
+        .map((a) => {
+          const sc = scenarioMap[a.scenarioId];
+          const matchedChoice = sc?.choices?.find(
+            (c) => c.id === a.selectedAction || c.label === a.selectedAction,
+          );
+          const fullActionText = matchedChoice?.label || a.selectedAction || "—";
+          const isSafe =
+            a.unsafe !== undefined
+              ? !a.unsafe
+              : matchedChoice
+                ? !matchedChoice.unsafe
+                : (a.correct ?? true);
+          const riskScore =
+            a.privacyRiskScore ??
+            matchedChoice?.privacyRiskScore ??
+            (isSafe ? 0 : 3);
+          const disclosedCategory =
+            a.disclosedInfoCategory ||
+            matchedChoice?.disclosedInfoCategory ||
+            (isSafe ? "None" : "Personal / Account Data");
+
+          return {
+            participantId,
+            submissionId: s.submissionId || s.id,
+            scenarioId: a.scenarioId,
+            scenarioTitle:
+              sc?.title || SCENARIO_TITLES[a.scenarioId] || a.scenarioId,
+            primaryIV: a.primaryIV || getScenarioIv(a.scenarioId),
+            selectedAction: fullActionText,
+            rawAction: a.selectedAction,
+            correct: a.correct,
+            unsafe: !isSafe,
+            privacyRiskScore: riskScore,
+            disclosedCategory,
+            elapsedMs: a.elapsedMs,
+            timestamp: a.createdAt || s.submittedAt || s.createdAt,
+            joinedAt,
+            submittedAt,
+            status,
+            completedAllChallenges: scoreSummary(s.attempts).completed >= 20,
+          };
+        });
     });
-  }, [filtered]);
+  }, [filtered, scenarioMap]);
 
   // Filtered audit attempts
   const filteredAuditAttempts = useMemo(() => {
@@ -409,6 +594,8 @@ export default function Admin({
       if (auditIvFilter !== "all" && item.primaryIV !== auditIvFilter) return false;
       if (auditSafetyFilter === "safe" && item.unsafe) return false;
       if (auditSafetyFilter === "unsafe" && !item.unsafe) return false;
+      if (auditCompletionFilter === "completed_all" && !item.completedAllChallenges) return false;
+      if (auditCompletionFilter === "partial" && item.completedAllChallenges) return false;
       if (auditSearch) {
         const query = auditSearch.toLowerCase();
         const match =
@@ -420,7 +607,7 @@ export default function Admin({
       }
       return true;
     });
-  }, [auditAttempts, auditIvFilter, auditSafetyFilter, auditSearch]);
+  }, [auditAttempts, auditIvFilter, auditSafetyFilter, auditCompletionFilter, auditSearch]);
 
   const auditPageSize = 15;
   const paginatedAuditAttempts = filteredAuditAttempts.slice(
@@ -428,24 +615,124 @@ export default function Admin({
     (auditPage + 1) * auditPageSize,
   );
 
+  // Grouped by Participant in Responses view
+  const participantAuditGroups = useMemo(() => {
+    return filtered
+      .map((s) => {
+        const challenges = getParticipantChallenges(s);
+        const summary = scoreSummary(s.attempts);
+        const completedChallenges = challenges.filter((c) => c.status === "completed");
+        const safeCount = completedChallenges.filter((c) => c.isSafe).length;
+        const unsafeCount = completedChallenges.filter((c) => c.isSafe === false).length;
+        const avgRisk = completedChallenges.length
+          ? (
+              completedChallenges.reduce((sum, c) => sum + (c.riskScore ?? 0), 0) /
+              completedChallenges.length
+            ).toFixed(2)
+          : "—";
+
+        return {
+          session: s,
+          participantId: s.code || s.participantId || "ANON",
+          joinedAt: s.createdAt,
+          submittedAt: s.submittedAt,
+          status: s.status,
+          duration: formatDuration(s.createdAt, s.submittedAt),
+          totalFinished: summary.completed,
+          challenges,
+          safeCount,
+          unsafeCount,
+          avgRisk,
+        };
+      })
+      .filter((g) => {
+        if (auditCompletionFilter === "completed_all" && g.totalFinished < 20) return false;
+        if (auditCompletionFilter === "partial" && g.totalFinished >= 20) return false;
+        if (auditSearch.trim()) {
+          const q = auditSearch.trim().toLowerCase();
+          const codeMatch = g.participantId.toLowerCase().includes(q);
+          const hasMatchingScenario = g.challenges.some(
+            (c) =>
+              c.title.toLowerCase().includes(q) ||
+              (c.selectedAction && c.selectedAction.toLowerCase().includes(q)),
+          );
+          if (!codeMatch && !hasMatchingScenario) return false;
+        }
+        return true;
+      });
+  }, [filtered, auditCompletionFilter, auditSearch, scenarioMap]);
+
+  const participantPageSize = 5;
+  const paginatedParticipantGroups = participantAuditGroups.slice(
+    auditParticipantPage * participantPageSize,
+    (auditParticipantPage + 1) * participantPageSize,
+  );
+
   const historyPageSize = 10;
   const historySessions = useMemo(() => {
-    return all;
-  }, [all]);
+    return all.filter((s) => {
+      if (historyStatusFilter === "completed" && s.status === "draft") return false;
+      if (historyStatusFilter === "draft" && s.status !== "draft") return false;
+      if (historyStatusFilter !== "all" && historyStatusFilter !== "completed" && historyStatusFilter !== "draft") {
+        if (s.status !== historyStatusFilter) return false;
+      }
+      if (historyChallengeFilter === "completed_all") {
+        if (scoreSummary(s.attempts).completed < 20) return false;
+      } else if (historyChallengeFilter === "partial") {
+        if (scoreSummary(s.attempts).completed >= 20) return false;
+      }
+      if (historySearch.trim()) {
+        const q = historySearch.trim().toLowerCase();
+        const codeMatch = s.code?.toLowerCase().includes(q);
+        const subMatch = (s.submissionId || s.id)?.toLowerCase().includes(q);
+        if (!codeMatch && !subMatch) return false;
+      }
+      return true;
+    });
+  }, [all, historyStatusFilter, historyChallengeFilter, historySearch]);
 
   const historySubmitted = useMemo(() => {
-    return historySessions.filter(
+    return all.filter(
       (s) =>
         s.status === "submitted_complete" ||
         s.status === "submitted_with_missing",
     );
-  }, [historySessions]);
+  }, [all]);
 
   const historyUniqueParticipants = useMemo(() => {
     return new Set(
-      historySubmitted.map((s) => s.participantId || s.code),
+      all.map((s) => s.participantId || s.code),
     ).size;
-  }, [historySubmitted]);
+  }, [all]);
+
+  const historyAllCompletedCount = useMemo(() => {
+    return all.filter((s) => scoreSummary(s.attempts).completed >= 20).length;
+  }, [all]);
+
+  const historyAvgDurationStr = useMemo(() => {
+    const durations = all
+      .filter((s) => s.submittedAt && s.createdAt)
+      .map((s) => {
+        const start = new Date(s.createdAt).getTime();
+        const end = new Date(s.submittedAt!).getTime();
+        return end > start ? (end - start) / 1000 : 0;
+      })
+      .filter((d) => d > 0);
+    if (!durations.length) return "—";
+    const avgSec = Math.round(durations.reduce((a, b) => a + b, 0) / durations.length);
+    const m = Math.floor(avgSec / 60);
+    const s = avgSec % 60;
+    return `${m}m ${s}s`;
+  }, [all]);
+
+  const historySafeDecisionRate = useMemo(() => {
+    const attempts = all
+      .flatMap((s) => s.attempts || [])
+      .filter((a) => a.attemptNumber === 1 && a.selectedAction !== null);
+    if (!attempts.length) return 0;
+    const safeCount = attempts.filter((a) => !a.unsafe).length;
+    return Math.round((safeCount / attempts.length) * 100);
+  }, [all]);
 
   const paginatedHistorySessions = useMemo(() => {
     return historySessions.slice(
@@ -1358,6 +1645,68 @@ export default function Admin({
             ===================================================================== */}
         {active === "responses" && (
           <div className="space-y-6">
+            {/* Top Workspace Stats Banner */}
+            <div className="workspace-stat-strip">
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Total Decisions Recorded</span>
+                  <div className="workspace-stat-icon lavender">
+                    <Database size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{filteredAuditAttempts.length}</div>
+                <div className="workspace-stat-subtext">
+                  <CheckCircle size={12} className="text-emerald" />
+                  <span>Immutable research attempts</span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Unique Participants</span>
+                  <div className="workspace-stat-icon cyan">
+                    <Users size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historyUniqueParticipants}</div>
+                <div className="workspace-stat-subtext">
+                  <Clock size={12} />
+                  <span>Enrolled &amp; consented in study</span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">All 20 Challenges Done</span>
+                  <div className="workspace-stat-icon emerald">
+                    <Gamepad2 size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historyAllCompletedCount}</div>
+                <div className="workspace-stat-subtext">
+                  <span>
+                    {historyUniqueParticipants > 0
+                      ? Math.round((historyAllCompletedCount / historyUniqueParticipants) * 100)
+                      : 0}
+                    % full challenge completion
+                  </span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Protective Decision Rate</span>
+                  <div className="workspace-stat-icon amber">
+                    <ShieldCheck size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historySafeDecisionRate}%</div>
+                <div className="workspace-stat-subtext">
+                  <span>Across all observed simulations</span>
+                </div>
+              </div>
+            </div>
+
             <div className="card">
               <div className="card-top">
                 <div>
@@ -1372,34 +1721,61 @@ export default function Admin({
                     Original research responses remain immutable and cannot be modified by review screens or scoring adjustments.
                   </p>
                 </div>
-                <span className="tag">{filteredAuditAttempts.length} Recorded Attempts</span>
+                <div className="flex items-center gap-3">
+                  <span className="tag">
+                    {auditViewMode === "participants"
+                      ? `${participantAuditGroups.length} Participants`
+                      : `${filteredAuditAttempts.length} Recorded Attempts`}
+                  </span>
+
+                  {/* View Mode Switcher */}
+                  <div className="view-mode-pill-group">
+                    <button
+                      type="button"
+                      className={`view-mode-pill-btn ${auditViewMode === "participants" ? "active" : ""}`}
+                      onClick={() => setAuditViewMode("participants")}
+                      title="Group challenge responses by participant with joined timestamps"
+                    >
+                      <Users size={13} />
+                      <span>By Participant</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`view-mode-pill-btn ${auditViewMode === "table" ? "active" : ""}`}
+                      onClick={() => setAuditViewMode("table")}
+                      title="Flat audit log table of all decisions"
+                    >
+                      <FileText size={13} />
+                      <span>Audit Table</span>
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Filters for audit table */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t">
-                <label className="text-xs">
-                  Search Participant or Scenario
-                  <input
-                    type="text"
-                    placeholder="Search code, scenario, action..."
-                    value={auditSearch}
-                    onChange={(e) => {
-                      setAuditSearch(e.target.value);
-                      setAuditPage(0);
-                    }}
-                    className="mt-1"
-                  />
-                </label>
+              {/* Filters for responses */}
+              <div className="workspace-toolbar mt-4">
+                <div className="workspace-filter-inputs">
+                  <div className="workspace-search-box">
+                    <Search size={14} />
+                    <input
+                      type="text"
+                      placeholder="Search participant code, scenario, decision..."
+                      value={auditSearch}
+                      onChange={(e) => {
+                        setAuditSearch(e.target.value);
+                        setAuditPage(0);
+                        setAuditParticipantPage(0);
+                      }}
+                    />
+                  </div>
 
-                <label className="text-xs">
-                  Filter by Threat Variable
                   <select
+                    className="workspace-select"
                     value={auditIvFilter}
                     onChange={(e) => {
                       setAuditIvFilter(e.target.value);
                       setAuditPage(0);
                     }}
-                    className="mt-1"
                   >
                     <option value="all">All Variables (IV1–IV4)</option>
                     <option value="IV1">IV1: Phishing</option>
@@ -1407,93 +1783,379 @@ export default function Admin({
                     <option value="IV3">IV3: Impersonation</option>
                     <option value="IV4">IV4: Scams &amp; Links</option>
                   </select>
-                </label>
 
-                <label className="text-xs">
-                  Filter by Decision Safety
                   <select
+                    className="workspace-select"
                     value={auditSafetyFilter}
                     onChange={(e) => {
                       setAuditSafetyFilter(e.target.value);
                       setAuditPage(0);
                     }}
-                    className="mt-1"
                   >
                     <option value="all">All Decisions</option>
                     <option value="safe">Protective / Safest Action Only</option>
                     <option value="unsafe">Unsafe / Disclosed Data Only</option>
                   </select>
-                </label>
+
+                  <select
+                    className="workspace-select"
+                    value={auditCompletionFilter}
+                    onChange={(e) => {
+                      setAuditCompletionFilter(e.target.value);
+                      setAuditPage(0);
+                      setAuditParticipantPage(0);
+                    }}
+                  >
+                    <option value="all">All Participants</option>
+                    <option value="completed_all">Completed All 20 Challenges Only</option>
+                    <option value="partial">In-Progress / Partial Challenges</option>
+                  </select>
+                </div>
+
+                {auditSearch && (
+                  <button
+                    type="button"
+                    className="button secondary small text-xs"
+                    onClick={() => {
+                      setAuditSearch("");
+                      setAuditPage(0);
+                      setAuditParticipantPage(0);
+                    }}
+                  >
+                    Clear Search
+                  </button>
+                )}
               </div>
 
-              <div className="table-scroll mt-4" tabIndex={0} role="region" aria-label="Original participant responses table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th className="sticky-col-header">Participant Code</th>
-                      <th>Scenario ID</th>
-                      <th>Scenario Title</th>
-                      <th>Variable</th>
-                      <th>Decision Selected</th>
-                      <th>Safety Status</th>
-                      <th>Risk Score (0–4)</th>
-                      <th>Elapsed</th>
-                      <th>Timestamp</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedAuditAttempts.map((item, idx) => (
-                      <tr key={`${item.participantId}-${item.scenarioId}-${idx}`}>
-                        <td className="sticky-col-cell"><code>{item.participantId}</code></td>
-                        <td><code>{item.scenarioId}</code></td>
-                        <td className="text-xs">{item.scenarioTitle}</td>
-                        <td><span className="tag small">{item.primaryIV}</span></td>
-                        <td className="text-xs max-w-xs truncate">{item.selectedAction}</td>
-                        <td>
-                          {item.unsafe ? (
-                            <span className="badge-status-tag locked text-[11px] py-0.5 px-1.5">
-                              Unsafe
-                            </span>
-                          ) : (
-                            <span className="badge-status-tag unlocked text-[11px] py-0.5 px-1.5">
-                              Protective
-                            </span>
-                          )}
-                        </td>
-                        <td className="font-mono text-xs">{item.privacyRiskScore}</td>
-                        <td className="text-xs">{(item.elapsedMs / 1000).toFixed(1)}s</td>
-                        <td className="text-xs text-muted">{colomboTime(item.timestamp)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {/* -------------------------------------------------------------
+                  MODE A: BY PARTICIPANT (JOINED ALL CHALLENGES VIEW)
+                  ------------------------------------------------------------- */}
+              {auditViewMode === "participants" && (
+                <div className="space-y-5 mt-4">
+                  {paginatedParticipantGroups.map((group) => {
+                    const isExpanded = expandedAuditParticipantId === group.session.id || expandedAuditParticipantId === null;
+                    const visibleChallenges = group.challenges.filter((c) => {
+                      if (auditIvFilter !== "all" && c.iv !== auditIvFilter) return false;
+                      if (auditSafetyFilter === "safe" && c.isSafe !== true) return false;
+                      if (auditSafetyFilter === "unsafe" && c.isSafe !== false) return false;
+                      return true;
+                    });
 
-              {!filteredAuditAttempts.length && (
-                <p className="empty-copy">No research responses available yet.</p>
+                    return (
+                      <div key={group.session.id} className="participant-group-card">
+                        <div className="participant-group-header">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="font-mono font-bold text-base px-2.5 py-1 rounded bg-surface border text-cyan flex items-center gap-1.5">
+                              <UserCheck size={14} />
+                              Participant {group.participantId}
+                            </span>
+                            <span className="tag text-xs">
+                              {group.status.replaceAll("_", " ")}
+                            </span>
+
+                            {/* Joined Research Timestamp */}
+                            <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
+                              <Calendar size={12} className="text-cyan" />
+                              <span>Joined:</span>
+                              <strong className="text-foreground">{colomboTime(group.joinedAt)}</strong>
+                            </span>
+
+                            {/* Submitted Timestamp */}
+                            <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
+                              <Clock size={12} />
+                              <span>Submitted:</span>
+                              <strong className="text-foreground">
+                                {group.submittedAt ? colomboTime(group.submittedAt) : "In Progress"}
+                              </strong>
+                            </span>
+
+                            {/* Duration */}
+                            <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
+                              <Timer size={12} className="text-emerald" />
+                              <span>Duration:</span>
+                              <strong className="text-foreground">{group.duration}</strong>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {/* 20 Challenges Progress Badge */}
+                            <div className="text-right">
+                              <span
+                                className={`text-xs font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                                  group.totalFinished >= 20
+                                    ? "bg-emerald/15 text-emerald border border-emerald/30"
+                                    : "bg-cyan/15 text-cyan border border-cyan/30"
+                                }`}
+                              >
+                                {group.totalFinished >= 20 ? (
+                                  <CheckCircle size={11} />
+                                ) : (
+                                  <Clock size={11} />
+                                )}
+                                {group.totalFinished} / 20 Challenges Finished
+                              </span>
+                              <div className="mini-progress-track w-28">
+                                <div
+                                  className={`mini-progress-fill ${
+                                    group.totalFinished >= 20 ? "" : "partial"
+                                  }`}
+                                  style={{
+                                    width: `${Math.min(100, (group.totalFinished / 20) * 100)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="button secondary small text-xs"
+                              onClick={() =>
+                                setExpandedAuditParticipantId(
+                                  expandedAuditParticipantId === group.session.id
+                                    ? "none"
+                                    : group.session.id,
+                                )
+                              }
+                            >
+                              {expandedAuditParticipantId === group.session.id ? (
+                                <>
+                                  <ChevronUp size={13} />
+                                  <span>Collapse</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown size={13} />
+                                  <span>Inspect Challenges</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Summary Pill Bar */}
+                        <div className="px-5 py-2.5 bg-surface/50 border-b flex items-center gap-4 text-xs flex-wrap">
+                          <span className="flex items-center gap-1 text-emerald font-semibold">
+                            <ShieldCheck size={13} />
+                            {group.safeCount} Safe Decisions
+                          </span>
+                          <span className="flex items-center gap-1 text-red font-semibold">
+                            <AlertTriangle size={13} />
+                            {group.unsafeCount} Unsafe Decisions
+                          </span>
+                          <span className="text-muted">
+                            Mean Simulated Privacy Risk:{" "}
+                            <strong className="text-foreground font-mono">{group.avgRisk} / 4.0</strong>
+                          </span>
+                        </div>
+
+                        {/* All 20 Challenges Joined Breakdown */}
+                        {isExpanded && (
+                          <div className="p-4 bg-surface/20">
+                            <div className="challenges-grid">
+                              {visibleChallenges.map((ch) => (
+                                <div
+                                  key={ch.id}
+                                  className={`challenge-decision-card ${
+                                    ch.status === "pending"
+                                      ? "pending"
+                                      : ch.isSafe
+                                        ? "safe"
+                                        : "unsafe"
+                                  }`}
+                                >
+                                  <div>
+                                    <div className="challenge-card-header">
+                                      <div className="flex items-center gap-2">
+                                        <span className="challenge-id-badge">{ch.id}</span>
+                                        <span className="tag text-[10px] py-0.5 px-2">
+                                          {ch.iv} · {ch.missionName}
+                                        </span>
+                                      </div>
+
+                                      {ch.status === "completed" ? (
+                                        ch.isSafe ? (
+                                          <span className="badge-status-tag unlocked text-[10.5px]">
+                                            <ShieldCheck size={11} /> Protective
+                                          </span>
+                                        ) : (
+                                          <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
+                                            <AlertTriangle size={11} /> Unsafe
+                                          </span>
+                                        )
+                                      ) : (
+                                        <span className="text-[10.5px] text-muted italic">
+                                          Not Attempted
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <h4 className="challenge-title-text">{ch.title}</h4>
+
+                                    {ch.status === "completed" ? (
+                                      <div className="challenge-action-quote mt-2.5">
+                                        <span className="text-[10px] uppercase font-bold text-muted block mb-1">
+                                          Participant Chosen Action:
+                                        </span>
+                                        <span>&ldquo;{ch.selectedAction}&rdquo;</span>
+                                        {!ch.isSafe && ch.disclosedCategory && ch.disclosedCategory !== "None" && (
+                                          <span className="text-[11px] text-red font-semibold block mt-1.5">
+                                            ⚠️ Compromised Data: {ch.disclosedCategory}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted italic mt-2">
+                                        No attempt recorded for this scenario yet.
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div className="challenge-card-footer">
+                                    <span>
+                                      Risk Score:{" "}
+                                      <strong className="font-mono text-foreground">
+                                        {ch.riskScore !== null ? `${ch.riskScore} / 4` : "—"}
+                                      </strong>
+                                    </span>
+                                    <span>
+                                      Elapsed:{" "}
+                                      <strong className="text-foreground">
+                                        {ch.elapsedSec !== null ? `${ch.elapsedSec}s` : "—"}
+                                      </strong>
+                                    </span>
+                                    <span>{colomboTime(ch.createdAt)}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {!participantAuditGroups.length && (
+                    <p className="empty-copy">No participant challenge responses found matching criteria.</p>
+                  )}
+
+                  {/* Pagination for Participants view */}
+                  <div className="pagination">
+                    <button
+                      className="button secondary small"
+                      disabled={auditParticipantPage === 0}
+                      onClick={() => setAuditParticipantPage(auditParticipantPage - 1)}
+                    >
+                      Previous
+                    </button>
+                    <span>
+                      Page {auditParticipantPage + 1} of{" "}
+                      {Math.max(1, Math.ceil(participantAuditGroups.length / participantPageSize))}
+                    </span>
+                    <button
+                      className="button secondary small"
+                      disabled={(auditParticipantPage + 1) * participantPageSize >= participantAuditGroups.length}
+                      onClick={() => setAuditParticipantPage(auditParticipantPage + 1)}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
               )}
 
-              {/* Audit Pagination */}
-              <div className="pagination mt-4">
-                <button
-                  className="button secondary small"
-                  disabled={auditPage === 0}
-                  onClick={() => setAuditPage(auditPage - 1)}
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {auditPage + 1} of{" "}
-                  {Math.max(1, Math.ceil(filteredAuditAttempts.length / auditPageSize))}
-                </span>
-                <button
-                  className="button secondary small"
-                  disabled={(auditPage + 1) * auditPageSize >= filteredAuditAttempts.length}
-                  onClick={() => setAuditPage(auditPage + 1)}
-                >
-                  Next
-                </button>
-              </div>
+              {/* -------------------------------------------------------------
+                  MODE B: ALL DECISIONS FLAT AUDIT LOG TABLE
+                  ------------------------------------------------------------- */}
+              {auditViewMode === "table" && (
+                <>
+                  <div
+                    className="table-scroll mt-4"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Original participant responses table"
+                  >
+                    <table>
+                      <thead>
+                        <tr>
+                          <th className="sticky-col-header">Participant Code</th>
+                          <th>Joined Research</th>
+                          <th>Scenario ID</th>
+                          <th>Scenario Title</th>
+                          <th>Threat Variable</th>
+                          <th>Decision Selected</th>
+                          <th>Safety Status</th>
+                          <th>Risk Score (0–4)</th>
+                          <th>Elapsed</th>
+                          <th>Recorded Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paginatedAuditAttempts.map((item, idx) => (
+                          <tr key={`${item.participantId}-${item.scenarioId}-${idx}`}>
+                            <td className="sticky-col-cell">
+                              <code>{item.participantId}</code>
+                            </td>
+                            <td className="text-xs text-muted whitespace-nowrap">
+                              {colomboTime(item.joinedAt)}
+                            </td>
+                            <td>
+                              <code>{item.scenarioId}</code>
+                            </td>
+                            <td className="text-xs font-medium">{item.scenarioTitle}</td>
+                            <td>
+                              <span className="tag small">{item.primaryIV}</span>
+                            </td>
+                            <td className="text-xs max-w-sm truncate" title={item.selectedAction}>
+                              {item.selectedAction}
+                            </td>
+                            <td>
+                              {item.unsafe ? (
+                                <span className="badge-status-tag locked text-[11px] py-0.5 px-1.5 bg-red/15 text-red border-red/30">
+                                  Unsafe
+                                </span>
+                              ) : (
+                                <span className="badge-status-tag unlocked text-[11px] py-0.5 px-1.5">
+                                  Protective
+                                </span>
+                              )}
+                            </td>
+                            <td className="font-mono text-xs">{item.privacyRiskScore}</td>
+                            <td className="text-xs">{(item.elapsedMs / 1000).toFixed(1)}s</td>
+                            <td className="text-xs text-muted whitespace-nowrap">
+                              {colomboTime(item.timestamp)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {!filteredAuditAttempts.length && (
+                    <p className="empty-copy">No research responses available yet.</p>
+                  )}
+
+                  {/* Audit Pagination */}
+                  <div className="pagination mt-4">
+                    <button
+                      className="button secondary small"
+                      disabled={auditPage === 0}
+                      onClick={() => setAuditPage(auditPage - 1)}
+                    >
+                      Previous
+                    </button>
+                    <span>
+                      Page {auditPage + 1} of{" "}
+                      {Math.max(1, Math.ceil(filteredAuditAttempts.length / auditPageSize))}
+                    </span>
+                    <button
+                      className="button secondary small"
+                      disabled={(auditPage + 1) * auditPageSize >= filteredAuditAttempts.length}
+                      onClick={() => setAuditPage(auditPage + 1)}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -1557,10 +2219,94 @@ export default function Admin({
             ===================================================================== */}
         {active === "history" && (
           <div className="space-y-6">
+            {/* Summary Stat Strip */}
+            <div className="workspace-stat-strip">
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Total Participants Enrolled</span>
+                  <div className="workspace-stat-icon cyan">
+                    <Users size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historyUniqueParticipants}</div>
+                <div className="workspace-stat-subtext">
+                  <Clock size={12} className="text-cyan" />
+                  <span>Joined &amp; consented in research</span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Completed Submissions</span>
+                  <div className="workspace-stat-icon emerald">
+                    <CheckCircle2 size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historySubmitted.length}</div>
+                <div className="workspace-stat-subtext">
+                  <span>
+                    {historyUniqueParticipants > 0
+                      ? Math.round((historySubmitted.length / historyUniqueParticipants) * 100)
+                      : 0}
+                    % submission conversion
+                  </span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Finished All 20 Challenges</span>
+                  <div className="workspace-stat-icon lavender">
+                    <Gamepad2 size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historyAllCompletedCount}</div>
+                <div className="workspace-stat-subtext">
+                  <span>
+                    {historyUniqueParticipants > 0
+                      ? Math.round((historyAllCompletedCount / historyUniqueParticipants) * 100)
+                      : 0}
+                    % completed all 4 missions
+                  </span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Avg Safe Decision Rate</span>
+                  <div className="workspace-stat-icon amber">
+                    <ShieldCheck size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historySafeDecisionRate}%</div>
+                <div className="workspace-stat-subtext">
+                  <span>Overall protective choices</span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Avg Session Duration</span>
+                  <div className="workspace-stat-icon rose">
+                    <Timer size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{historyAvgDurationStr}</div>
+                <div className="workspace-stat-subtext">
+                  <span>From join to submission</span>
+                </div>
+              </div>
+            </div>
+
             <div className="card">
               <div className="card-top">
                 <div>
-                  <h2>Participant Submission History</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="eyebrow text-cyan font-bold flex items-center gap-1">
+                      <History size={13} /> PARTICIPANT AUDIT TIMELINE
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold mt-1">Participant Submission History</h2>
                   <p className="text-sm opacity-80 mt-1">
                     {historySessions.length} matching records · {historySubmitted.length} total submissions from{" "}
                     {historyUniqueParticipants} unique participants
@@ -1569,8 +2315,68 @@ export default function Admin({
                 <span className="tag">Times in Asia/Colombo</span>
               </div>
 
+              {/* Toolbar & Filters */}
+              <div className="workspace-toolbar mt-4">
+                <div className="workspace-filter-inputs">
+                  <div className="workspace-search-box">
+                    <Search size={14} />
+                    <input
+                      type="text"
+                      placeholder="Search participant code or submission ID..."
+                      value={historySearch}
+                      onChange={(e) => {
+                        setHistorySearch(e.target.value);
+                        setHistoryPage(0);
+                      }}
+                    />
+                  </div>
+
+                  <select
+                    className="workspace-select"
+                    value={historyStatusFilter}
+                    onChange={(e) => {
+                      setHistoryStatusFilter(e.target.value);
+                      setHistoryPage(0);
+                    }}
+                  >
+                    <option value="all">All Participation Statuses</option>
+                    <option value="submitted_complete">Submitted Complete</option>
+                    <option value="submitted_with_missing">Submitted with Missing</option>
+                    <option value="draft">In-Progress / Draft</option>
+                  </select>
+
+                  <select
+                    className="workspace-select"
+                    value={historyChallengeFilter}
+                    onChange={(e) => {
+                      setHistoryChallengeFilter(e.target.value);
+                      setHistoryPage(0);
+                    }}
+                  >
+                    <option value="all">All Challenge Progress</option>
+                    <option value="completed_all">Completed All 20 Challenges</option>
+                    <option value="partial">In-Progress / Partial Challenges</option>
+                  </select>
+                </div>
+
+                {(historySearch || historyStatusFilter !== "all" || historyChallengeFilter !== "all") && (
+                  <button
+                    type="button"
+                    className="button secondary small text-xs"
+                    onClick={() => {
+                      setHistorySearch("");
+                      setHistoryStatusFilter("all");
+                      setHistoryChallengeFilter("all");
+                      setHistoryPage(0);
+                    }}
+                  >
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+
               <div
-                className="table-scroll"
+                className="table-scroll mt-3"
                 tabIndex={0}
                 role="region"
                 aria-label="Submission history table"
@@ -1578,35 +2384,191 @@ export default function Admin({
                 <table>
                   <thead>
                     <tr>
-                      <th className="sticky-col-header">Participant code</th>
+                      <th className="sticky-col-header">Participant Code</th>
                       <th>Status</th>
-                      <th>Answered / 25</th>
-                      <th>Missions Finished</th>
+                      <th>Joined Research (Asia/Colombo)</th>
                       <th>Submission Date &amp; Time</th>
+                      <th>Session Duration</th>
+                      <th>All Challenges (20)</th>
+                      <th>Survey (Q1–Q25)</th>
+                      <th>Simulated Risk</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedHistorySessions.map((s) => (
-                      <tr key={s.submissionId ?? s.id}>
-                        <td className="sticky-col-cell">
-                          <code>{s.code}</code>
-                        </td>
-                        <td>
-                          <span className="tag">
-                            {s.status.replaceAll("_", " ")}
-                          </span>
-                        </td>
-                        <td>
-                          {
-                            Object.values(s.answers).filter(
-                              (a) => a.status === "answered",
-                            ).length
-                          }
-                        </td>
-                        <td>{scoreSummary(s.attempts).completed} / 20</td>
-                        <td>{colomboTime(s.submittedAt) || colomboTime(s.createdAt)}</td>
-                      </tr>
-                    ))}
+                    {paginatedHistorySessions.map((s) => {
+                      const rowKey = s.submissionId ?? s.id;
+                      const isRowExpanded = expandedParticipantId === rowKey;
+                      const summary = scoreSummary(s.attempts);
+                      const challenges = getParticipantChallenges(s);
+                      const completedCount = challenges.filter((c) => c.status === "completed").length;
+                      const safeCount = challenges.filter((c) => c.status === "completed" && c.isSafe).length;
+                      const unsafeCount = challenges.filter((c) => c.status === "completed" && c.isSafe === false).length;
+                      const answeredSurveyCount = Object.values(s.answers).filter(
+                        (a) => a.status === "answered",
+                      ).length;
+
+                      const duration = formatDuration(s.createdAt, s.submittedAt);
+                      const avgRisk = completedCount
+                        ? (
+                            challenges
+                              .filter((c) => c.status === "completed")
+                              .reduce((sum, c) => sum + (c.riskScore ?? 0), 0) / completedCount
+                          ).toFixed(2)
+                        : "—";
+
+                      const filteredChallenges = challenges.filter((c) => {
+                        if (historyMissionFilter !== "all" && c.iv !== historyMissionFilter) return false;
+                        return true;
+                      });
+
+                      return (
+                        <tr key={rowKey} className="group">
+                          <td className="sticky-col-cell">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="p-1 rounded hover:bg-surface text-muted hover:text-cyan transition-colors"
+                                onClick={() =>
+                                  setExpandedParticipantId(isRowExpanded ? null : rowKey)
+                                }
+                                title={isRowExpanded ? "Collapse participant dossier" : "Expand all 20 challenges"}
+                              >
+                                {isRowExpanded ? (
+                                  <ChevronUp size={14} className="text-cyan" />
+                                ) : (
+                                  <ChevronDown size={14} />
+                                )}
+                              </button>
+                              <code className="font-bold text-xs">{s.code}</code>
+                            </div>
+                          </td>
+
+                          <td>
+                            <span
+                              className={`tag text-[11px] ${
+                                s.status === "submitted_complete"
+                                  ? "border-emerald/30 text-emerald"
+                                  : s.status === "submitted_with_missing"
+                                    ? "border-amber/30 text-amber"
+                                    : "border-cyan/30 text-cyan"
+                              }`}
+                            >
+                              {s.status.replaceAll("_", " ")}
+                            </span>
+                          </td>
+
+                          {/* Joined Research Timestamp */}
+                          <td className="whitespace-nowrap">
+                            <div className="flex flex-col">
+                              <strong className="text-xs text-foreground font-mono">
+                                {colomboTime(s.createdAt)}
+                              </strong>
+                              <span className="text-[10px] text-muted flex items-center gap-1 mt-0.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan inline-block" />
+                                Consented &amp; Joined
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Submitted Research Timestamp */}
+                          <td className="whitespace-nowrap">
+                            {s.submittedAt ? (
+                              <div className="flex flex-col">
+                                <span className="text-xs text-foreground font-mono">
+                                  {colomboTime(s.submittedAt)}
+                                </span>
+                                <span className="text-[10px] text-emerald flex items-center gap-1 mt-0.5">
+                                  <CheckCircle size={10} /> Baseline Submitted
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted italic flex items-center gap-1">
+                                <Clock size={11} /> In Progress / Draft
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Session Duration */}
+                          <td className="whitespace-nowrap">
+                            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface border flex items-center gap-1 w-fit">
+                              <Timer size={11} className="text-emerald" />
+                              {duration}
+                            </span>
+                          </td>
+
+                          {/* All 20 Challenges Progress */}
+                          <td>
+                            <div className="w-36">
+                              <div className="flex items-center justify-between text-xs font-bold mb-1">
+                                <span className={completedCount >= 20 ? "text-emerald" : "text-cyan"}>
+                                  {completedCount} / 20
+                                </span>
+                                <span className="text-[10px] text-muted font-normal">
+                                  {completedCount >= 20 ? "All Done" : `${Math.round((completedCount / 20) * 100)}%`}
+                                </span>
+                              </div>
+                              <div className="mini-progress-track">
+                                <div
+                                  className={`mini-progress-fill ${
+                                    completedCount >= 20 ? "" : "partial"
+                                  }`}
+                                  style={{
+                                    width: `${Math.min(100, (completedCount / 20) * 100)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Survey Responses */}
+                          <td>
+                            <span className="text-xs font-mono font-medium">
+                              {answeredSurveyCount} / 25
+                            </span>
+                          </td>
+
+                          {/* Simulated Risk Score */}
+                          <td>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono text-xs font-bold text-foreground">
+                                {avgRisk}
+                              </span>
+                              <span className="text-[10px] text-muted">/ 4</span>
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5"
+                                onClick={() =>
+                                  setExpandedParticipantId(isRowExpanded ? null : rowKey)
+                                }
+                              >
+                                <Eye size={12} />
+                                <span>{isRowExpanded ? "Hide" : "Inspect 20 Challenges"}</span>
+                              </button>
+
+                              <Link
+                                href={href("responses") + (query ? "" : "?code=" + encodeURIComponent(s.code))}
+                                onClick={() => {
+                                  setAuditSearch(s.code);
+                                  setAuditViewMode("participants");
+                                }}
+                                className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
+                                title="View raw responses and decisions in audit log"
+                              >
+                                <span>Responses</span>
+                                <ArrowUpRight size={11} />
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1615,6 +2577,295 @@ export default function Admin({
                 <p className="empty-copy">No research responses available yet.</p>
               )}
 
+              {/* -------------------------------------------------------------
+                  EXPANDED PARTICIPANT DOSSIER PANEL (ALL 20 CHALLENGES & SURVEY)
+                  ------------------------------------------------------------- */}
+              {expandedParticipantId && (
+                (() => {
+                  const targetSession = historySessions.find(
+                    (s) => (s.submissionId ?? s.id) === expandedParticipantId,
+                  );
+                  if (!targetSession) return null;
+
+                  const summary = scoreSummary(targetSession.attempts);
+                  const challenges = getParticipantChallenges(targetSession);
+                  const completedChallenges = challenges.filter((c) => c.status === "completed");
+                  const safeCount = completedChallenges.filter((c) => c.isSafe).length;
+                  const unsafeCount = completedChallenges.filter((c) => c.isSafe === false).length;
+                  const filteredChallenges = challenges.filter((c) => {
+                    if (historyMissionFilter !== "all" && c.iv !== historyMissionFilter) return false;
+                    return true;
+                  });
+
+                  return (
+                    <div className="participant-dossier-wrapper mt-5 border rounded-xl">
+                      {/* Dossier Header Grid */}
+                      <div className="dossier-header-grid">
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Participant ID</span>
+                          <span className="dossier-meta-value font-mono text-cyan">
+                            <UserCheck size={15} />
+                            {targetSession.code}
+                          </span>
+                        </div>
+
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Joined Research (Colombo)</span>
+                          <span className="dossier-meta-value text-xs font-mono">
+                            <Calendar size={13} className="text-cyan" />
+                            {colomboTime(targetSession.createdAt)}
+                          </span>
+                        </div>
+
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Submitted Baseline</span>
+                          <span className="dossier-meta-value text-xs font-mono">
+                            <Clock size={13} />
+                            {targetSession.submittedAt ? colomboTime(targetSession.submittedAt) : "In Progress"}
+                          </span>
+                        </div>
+
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Active Session Duration</span>
+                          <span className="dossier-meta-value text-xs font-mono text-emerald">
+                            <Timer size={13} />
+                            {formatDuration(targetSession.createdAt, targetSession.submittedAt)}
+                          </span>
+                        </div>
+
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Challenges Completed</span>
+                          <span className="dossier-meta-value text-xs font-mono">
+                            <Gamepad2 size={13} />
+                            {completedChallenges.length} / 20 ({Math.round((completedChallenges.length / 20) * 100)}%)
+                          </span>
+                        </div>
+
+                        <div className="dossier-meta-item">
+                          <span className="dossier-meta-label">Protective Decisions</span>
+                          <span className="dossier-meta-value text-xs text-emerald">
+                            <ShieldCheck size={13} />
+                            {safeCount} Safe · {unsafeCount} Unsafe
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Navigation Tabs between All 20 Challenges and Survey Responses */}
+                      <div className="dossier-nav-tabs">
+                        <button
+                          type="button"
+                          className={`dossier-tab-btn ${historyDetailTab === "challenges" ? "active" : ""}`}
+                          onClick={() => setHistoryDetailTab("challenges")}
+                        >
+                          <Gamepad2 size={14} />
+                          <span>All 20 Challenges &amp; Decisions ({completedChallenges.length} / 20)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`dossier-tab-btn ${historyDetailTab === "survey" ? "active" : ""}`}
+                          onClick={() => setHistoryDetailTab("survey")}
+                        >
+                          <FileText size={14} />
+                          <span>Baseline Survey Responses (Q1–Q25)</span>
+                        </button>
+
+                        <div className="ml-auto">
+                          <Link
+                            href={href("responses") + (query ? "" : "?code=" + encodeURIComponent(targetSession.code))}
+                            onClick={() => {
+                              setAuditSearch(targetSession.code);
+                              setAuditViewMode("participants");
+                            }}
+                            className="button secondary small text-xs flex items-center gap-1.5"
+                          >
+                            <span>Open in Responses Audit</span>
+                            <ArrowUpRight size={13} />
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* TAB 1: ALL 20 CHALLENGES JOINED WITH RESPONSES */}
+                      {historyDetailTab === "challenges" && (
+                        <div className="space-y-4">
+                          {/* Mission Filter Pills */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs text-muted font-semibold">Filter Missions:</span>
+                            {[
+                              { id: "all", label: "All 20 Challenges (20)" },
+                              { id: "IV1", label: "IV1: Phishing (5)" },
+                              { id: "IV2", label: "IV2: Pretexting (5)" },
+                              { id: "IV3", label: "IV3: Impersonation (5)" },
+                              { id: "IV4", label: "IV4: Scam Links (5)" },
+                            ].map((tab) => (
+                              <button
+                                key={tab.id}
+                                type="button"
+                                className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                                  historyMissionFilter === tab.id
+                                    ? "bg-primary text-white border-primary"
+                                    : "bg-surface hover:bg-card-bg text-muted border-border"
+                                }`}
+                                onClick={() => setHistoryMissionFilter(tab.id)}
+                              >
+                                {tab.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Grid of all 20 challenges */}
+                          <div className="challenges-grid">
+                            {filteredChallenges.map((ch) => (
+                              <div
+                                key={ch.id}
+                                className={`challenge-decision-card ${
+                                  ch.status === "pending"
+                                    ? "pending"
+                                    : ch.isSafe
+                                      ? "safe"
+                                      : "unsafe"
+                                }`}
+                              >
+                                <div>
+                                  <div className="challenge-card-header">
+                                    <div className="flex items-center gap-2">
+                                      <span className="challenge-id-badge">{ch.id}</span>
+                                      <span className="tag text-[10px] py-0.5 px-2">
+                                        {ch.iv} · {ch.missionName}
+                                      </span>
+                                    </div>
+
+                                    {ch.status === "completed" ? (
+                                      ch.isSafe ? (
+                                        <span className="badge-status-tag unlocked text-[10.5px]">
+                                          <ShieldCheck size={11} /> Protective
+                                        </span>
+                                      ) : (
+                                        <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
+                                          <AlertTriangle size={11} /> Unsafe
+                                        </span>
+                                      )
+                                    ) : (
+                                      <span className="text-[10.5px] text-muted italic">
+                                        Pending / Not Attempted
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <h4 className="challenge-title-text">{ch.title}</h4>
+
+                                  {ch.status === "completed" ? (
+                                    <div className="challenge-action-quote mt-2.5">
+                                      <span className="text-[10px] uppercase font-bold text-muted block mb-1">
+                                        Participant Chosen Decision:
+                                      </span>
+                                      <span>&ldquo;{ch.selectedAction}&rdquo;</span>
+                                      {!ch.isSafe && ch.disclosedCategory && ch.disclosedCategory !== "None" && (
+                                        <span className="text-[11px] text-red font-semibold block mt-1.5">
+                                          ⚠️ Compromised Data: {ch.disclosedCategory}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-muted italic mt-2">
+                                      Participant has not recorded a decision on this scenario.
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div className="challenge-card-footer">
+                                  <span>
+                                    Risk Score:{" "}
+                                    <strong className="font-mono text-foreground">
+                                      {ch.riskScore !== null ? `${ch.riskScore} / 4` : "—"}
+                                    </strong>
+                                  </span>
+                                  <span>
+                                    Elapsed:{" "}
+                                    <strong className="text-foreground">
+                                      {ch.elapsedSec !== null ? `${ch.elapsedSec}s` : "—"}
+                                    </strong>
+                                  </span>
+                                  <span>{colomboTime(ch.createdAt)}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* TAB 2: BASELINE SURVEY QUESTIONNAIRE (Q1–Q25) */}
+                      {historyDetailTab === "survey" && (
+                        <div className="space-y-4">
+                          <div className="table-scroll" tabIndex={0} role="region" aria-label="Participant survey answers">
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>Question ID</th>
+                                  <th>Variable / Dimension</th>
+                                  <th>Answer Option Selected</th>
+                                  <th>Raw Value</th>
+                                  <th>Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {questions.map((q) => {
+                                  const answer = targetSession.answers[q.id];
+                                  const matchedOption = q.options.find((o) => o.code === answer?.value);
+                                  const isAnswered = answer?.status === "answered";
+
+                                  return (
+                                    <tr key={q.id}>
+                                      <td>
+                                        <code className="font-bold">{q.id}</code>
+                                      </td>
+                                      <td>
+                                        <span className="text-xs font-medium text-foreground block">
+                                          {q.variable}
+                                        </span>
+                                        <span className="text-[11px] text-muted block max-w-md truncate">
+                                          {q.text}
+                                        </span>
+                                      </td>
+                                      <td className="text-xs">
+                                        {matchedOption ? (
+                                          <span className="font-medium text-foreground">
+                                            {matchedOption.label}
+                                          </span>
+                                        ) : (
+                                          <span className="text-muted italic">Not answered</span>
+                                        )}
+                                      </td>
+                                      <td className="font-mono text-xs">
+                                        {answer?.value !== null && answer?.value !== undefined
+                                          ? answer.value
+                                          : "—"}
+                                      </td>
+                                      <td>
+                                        <span
+                                          className={`tag text-[10px] py-0.5 px-1.5 ${
+                                            isAnswered
+                                              ? "border-emerald/30 text-emerald"
+                                              : "border-border text-muted"
+                                          }`}
+                                        >
+                                          {answer?.status || "unrecorded"}
+                                        </span>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              )}
+
+              {/* History Pagination */}
               <div className="pagination">
                 <button
                   className="button secondary"

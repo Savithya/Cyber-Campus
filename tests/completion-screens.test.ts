@@ -145,8 +145,9 @@ describe("Research Completion Flow - 20 Questions (Image 1 and Image 2)", () => 
     );
 
     // Image 2: Header & Badges
-    expect(html).toContain("MISSION ACCOMPLISHED");
+    expect(html).not.toContain("MISSION ACCOMPLISHED");
     expect(html).toContain("Challenge Complete!");
+    expect(html).toContain("Submit Responses");
     expect(html).toContain("Thank you for participating in this research study.");
     expect(html).toContain("Your responses have been securely recorded for academic research.");
     expect(html).toContain("Anonymous participant code:");

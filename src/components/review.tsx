@@ -614,7 +614,13 @@ export default function Review() {
           {/* Anonymous Participant Code */}
           <div className="pt-1">
             <div className="inline-flex items-center justify-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400 max-w-full flex-wrap">
-              <span>{`Anonymous participant code: ${state.session.code}`}</span>
+              <span>{`Anonymous participant code: ${
+                state.session?.code
+                  ? /^\d+$/.test(state.session.code.trim())
+                    ? String(parseInt(state.session.code.trim(), 10)).padStart(2, "0")
+                    : state.session.code
+                  : "01"
+              }`}</span>
               <button
                 type="button"
                 onClick={handleCopyCode}

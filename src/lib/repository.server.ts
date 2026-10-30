@@ -637,7 +637,16 @@ export async function getSession(): Promise<Session | null> {
         if (parsed?.counter === 0) counterIsZero = true;
       } catch {}
 
-      if (counterIsZero && cwdList.length === 0 && demoList.length === 0 && s.status === "draft") {
+      if (counterIsZero && cwdList.length === 0 && demoList.length === 0) {
+        if (s.status !== "draft") {
+          await writeLocal(null);
+          try {
+            const jar = await cookies();
+            jar.delete("cc_last_code");
+            jar.delete("cc_pid");
+          } catch {}
+          return null;
+        }
         if (s.code !== "01") {
           s = { ...s, code: "01" };
           await writeLocal({ ...local, session: s });
@@ -694,10 +703,38 @@ export async function startSession(input: {
       "impersonation",
       "links",
     ];
-    const nextCode = await nextLocalParticipantCode({
-      existingCode: existing?.code,
-      clientHintCode: input.clientLastCode,
-    });
+    const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
+    const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
+    const hasSubmissions = cwdList.length > 0 || demoList.length > 0;
+
+    let nextCode: string;
+    if (!hasSubmissions && (!existing || existing.status === "draft")) {
+      nextCode = "01";
+      const counterPayload = JSON.stringify({ counter: 1 });
+      try {
+        await mkdir(getDemoDataDir(), { recursive: true });
+        await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+      try {
+        await mkdir(getCwdDataDir(), { recursive: true });
+        await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+      try {
+        const jar = await cookies();
+        jar.set("cc_last_code", "01", {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 365 * 86400,
+        });
+      } catch {}
+    } else {
+      nextCode = await nextLocalParticipantCode({
+        existingCode: existing?.code,
+        clientHintCode: input.clientLastCode,
+      });
+    }
     const session: Session = {
       id: sessionId,
       submissionId: sessionId,
