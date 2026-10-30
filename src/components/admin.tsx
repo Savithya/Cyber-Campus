@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Fragment } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -2308,8 +2308,12 @@ export default function Admin({
                   </div>
                   <h2 className="text-xl font-bold mt-1">Participant Submission History</h2>
                   <p className="text-sm opacity-80 mt-1">
-                    {historySessions.length} matching records · {historySubmitted.length} total submissions from{" "}
-                    {historyUniqueParticipants} unique participants
+                    {historySessions.length} matching{" "}
+                    {historySessions.length === 1 ? "record" : "records"} ·{" "}
+                    {historySubmitted.length} total{" "}
+                    {historySubmitted.length === 1 ? "submission" : "submissions"}{" "}
+                    from {historyUniqueParticipants} unique{" "}
+                    {historyUniqueParticipants === 1 ? "participant" : "participants"}
                   </p>
                 </div>
                 <span className="tag">Times in Asia/Colombo</span>
@@ -2322,13 +2326,26 @@ export default function Admin({
                     <Search size={14} />
                     <input
                       type="text"
-                      placeholder="Search participant code or submission ID..."
+                      placeholder="Search participant code or ID..."
                       value={historySearch}
                       onChange={(e) => {
                         setHistorySearch(e.target.value);
                         setHistoryPage(0);
                       }}
                     />
+                    {historySearch && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHistorySearch("");
+                          setHistoryPage(0);
+                        }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-foreground p-0.5"
+                        title="Clear search"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
                   </div>
 
                   <select
@@ -2355,24 +2372,33 @@ export default function Admin({
                   >
                     <option value="all">All Challenge Progress</option>
                     <option value="completed_all">Completed All 20 Challenges</option>
-                    <option value="partial">In-Progress / Partial Challenges</option>
+                    <option value="partial">Partial Challenges (&lt; 20)</option>
                   </select>
+
+                  {(historySearch || historyStatusFilter !== "all" || historyChallengeFilter !== "all") && (
+                    <button
+                      type="button"
+                      className="button secondary small text-xs flex items-center gap-1.5 h-[38px] px-3"
+                      onClick={() => {
+                        setHistorySearch("");
+                        setHistoryStatusFilter("all");
+                        setHistoryChallengeFilter("all");
+                        setHistoryPage(0);
+                      }}
+                    >
+                      <RotateCcw size={12} />
+                      <span>Reset Filters</span>
+                    </button>
+                  )}
                 </div>
 
-                {(historySearch || historyStatusFilter !== "all" || historyChallengeFilter !== "all") && (
-                  <button
-                    type="button"
-                    className="button secondary small text-xs"
-                    onClick={() => {
-                      setHistorySearch("");
-                      setHistoryStatusFilter("all");
-                      setHistoryChallengeFilter("all");
-                      setHistoryPage(0);
-                    }}
-                  >
-                    Reset Filters
-                  </button>
-                )}
+                <div className="text-xs text-muted font-mono flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card-bg border border-border shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan inline-block" />
+                  <span>
+                    Showing <strong>{historySessions.length}</strong>{" "}
+                    {historySessions.length === 1 ? "record" : "records"}
+                  </span>
+                </div>
               </div>
 
               <div
@@ -2384,503 +2410,725 @@ export default function Admin({
                 <table>
                   <thead>
                     <tr>
-                      <th className="sticky-col-header">Participant Code</th>
+                      <th className="sticky-col-header">Participant</th>
                       <th>Status</th>
-                      <th>Joined Research (Asia/Colombo)</th>
-                      <th>Submission Date &amp; Time</th>
-                      <th>Session Duration</th>
-                      <th>All Challenges (20)</th>
+                      <th>Submitted &amp; Duration</th>
+                      <th>Challenges (20)</th>
                       <th>Survey (Q1–Q25)</th>
-                      <th>Simulated Risk</th>
-                      <th>Actions</th>
+                      <th>Risk Level</th>
+                      <th className="text-right pr-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedHistorySessions.map((s) => {
-                      const rowKey = s.submissionId ?? s.id;
-                      const isRowExpanded = expandedParticipantId === rowKey;
-                      const summary = scoreSummary(s.attempts);
-                      const challenges = getParticipantChallenges(s);
-                      const completedCount = challenges.filter((c) => c.status === "completed").length;
-                      const safeCount = challenges.filter((c) => c.status === "completed" && c.isSafe).length;
-                      const unsafeCount = challenges.filter((c) => c.status === "completed" && c.isSafe === false).length;
-                      const answeredSurveyCount = Object.values(s.answers).filter(
-                        (a) => a.status === "answered",
-                      ).length;
-
-                      const duration = formatDuration(s.createdAt, s.submittedAt);
-                      const avgRisk = completedCount
-                        ? (
-                            challenges
-                              .filter((c) => c.status === "completed")
-                              .reduce((sum, c) => sum + (c.riskScore ?? 0), 0) / completedCount
-                          ).toFixed(2)
-                        : "—";
-
-                      const filteredChallenges = challenges.filter((c) => {
-                        if (historyMissionFilter !== "all" && c.iv !== historyMissionFilter) return false;
-                        return true;
-                      });
-
-                      return (
-                        <tr key={rowKey} className="group">
-                          <td className="sticky-col-cell">
-                            <div className="flex items-center gap-2">
+                    {paginatedHistorySessions.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="text-center py-10 text-muted">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <Users size={28} className="opacity-40" />
+                            <p className="text-sm font-medium">
+                              No participant submission records match your filters.
+                            </p>
+                            {(historySearch ||
+                              historyStatusFilter !== "all" ||
+                              historyChallengeFilter !== "all") && (
                               <button
                                 type="button"
-                                className="p-1 rounded hover:bg-surface text-muted hover:text-cyan transition-colors"
-                                onClick={() =>
-                                  setExpandedParticipantId(isRowExpanded ? null : rowKey)
-                                }
-                                title={isRowExpanded ? "Collapse participant dossier" : "Expand all 20 challenges"}
-                              >
-                                {isRowExpanded ? (
-                                  <ChevronUp size={14} className="text-cyan" />
-                                ) : (
-                                  <ChevronDown size={14} />
-                                )}
-                              </button>
-                              <code className="font-bold text-xs">{s.code}</code>
-                            </div>
-                          </td>
-
-                          <td>
-                            <span
-                              className={`tag text-[11px] ${
-                                s.status === "submitted_complete"
-                                  ? "border-emerald/30 text-emerald"
-                                  : s.status === "submitted_with_missing"
-                                    ? "border-amber/30 text-amber"
-                                    : "border-cyan/30 text-cyan"
-                              }`}
-                            >
-                              {s.status.replaceAll("_", " ")}
-                            </span>
-                          </td>
-
-                          {/* Joined Research Timestamp */}
-                          <td className="whitespace-nowrap">
-                            <div className="flex flex-col">
-                              <strong className="text-xs text-foreground font-mono">
-                                {colomboTime(s.createdAt)}
-                              </strong>
-                              <span className="text-[10px] text-muted flex items-center gap-1 mt-0.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-cyan inline-block" />
-                                Consented &amp; Joined
-                              </span>
-                            </div>
-                          </td>
-
-                          {/* Submitted Research Timestamp */}
-                          <td className="whitespace-nowrap">
-                            {s.submittedAt ? (
-                              <div className="flex flex-col">
-                                <span className="text-xs text-foreground font-mono">
-                                  {colomboTime(s.submittedAt)}
-                                </span>
-                                <span className="text-[10px] text-emerald flex items-center gap-1 mt-0.5">
-                                  <CheckCircle size={10} /> Baseline Submitted
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-xs text-muted italic flex items-center gap-1">
-                                <Clock size={11} /> In Progress / Draft
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Session Duration */}
-                          <td className="whitespace-nowrap">
-                            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-surface border flex items-center gap-1 w-fit">
-                              <Timer size={11} className="text-emerald" />
-                              {duration}
-                            </span>
-                          </td>
-
-                          {/* All 20 Challenges Progress */}
-                          <td>
-                            <div className="w-36">
-                              <div className="flex items-center justify-between text-xs font-bold mb-1">
-                                <span className={completedCount >= 20 ? "text-emerald" : "text-cyan"}>
-                                  {completedCount} / 20
-                                </span>
-                                <span className="text-[10px] text-muted font-normal">
-                                  {completedCount >= 20 ? "All Done" : `${Math.round((completedCount / 20) * 100)}%`}
-                                </span>
-                              </div>
-                              <div className="mini-progress-track">
-                                <div
-                                  className={`mini-progress-fill ${
-                                    completedCount >= 20 ? "" : "partial"
-                                  }`}
-                                  style={{
-                                    width: `${Math.min(100, (completedCount / 20) * 100)}%`,
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Survey Responses */}
-                          <td>
-                            <span className="text-xs font-mono font-medium">
-                              {answeredSurveyCount} / 25
-                            </span>
-                          </td>
-
-                          {/* Simulated Risk Score */}
-                          <td>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-xs font-bold text-foreground">
-                                {avgRisk}
-                              </span>
-                              <span className="text-[10px] text-muted">/ 4</span>
-                            </div>
-                          </td>
-
-                          {/* Actions */}
-                          <td className="whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5"
-                                onClick={() =>
-                                  setExpandedParticipantId(isRowExpanded ? null : rowKey)
-                                }
-                              >
-                                <Eye size={12} />
-                                <span>{isRowExpanded ? "Hide" : "Inspect 20 Challenges"}</span>
-                              </button>
-
-                              <Link
-                                href={href("responses") + (query ? "" : "?code=" + encodeURIComponent(s.code))}
+                                className="button secondary small text-xs mt-1"
                                 onClick={() => {
-                                  setAuditSearch(s.code);
-                                  setAuditViewMode("participants");
+                                  setHistorySearch("");
+                                  setHistoryStatusFilter("all");
+                                  setHistoryChallengeFilter("all");
+                                  setHistoryPage(0);
                                 }}
-                                className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
-                                title="View raw responses and decisions in audit log"
                               >
-                                <span>Responses</span>
-                                <ArrowUpRight size={11} />
-                              </Link>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                                Reset Filters
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedHistorySessions.map((s) => {
+                        const rowKey = s.submissionId ?? s.id;
+                        const isRowExpanded = expandedParticipantId === rowKey;
+                        const challenges = getParticipantChallenges(s);
+                        const completedCount = challenges.filter(
+                          (c) => c.status === "completed",
+                        ).length;
+                        const safeCount = challenges.filter(
+                          (c) => c.status === "completed" && c.isSafe,
+                        ).length;
+                        const unsafeCount = challenges.filter(
+                          (c) => c.status === "completed" && c.isSafe === false,
+                        ).length;
+                        const answeredSurveyCount = Object.values(
+                          s.answers,
+                        ).filter((a) => a.status === "answered").length;
+
+                        const duration = formatDuration(s.createdAt, s.submittedAt);
+                        const avgRisk = completedCount
+                          ? (
+                              challenges
+                                .filter((c) => c.status === "completed")
+                                .reduce(
+                                  (sum, c) => sum + (c.riskScore ?? 0),
+                                  0,
+                                ) / completedCount
+                            ).toFixed(2)
+                          : "—";
+
+                        const numRisk = parseFloat(avgRisk);
+                        const isLowRisk = !isNaN(numRisk) && numRisk < 1.5;
+                        const isMedRisk =
+                          !isNaN(numRisk) && numRisk >= 1.5 && numRisk <= 2.5;
+
+                        return (
+                          <Fragment key={rowKey}>
+                            <tr
+                              className={`group transition-colors cursor-pointer ${
+                                isRowExpanded
+                                  ? "bg-cyan/[0.04]"
+                                  : "hover:bg-surface/50"
+                              }`}
+                              onClick={() =>
+                                setExpandedParticipantId(
+                                  isRowExpanded ? null : rowKey,
+                                )
+                              }
+                            >
+                              <td className="sticky-col-cell">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    className={`p-1 rounded transition-colors ${
+                                      isRowExpanded
+                                        ? "text-cyan bg-cyan/10"
+                                        : "text-muted hover:text-cyan hover:bg-surface"
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setExpandedParticipantId(
+                                        isRowExpanded ? null : rowKey,
+                                      );
+                                    }}
+                                    title={
+                                      isRowExpanded
+                                        ? "Close participant dossier"
+                                        : "Inspect participant dossier"
+                                    }
+                                  >
+                                    {isRowExpanded ? (
+                                      <ChevronUp size={14} className="text-cyan" />
+                                    ) : (
+                                      <ChevronDown size={14} />
+                                    )}
+                                  </button>
+                                  <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-surface border border-border/70 text-foreground">
+                                    {s.code}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                {s.status === "submitted_complete" ? (
+                                  <span className="tag text-[11px] border-emerald/30 text-emerald bg-emerald/5 inline-flex items-center gap-1">
+                                    <CheckCircle size={11} /> Completed
+                                  </span>
+                                ) : s.status === "submitted_with_missing" ? (
+                                  <span className="tag text-[11px] border-amber/30 text-amber bg-amber/5 inline-flex items-center gap-1">
+                                    <AlertTriangle size={11} /> Missing Items
+                                  </span>
+                                ) : (
+                                  <span className="tag text-[11px] border-cyan/30 text-cyan bg-cyan/5 inline-flex items-center gap-1">
+                                    <Clock size={11} /> In Progress
+                                  </span>
+                                )}
+                              </td>
+
+                              <td className="whitespace-nowrap">
+                                <div className="flex flex-col gap-0.5">
+                                  {s.submittedAt ? (
+                                    <>
+                                      <strong className="text-xs text-foreground font-mono">
+                                        {colomboTime(s.submittedAt)}
+                                      </strong>
+                                      <span className="text-[11px] text-muted flex items-center gap-1.5">
+                                        <Timer
+                                          size={11}
+                                          className="text-emerald"
+                                        />
+                                        <span className="text-emerald font-semibold font-mono">
+                                          {duration}
+                                        </span>
+                                        <span className="opacity-40">·</span>
+                                        <span>
+                                          Joined {colomboTime(s.createdAt)}
+                                        </span>
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-xs text-muted italic flex items-center gap-1">
+                                        <Clock size={11} /> In Progress / Draft
+                                      </span>
+                                      <span className="text-[11px] text-muted">
+                                        Joined {colomboTime(s.createdAt)}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* All 20 Challenges Progress */}
+                              <td>
+                                <div className="w-32">
+                                  <div className="flex items-center justify-between text-xs font-bold mb-1">
+                                    <span
+                                      className={
+                                        completedCount >= 20
+                                          ? "text-emerald"
+                                          : "text-cyan"
+                                      }
+                                    >
+                                      {completedCount} / 20
+                                    </span>
+                                    <span className="text-[10px] text-muted font-normal">
+                                      {completedCount >= 20
+                                        ? "All Done"
+                                        : `${Math.round((completedCount / 20) * 100)}%`}
+                                    </span>
+                                  </div>
+                                  <div className="mini-progress-track">
+                                    <div
+                                      className={`mini-progress-fill ${
+                                        completedCount >= 20 ? "" : "partial"
+                                      }`}
+                                      style={{
+                                        width: `${Math.min(100, (completedCount / 20) * 100)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Survey Responses */}
+                              <td>
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-mono font-medium">
+                                    <strong>{answeredSurveyCount}</strong> / 25
+                                  </span>
+                                  <span className="text-[10px] text-muted mt-0.5">
+                                    {answeredSurveyCount === 25 ? (
+                                      <span className="text-emerald">
+                                        All 25 answered
+                                      </span>
+                                    ) : (
+                                      `${25 - answeredSurveyCount} missing`
+                                    )}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Simulated Risk Score */}
+                              <td>
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-1 font-mono text-xs">
+                                    <strong className="text-foreground">
+                                      {avgRisk}
+                                    </strong>
+                                    <span className="text-[10px] text-muted">
+                                      / 4
+                                    </span>
+                                  </div>
+                                  {completedCount > 0 && !isNaN(numRisk) && (
+                                    <span
+                                      className={`text-[9.5px] font-semibold px-1.5 py-0.2 rounded w-fit uppercase tracking-wider ${
+                                        isLowRisk
+                                          ? "text-emerald bg-emerald/10 border border-emerald/20"
+                                          : isMedRisk
+                                            ? "text-amber bg-amber/10 border border-amber/20"
+                                            : "text-red bg-red/10 border border-red/20"
+                                      }`}
+                                    >
+                                      {isLowRisk
+                                        ? "Low Risk"
+                                        : isMedRisk
+                                          ? "Moderate"
+                                          : "High Risk"}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Actions */}
+                              <td className="whitespace-nowrap text-right pr-4">
+                                <div
+                                  className="flex items-center justify-end gap-2"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <button
+                                    type="button"
+                                    className={`button small text-xs flex items-center gap-1 py-1 px-2.5 transition-all ${
+                                      isRowExpanded
+                                        ? "bg-cyan text-white border-cyan shadow-sm"
+                                        : "secondary"
+                                    }`}
+                                    onClick={() =>
+                                      setExpandedParticipantId(
+                                        isRowExpanded ? null : rowKey,
+                                      )
+                                    }
+                                  >
+                                    {isRowExpanded ? (
+                                      <>
+                                        <ChevronUp size={12} />
+                                        <span>Close Dossier</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Eye size={12} />
+                                        <span>Inspect Dossier</span>
+                                      </>
+                                    )}
+                                  </button>
+
+                                  <Link
+                                    href={
+                                      href("responses") +
+                                      (query
+                                        ? ""
+                                        : "?code=" + encodeURIComponent(s.code))
+                                    }
+                                    onClick={() => {
+                                      setAuditSearch(s.code);
+                                      setAuditViewMode("participants");
+                                    }}
+                                    className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
+                                    title="View raw responses and decisions in audit log"
+                                  >
+                                    <span>Responses</span>
+                                    <ArrowUpRight size={11} />
+                                  </Link>
+                                </div>
+                              </td>
+                            </tr>
+
+                            {/* INLINE DOSSIER DRAWER UNDER THE PARTICIPANT ROW */}
+                            {isRowExpanded && (
+                              <tr key={`${rowKey}-dossier`} className="bg-surface/40">
+                                <td colSpan={7} className="p-0 border-b border-border">
+                                  <div className="p-5 border-t border-cyan/30 bg-card-bg/60">
+                                    {/* Dossier Header */}
+                                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan">
+                                          <UserCheck size={16} />
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-sm text-foreground">
+                                              Participant Dossier:{" "}
+                                              <span className="font-mono text-cyan">
+                                                {s.code}
+                                              </span>
+                                            </h3>
+                                            <span
+                                              className={`tag text-[10px] py-0.5 px-2 ${
+                                                s.status === "submitted_complete"
+                                                  ? "border-emerald/30 text-emerald"
+                                                  : "border-cyan/30 text-cyan"
+                                              }`}
+                                            >
+                                              {s.status.replaceAll("_", " ")}
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-muted mt-0.5">
+                                            Submission ID:{" "}
+                                            <code className="font-mono">{rowKey}</code>
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <button
+                                        type="button"
+                                        className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5"
+                                        onClick={() => setExpandedParticipantId(null)}
+                                      >
+                                        <X size={12} />
+                                        <span>Close Dossier</span>
+                                      </button>
+                                    </div>
+
+                                    {/* Dossier Meta Stats Grid */}
+                                    <div className="dossier-header-grid">
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Joined Research
+                                        </span>
+                                        <span className="dossier-meta-value text-xs font-mono">
+                                          <Calendar size={13} className="text-cyan" />
+                                          {colomboTime(s.createdAt)}
+                                        </span>
+                                      </div>
+
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Submitted Baseline
+                                        </span>
+                                        <span className="dossier-meta-value text-xs font-mono">
+                                          <Clock size={13} />
+                                          {s.submittedAt
+                                            ? colomboTime(s.submittedAt)
+                                            : "In Progress"}
+                                        </span>
+                                      </div>
+
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Active Session Duration
+                                        </span>
+                                        <span className="dossier-meta-value text-xs font-mono text-emerald">
+                                          <Timer size={13} />
+                                          {duration}
+                                        </span>
+                                      </div>
+
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Challenges Completed
+                                        </span>
+                                        <span className="dossier-meta-value text-xs font-mono">
+                                          <Gamepad2 size={13} />
+                                          {completedCount} / 20 (
+                                          {Math.round((completedCount / 20) * 100)}%)
+                                        </span>
+                                      </div>
+
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Protective Decisions
+                                        </span>
+                                        <span className="dossier-meta-value text-xs text-emerald">
+                                          <ShieldCheck size={13} />
+                                          {safeCount} Safe · {unsafeCount} Unsafe
+                                        </span>
+                                      </div>
+
+                                      <div className="dossier-meta-item">
+                                        <span className="dossier-meta-label">
+                                          Simulated Risk Score
+                                        </span>
+                                        <span className="dossier-meta-value text-xs font-mono">
+                                          <ShieldAlert
+                                            size={13}
+                                            className="text-amber"
+                                          />
+                                          {avgRisk} / 4.00
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {/* Tabs between All 20 Challenges and Survey Responses */}
+                                    <div className="dossier-nav-tabs">
+                                      <button
+                                        type="button"
+                                        className={`dossier-tab-btn ${
+                                          historyDetailTab === "challenges"
+                                            ? "active"
+                                            : ""
+                                        }`}
+                                        onClick={() =>
+                                          setHistoryDetailTab("challenges")
+                                        }
+                                      >
+                                        <Gamepad2 size={14} />
+                                        <span>
+                                          All 20 Challenges &amp; Decisions (
+                                          {completedCount} / 20)
+                                        </span>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        className={`dossier-tab-btn ${
+                                          historyDetailTab === "survey" ? "active" : ""
+                                        }`}
+                                        onClick={() => setHistoryDetailTab("survey")}
+                                      >
+                                        <FileText size={14} />
+                                        <span>
+                                          Baseline Survey Responses (
+                                          {answeredSurveyCount} / 25)
+                                        </span>
+                                      </button>
+                                    </div>
+
+                                    {/* TAB 1: ALL 20 CHALLENGES */}
+                                    {historyDetailTab === "challenges" && (
+                                      <div className="space-y-4">
+                                        {/* IV mission filter buttons */}
+                                        <div className="flex items-center gap-1.5 flex-wrap pb-1">
+                                          {[
+                                            { id: "all", label: "All 20 Challenges" },
+                                            { id: "IV1", label: "IV1 · Phishing (5)" },
+                                            { id: "IV2", label: "IV2 · Pretexting (5)" },
+                                            {
+                                              id: "IV3",
+                                              label: "IV3 · Impersonation (5)",
+                                            },
+                                            {
+                                              id: "IV4",
+                                              label: "IV4 · Scams & Links (5)",
+                                            },
+                                          ].map((tab) => (
+                                            <button
+                                              key={tab.id}
+                                              type="button"
+                                              className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                                                historyMissionFilter === tab.id
+                                                  ? "bg-primary text-white border-primary"
+                                                  : "bg-surface hover:bg-card-bg text-muted border-border"
+                                              }`}
+                                              onClick={() =>
+                                                setHistoryMissionFilter(tab.id)
+                                              }
+                                            >
+                                              {tab.label}
+                                            </button>
+                                          ))}
+                                        </div>
+
+                                        {/* Grid of 20 challenges */}
+                                        <div className="challenges-grid">
+                                          {challenges
+                                            .filter(
+                                              (c) =>
+                                                historyMissionFilter === "all" ||
+                                                c.iv === historyMissionFilter,
+                                            )
+                                            .map((ch) => (
+                                              <div
+                                                key={ch.id}
+                                                className={`challenge-decision-card ${
+                                                  ch.status === "pending"
+                                                    ? "pending"
+                                                    : ch.isSafe
+                                                      ? "safe"
+                                                      : "unsafe"
+                                                }`}
+                                              >
+                                                <div>
+                                                  <div className="challenge-card-header">
+                                                    <div className="flex items-center gap-2">
+                                                      <span className="challenge-id-badge">
+                                                        {ch.id}
+                                                      </span>
+                                                      <span className="tag text-[10px] py-0.5 px-2">
+                                                        {ch.iv} · {ch.missionName}
+                                                      </span>
+                                                    </div>
+
+                                                    {ch.status === "completed" ? (
+                                                      ch.isSafe ? (
+                                                        <span className="badge-status-tag unlocked text-[10.5px]">
+                                                          <ShieldCheck size={11} />{" "}
+                                                          Protective
+                                                        </span>
+                                                      ) : (
+                                                        <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
+                                                          <AlertTriangle size={11} />{" "}
+                                                          Unsafe
+                                                        </span>
+                                                      )
+                                                    ) : (
+                                                      <span className="text-[10.5px] text-muted italic">
+                                                        Pending / Not Attempted
+                                                      </span>
+                                                    )}
+                                                  </div>
+
+                                                  <h4 className="challenge-title-text">
+                                                    {ch.title}
+                                                  </h4>
+
+                                                  {ch.status === "completed" ? (
+                                                    <div className="challenge-action-quote mt-2.5">
+                                                      <span className="text-[10px] uppercase font-bold text-muted block mb-1">
+                                                        Participant Chosen Decision:
+                                                      </span>
+                                                      <span>
+                                                        &ldquo;{ch.selectedAction}&rdquo;
+                                                      </span>
+                                                      {!ch.isSafe &&
+                                                        ch.disclosedCategory &&
+                                                        ch.disclosedCategory !==
+                                                          "None" && (
+                                                          <span className="text-[11px] text-red font-semibold block mt-1.5">
+                                                            ⚠️ Compromised Data:{" "}
+                                                            {ch.disclosedCategory}
+                                                          </span>
+                                                        )}
+                                                    </div>
+                                                  ) : (
+                                                    <p className="text-xs text-muted italic mt-2">
+                                                      Participant has not recorded a
+                                                      decision on this scenario.
+                                                    </p>
+                                                  )}
+                                                </div>
+
+                                                <div className="challenge-card-footer">
+                                                  <span>
+                                                    Risk Score:{" "}
+                                                    <strong className="font-mono text-foreground">
+                                                      {ch.riskScore !== null
+                                                        ? `${ch.riskScore} / 4`
+                                                        : "—"}
+                                                    </strong>
+                                                  </span>
+                                                  <span>
+                                                    Elapsed:{" "}
+                                                    <strong className="text-foreground">
+                                                      {ch.elapsedSec !== null
+                                                        ? `${ch.elapsedSec}s`
+                                                        : "—"}
+                                                    </strong>
+                                                  </span>
+                                                  <span>
+                                                    {colomboTime(ch.createdAt)}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* TAB 2: BASELINE SURVEY QUESTIONNAIRE */}
+                                    {historyDetailTab === "survey" && (
+                                      <div className="space-y-4">
+                                        <div
+                                          className="table-scroll"
+                                          tabIndex={0}
+                                          role="region"
+                                          aria-label="Participant survey answers"
+                                        >
+                                          <table>
+                                            <thead>
+                                              <tr>
+                                                <th>Question ID</th>
+                                                <th>Variable / Dimension</th>
+                                                <th>Answer Option Selected</th>
+                                                <th>Raw Value</th>
+                                                <th>Status</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {questions.map((q) => {
+                                                const answer = s.answers[q.id];
+                                                const matchedOption = q.options.find(
+                                                  (o) => o.code === answer?.value,
+                                                );
+                                                const isAnswered =
+                                                  answer?.status === "answered";
+
+                                                return (
+                                                  <tr key={q.id}>
+                                                    <td>
+                                                      <code className="font-bold">
+                                                        {q.id}
+                                                      </code>
+                                                    </td>
+                                                    <td>
+                                                      <span className="text-xs font-medium text-foreground block">
+                                                        {q.variable}
+                                                      </span>
+                                                      <span className="text-[11px] text-muted block max-w-md truncate">
+                                                        {q.text}
+                                                      </span>
+                                                    </td>
+                                                    <td className="text-xs">
+                                                      {matchedOption ? (
+                                                        <span className="font-medium text-foreground">
+                                                          {matchedOption.label}
+                                                        </span>
+                                                      ) : (
+                                                        <span className="text-muted italic">
+                                                          Not answered
+                                                        </span>
+                                                      )}
+                                                    </td>
+                                                    <td className="font-mono text-xs">
+                                                      {answer?.value !== null &&
+                                                      answer?.value !== undefined
+                                                        ? answer.value
+                                                        : "—"}
+                                                    </td>
+                                                    <td>
+                                                      <span
+                                                        className={`tag text-[10px] py-0.5 px-1.5 ${
+                                                          isAnswered
+                                                            ? "border-emerald/30 text-emerald"
+                                                            : "border-border text-muted"
+                                                        }`}
+                                                      >
+                                                        {answer?.status || "unrecorded"}
+                                                      </span>
+                                                    </td>
+                                                  </tr>
+                                                );
+                                              })}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
 
-              {!historySessions.length && (
-                <p className="empty-copy">No research responses available yet.</p>
-              )}
 
-              {/* -------------------------------------------------------------
-                  EXPANDED PARTICIPANT DOSSIER PANEL (ALL 20 CHALLENGES & SURVEY)
-                  ------------------------------------------------------------- */}
-              {expandedParticipantId && (
-                (() => {
-                  const targetSession = historySessions.find(
-                    (s) => (s.submissionId ?? s.id) === expandedParticipantId,
-                  );
-                  if (!targetSession) return null;
-
-                  const summary = scoreSummary(targetSession.attempts);
-                  const challenges = getParticipantChallenges(targetSession);
-                  const completedChallenges = challenges.filter((c) => c.status === "completed");
-                  const safeCount = completedChallenges.filter((c) => c.isSafe).length;
-                  const unsafeCount = completedChallenges.filter((c) => c.isSafe === false).length;
-                  const filteredChallenges = challenges.filter((c) => {
-                    if (historyMissionFilter !== "all" && c.iv !== historyMissionFilter) return false;
-                    return true;
-                  });
-
-                  return (
-                    <div className="participant-dossier-wrapper mt-5 border rounded-xl">
-                      {/* Dossier Header Grid */}
-                      <div className="dossier-header-grid">
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Participant ID</span>
-                          <span className="dossier-meta-value font-mono text-cyan">
-                            <UserCheck size={15} />
-                            {targetSession.code}
-                          </span>
-                        </div>
-
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Joined Research (Colombo)</span>
-                          <span className="dossier-meta-value text-xs font-mono">
-                            <Calendar size={13} className="text-cyan" />
-                            {colomboTime(targetSession.createdAt)}
-                          </span>
-                        </div>
-
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Submitted Baseline</span>
-                          <span className="dossier-meta-value text-xs font-mono">
-                            <Clock size={13} />
-                            {targetSession.submittedAt ? colomboTime(targetSession.submittedAt) : "In Progress"}
-                          </span>
-                        </div>
-
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Active Session Duration</span>
-                          <span className="dossier-meta-value text-xs font-mono text-emerald">
-                            <Timer size={13} />
-                            {formatDuration(targetSession.createdAt, targetSession.submittedAt)}
-                          </span>
-                        </div>
-
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Challenges Completed</span>
-                          <span className="dossier-meta-value text-xs font-mono">
-                            <Gamepad2 size={13} />
-                            {completedChallenges.length} / 20 ({Math.round((completedChallenges.length / 20) * 100)}%)
-                          </span>
-                        </div>
-
-                        <div className="dossier-meta-item">
-                          <span className="dossier-meta-label">Protective Decisions</span>
-                          <span className="dossier-meta-value text-xs text-emerald">
-                            <ShieldCheck size={13} />
-                            {safeCount} Safe · {unsafeCount} Unsafe
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Navigation Tabs between All 20 Challenges and Survey Responses */}
-                      <div className="dossier-nav-tabs">
-                        <button
-                          type="button"
-                          className={`dossier-tab-btn ${historyDetailTab === "challenges" ? "active" : ""}`}
-                          onClick={() => setHistoryDetailTab("challenges")}
-                        >
-                          <Gamepad2 size={14} />
-                          <span>All 20 Challenges &amp; Decisions ({completedChallenges.length} / 20)</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`dossier-tab-btn ${historyDetailTab === "survey" ? "active" : ""}`}
-                          onClick={() => setHistoryDetailTab("survey")}
-                        >
-                          <FileText size={14} />
-                          <span>Baseline Survey Responses (Q1–Q25)</span>
-                        </button>
-
-                        <div className="ml-auto">
-                          <Link
-                            href={href("responses") + (query ? "" : "?code=" + encodeURIComponent(targetSession.code))}
-                            onClick={() => {
-                              setAuditSearch(targetSession.code);
-                              setAuditViewMode("participants");
-                            }}
-                            className="button secondary small text-xs flex items-center gap-1.5"
-                          >
-                            <span>Open in Responses Audit</span>
-                            <ArrowUpRight size={13} />
-                          </Link>
-                        </div>
-                      </div>
-
-                      {/* TAB 1: ALL 20 CHALLENGES JOINED WITH RESPONSES */}
-                      {historyDetailTab === "challenges" && (
-                        <div className="space-y-4">
-                          {/* Mission Filter Pills */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs text-muted font-semibold">Filter Missions:</span>
-                            {[
-                              { id: "all", label: "All 20 Challenges (20)" },
-                              { id: "IV1", label: "IV1: Phishing (5)" },
-                              { id: "IV2", label: "IV2: Pretexting (5)" },
-                              { id: "IV3", label: "IV3: Impersonation (5)" },
-                              { id: "IV4", label: "IV4: Scam Links (5)" },
-                            ].map((tab) => (
-                              <button
-                                key={tab.id}
-                                type="button"
-                                className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-                                  historyMissionFilter === tab.id
-                                    ? "bg-primary text-white border-primary"
-                                    : "bg-surface hover:bg-card-bg text-muted border-border"
-                                }`}
-                                onClick={() => setHistoryMissionFilter(tab.id)}
-                              >
-                                {tab.label}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Grid of all 20 challenges */}
-                          <div className="challenges-grid">
-                            {filteredChallenges.map((ch) => (
-                              <div
-                                key={ch.id}
-                                className={`challenge-decision-card ${
-                                  ch.status === "pending"
-                                    ? "pending"
-                                    : ch.isSafe
-                                      ? "safe"
-                                      : "unsafe"
-                                }`}
-                              >
-                                <div>
-                                  <div className="challenge-card-header">
-                                    <div className="flex items-center gap-2">
-                                      <span className="challenge-id-badge">{ch.id}</span>
-                                      <span className="tag text-[10px] py-0.5 px-2">
-                                        {ch.iv} · {ch.missionName}
-                                      </span>
-                                    </div>
-
-                                    {ch.status === "completed" ? (
-                                      ch.isSafe ? (
-                                        <span className="badge-status-tag unlocked text-[10.5px]">
-                                          <ShieldCheck size={11} /> Protective
-                                        </span>
-                                      ) : (
-                                        <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
-                                          <AlertTriangle size={11} /> Unsafe
-                                        </span>
-                                      )
-                                    ) : (
-                                      <span className="text-[10.5px] text-muted italic">
-                                        Pending / Not Attempted
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <h4 className="challenge-title-text">{ch.title}</h4>
-
-                                  {ch.status === "completed" ? (
-                                    <div className="challenge-action-quote mt-2.5">
-                                      <span className="text-[10px] uppercase font-bold text-muted block mb-1">
-                                        Participant Chosen Decision:
-                                      </span>
-                                      <span>&ldquo;{ch.selectedAction}&rdquo;</span>
-                                      {!ch.isSafe && ch.disclosedCategory && ch.disclosedCategory !== "None" && (
-                                        <span className="text-[11px] text-red font-semibold block mt-1.5">
-                                          ⚠️ Compromised Data: {ch.disclosedCategory}
-                                        </span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <p className="text-xs text-muted italic mt-2">
-                                      Participant has not recorded a decision on this scenario.
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div className="challenge-card-footer">
-                                  <span>
-                                    Risk Score:{" "}
-                                    <strong className="font-mono text-foreground">
-                                      {ch.riskScore !== null ? `${ch.riskScore} / 4` : "—"}
-                                    </strong>
-                                  </span>
-                                  <span>
-                                    Elapsed:{" "}
-                                    <strong className="text-foreground">
-                                      {ch.elapsedSec !== null ? `${ch.elapsedSec}s` : "—"}
-                                    </strong>
-                                  </span>
-                                  <span>{colomboTime(ch.createdAt)}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* TAB 2: BASELINE SURVEY QUESTIONNAIRE (Q1–Q25) */}
-                      {historyDetailTab === "survey" && (
-                        <div className="space-y-4">
-                          <div className="table-scroll" tabIndex={0} role="region" aria-label="Participant survey answers">
-                            <table>
-                              <thead>
-                                <tr>
-                                  <th>Question ID</th>
-                                  <th>Variable / Dimension</th>
-                                  <th>Answer Option Selected</th>
-                                  <th>Raw Value</th>
-                                  <th>Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {questions.map((q) => {
-                                  const answer = targetSession.answers[q.id];
-                                  const matchedOption = q.options.find((o) => o.code === answer?.value);
-                                  const isAnswered = answer?.status === "answered";
-
-                                  return (
-                                    <tr key={q.id}>
-                                      <td>
-                                        <code className="font-bold">{q.id}</code>
-                                      </td>
-                                      <td>
-                                        <span className="text-xs font-medium text-foreground block">
-                                          {q.variable}
-                                        </span>
-                                        <span className="text-[11px] text-muted block max-w-md truncate">
-                                          {q.text}
-                                        </span>
-                                      </td>
-                                      <td className="text-xs">
-                                        {matchedOption ? (
-                                          <span className="font-medium text-foreground">
-                                            {matchedOption.label}
-                                          </span>
-                                        ) : (
-                                          <span className="text-muted italic">Not answered</span>
-                                        )}
-                                      </td>
-                                      <td className="font-mono text-xs">
-                                        {answer?.value !== null && answer?.value !== undefined
-                                          ? answer.value
-                                          : "—"}
-                                      </td>
-                                      <td>
-                                        <span
-                                          className={`tag text-[10px] py-0.5 px-1.5 ${
-                                            isAnswered
-                                              ? "border-emerald/30 text-emerald"
-                                              : "border-border text-muted"
-                                          }`}
-                                        >
-                                          {answer?.status || "unrecorded"}
-                                        </span>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()
-              )}
 
               {/* History Pagination */}
-              <div className="pagination">
+              <div className="pagination flex items-center justify-between mt-4 px-2">
                 <button
-                  className="button secondary"
+                  className="button secondary small text-xs"
                   disabled={historyPage === 0}
                   onClick={() => setHistoryPage(historyPage - 1)}
                 >
                   Previous
                 </button>
-                <span>
-                  Page {historyPage + 1} of{" "}
-                  {Math.max(1, Math.ceil(historySessions.length / historyPageSize))}
+                <span className="text-xs text-muted">
+                  Page <strong>{historyPage + 1}</strong> of{" "}
+                  <strong>
+                    {Math.max(1, Math.ceil(historySessions.length / historyPageSize))}
+                  </strong>
+                  {historySessions.length > 0 && (
+                    <>
+                      <span className="mx-2 opacity-40">·</span>
+                      Showing{" "}
+                      {historyPage * historyPageSize + 1}–
+                      {Math.min(
+                        historySessions.length,
+                        (historyPage + 1) * historyPageSize,
+                      )}{" "}
+                      of {historySessions.length} participants
+                    </>
+                  )}
                 </span>
                 <button
-                  className="button secondary"
-                  disabled={(historyPage + 1) * historyPageSize >= historySessions.length}
+                  className="button secondary small text-xs"
+                  disabled={
+                    (historyPage + 1) * historyPageSize >= historySessions.length
+                  }
                   onClick={() => setHistoryPage(historyPage + 1)}
                 >
                   Next

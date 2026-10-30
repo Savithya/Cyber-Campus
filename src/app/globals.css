@@ -4918,11 +4918,11 @@ tfoot {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding: 14px 18px;
+  padding: 12px 16px;
   background: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .workspace-filter-inputs {
@@ -4936,37 +4936,50 @@ tfoot {
 .workspace-search-box {
   position: relative;
   min-width: 200px;
-  max-width: 320px;
-  flex: 1;
+  max-width: 360px;
+  flex: 1 1 240px;
 }
 
-.workspace-search-box input {
-  width: 100%;
-  padding: 7px 12px 7px 32px;
-  font-size: 12.5px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--ink);
+.workspace-search-box input,
+.workspace-search-box input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 7px 12px 7px 36px !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--card-bg) !important;
+  color: var(--ink) !important;
+  box-sizing: border-box !important;
 }
 
 .workspace-search-box svg {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--muted);
   pointer-events: none;
+  z-index: 2;
 }
 
+select.workspace-select,
 .workspace-select {
-  padding: 7px 12px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--ink);
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 180px !important;
+  max-width: 280px !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 7px 28px 7px 12px !important;
+  font-size: 12.5px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--card-bg) !important;
+  color: var(--ink) !important;
   cursor: pointer;
+  box-sizing: border-box !important;
 }
 
 /* View Mode Switcher Pills */
