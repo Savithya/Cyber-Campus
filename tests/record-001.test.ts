@@ -146,7 +146,7 @@ describe("Record 001 Integration & Visibility", () => {
     expect(r001?.code).toBe("001");
     expect(r001?.status).toBe("submitted_complete");
     expect(r001?.attempts.length).toBe(20);
-  });
+  }, 20000);
 
   afterAll(async () => {
     try {

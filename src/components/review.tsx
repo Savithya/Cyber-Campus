@@ -42,6 +42,7 @@ export default function Review() {
   const [error, setError] = useState("");
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "saving" | "success">("idle");
 
   // Accordion state for the 20 scenario story debrief cards
   const [expandedScenarioId, setExpandedScenarioId] = useState<string | null>(null);
@@ -194,6 +195,47 @@ export default function Review() {
     } catch (err) {
       setError((err as Error).message || "Failed to submit responses. Please retry.");
     } finally {
+      setBusy(false);
+    }
+  }
+
+  // Final submission from View C: saves responses, provides clear button feedback, and returns to Hero page
+  async function handleSubmitResponsesAndGoHome() {
+    if (!state.session || busy) return;
+    setBusy(true);
+    setSubmitState("saving");
+    setError("");
+    try {
+      if (state.session.mode !== "practice") {
+        try {
+          await api<{ ok: boolean; session: Session; message: string }>(
+            "session/submit-answers",
+            {}
+          );
+        } catch {
+          const draft = loadDraft(state.session.code);
+          const key = draft?.submitKey ?? crypto.randomUUID();
+          await api("session/submit", {
+            answers: state.session.answers ?? {},
+            idempotencyKey: key,
+          });
+        }
+      }
+
+      clearDraft();
+      setSubmitState("success");
+      await state.reload();
+
+      // Smoothly navigate back to Hero page
+      setTimeout(() => {
+        router.push("/");
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }, 500);
+    } catch (err) {
+      setSubmitState("idle");
+      setError((err as Error).message || "Failed to submit responses. Please retry.");
       setBusy(false);
     }
   }
@@ -868,31 +910,47 @@ export default function Review() {
           </div>
         </section>
 
+        {/* Error Banner if final submission fails */}
+        {error && (
+          <div className="pt-2">
+            <ErrorBox message={error} retry={handleSubmitResponsesAndGoHome} />
+          </div>
+        )}
+
         {/* Footer Navigation Actions */}
-        <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+        <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <Link
             href="/"
-            className="button secondary"
+            className="button secondary w-full sm:w-auto justify-center min-h-[44px]"
           >
             <Home size={16} />
-            Return to Cyber Campus Home
+            <span>Return to Cyber Campus Home</span>
           </Link>
 
           <button
             type="button"
-            onClick={handleFinalSubmit}
-            disabled={busy}
-            className="button primary inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={handleSubmitResponsesAndGoHome}
+            disabled={busy || submitState === "success"}
+            className="button primary w-full sm:w-auto justify-center inline-flex items-center gap-2 min-h-[44px] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+            aria-live="polite"
           >
-            {busy ? (
+            {submitState === "saving" ? (
               <>
-                <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" aria-hidden="true" />
-                Submitting…
+                <span
+                  className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                  aria-hidden="true"
+                />
+                <span>Saving responses…</span>
+              </>
+            ) : submitState === "success" ? (
+              <>
+                <CheckCircle2 size={16} className="text-emerald-300" aria-hidden="true" />
+                <span>Responses saved! Returning home…</span>
               </>
             ) : (
               <>
-                <CheckCheck size={16} />
-                Submit Responses
+                <CheckCheck size={16} aria-hidden="true" />
+                <span>Submit Responses</span>
               </>
             )}
           </button>

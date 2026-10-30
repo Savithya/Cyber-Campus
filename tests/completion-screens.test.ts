@@ -183,5 +183,37 @@ describe("Research Completion Flow - 20 Questions (Image 1 and Image 2)", () => 
 
     // Subtitle outcomes
     expect(html).toContain("An opportunity to pause &amp; verify · 0 game points");
+
+    // Verify footer actions: "Return to Cyber Campus Home" and "Submit Responses" button
+    expect(html).toContain("Return to Cyber Campus Home");
+    expect(html).toContain("Submit Responses");
+  });
+
+  it("verifies the footer action contains the Submit Responses button and Home return link", () => {
+    const mockContextValue = {
+      session: {
+        code: "P-8C0C39B7A0E1",
+        status: "submitted_complete" as const,
+        mode: "research" as const,
+        draftExpiresAt: new Date(Date.now() + 86400000).toISOString(),
+        answers: {},
+        attempts: [],
+      },
+      setSession: vi.fn(),
+      loading: false,
+      error: null,
+      reload: vi.fn().mockResolvedValue(undefined),
+    } as unknown as SessionContextType;
+
+    const html = renderToString(
+      React.createElement(
+        SessionContext.Provider,
+        { value: mockContextValue },
+        React.createElement(Review)
+      )
+    );
+
+    expect(html).toContain("Return to Cyber Campus Home");
+    expect(html).toContain("Submit Responses");
   });
 });

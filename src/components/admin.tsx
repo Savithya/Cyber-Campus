@@ -1708,7 +1708,7 @@ export default function Admin({
             </div>
 
             <div className="card">
-              <div className="card-top">
+              <div className="card-top flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="eyebrow text-cyan font-bold flex items-center gap-1">
@@ -1721,15 +1721,15 @@ export default function Admin({
                     Original research responses remain immutable and cannot be modified by review screens or scoring adjustments.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="tag">
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+                  <span className="tag shrink-0">
                     {auditViewMode === "participants"
                       ? `${participantAuditGroups.length} Participants`
                       : `${filteredAuditAttempts.length} Recorded Attempts`}
                   </span>
 
                   {/* View Mode Switcher */}
-                  <div className="view-mode-pill-group">
+                  <div className="view-mode-pill-group w-full sm:w-auto">
                     <button
                       type="button"
                       className={`view-mode-pill-btn ${auditViewMode === "participants" ? "active" : ""}`}
@@ -1815,7 +1815,7 @@ export default function Admin({
                 {auditSearch && (
                   <button
                     type="button"
-                    className="button secondary small text-xs"
+                    className="button secondary small text-xs w-full sm:w-auto justify-center"
                     onClick={() => {
                       setAuditSearch("");
                       setAuditPage(0);
@@ -1844,25 +1844,25 @@ export default function Admin({
                     return (
                       <div key={group.session.id} className="participant-group-card">
                         <div className="participant-group-header">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <span className="font-mono font-bold text-base px-2.5 py-1 rounded bg-surface border text-cyan flex items-center gap-1.5">
+                          <div className="participant-header-meta flex items-center gap-2 sm:gap-3 flex-wrap">
+                            <span className="font-mono font-bold text-sm sm:text-base px-2.5 py-1 rounded bg-surface border text-cyan flex items-center gap-1.5 shrink-0">
                               <UserCheck size={14} />
                               Participant {group.participantId}
                             </span>
-                            <span className="tag text-xs">
+                            <span className="tag text-xs shrink-0">
                               {group.status.replaceAll("_", " ")}
                             </span>
 
                             {/* Joined Research Timestamp */}
                             <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
-                              <Calendar size={12} className="text-cyan" />
+                              <Calendar size={12} className="text-cyan shrink-0" />
                               <span>Joined:</span>
                               <strong className="text-foreground">{colomboTime(group.joinedAt)}</strong>
                             </span>
 
                             {/* Submitted Timestamp */}
                             <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
-                              <Clock size={12} />
+                              <Clock size={12} className="shrink-0" />
                               <span>Submitted:</span>
                               <strong className="text-foreground">
                                 {group.submittedAt ? colomboTime(group.submittedAt) : "In Progress"}
@@ -1871,15 +1871,15 @@ export default function Admin({
 
                             {/* Duration */}
                             <span className="text-xs text-muted flex items-center gap-1 bg-surface px-2.5 py-1 rounded border">
-                              <Timer size={12} className="text-emerald" />
+                              <Timer size={12} className="text-emerald shrink-0" />
                               <span>Duration:</span>
                               <strong className="text-foreground">{group.duration}</strong>
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-3">
+                          <div className="participant-header-actions flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
                             {/* 20 Challenges Progress Badge */}
-                            <div className="text-right">
+                            <div className="text-left sm:text-right">
                               <span
                                 className={`text-xs font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
                                   group.totalFinished >= 20
@@ -1892,9 +1892,9 @@ export default function Admin({
                                 ) : (
                                   <Clock size={11} />
                                 )}
-                                {group.totalFinished} / 20 Challenges Finished
+                                {group.totalFinished} / 20 Finished
                               </span>
-                              <div className="mini-progress-track w-28">
+                              <div className="mini-progress-track w-28 sm:w-28">
                                 <div
                                   className={`mini-progress-fill ${
                                     group.totalFinished >= 20 ? "" : "partial"
@@ -1908,7 +1908,7 @@ export default function Admin({
 
                             <button
                               type="button"
-                              className="button secondary small text-xs"
+                              className="button secondary small text-xs shrink-0"
                               onClick={() =>
                                 setExpandedAuditParticipantId(
                                   expandedAuditParticipantId === group.session.id
@@ -1933,7 +1933,7 @@ export default function Admin({
                         </div>
 
                         {/* Summary Pill Bar */}
-                        <div className="px-5 py-2.5 bg-surface/50 border-b flex items-center gap-4 text-xs flex-wrap">
+                        <div className="participant-summary-bar px-4 sm:px-5 py-2.5 bg-surface/50 border-b flex items-center gap-3 sm:gap-4 text-xs flex-wrap">
                           <span className="flex items-center gap-1 text-emerald font-semibold">
                             <ShieldCheck size={13} />
                             {group.safeCount} Safe Decisions
@@ -1950,7 +1950,7 @@ export default function Admin({
 
                         {/* All 20 Challenges Joined Breakdown */}
                         {isExpanded && (
-                          <div className="p-4 bg-surface/20">
+                          <div className="challenges-container p-3 sm:p-4 bg-surface/20">
                             <div className="challenges-grid">
                               {visibleChallenges.map((ch) => (
                                 <div
@@ -1964,8 +1964,8 @@ export default function Admin({
                                   }`}
                                 >
                                   <div>
-                                    <div className="challenge-card-header">
-                                      <div className="flex items-center gap-2">
+                                    <div className="challenge-card-header flex items-start justify-between gap-2 flex-wrap">
+                                      <div className="flex items-center gap-2 flex-wrap">
                                         <span className="challenge-id-badge">{ch.id}</span>
                                         <span className="tag text-[10px] py-0.5 px-2">
                                           {ch.iv} · {ch.missionName}
@@ -2010,7 +2010,7 @@ export default function Admin({
                                     )}
                                   </div>
 
-                                  <div className="challenge-card-footer">
+                                  <div className="challenge-card-footer flex items-center justify-between gap-2 flex-wrap text-[11px] sm:text-xs">
                                     <span>
                                       Risk Score:{" "}
                                       <strong className="font-mono text-foreground">
@@ -2039,7 +2039,7 @@ export default function Admin({
                   )}
 
                   {/* Pagination for Participants view */}
-                  <div className="pagination">
+                  <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
                     <button
                       className="button secondary small"
                       disabled={auditParticipantPage === 0}
@@ -2047,7 +2047,7 @@ export default function Admin({
                     >
                       Previous
                     </button>
-                    <span>
+                    <span className="text-xs text-muted">
                       Page {auditParticipantPage + 1} of{" "}
                       {Math.max(1, Math.ceil(participantAuditGroups.length / participantPageSize))}
                     </span>
@@ -2067,8 +2067,12 @@ export default function Admin({
                   ------------------------------------------------------------- */}
               {auditViewMode === "table" && (
                 <>
+                  <div className="table-mobile-hint">
+                    <ArrowRight size={13} className="text-cyan animate-pulse shrink-0" />
+                    <span>Swipe horizontally to view all 10 response decision columns</span>
+                  </div>
                   <div
-                    className="table-scroll mt-4"
+                    className="table-scroll mt-2 sm:mt-4"
                     tabIndex={0}
                     role="region"
                     aria-label="Original participant responses table"
@@ -2134,7 +2138,7 @@ export default function Admin({
                   )}
 
                   {/* Audit Pagination */}
-                  <div className="pagination mt-4">
+                  <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
                     <button
                       className="button secondary small"
                       disabled={auditPage === 0}
@@ -2142,7 +2146,7 @@ export default function Admin({
                     >
                       Previous
                     </button>
-                    <span>
+                    <span className="text-xs text-muted">
                       Page {auditPage + 1} of{" "}
                       {Math.max(1, Math.ceil(filteredAuditAttempts.length / auditPageSize))}
                     </span>
@@ -2401,8 +2405,12 @@ export default function Admin({
                 </div>
               </div>
 
+              <div className="table-mobile-hint">
+                <ArrowRight size={13} className="text-cyan animate-pulse shrink-0" />
+                <span>Swipe horizontally to inspect participant dossier, timestamps &amp; actions</span>
+              </div>
               <div
-                className="table-scroll mt-3"
+                className="table-scroll mt-2 sm:mt-3"
                 tabIndex={0}
                 role="region"
                 aria-label="Submission history table"
@@ -2717,15 +2725,15 @@ export default function Admin({
                             {isRowExpanded && (
                               <tr key={`${rowKey}-dossier`} className="bg-surface/40">
                                 <td colSpan={7} className="p-0 border-b border-border">
-                                  <div className="p-5 border-t border-cyan/30 bg-card-bg/60">
+                                  <div className="p-3 sm:p-5 border-t border-cyan/30 bg-card-bg/60">
                                     {/* Dossier Header */}
-                                    <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+                                    <div className="flex items-start sm:items-center justify-between pb-3 mb-4 border-b border-border flex-wrap gap-2.5">
                                       <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-lg bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan">
+                                        <div className="w-8 h-8 rounded-lg bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan shrink-0">
                                           <UserCheck size={16} />
                                         </div>
                                         <div>
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex items-center gap-2 flex-wrap">
                                             <h3 className="font-bold text-sm text-foreground">
                                               Participant Dossier:{" "}
                                               <span className="font-mono text-cyan">
@@ -2742,7 +2750,7 @@ export default function Admin({
                                               {s.status.replaceAll("_", " ")}
                                             </span>
                                           </div>
-                                          <p className="text-xs text-muted mt-0.5">
+                                          <p className="text-xs text-muted mt-0.5 truncate max-w-xs sm:max-w-none">
                                             Submission ID:{" "}
                                             <code className="font-mono">{rowKey}</code>
                                           </p>
@@ -2751,7 +2759,7 @@ export default function Admin({
 
                                       <button
                                         type="button"
-                                        className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5"
+                                        className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5 shrink-0"
                                         onClick={() => setExpandedParticipantId(null)}
                                       >
                                         <X size={12} />
