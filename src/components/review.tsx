@@ -175,23 +175,30 @@ export default function Review() {
     setBusy(true);
     setError("");
     try {
+      let updatedSession: Session | undefined;
       try {
-        await api<{ ok: boolean; session: Session; message: string }>(
+        const res = await api<{ ok: boolean; session?: Session; message: string }>(
           "session/submit-answers",
           {}
         );
+        updatedSession = res.session;
       } catch {
         const draft = loadDraft(state.session.code);
         const key = draft?.submitKey ?? crypto.randomUUID();
-        await api("session/submit", {
+        const res = await api<{ session?: Session }>("session/submit", {
           answers: state.session.answers ?? {},
           idempotencyKey: key,
         });
+        updatedSession = res.session;
       }
 
       clearDraft();
       setSubmittedSuccess(true);
-      await state.reload();
+      if (updatedSession) {
+        state.setSession(updatedSession);
+      } else {
+        void state.reload();
+      }
     } catch (err) {
       setError((err as Error).message || "Failed to submit responses. Please retry.");
     } finally {
@@ -206,25 +213,32 @@ export default function Review() {
     setSubmitState("saving");
     setError("");
     try {
+      let updatedSession: Session | undefined;
       if (state.session.mode !== "practice") {
         try {
-          await api<{ ok: boolean; session: Session; message: string }>(
+          const res = await api<{ ok: boolean; session?: Session; message: string }>(
             "session/submit-answers",
             {}
           );
+          updatedSession = res.session;
         } catch {
           const draft = loadDraft(state.session.code);
           const key = draft?.submitKey ?? crypto.randomUUID();
-          await api("session/submit", {
+          const res = await api<{ session?: Session }>("session/submit", {
             answers: state.session.answers ?? {},
             idempotencyKey: key,
           });
+          updatedSession = res.session;
         }
       }
 
       clearDraft();
       setSubmitState("success");
-      await state.reload();
+      if (updatedSession) {
+        state.setSession(updatedSession);
+      } else {
+        void state.reload();
+      }
 
       // Smoothly navigate back to Hero page
       setTimeout(() => {
@@ -232,7 +246,7 @@ export default function Review() {
         if (typeof window !== "undefined") {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
-      }, 500);
+      }, 250);
     } catch (err) {
       setSubmitState("idle");
       setError((err as Error).message || "Failed to submit responses. Please retry.");

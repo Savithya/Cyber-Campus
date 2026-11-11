@@ -1,5 +1,4 @@
 "use client";
-import { motion, useReducedMotion } from "motion/react";
 import { LoaderCircle, TriangleAlert } from "lucide-react";
 export function Reveal({
   children,
@@ -8,17 +7,7 @@ export function Reveal({
   children: React.ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 export function Loading() {
   return (

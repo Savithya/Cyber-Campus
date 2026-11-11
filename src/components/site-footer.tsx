@@ -32,13 +32,13 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
             <span>· Academic Cybersecurity Research · Sri Lanka</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+            <Link href="/privacy" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
               Privacy &amp; Rights
             </Link>
-            <Link href="/withdraw" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+            <Link href="/withdraw" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
               Withdrawal
             </Link>
-            <Link href="/admin/login" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1">
+            <Link href="/admin/login" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1">
               <span>Researcher Access</span>
               <ArrowUpRight size={12} aria-hidden="true" />
             </Link>
@@ -164,6 +164,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/admin/login"
+                  prefetch={false}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   <span>Researcher Access</span>
@@ -173,6 +174,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/withdraw"
+                  prefetch={false}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Participant Withdrawal

@@ -3,9 +3,11 @@ const config: NextConfig = {
   poweredByHeader: false,
   turbopack: { root: process.cwd() },
   devIndicators: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   experimental: {
-    cpus: 1,
-    workerThreads: false,
+    optimizePackageImports: ["motion", "lucide-react", "recharts"],
     staleTimes: {
       dynamic: 30,
       static: 180,

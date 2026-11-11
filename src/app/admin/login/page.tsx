@@ -75,7 +75,7 @@ export default function Page() {
             <div className="illustration-ambient-glow" aria-hidden="true" />
             <div className="illustration-image-frame">
               <Image
-                src="/images/research-workspace-portal.jpg"
+                src="/images/research-workspace-portal.webp"
                 alt="Cybersecurity research workspace 3D isometric visualization"
                 width={540}
                 height={540}

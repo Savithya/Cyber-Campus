@@ -1,10 +1,12 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import type { Session, Answers } from "./types";
 
-// Client-side in-memory cache for static GET responses
+// Client-side in-memory cache and in-flight deduplication for read-only GET responses
 const getCache = new Map<string, { data: unknown; timestamp: number }>();
+const inflightGets = new Map<string, Promise<unknown>>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHEABLE_GET_PATHS = new Set(["config", "scenarios", "debrief"]);
 
 export async function api<T = Record<string, unknown>>(
   path: string,
@@ -19,40 +21,57 @@ export async function api<T = Record<string, unknown>>(
     path === "admin/reset-workspace" ||
     path === "auth/logout";
   const method = body !== undefined || isMutation ? "POST" : "GET";
+  const cacheableGet = method === "GET" && CACHEABLE_GET_PATHS.has(path);
 
   // Serve static read-only GET requests from memory cache when available
-  if (method === "GET" && path === "config") {
+  if (cacheableGet) {
     const cached = getCache.get(path);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       return cached.data as T;
     }
+    const existing = inflightGets.get(path);
+    if (existing) {
+      return existing as Promise<T>;
+    }
   }
 
-  const r = await fetch("/api/" + path, {
-    method,
-    headers:
-      body === undefined && !isMutation
-        ? {}
-        : { "Content-Type": "application/json" },
-    body:
-      body === undefined && isMutation
-        ? "{}"
-        : body === undefined
-        ? undefined
-        : JSON.stringify(body),
-    cache: "no-store",
-  });
-  const data = await r.json();
-  if (!r.ok)
-    throw new Error(
-      data.error ?? "Unable to save. Check your connection and retry.",
-    );
+  const runFetch = async () => {
+    const r = await fetch("/api/" + path, {
+      method,
+      headers:
+        body === undefined && !isMutation
+          ? {}
+          : { "Content-Type": "application/json" },
+      body:
+        body === undefined && isMutation
+          ? "{}"
+          : body === undefined
+          ? undefined
+          : JSON.stringify(body),
+      cache: "no-store",
+    });
+    const data = await r.json();
+    if (!r.ok)
+      throw new Error(
+        data.error ?? "Unable to save. Check your connection and retry.",
+      );
 
-  if (method === "GET" && path === "config") {
-    getCache.set(path, { data, timestamp: Date.now() });
+    if (cacheableGet) {
+      getCache.set(path, { data, timestamp: Date.now() });
+    }
+
+    return data as T;
+  };
+
+  if (cacheableGet) {
+    const p = runFetch().finally(() => {
+      inflightGets.delete(path);
+    });
+    inflightGets.set(path, p);
+    return p;
   }
 
-  return data;
+  return runFetch();
 }
 
 export interface SessionContextType {
@@ -65,19 +84,45 @@ export interface SessionContextType {
 
 export const SessionContext = createContext<SessionContextType | null>(null);
 
+let inflightSessionPromise: Promise<{ session: Session | null }> | null = null;
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSessionState] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasSettledRef = useRef(false);
+  const errorRef = useRef("");
+
+  const setSession = useCallback(
+    (next: React.SetStateAction<Session | null>) => {
+      hasSettledRef.current = true;
+      errorRef.current = "";
+      setSessionState(next);
+      setLoading(false);
+      setError("");
+    },
+    [],
+  );
 
   const reload = useCallback(async () => {
-    setLoading(true);
+    if (!hasSettledRef.current || errorRef.current) {
+      setLoading(true);
+    }
+    errorRef.current = "";
     setError("");
     try {
-      const res = await api<{ session: Session | null }>("session");
-      setSession(res.session);
+      if (!inflightSessionPromise) {
+        inflightSessionPromise = api<{ session: Session | null }>("session").finally(() => {
+          inflightSessionPromise = null;
+        });
+      }
+      const res = await inflightSessionPromise;
+      hasSettledRef.current = true;
+      setSessionState(res.session);
     } catch (e) {
-      setError((e as Error).message);
+      const msg = (e as Error).message;
+      errorRef.current = msg;
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -150,4 +195,6 @@ export function clearParticipationStorage() {
     } catch {}
   }
   getCache.clear();
+  inflightGets.clear();
+  inflightSessionPromise = null;
 }

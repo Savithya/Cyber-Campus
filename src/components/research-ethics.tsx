@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import {
@@ -131,7 +129,7 @@ export function ResearchEthics() {
 
                   <Link
                     href={card.linkHref}
-                    prefetch={true}
+                    prefetch={false}
                     className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-cyan-400 hover:underline pt-1 min-h-[36px]"
                   >
                     <span>{card.linkText}</span>

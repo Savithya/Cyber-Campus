@@ -20,7 +20,6 @@ import {
   attemptSchema,
   withdrawalSchema,
 } from "@/lib/validation";
-import { scenarios } from "@/content/scenarios.server";
 import { isResearch } from "@/lib/config.server";
 import { requireResearcher, supabase } from "@/lib/supabase.server";
 import {
@@ -31,16 +30,7 @@ import {
   setResearcherSession,
   verifyPinConstantTime,
 } from "@/lib/researcher-auth.server";
-import { exportCsv, exportKinds, type ExportKind } from "@/lib/csv";
-import {
-  exportDescriptiveStatsCsv,
-  exportCorrelationMatrixCsv,
-  exportHypothesisSummaryCsv,
-  exportRegressionResultsCsv,
-  exportReliabilityCsv,
-  exportExcelXmlWorkbook,
-} from "@/lib/statistics-export";
-import { filterSessions } from "@/lib/analytics";
+import type { ExportKind } from "@/lib/csv";
 import type { Session, Filters } from "@/lib/types";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -86,6 +76,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           },
           403,
         );
+      const { scenarios } = await import("@/content/scenarios.server");
       return json({ scenarios });
     }
     if (path === "debrief") {
@@ -148,10 +139,8 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         "stats-reliability",
         "stats-excel",
       ];
-      if (
-        !exportKinds.includes(kind as ExportKind) &&
-        !statKinds.includes(kind)
-      )
+      const csvMod = statKinds.includes(kind) ? null : await import("@/lib/csv");
+      if (csvMod && !csvMod.exportKinds.includes(kind as ExportKind))
         return json({ error: "Unknown export format." }, 400);
       const filters = Object.fromEntries(
         [...req.nextUrl.searchParams.entries()].filter(([k]) =>
@@ -176,7 +165,30 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           throw new Error("The export audit could not be saved. Please retry.");
       }
 
+      const { filterSessions } = await import("@/lib/analytics");
       const filteredData = filterSessions(data, filters);
+
+      if (csvMod) {
+        return new NextResponse(
+          csvMod.exportCsv(kind as ExportKind, filteredData, filters, demo),
+          {
+            headers: {
+              "Content-Type": "text/csv; charset=utf-8",
+              "Content-Disposition": 'attachment; filename="' + kind + '.csv"',
+              "Cache-Control": "no-store, private",
+            },
+          },
+        );
+      }
+
+      const {
+        exportDescriptiveStatsCsv,
+        exportCorrelationMatrixCsv,
+        exportHypothesisSummaryCsv,
+        exportRegressionResultsCsv,
+        exportReliabilityCsv,
+        exportExcelXmlWorkbook,
+      } = await import("@/lib/statistics-export");
 
       if (kind === "stats-excel") {
         return new NextResponse(exportExcelXmlWorkbook(filteredData, demo), {
@@ -245,26 +257,13 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         );
       }
 
-      if (kind === "stats-reliability") {
-        return new NextResponse(
-          exportReliabilityCsv(filteredData),
-          {
-            headers: {
-              "Content-Type": "text/csv; charset=utf-8",
-              "Content-Disposition":
-                'attachment; filename="scale-reliability-results.csv"',
-              "Cache-Control": "no-store, private",
-            },
-          },
-        );
-      }
-
       return new NextResponse(
-        exportCsv(kind as ExportKind, filteredData, filters, demo),
+        exportReliabilityCsv(filteredData),
         {
           headers: {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": 'attachment; filename="' + kind + '.csv"',
+            "Content-Disposition":
+              'attachment; filename="scale-reliability-results.csv"',
             "Cache-Control": "no-store, private",
           },
         },

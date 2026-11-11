@@ -63,7 +63,6 @@ export function DemographicsForm() {
         });
         setSaveStatus("New anonymous participant ready");
       }
-      await state.reload();
     } catch (e) {
       setError((e as Error).message || "Failed to assign new Anonymous ID. Please retry.");
     } finally {
@@ -101,7 +100,6 @@ export function DemographicsForm() {
         });
         setSaveStatus("Anonymous participant sequence reset to ID 01");
       }
-      await state.reload();
     } catch (e) {
       setError((e as Error).message || "Failed to reset Anonymous ID. Please retry.");
     } finally {
@@ -116,8 +114,13 @@ export function DemographicsForm() {
 
   useEffect(() => {
     router.prefetch("/play");
-    router.prefetch("/consent");
-  }, [router]);
+    if (
+      state.session &&
+      (state.session.mode === "practice" || state.session.status !== "draft")
+    ) {
+      void api("scenarios").catch(() => {});
+    }
+  }, [router, state.session]);
 
   useEffect(() => {
     if (!state.loading && !state.session) {

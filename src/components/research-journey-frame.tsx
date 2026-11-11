@@ -220,7 +220,7 @@ export function ResearchJourneyFrame({
                     key={step.key}
                     ref={isActive ? activeStepRef : undefined}
                     href={step.href}
-                    prefetch={true}
+                    prefetch={false}
                     className={`journey-step-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
                     aria-current={isActive ? "step" : undefined}
                     title={`${step.kicker}: ${step.title}`}
@@ -305,7 +305,7 @@ export function ResearchJourneyFrame({
               {backHref ? (
                 <Link
                   href={backHref}
-                  prefetch={true}
+                  prefetch={false}
                   className="journey-back-btn"
                   aria-label={backLabel}
                 >
@@ -357,7 +357,7 @@ export function ResearchJourneyFrame({
           <div className="journey-leave-wrapper">
             <Link
               href="/withdraw"
-              prefetch={true}
+              prefetch={false}
               className="journey-leave-link"
               aria-label="Leave study and withdraw record"
             >

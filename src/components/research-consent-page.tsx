@@ -43,22 +43,23 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
   const [error, setError] = useState("");
   const [expandedDetails, setExpandedDetails] = useState(false);
 
-  // Load config & check practice exposure flag
+  // Load config (if not passed from server) & check practice exposure flag
   useEffect(() => {
     router.prefetch("/demographics");
-    router.prefetch("/play");
 
-    api<{ config: StudyConfig; mode: string }>("config")
-      .then((d) => {
-        setConfig(d.config);
-        setMode(d.mode);
-      })
-      .catch((e) => setError(e.message));
+    if (!initialConfig) {
+      api<{ config: StudyConfig; mode: string }>("config")
+        .then((d) => {
+          setConfig(d.config);
+          setMode(d.mode);
+        })
+        .catch((e) => setError(e.message));
+    }
 
     if (typeof window !== "undefined") {
       setPrior(localStorage.getItem("cc-practice-exposure") === "yes");
     }
-  }, [router]);
+  }, [router, initialConfig]);
 
   // Start research session or practice mode
   async function handleStart(practice: boolean) {
@@ -81,7 +82,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           localStorage.setItem("cc-practice-exposure", "yes");
         }
         state.setSession(session);
-        await state.reload();
         router.push("/play");
       } else {
         if (typeof window !== "undefined" && session.code) {
@@ -96,7 +96,6 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
           submitKey: crypto.randomUUID(),
         });
         state.setSession(session);
-        await state.reload();
         router.push("/demographics");
       }
     } catch (e) {

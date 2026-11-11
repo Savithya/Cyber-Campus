@@ -260,7 +260,6 @@ export function ThreatCategories() {
 
                   <Link
                     href={card.destinationHref}
-                    prefetch={true}
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5 focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[44px] text-center"
                     aria-label={`Participate in ${card.title} scenarios`}
                   >

@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import {
@@ -50,7 +48,6 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
               <Link
                 href="/consent"
-                prefetch={true}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-blue-500 text-sm sm:text-base min-h-[48px]"
                 aria-label="Start Research participation"
               >
@@ -92,6 +89,7 @@ export function HeroSection() {
               {/* Top: Dark Cybersecurity Console Visual */}
               <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#0c1428] border border-slate-800/90 shadow-inner">
                 <picture>
+                  <source srcSet="/images/cyber-research-node.webp" type="image/webp" />
                   <source srcSet="/images/cyber-research-node.png" type="image/png" />
                   <img
                     src="/images/cyber-research-node.png"

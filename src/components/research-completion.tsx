@@ -153,8 +153,9 @@ export function ResearchCompletion() {
   }, []);
 
   // Load scenarios and debrief answer keys
+  const hasSession = Boolean(state.session);
   useEffect(() => {
-    if (!state.session) return;
+    if (!hasSession) return;
     Promise.all([
       api<{ scenarios: Scenario[] }>("scenarios").catch(() => ({ scenarios: [] })),
       api<{ debrief: Record<string, AnswerKey> }>("debrief").catch(() => ({ debrief: {} })),
@@ -166,7 +167,7 @@ export function ResearchCompletion() {
       .finally(() => {
         setLoadingContent(false);
       });
-  }, [state.session]);
+  }, [hasSession]);
 
   const activeModules = useMemo(() => getActiveMissions(false), []);
 
@@ -229,7 +230,7 @@ export function ResearchCompletion() {
       <div className="container page-space narrow text-center">
         <h2>Research Session Incomplete</h2>
         <p className="mt-2 text-muted">You have not started or submitted your research session yet.</p>
-        <Link href="/consent" prefetch={true} className="button primary large mt-6">
+        <Link href="/consent" className="button primary large mt-6">
           <span>Go to Research Consent</span>
           <ArrowRight size={18} aria-hidden="true" />
         </Link>
@@ -601,7 +602,7 @@ export function ResearchCompletion() {
 
             <Link
               href="/admin"
-              prefetch={true}
+              prefetch={false}
               className="btn-workspace-open"
               title="Open Research Workspace analytics to view real-time participant charts"
             >
@@ -610,12 +611,12 @@ export function ResearchCompletion() {
               <ExternalLink size={14} className="opacity-70" aria-hidden="true" />
             </Link>
 
-            <Link href="/" prefetch={true} className="button ghost large flex items-center gap-2">
+            <Link href="/" className="button ghost large flex items-center gap-2">
               <Home size={18} aria-hidden="true" />
               <span>Return to Home</span>
             </Link>
 
-            <Link href="/play" prefetch={true} className="button ghost large flex items-center gap-2">
+            <Link href="/play" className="button ghost large flex items-center gap-2">
               <RotateCcw size={18} aria-hidden="true" />
               <span>Practice Missions</span>
             </Link>

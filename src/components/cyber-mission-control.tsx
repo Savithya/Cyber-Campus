@@ -95,8 +95,10 @@ export function CyberMissionControl({
   }, [activeMissionId, activeScenarioIndex]);
 
   const fetchScenarios = useCallback(async () => {
-    if (cachedScenarios && cachedScenarios.length > 0) {
-      setScenarios(cachedScenarios);
+    const existing = cachedScenarios?.length ? cachedScenarios : initialScenarios;
+    if (existing && existing.length > 0) {
+      cachedScenarios = existing;
+      setScenarios(existing);
       setLoadingScenarios(false);
       return;
     }
@@ -111,7 +113,7 @@ export function CyberMissionControl({
     } finally {
       setLoadingScenarios(false);
     }
-  }, []);
+  }, [initialScenarios]);
 
   useEffect(() => {
     if (state.loading) return;
@@ -204,7 +206,7 @@ export function CyberMissionControl({
           </p>
 
           <div className="cyber-access-actions">
-            <Link href="/consent" prefetch={true} className="button primary large">
+            <Link href="/consent" className="button primary large">
               <span>Begin Research Consent</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -219,7 +221,7 @@ export function CyberMissionControl({
               <span>{startingPractice ? "Launching Practice…" : "Explore Practice Challenges"}</span>
             </button>
 
-            <Link href="/" prefetch={true} className="button ghost">
+            <Link href="/" className="button ghost">
               <span>Back to Home</span>
             </Link>
           </div>
@@ -260,7 +262,7 @@ export function CyberMissionControl({
           </p>
 
           <div className="cyber-access-actions">
-            <Link href="/demographics" prefetch={true} className="button primary large">
+            <Link href="/demographics" className="button primary large">
               <span>Continue Student Profile</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -275,7 +277,7 @@ export function CyberMissionControl({
               <span>{startingPractice ? "Launching Practice…" : "Explore Practice Challenges"}</span>
             </button>
 
-            <Link href="/" prefetch={true} className="button ghost">
+            <Link href="/" className="button ghost">
               <span>Back to Home</span>
             </Link>
           </div>
@@ -452,17 +454,15 @@ export function CyberMissionControl({
             overallXp={completedCount * 10}
             previousAttempt={currentAttempt}
             educationalMode={session.mode === "practice"}
-            onCompleteScenario={(newAttempt) => {
-              void state.reload();
+            onCompleteScenario={() => {
+              // Session already updated via state.setSession in InteractiveChallengeRunner
             }}
             onPreviousScenario={() => {
-              void state.reload();
               if (activeScenarioIndex > 0) {
                 setActiveScenarioIndex((prev) => prev - 1);
               }
             }}
             onNextScenario={() => {
-              void state.reload();
               if (activeScenarioIndex < missionScenarios.length - 1) {
                 setActiveScenarioIndex((prev) => prev + 1);
               } else {
@@ -486,17 +486,14 @@ export function CyberMissionControl({
               }
             }}
             onSelectScenarioIndex={(idx) => {
-              void state.reload();
               setActiveScenarioIndex(idx);
             }}
             onSelectMission={(mid, sIdx = 0) => {
-              void state.reload();
               setActiveMissionId(mid);
               setActiveScenarioIndex(sIdx);
               router.push(`/play?module=${mid}`);
             }}
             onReturnToHub={() => {
-              void state.reload();
               setActiveMissionId(null);
               setActiveScenarioIndex(0);
               router.push("/play");
@@ -692,7 +689,7 @@ export function CyberMissionControl({
                 </p>
               </div>
             </div>
-            <Link href="/survey/review" prefetch={true} className="button primary large banner-cta-btn">
+            <Link href="/survey/review" className="button primary large banner-cta-btn">
               <span>Continue to BEFORE THE INBOX: Review &amp; Save</span>
               <ArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -850,7 +847,7 @@ export function CyberMissionControl({
             </span>
           </div>
 
-          <Link href="/survey/review" prefetch={true} className="button primary">
+          <Link href="/survey/review" className="button primary">
             <span>Continue to Step 07: Review &amp; Save</span>
             <ChevronRight size={16} aria-hidden="true" />
           </Link>

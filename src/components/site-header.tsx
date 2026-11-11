@@ -93,7 +93,6 @@ export function SiteHeader() {
         <Link
           href="/#home"
           onClick={handleHomeClick}
-          prefetch={true}
           className="brand"
           aria-label="Cyber Campus Home - Return to Hero Section"
         >
@@ -178,7 +177,6 @@ export function SiteHeader() {
           <Link
             href="/#home"
             onClick={handleHomeClick}
-            prefetch={true}
             className={`nav-pill ${isHomeActive ? "active" : ""}`}
             aria-current={isHomeActive ? "page" : undefined}
           >
@@ -188,7 +186,6 @@ export function SiteHeader() {
 
           <Link
             href={joinHref}
-            prefetch={true}
             className={`nav-pill ${isJoinActive ? "active" : ""}`}
             aria-current={isJoinActive ? "page" : undefined}
           >
@@ -198,7 +195,6 @@ export function SiteHeader() {
 
           <Link
             href="/privacy"
-            prefetch={true}
             className={`nav-pill ${isAboutActive ? "active" : ""}`}
             aria-current={isAboutActive ? "page" : undefined}
           >
@@ -211,7 +207,7 @@ export function SiteHeader() {
         <div className="desktop-header-right">
           <Link
             href="/admin/login"
-            prefetch={true}
+            prefetch={false}
             className={`nav-admin nav-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 shadow-sm transition-all duration-200 ${
               isResearcherActive ? "active" : ""
             }`}
@@ -305,7 +301,7 @@ export function SiteHeader() {
               <Link
                 href="/#home"
                 onClick={handleHomeClick}
-                prefetch={true}
+                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isHomeActive ? "active" : ""
                 }`}
@@ -319,7 +315,7 @@ export function SiteHeader() {
               <Link
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={true}
+                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isJoinActive ? "active" : ""
                 }`}
@@ -333,7 +329,7 @@ export function SiteHeader() {
               <Link
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={true}
+                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isAboutActive ? "active" : ""
                 }`}
@@ -347,7 +343,7 @@ export function SiteHeader() {
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={true}
+                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill mobile-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 font-bold ${
                   isResearcherActive ? "active" : ""
                 }`}

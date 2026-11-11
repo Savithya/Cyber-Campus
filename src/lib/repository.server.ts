@@ -628,8 +628,6 @@ export async function getSession(): Promise<Session | null> {
     let s = local.session;
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const num = parseInt(String(s.code).trim(), 10);
-      const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
-      const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
       let counterIsZero = false;
       try {
         const raw = await readFile(path.join(getDemoDataDir(), "participant_counter.json"), "utf-8");
@@ -637,7 +635,16 @@ export async function getSession(): Promise<Session | null> {
         if (parsed?.counter === 0) counterIsZero = true;
       } catch {}
 
-      if (counterIsZero && cwdList.length === 0 && demoList.length === 0) {
+      let allEmpty = false;
+      if (counterIsZero) {
+        const demoDir = getDemoDataDir();
+        const cwdDir = getCwdDataDir();
+        const demoList = await readSubmissionsFromFile(path.join(demoDir, "submissions.json"));
+        const cwdList = demoDir === cwdDir ? demoList : await readSubmissionsFromFile(path.join(cwdDir, "submissions.json"));
+        allEmpty = cwdList.length === 0 && demoList.length === 0;
+      }
+
+      if (counterIsZero && allEmpty) {
         if (s.status !== "draft") {
           await writeLocal(null);
           try {

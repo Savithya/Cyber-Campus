@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import {
   ShieldCheck,
   Lock,
@@ -40,7 +39,6 @@ export function ResearchParticipationPage({
   config,
   error,
 }: ResearchParticipationPageProps) {
-  const shouldReduceMotion = useReducedMotion();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState<string>("overview");
 
@@ -87,19 +85,15 @@ export function ResearchParticipationPage({
       const yOffset = -100;
       const y =
         element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       window.scrollTo({
         top: y,
-        behavior: shouldReduceMotion ? "auto" : "smooth",
+        behavior: prefersReducedMotion ? "auto" : "smooth",
       });
       setActiveSection(id);
     }
-  };
-
-  // Motion variants
-  const fadeIn = {
-    initial: shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.4, ease: "easeOut" as const },
   };
 
   return (
@@ -162,11 +156,8 @@ export function ResearchParticipationPage({
         <div className="research-container max-w-4xl mx-auto">
           <div className="research-hero-single-col">
             {/* Centered Column: Heading, Supporting Description, Buttons, Reassurance */}
-            <motion.div
+            <div
               className="research-hero-copy max-w-3xl mx-auto text-center items-center justify-center flex flex-col w-full"
-              initial={fadeIn.initial}
-              animate={fadeIn.animate}
-              transition={fadeIn.transition}
             >
               {/* Eyebrow badge */}
               <div className="research-hero-eyebrow mx-auto">
@@ -250,7 +241,7 @@ export function ResearchParticipationPage({
                   <span>Sri Lankan Undergraduates</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -278,13 +269,7 @@ export function ResearchParticipationPage({
 
           <div className="overview-grid">
             {/* Background Card */}
-            <motion.article
-              className="research-glass-card overview-card"
-              initial={fadeIn.initial}
-              whileInView={fadeIn.animate}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.3 }}
-            >
+            <article className="research-glass-card overview-card">
               <div className="card-top-row">
                 <div className="card-icon-box lavender-box">
                   <BookOpen size={24} aria-hidden="true" />
@@ -301,16 +286,10 @@ export function ResearchParticipationPage({
                 announcements, and manipulative messages designed to compromise
                 credentials.
               </p>
-            </motion.article>
+            </article>
 
             {/* Aim Card */}
-            <motion.article
-              className="research-glass-card overview-card"
-              initial={fadeIn.initial}
-              whileInView={fadeIn.animate}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.35 }}
-            >
+            <article className="research-glass-card overview-card">
               <div className="card-top-row">
                 <div className="card-icon-box cyan-box">
                   <Target size={24} aria-hidden="true" />
@@ -325,16 +304,10 @@ export function ResearchParticipationPage({
                 threat awareness, vulnerability patterns, and practical
                 protective habits across state and private campuses.
               </p>
-            </motion.article>
+            </article>
 
             {/* Objectives Card */}
-            <motion.article
-              className="research-glass-card overview-card"
-              initial={fadeIn.initial}
-              whileInView={fadeIn.animate}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4 }}
-            >
+            <article className="research-glass-card overview-card">
               <div className="card-top-row">
                 <div className="card-icon-box teal-box">
                   <ListChecks size={24} aria-hidden="true" />
@@ -388,16 +361,10 @@ export function ResearchParticipationPage({
                   </span>
                 </li>
               </ul>
-            </motion.article>
+            </article>
 
             {/* Importance Card */}
-            <motion.article
-              className="research-glass-card overview-card"
-              initial={fadeIn.initial}
-              whileInView={fadeIn.animate}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.45 }}
-            >
+            <article className="research-glass-card overview-card">
               <div className="card-top-row">
                 <div className="card-icon-box peach-box">
                   <Award size={24} aria-hidden="true" />
@@ -413,7 +380,7 @@ export function ResearchParticipationPage({
                 cybersecurity awareness modules and student-centric privacy
                 safeguards across Sri Lanka.
               </p>
-            </motion.article>
+            </article>
           </div>
         </div>
       </section>
@@ -762,7 +729,6 @@ export function ResearchParticipationPage({
             <div className="spot-purpose-action flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
               <Link
                 href="/consent"
-                prefetch={true}
                 className="button primary small inline-flex items-center gap-1.5"
                 aria-label="Start Research Survey by proceeding to consent screen"
               >
@@ -771,7 +737,7 @@ export function ResearchParticipationPage({
               </Link>
               <Link
                 href="/withdraw"
-                prefetch={true}
+                prefetch={false}
                 className="spot-purpose-link"
                 aria-label="Withdraw a previously submitted response"
               >

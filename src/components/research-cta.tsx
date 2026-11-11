@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
@@ -35,7 +33,6 @@ export function ResearchCTA() {
           <div className="relative z-10 mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
             <Link
               href="/consent"
-              prefetch={true}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[48px]"
               aria-label="Start Your Research Journey"
             >
@@ -45,7 +42,7 @@ export function ResearchCTA() {
 
             <Link
               href="/privacy"
-              prefetch={true}
+              prefetch={false}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 border border-blue-500 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[48px]"
               aria-label="Learn About the Study"
             >
