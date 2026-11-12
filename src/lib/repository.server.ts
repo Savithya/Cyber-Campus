@@ -34,10 +34,6 @@ function getCwdDataDir(): string {
   return path.join(process.cwd(), ".demo-data");
 }
 
-function getSeedFilePath(): string {
-  return path.join(process.cwd(), "src", "data", "seed-submissions.json");
-}
-
 async function readSubmissionsFromFile(filePath: string): Promise<Session[]> {
   try {
     const raw = await readFile(filePath, "utf-8");
@@ -82,17 +78,7 @@ export async function nextLocalParticipantCode(options?: {
   let highestCodeFound = 0;
   let hasRealSubmissions = false;
 
-  // 1. Scan bundled seed submissions
-  const seedList = await readSubmissionsFromFile(getSeedFilePath());
-  for (const s of seedList) {
-    if (s.code && /^\d+$/.test(String(s.code).trim())) {
-      const n = parseInt(String(s.code).trim(), 10);
-      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
-      hasRealSubmissions = true;
-    }
-  }
-
-  // 2. Scan cwd submissions (repository baseline)
+  // 1. Scan cwd submissions (repository baseline)
   const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
   for (const s of cwdList) {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
@@ -239,8 +225,8 @@ async function getOrCreateParticipantId(): Promise<string> {
 }
 
 /**
- * Derives valid 1-5 Likert survey answers for Q6-Q25 from cyber mission scenario attempts.
- * This guarantees all IVs and DV in the Research Workspace update automatically as missions are performed.
+ * Derives valid Likert survey answers for Q6-Q25 strictly from completed cyber mission scenario attempts.
+ * Only scenarios actually attempted by the participant are mapped; unattempted items remain unchanged.
  */
 export function deriveSurveyAnswersFromAttempts(
   attempts: Attempt[],
@@ -257,60 +243,35 @@ export function deriveSurveyAnswersFromAttempts(
     return updated;
   }
 
-  const getModuleMetrics = (iv: string) => {
-    const list = firstAttempts.filter((a) => a.primaryIV === iv);
-    const count = list.length;
-    if (count === 0) {
-      return { count: 0, safeRatio: 0.6, avgRisk: 1.5 };
-    }
-    const safeCount = list.filter((a) => a.unsafe === false || a.correct === true).length;
-    const totalRisk = list.reduce((acc, a) => acc + (a.privacyRiskScore ?? (a.unsafe ? 3 : 0)), 0);
-    return {
-      count,
-      safeRatio: safeCount / count,
-      avgRisk: totalRisk / count,
-    };
-  };
-
-  const m1 = getModuleMetrics("IV1"); // Phishing (PH01-PH05)
-  const m2 = getModuleMetrics("IV2"); // Pretexting (PT01-PT05)
-  const m3 = getModuleMetrics("IV3"); // Impersonation (IM01-IM05)
-  const m4 = getModuleMetrics("IV4"); // Online Scams & Links (SC01-SC05)
-
-  const totalSafe = firstAttempts.filter((a) => a.unsafe === false || a.correct === true).length;
-  const totalRiskSum = firstAttempts.reduce((acc, a) => acc + (a.privacyRiskScore ?? (a.unsafe ? 3 : 0)), 0);
-  const overallSafeRatio = totalSafe / Math.max(1, firstAttempts.length);
-  const overallAvgRisk = totalRiskSum / Math.max(1, firstAttempts.length);
-
   // Scenario to Question Map (STEP 03 - STEP 06: Q6 - Q25)
-  const scenarioToQuestionMap: Record<string, { qid: string; iv: string }> = {
+  const scenarioToQuestionMap: Record<string, string> = {
     // STEP 03: Phishing Investigation (IV1) -> Q6 - Q10
-    PH01: { qid: "Q6", iv: "IV1" },
-    PH02: { qid: "Q7", iv: "IV1" },
-    PH03: { qid: "Q8", iv: "IV1" },
-    PH04: { qid: "Q9", iv: "IV1" },
-    PH05: { qid: "Q10", iv: "IV1" },
+    PH01: "Q6",
+    PH02: "Q7",
+    PH03: "Q8",
+    PH04: "Q9",
+    PH05: "Q10",
     // STEP 04: Pretexting Detection (IV2) -> Q11 - Q15
-    PT01: { qid: "Q11", iv: "IV2" },
-    PT02: { qid: "Q12", iv: "IV2" },
-    PT03: { qid: "Q13", iv: "IV2" },
-    PT04: { qid: "Q14", iv: "IV2" },
-    PT05: { qid: "Q15", iv: "IV2" },
+    PT01: "Q11",
+    PT02: "Q12",
+    PT03: "Q13",
+    PT04: "Q14",
+    PT05: "Q15",
     // STEP 05: Impersonation Investigation (IV3) -> Q16 - Q20
-    IM01: { qid: "Q16", iv: "IV3" },
-    IM02: { qid: "Q17", iv: "IV3" },
-    IM03: { qid: "Q18", iv: "IV3" },
-    IM04: { qid: "Q19", iv: "IV3" },
-    IM05: { qid: "Q20", iv: "IV3" },
+    IM01: "Q16",
+    IM02: "Q17",
+    IM03: "Q18",
+    IM04: "Q19",
+    IM05: "Q20",
     // STEP 06: Scam & Malicious Link Investigation (IV4) -> Q21 - Q25
-    SC01: { qid: "Q21", iv: "IV4" },
-    SC02: { qid: "Q22", iv: "IV4" },
-    SC03: { qid: "Q23", iv: "IV4" },
-    SC04: { qid: "Q24", iv: "IV4" },
-    SC05: { qid: "Q25", iv: "IV4" },
+    SC01: "Q21",
+    SC02: "Q22",
+    SC03: "Q23",
+    SC04: "Q24",
+    SC05: "Q25",
   };
 
-  for (const [scId, meta] of Object.entries(scenarioToQuestionMap)) {
+  for (const [scId, qid] of Object.entries(scenarioToQuestionMap)) {
     const att = firstAttempts.find((a) => a.scenarioId === scId);
     if (att && att.selectedAction !== null) {
       let code = 1; // Option 1: Identified threat accurately
@@ -321,12 +282,7 @@ export function deriveSurveyAnswersFromAttempts(
       } else {
         code = 1;
       }
-      updated[meta.qid] = { value: code, status: "answered" };
-    } else if (!updated[meta.qid] || updated[meta.qid].value === null) {
-      // Derive based on IV metrics if scenario not individually completed yet
-      const m = meta.iv === "IV1" ? m1 : meta.iv === "IV2" ? m2 : meta.iv === "IV3" ? m3 : m4;
-      const derivedCode = m.safeRatio >= 0.5 ? 1 : 2;
-      updated[meta.qid] = { value: derivedCode, status: "answered" };
+      updated[qid] = { value: code, status: "answered" };
     }
   }
 
@@ -383,14 +339,7 @@ export async function saveDemoSubmission(session: Session) {
 export async function getDemoSubmissions(): Promise<Session[]> {
   const mergedMap = new Map<string, Session>();
 
-  // 1. Bundled seed submissions (always present across all lambdas & cold starts)
-  const seedList = await readSubmissionsFromFile(getSeedFilePath());
-  for (const s of seedList) {
-    const k = s.code || s.id;
-    mergedMap.set(k, s);
-  }
-
-  // 2. Repository cwd submissions
+  // 1. Repository cwd submissions
   const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
   for (const s of cwdList) {
     const k = s.code || s.id;
@@ -429,7 +378,7 @@ export async function getDemoSubmissions(): Promise<Session[]> {
       if (parsed?.counter === 0) counterIsZero = true;
     } catch {}
 
-    const hasStoredSubmissions = seedList.length > 0 || cwdList.length > 0 || demoList.length > 0;
+    const hasStoredSubmissions = cwdList.length > 0 || demoList.length > 0;
 
     // Do NOT resurrect stale cookie sessions if the workspace has been reset to zero with no stored submissions
     if (!counterIsZero || hasStoredSubmissions) {
@@ -477,16 +426,8 @@ export async function getDemoSubmissions(): Promise<Session[]> {
     await writeFile(subPath, JSON.stringify(list, null, 2), "utf-8").catch(() => {});
   } catch {}
 
-  // 8. Filter out mock records and synthetic fixtures
-  const filtered = list.filter(
-    (s: Session) =>
-      !s.id?.includes("synthetic") &&
-      !s.submissionId?.includes("synthetic") &&
-      !s.code?.includes("synthetic") &&
-      !s.id?.includes("mock") &&
-      !s.submissionId?.includes("mock") &&
-      s.mode !== "practice",
-  );
+  // 6. Exclude practice-only runs
+  const filtered = list.filter((s: Session) => s.mode !== "practice");
 
   return filtered;
 }
@@ -527,10 +468,6 @@ export async function resetResearchData(): Promise<{ ok: boolean; message: strin
     await mkdir(getCwdDataDir(), { recursive: true });
     await writeFile(path.join(getCwdDataDir(), "submissions.json"), emptyList, "utf-8");
     await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), zeroCounter, "utf-8");
-  } catch {}
-
-  try {
-    await writeFile(getSeedFilePath(), emptyList, "utf-8");
   } catch {}
 
   // 3. Clear active browser session cookie & tracking identifiers

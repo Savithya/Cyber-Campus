@@ -59,22 +59,14 @@ export async function requireResearcher() {
     throw new Error("Researcher authentication required.");
   }
 
-  // In local/demo mode, return actual submitted participant sessions (excluding synthetic mock fixtures)
+  // In local/demo mode, return actual submitted participant sessions (excluding practice runs)
   if (!isResearch()) {
     return {
       rpc: async (name: string) => {
         if (name === "research_dataset") {
           const { getDemoSubmissions } = await import("./repository.server");
           const demoSubs = await getDemoSubmissions();
-          const cleanSubs = demoSubs.filter(
-            (s) =>
-              !s.id?.includes("synthetic") &&
-              !s.submissionId?.includes("synthetic") &&
-              !s.code?.includes("synthetic") &&
-              !s.id?.includes("mock") &&
-              !s.submissionId?.includes("mock") &&
-              s.mode !== "practice",
-          );
+          const cleanSubs = demoSubs.filter((s) => s.mode !== "practice");
           return { data: cleanSubs, error: null };
         }
         if (name === "audit_export") {

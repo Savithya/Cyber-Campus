@@ -62,8 +62,8 @@ export function exportCsv(
       "inclusion_rules",
     ]);
     for (const s of sessions) {
-      const answered = Object.values(s.answers).filter(
-        (a) => a.status === "answered",
+      const answered = questions.filter(
+        (q) => s.answers[q.id]?.status === "answered",
       ).length;
       rows.push([
         s.code,
@@ -82,7 +82,7 @@ export function exportCsv(
           ];
         }),
         answered,
-        25 - answered,
+        questions.length - answered,
         ...meta,
       ]);
     }

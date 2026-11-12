@@ -22,24 +22,15 @@ async function runBackup() {
     participantCounter = { counter: 0 };
   }
 
-  let seedSubmissions = [];
-  try {
-    seedSubmissions = JSON.parse(await fs.readFile("src/data/seed-submissions.json", "utf8"));
-  } catch (e) {
-    seedSubmissions = [];
-  }
-
   const payload = {
     created_at: new Date().toISOString(),
     environment: process.env.APP_MODE || "demo",
     files: {
       ".demo-data/submissions.json": demoSubmissions,
       ".demo-data/participant_counter.json": participantCounter,
-      "src/data/seed-submissions.json": seedSubmissions,
     },
     counts: {
       demoSubmissions: demoSubmissions.length,
-      seedSubmissions: seedSubmissions.length,
       counter: participantCounter.counter,
     },
   };

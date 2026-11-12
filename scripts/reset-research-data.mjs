@@ -45,10 +45,6 @@ export async function executeReset() {
   );
   results.localReset["participant_counter.json"] = "counter reset to 0";
 
-  const seedPath = path.join(process.cwd(), "src", "data", "seed-submissions.json");
-  await fs.writeFile(seedPath, "[]\n", "utf8");
-  results.localReset["seed-submissions.json"] = "reset to empty array []";
-
   // Check os.tmpdir() demo data if present
   const tmpDir = path.join(os.tmpdir(), ".demo-data");
   try {

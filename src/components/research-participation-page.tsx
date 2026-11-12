@@ -28,6 +28,7 @@ import {
   HelpCircle,
   Compass,
 } from "lucide-react";
+import { questions } from "@/content/questionnaire";
 import type { StudyConfig } from "@/lib/config.server";
 
 interface ResearchParticipationPageProps {
@@ -659,7 +660,7 @@ export function ResearchParticipationPage({
               },
               {
                 q: "How long does the questionnaire actually take?",
-                a: "Most students complete the 25 questions in approximately 5 to 7 minutes. Questions are clear multiple-choice items with no complicated typing required.",
+                a: `Most students complete the ${questions.length} questions in approximately 5 to 7 minutes. Questions are clear multiple-choice items with no complicated typing required.`,
               },
               {
                 q: "What if I haven't experienced any cyber attacks?",

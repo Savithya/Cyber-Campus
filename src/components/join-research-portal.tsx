@@ -34,6 +34,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { api, randomToken, putDraft, clearParticipationStorage, useSession } from "@/lib/client";
+import { questions } from "@/content/questionnaire";
 import type { StudyConfig } from "@/lib/config.server";
 import type { Session } from "@/lib/types";
 import { ResearchTitleIllustration } from "./research-title-illustration";
@@ -302,7 +303,7 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
             <div className="portal-title-footer">
               <span className="portal-title-meta">
                 <ShieldCheck size={14} className="text-teal" aria-hidden="true" />
-                <span>Standardized Academic Instrument · 25 Items</span>
+                <span>Standardized Academic Instrument · {questions.length} Items</span>
               </span>
               <span className="portal-title-meta">
                 <Lock size={14} className="text-purple" aria-hidden="true" />
@@ -873,7 +874,7 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
               </div>
               <h3 className="step-card-title">Complete the Research Questionnaire</h3>
               <p className="step-card-desc">
-                Answer 25 multiple-choice questions covering awareness, threat experiences, digital behaviours,
+                Answer {questions.length} multiple-choice questions covering awareness, threat experiences, digital behaviours,
                 and privacy concerns at your own pace.
               </p>
             </div>
@@ -949,7 +950,7 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
                   <strong>Participation is voluntary</strong>
                   <p>
                     Skip any question using its separate skip action, or stop at any time without penalty.
-                    Consent and eligibility are administrative fields, separate from Q1–Q25.
+                    Consent and eligibility are administrative fields, separate from Q1–Q4 and Q6–Q25.
                   </p>
                 </div>
               </div>

@@ -130,12 +130,13 @@ export default function Survey() {
       </div>
     );
   const s = sections[index],
-    answered = Object.values(answers).filter(
-      (a) => a.status === "answered",
+    answered = questions.filter(
+      (q) => answers[q.id]?.status === "answered",
     ).length,
-    reviewed = Object.values(answers).filter(
-      (a) => a.status !== "not_answered",
-    ).length;
+    reviewed = questions.filter((q) => {
+      const a = answers[q.id];
+      return a && a.status !== "not_answered";
+    }).length;
   return (
     <div className="survey-layout container page-space">
       <aside className="survey-sidebar">
@@ -203,7 +204,7 @@ export default function Survey() {
         <div className="survey-topline">
           <span>SECTION {s.id} OF {sections[sections.length - 1]?.id ?? "E"}</span>
           <span>
-            {reviewed} of 25 reviewed · {answered} answered
+            {reviewed} of {questions.length} reviewed · {answered} answered
           </span>
         </div>
         <div
@@ -212,9 +213,9 @@ export default function Survey() {
           aria-label="Questions reviewed"
           aria-valuenow={reviewed}
           aria-valuemin={0}
-          aria-valuemax={25}
+          aria-valuemax={questions.length}
         >
-          <div style={{ width: (reviewed / 25) * 100 + "%" }} />
+          <div style={{ width: (reviewed / questions.length) * 100 + "%" }} />
         </div>
         <div className="survey-title">
           <h1>{s.title}</h1>

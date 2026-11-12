@@ -205,7 +205,7 @@ export default function StatisticalAnalysis({
           </div>
           <div className="metric-cell">
             <span className="metric-label">Research Variables</span>
-            <strong className="metric-val">25 Items + 6 Scales</strong>
+            <strong className="metric-val">{questions.length} Items + 6 Scales</strong>
             <span className="metric-note">4 IVs (Q6–Q18) · 1 DV (Q19–Q25)</span>
           </div>
           <div className="metric-cell">

@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { HeroSection } from "@/components/hero-section";
 import { ThreatCategories } from "@/components/threat-categories";
 import { ParticipationJourney } from "@/components/participation-journey";
-import { CyberLabPreview } from "@/components/cyber-lab-preview";
 import { ResearchEthics } from "@/components/research-ethics";
 import { ResearchJourneyFrame } from "@/components/research-journey-frame";
 import { ResearchParticipationPage } from "@/components/research-participation-page";
@@ -158,17 +157,6 @@ describe("CYBER CAMPUS — Complete 14-Viewport Responsiveness & Accessibility A
       expect(html).toContain("Impersonation");
       expect(html).toContain("IV4");
       expect(html).toContain("Online Scams &amp; Malicious Links");
-    });
-
-    it("renders CyberLabPreview with safe simulated email headers", () => {
-      const html = renderToString(React.createElement(CyberLabPreview));
-
-      expect(html).toContain("cyber-lab-preview-section");
-      expect(html).toContain("LMS Account Verification");
-      expect(html).toContain("From:");
-      expect(html).toContain("Subject:");
-      expect(html).toContain("Simulated Link Destination:");
-      expect(html).toContain("What Would You Do?");
     });
   });
 

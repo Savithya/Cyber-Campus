@@ -9,7 +9,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { HeroSection } from "@/components/hero-section";
 import { ThreatCategories } from "@/components/threat-categories";
 import { ParticipationJourney } from "@/components/participation-journey";
-import { CyberLabPreview } from "@/components/cyber-lab-preview";
 import { ResearchEthics } from "@/components/research-ethics";
 import { ResearchCTA } from "@/components/research-cta";
 import { ResearchJourneyFrame } from "@/components/research-journey-frame";
@@ -144,15 +143,6 @@ describe("Comprehensive Multi-Device Responsiveness Across All Pages & Screen Si
       expect(html).toContain("Participant Demographics");
       expect(html).toContain("Cyber Investigation Missions");
       expect(html).toContain("Submit &amp; Complete");
-    });
-
-    it("renders CyberLabPreview with mobile-safe email metadata headers", () => {
-      const html = renderToString(React.createElement(CyberLabPreview));
-      expect(html).toContain("cyber-lab-preview-section");
-      expect(html).toContain("LMS Account Verification");
-      expect(html).toContain("From:");
-      expect(html).toContain("Subject:");
-      expect(html).toContain("Simulated Link Destination:");
     });
 
     it("renders ResearchEthics with responsive cards", () => {

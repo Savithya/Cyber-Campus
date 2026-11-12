@@ -105,29 +105,13 @@ export async function GET(req: NextRequest, ctx: Ctx) {
           );
         const { getDemoSubmissions } = await import("@/lib/repository.server");
         const demoSubs = await getDemoSubmissions();
-        data = demoSubs.filter(
-          (s) =>
-            !s.id?.includes("synthetic") &&
-            !s.submissionId?.includes("synthetic") &&
-            !s.code?.includes("synthetic") &&
-            !s.id?.includes("mock") &&
-            !s.submissionId?.includes("mock") &&
-            s.mode !== "practice",
-        );
+        data = demoSubs.filter((s) => s.mode !== "practice");
       } else {
         const db = await requireResearcher();
         const result = await db.rpc("research_dataset");
         if (result.error)
           throw new Error("The database is unavailable. Please retry.");
-        data = (result.data as Session[]).filter(
-          (s) =>
-            !s.id?.includes("synthetic") &&
-            !s.submissionId?.includes("synthetic") &&
-            !s.code?.includes("synthetic") &&
-            !s.id?.includes("mock") &&
-            !s.submissionId?.includes("mock") &&
-            s.mode !== "practice",
-        );
+        data = (result.data as Session[]).filter((s) => s.mode !== "practice");
       }
       if (path.endsWith("/data")) return json({ sessions: data });
       const kind = req.nextUrl.searchParams.get("kind") as string;

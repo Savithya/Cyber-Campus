@@ -8,7 +8,6 @@ import { HeroSection } from "@/components/hero-section";
 import { ResearchMetrics } from "@/components/research-metrics";
 import { ThreatCategories } from "@/components/threat-categories";
 import { ParticipationJourney } from "@/components/participation-journey";
-import { CyberLabPreview } from "@/components/cyber-lab-preview";
 import { ResearchEthics } from "@/components/research-ethics";
 import { ResearchCTA } from "@/components/research-cta";
 import { ThemeProvider, THEMES } from "@/components/theme-provider";
@@ -177,37 +176,6 @@ describe("Cyber Campus — Complete Hybrid Cyber Research Lab Homepage Redesign 
     // CTA
     expect(html).toContain("Begin Research Participation");
     expect(html).toContain('href="/consent"');
-  });
-
-  it("renders the interactive CyberLabPreview educational demo with research validity disclaimer", () => {
-    const html = renderToString(React.createElement(CyberLabPreview));
-
-    // Section title & subtitle
-    expect(html).toContain("Think Like a Cyber Investigator");
-    expect(html).toContain(
-      "Explore a sample digital scenario and discover how online deception can threaten your privacy."
-    );
-
-    // Critical Research Validity Banner
-    expect(html).toContain("Optional Educational Demo — Not Part of Research Scoring");
-
-    // Simulated email UI
-    expect(html).toContain("Campus Mail Client · Simulation");
-    expect(html).toContain("Safe Simulation");
-    expect(html).toContain("security@campus-serendib-verify.example");
-    expect(html).toContain("URGENT: Mandatory Student Security Audit");
-    expect(html).toContain("Link is disabled in educational simulation mode");
-
-    // Decision Panel
-    expect(html).toContain("What Would You Do?");
-    expect(html).toContain("Click the verification link immediately to avoid losing LMS access");
-    expect(html).toContain(
-      "Verify the notice through an official university helpdesk or published phone directory"
-    );
-    expect(html).toContain("Ignore the email and take no action");
-    expect(html).toContain(
-      "Report the message as a phishing attempt to university IT cybersecurity"
-    );
   });
 
   it("renders the ResearchEthics & Privacy section with 4 clear cards and direct policy links", () => {

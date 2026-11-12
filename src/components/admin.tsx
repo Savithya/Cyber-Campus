@@ -55,6 +55,7 @@ import {
 } from "lucide-react";
 import { questions, sections } from "@/content/questionnaire";
 import { missions, activeMissions } from "@/content/missions";
+import { SCENARIO_STORIES } from "@/content/scenario-stories";
 import {
   aggregateQuestion,
   filterSessions,
@@ -115,27 +116,18 @@ const navs = navSections.flatMap((s) =>
   s.items.map((i) => [i.id, i.label, i.icon] as const),
 );
 
-const SCENARIO_TITLES: Record<string, string> = {
-  PH01: "Suspicious University Email",
-  PH02: "Fake LMS Notification",
-  PH03: "Urgent Library Account Renewal",
-  PH04: "Impending Grade Appeal Notice",
-  PH05: "Scholarship Grant Verification",
-  PT01: "Urgent Research Survey Pretext",
-  PT02: "Fake Dean's Office Audit",
-  PT03: "Career Counselor Inquiry",
-  PT04: "Lost Student ID Card Pretext",
-  PT05: "Emergency Blood Donor Registry",
-  IM01: "Spoofed Lecturer Profile",
-  IM02: "Fake Student Union Representative",
-  IM03: "Cloned Department WhatsApp Group",
-  IM04: "Impersonated IT Support Desk",
-  IM05: "Bogus Alumni Mentor",
-  SC01: "Fake Online Shopping Store",
-  SC02: "Bogus Student Grant Link",
-  SC03: "Deceptive Room Rental Listing",
-  SC04: "Malicious QR Code at Campus Canteen",
-  SC05: "Shortened Link for Exam Paper Leak",
+const SCENARIO_TITLES: Record<string, string> = Object.fromEntries(
+  SCENARIO_STORIES.map((s) => [s.id, s.fullTitle]),
+);
+
+const MISSION_META_BY_PREFIX: Record<
+  string,
+  { iv: string; missionCode: string; missionName: string }
+> = {
+  PH: { iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation" },
+  PT: { iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection" },
+  IM: { iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation" },
+  SC: { iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation" },
 };
 
 export interface ChallengeDefinition {
@@ -146,32 +138,19 @@ export interface ChallengeDefinition {
   title: string;
 }
 
-export const ALL_RESEARCH_CHALLENGES: ChallengeDefinition[] = [
-  // IV1: Phishing Investigation
-  { id: "PH01", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Suspicious University Email" },
-  { id: "PH02", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Fake LMS Notification" },
-  { id: "PH03", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Urgent Library Account Renewal" },
-  { id: "PH04", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Impending Grade Appeal Notice" },
-  { id: "PH05", iv: "IV1", missionCode: "M01", missionName: "Phishing Investigation", title: "Scholarship Grant Verification" },
-  // IV2: Pretexting Detection
-  { id: "PT01", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Urgent Research Survey Pretext" },
-  { id: "PT02", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Fake Dean's Office Audit" },
-  { id: "PT03", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Career Counselor Inquiry" },
-  { id: "PT04", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Lost Student ID Card Pretext" },
-  { id: "PT05", iv: "IV2", missionCode: "M02", missionName: "Pretexting Detection", title: "Emergency Blood Donor Registry" },
-  // IV3: Impersonation Investigation
-  { id: "IM01", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Spoofed Lecturer Profile" },
-  { id: "IM02", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Fake Student Union Representative" },
-  { id: "IM03", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Cloned Department WhatsApp Group" },
-  { id: "IM04", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Impersonated IT Support Desk" },
-  { id: "IM05", iv: "IV3", missionCode: "M03", missionName: "Impersonation Investigation", title: "Bogus Alumni Mentor" },
-  // IV4: Online Scams & Malicious Links
-  { id: "SC01", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Fake Online Shopping Store" },
-  { id: "SC02", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Bogus Student Grant Link" },
-  { id: "SC03", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Deceptive Room Rental Listing" },
-  { id: "SC04", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Malicious QR Code at Campus Canteen" },
-  { id: "SC05", iv: "IV4", missionCode: "M04", missionName: "Scam & Malicious Link Investigation", title: "Shortened Link for Exam Paper Leak" },
-];
+export const ALL_RESEARCH_CHALLENGES: ChallengeDefinition[] =
+  SCENARIO_STORIES.map((s) => {
+    const meta = MISSION_META_BY_PREFIX[s.id.slice(0, 2)] ?? {
+      iv: "IV1",
+      missionCode: "M01",
+      missionName: "Phishing Investigation",
+    };
+    return {
+      id: s.id,
+      ...meta,
+      title: s.fullTitle,
+    };
+  });
 
 function getScenarioIv(id: string): string {
   if (id.startsWith("PH")) return "IV1";
@@ -196,99 +175,6 @@ function formatDuration(startIso: string | null, endIso: string | null): string 
   const remMinutes = minutes % 60;
   return `${hours}h ${remMinutes}m`;
 }
-
-const SC_FALLBACK_DEFINITIONS = [
-  {
-    id: "SC01",
-    title: "Fake Online Shopping Store",
-    scenario:
-      "A sponsored social advertisement displays: 'Undergraduate Laptop Liquidation — Apple MacBook Air M2 for LKR 68,000 (85% off)'. The site looks polished with authentic university logos.",
-    task: "What would you do first?",
-    options: [
-      { id: "A", text: "Proceed to checkout immediately and enter debit card details before stock runs out.", unsafe: true, category: "Payment Credentials" },
-      { id: "B", text: "Message the seller via WhatsApp asking for cash on delivery.", unsafe: true, category: "Personal Phone & Contact" },
-      { id: "C", text: "Recognize high-pressure pricing fraud; exit storefront and report the sponsored ad.", unsafe: false, category: "None", safest: true },
-      { id: "D", text: "Share the link in student groups to ask if anyone else has ordered from them.", unsafe: false, category: "None" },
-    ],
-    safestAction:
-      "Recognize high-pressure pricing fraud; exit the storefront and report the ad without entering payment credentials.",
-    explanation:
-      "Extreme 85% discounts on current hardware combined with artificial countdown timers represent classic urgency fraud designed to harvest card details.",
-    dimension: "Financial Credential Disclosure Risk (IV4)",
-  },
-  {
-    id: "SC02",
-    title: "Bogus Student Grant Link",
-    scenario:
-      "You receive an SMS: 'Ministry of Higher Education Relief Grant: LKR 45,000 approved for state university students. Claim via https://mohe-student-grant.sl-gov-relief.example within 24 hours.'",
-    task: "What would you do first?",
-    options: [
-      { id: "A", text: "Click the link and submit your National Identity Card (NIC) number and bank account details.", unsafe: true, category: "National ID & Bank Details" },
-      { id: "B", text: "Open the official Ministry of Education / UGC portal independently to verify legitimate grant notices.", unsafe: false, category: "None", safest: true },
-      { id: "C", text: "Forward the SMS to friends who might need financial assistance.", unsafe: false, category: "None" },
-      { id: "D", text: "Reply STOP to the SMS message to unsubscribe.", unsafe: true, category: "Phone Verification" },
-    ],
-    safestAction:
-      "Open the official government / university website separately and verify through official announcement channels.",
-    explanation:
-      "Government financial grants are never disbursed via urgent SMS links requiring immediate bank account and NIC submission on unofficial domains.",
-    dimension: "Identity Theft & Banking Fraud (IV4)",
-  },
-  {
-    id: "SC03",
-    title: "Deceptive Room Rental Listing",
-    scenario:
-      "A student accommodation listing on a campus group offers a luxury room near university for LKR 8,000/month. The landlord says: 'Send 2 months advance deposit immediately via bank transfer to hold the room.'",
-    task: "What would you do first?",
-    options: [
-      { id: "A", text: "Transfer the advance deposit immediately to secure the accommodation.", unsafe: true, category: "Direct Financial Loss" },
-      { id: "B", text: "Send a photo of your student ID card to prove you are a legitimate student.", unsafe: true, category: "Student Identity Theft" },
-      { id: "C", text: "Refuse advance payment; insist on inspecting the physical premises and verifying ownership documents in person.", unsafe: false, category: "None", safest: true },
-      { id: "D", text: "Ask the landlord to send their NIC copy before you transfer money.", unsafe: false, category: "None" },
-    ],
-    safestAction:
-      "Never send advance payments online before physically inspecting the property and verifying legitimate lease documents.",
-    explanation:
-      "Rental scams exploit student housing anxiety by demanding wire transfers for phantom properties using stolen or fabricated pictures.",
-    dimension: "Advance Fee Fraud & Personal ID Exposure (IV4)",
-  },
-  {
-    id: "SC04",
-    title: "Malicious QR Code at Campus Canteen",
-    scenario:
-      "A sticker QR code is placed over the canteen payment counter labelled 'Scan for 20% Student Discount on Cafeteria Payments'. Scanning opens a portal asking for university LMS login.",
-    task: "What would you do first?",
-    options: [
-      { id: "A", text: "Enter your student ID and LMS password to activate the meal discount.", unsafe: true, category: "LMS Account Compromise" },
-      { id: "B", text: "Inspect the URL; notice it is hosted on a third-party domain and immediately report the fraudulent sticker to cafeteria staff.", unsafe: false, category: "None", safest: true },
-      { id: "C", text: "Bookmark the page to log in later from your laptop.", unsafe: false, category: "None" },
-      { id: "D", text: "Take a screenshot and post it on social media asking if it works.", unsafe: false, category: "None" },
-    ],
-    safestAction:
-      "Inspect the landing URL domain; refrain from submitting login credentials and report the tampered QR sticker to canteen management.",
-    explanation:
-      "QR code tampering (quishing) overlays physical malicious QR codes on legitimate payment terminals to harvest single-sign-on credentials.",
-    dimension: "Physical Quishing & Credential Theft (IV4)",
-  },
-  {
-    id: "SC05",
-    title: "Shortened Link for Exam Paper Leak",
-    scenario:
-      "A message in an unofficial batch chat says: 'CONFIDENTIAL: Leaked End-Semester exam paper questions uploaded here: bit.ly/campus-exam-2024-pdf. Download now before admins delete it.'",
-    task: "What would you do first?",
-    options: [
-      { id: "A", text: "Click the bit.ly link immediately and download the zip file.", unsafe: true, category: "Malware Infection & Device Access" },
-      { id: "B", text: "Expand the shortened link using a URL expander / safety scanner and report the deceptive link to batch representatives.", unsafe: false, category: "None", safest: true },
-      { id: "C", text: "Ask the sender to email the PDF attachment directly to your personal email.", unsafe: true, category: "Targeted Phishing Vector" },
-      { id: "D", text: "Download the file on a university computer instead of your phone.", unsafe: true, category: "Campus Network Compromise" },
-    ],
-    safestAction:
-      "Expand and analyze shortened URLs using security scanners; avoid executing unverified downloads and report the academic misconduct lure.",
-    explanation:
-      "Shortened links hiding executable payloads (.exe, .zip) leverage curiosity and exam anxiety to deploy info-stealer malware on student devices.",
-    dimension: "Malware Delivery & Device Compromise (IV4)",
-  },
-];
 
 export default function Admin({
   sessions,
@@ -341,17 +227,9 @@ export default function Admin({
     return () => window.removeEventListener("focus", handleFocus);
   }, [router]);
 
-  // Strictly filter out any mock or synthetic fixture records
+  // Exclude practice-only sessions from research dataset views
   const realSessions = useMemo(() => {
-    return sessions.filter(
-      (s) =>
-        !s.id?.includes("synthetic") &&
-        !s.submissionId?.includes("synthetic") &&
-        !s.code?.includes("synthetic") &&
-        !s.id?.includes("mock") &&
-        !s.submissionId?.includes("mock") &&
-        s.mode !== "practice",
-    );
+    return sessions.filter((s) => s.mode !== "practice");
   }, [sessions]);
 
   const filtered = filterSessions(realSessions, filters),
@@ -1011,7 +889,7 @@ export default function Admin({
               <Stat
                 label="Submitted Complete"
                 value={counts.complete}
-                detail="All 25 items answered without skips"
+                detail={`All ${questions.length} items answered without skips`}
               />
               <Stat
                 label="Submitted with Missing"
@@ -1208,7 +1086,7 @@ export default function Admin({
               </div>
             ) : (
               <div className="space-y-6">
-                {questions.slice(0, 5).map((q) => {
+                {questions.filter((q) => q.section === "A").map((q) => {
                   const agg = aggregateQuestion(q, filtered);
                   return (
                     <div key={q.id} className="card">
@@ -1294,8 +1172,8 @@ export default function Admin({
                   </h2>
                   <p className="text-xs text-muted mt-1 max-w-3xl leading-relaxed">
                     This section documents the experimental scenarios, wording, and decision options configured for
-                    Independent Variable 4 (Online Scams &amp; Malicious Link Threats). Evaluates deceptive e-commerce offers,
-                    bogus student grants, fake rentals, canteen quishing stickers, and malicious exam links.
+                    Independent Variable 4 (Online Scams &amp; Malicious Link Threats). Evaluates fake online storefronts,
+                    rental deposit scams, unencrypted payment gateways, malicious OAuth event links, and advance-fee internship scams.
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -1308,71 +1186,80 @@ export default function Admin({
             </div>
 
             <div className="space-y-6">
-              {SC_FALLBACK_DEFINITIONS.map((sc, idx) => (
+              {SCENARIO_STORIES.filter((sc) => sc.id.startsWith("SC")).map((sc, idx) => {
+                const live = scenarioMap[sc.id];
+                const title = live?.title ?? sc.fullTitle;
+                const situation = live?.situation ?? sc.situation;
+                const message = live?.message ?? sc.message;
+                const choices = live?.choices ?? sc.choices;
+                return (
                 <div key={sc.id} className="card border-l-4 border-l-amber">
                   <div className="flex items-center justify-between gap-3 flex-wrap border-b pb-3">
                     <div className="flex items-center gap-2">
                       <span className="question-number">{sc.id}</span>
                       <span className="tag amber">Challenge 0{idx + 1} of 05</span>
-                      <h3 className="text-base font-bold ml-1">{sc.title}</h3>
+                      <h3 className="text-base font-bold ml-1">{title}</h3>
                     </div>
-                    <span className="text-xs font-mono text-muted">{sc.dimension}</span>
+                    <span className="text-xs font-mono text-muted">Online Scams &amp; Malicious Links (IV4)</span>
                   </div>
 
                   <div className="mt-3">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-muted">Scenario Briefing:</h4>
                     <p className="mt-1 text-sm bg-surface p-3 rounded border leading-relaxed">
-                      &ldquo;{sc.scenario}&rdquo;
+                      {situation}
                     </p>
-                  </div>
-
-                  <div className="mt-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted">Investigation Task:</h4>
-                    <strong className="text-sm block mt-0.5">{sc.task}</strong>
+                    <p className="mt-2 text-xs text-muted bg-surface p-2.5 rounded border leading-relaxed">
+                      &ldquo;{message}&rdquo;
+                    </p>
                   </div>
 
                   <div className="mt-3">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-muted mb-2">Response Options:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                      {sc.options.map((opt) => (
+                      {choices.map((opt) => {
+                        const isSafest = opt.id === sc.correctAction;
+                        return (
                         <div
                           key={opt.id}
                           className={`p-2.5 rounded border ${
-                            opt.safest
+                            isSafest
                               ? "bg-emerald/10 border-emerald/40 text-emerald"
                               : "bg-surface"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-bold">Option {opt.id}:</span>
+                            <span className="font-bold uppercase">{opt.id}</span>
                             <span
                               className={`text-[10px] py-0.5 px-1.5 rounded ${
-                                opt.safest ? "bg-emerald text-white" : "bg-red/10 text-red"
+                                isSafest
+                                  ? "bg-emerald text-white"
+                                  : opt.unsafe
+                                    ? "bg-red/10 text-red"
+                                    : "bg-surface-subtle text-muted"
                               }`}
                             >
-                              {opt.safest ? "Safest Action" : "Unsafe Choice"}
+                              {isSafest ? "Safest Action" : opt.unsafe ? "Unsafe Choice" : "Safe Alternative"}
                             </span>
                           </div>
-                          <p className="mt-1 leading-normal text-foreground">{opt.text}</p>
-                          <span className="text-[10px] text-muted block mt-1">
-                            Disclosed Info: {opt.category}
-                          </span>
+                          <p className="mt-1 leading-normal text-foreground">{opt.label}</p>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
                   <div className="mt-4 p-3 rounded bg-emerald/5 border border-emerald/20 text-xs">
                     <strong className="text-emerald block font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> Validated Safest Response:
+                      <CheckCircle2 size={14} /> Validated Rationale:
                     </strong>
-                    <p className="mt-1 text-foreground leading-relaxed">{sc.safestAction}</p>
+                    <p className="mt-1 text-foreground leading-relaxed">{sc.explanation}</p>
                     <p className="mt-1 text-muted text-[11px] leading-relaxed">
-                      <strong>Cybersecurity Rationale:</strong> {sc.explanation}
+                      <strong>Risk Consequence:</strong> {sc.consequence}
                     </p>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -1385,11 +1272,9 @@ export default function Admin({
             ivCode="IV4"
             threatName="Online Scams & Malicious Link Threats"
             missionCode="M04"
-            description="Empirical research analysis of student susceptibility to financial scams, high-pressure checkout portals, quishing stickers, and malware-bearing shortened links."
+            description="Empirical research analysis of student susceptibility to fraudulent storefronts, rental deposit scams, unencrypted payment gateways, malicious OAuth links, and advance-fee internship scams."
             scenarioIds={["SC01", "SC02", "SC03", "SC04", "SC05"]}
             attempts={first}
-            totalParticipants={counts.totalSubmissions}
-            insightsText="Undergraduates showed high vulnerability to 80%+ discount laptop clearances and fake accommodation deposit traps, while QR-code quishing stickers at dining areas frequently deceived students into submitting Single-Sign-On credentials."
           />
         )}
 
@@ -1401,11 +1286,9 @@ export default function Admin({
             ivCode="IV1"
             threatName="Phishing Investigation"
             missionCode="M01"
-            description="Empirical research analysis of deceptive university emails, lookalike authentication portals, urgency cues, and malicious credential-harvesting forms."
+            description="Empirical research analysis of deceptive emails, suspicious SMS lures, physical QR traps, malicious attachments, and lookalike authentication portals."
             scenarioIds={["PH01", "PH02", "PH03", "PH04", "PH05"]}
             attempts={first}
-            totalParticipants={counts.totalSubmissions}
-            insightsText="Urgent academic account suspension warnings and lookalike LMS portal notifications induced the highest password submission rates, demonstrating significant vulnerability to urgency-framed credential harvesting."
           />
         )}
 
@@ -1417,11 +1300,9 @@ export default function Admin({
             ivCode="IV2"
             threatName="Pretexting Detection"
             missionCode="M02"
-            description="Empirical research analysis of psychological manipulation, fabricated authority figures, fake dean's office audits, and peer pressure scenarios."
+            description="Empirical research analysis of fabricated IT support requests, emergency fine holds, bogus statutory census requests, network maintenance pretexts, and emotional peer pleas."
             scenarioIds={["PT01", "PT02", "PT03", "PT04", "PT05"]}
             attempts={first}
-            totalParticipants={counts.totalSubmissions}
-            insightsText="Students exhibited a pronounced compliance bias when confronted with fabricated administrative audits or urgency requests from perceived faculty authorities, frequently disclosing National Identity Card (NIC) numbers."
           />
         )}
 
@@ -1433,11 +1314,9 @@ export default function Admin({
             ivCode="IV3"
             threatName="Impersonation Investigation"
             missionCode="M03"
-            description="Empirical research analysis of cloned faculty profiles, spoofed student union representatives, and fake departmental communications."
+            description="Empirical research analysis of spoofed lecturer accounts, compromised peer chats, fake disciplinary notices, cloned student society profiles, and deceptive telecom offers."
             scenarioIds={["IM01", "IM02", "IM03", "IM04", "IM05"]}
             attempts={first}
-            totalParticipants={counts.totalSubmissions}
-            insightsText="Cloned departmental WhatsApp groups and spoofed faculty direct messages achieved high engagement, as students rarely conducted out-of-band verification before sharing contact lists or class notes."
           />
         )}
 
@@ -2147,7 +2026,7 @@ export default function Admin({
                         "One submitted participant per row. Raw codes, exact labels, missing statuses, versions, and Colombo UTC timestamps.",
                         "One row per participant and question. Section, role, dimension, value, label, and missing status.",
                         "Learning attempts and replays, kept separate from baseline responses. Includes versions, elapsed time, and first-attempt points.",
-                        "Option counts, valid-response percentages, valid n, missing n, and active filters for all 25 questions.",
+                        `Option counts, valid-response percentages, valid n, missing n, and active filters for all ${questions.length} questions.`,
                         "The complete instrument, option order and codes, measurement levels, and missing-value rules.",
                       ][i]
                     }
@@ -2387,7 +2266,7 @@ export default function Admin({
                       <th>Status</th>
                       <th>Submitted &amp; Duration</th>
                       <th>Challenges (20)</th>
-                      <th>Survey (Q1–Q25)</th>
+                      <th title="Questions Q1–Q4 and Q6–Q25">Survey ({questions.length})</th>
                       <th>Risk Level</th>
                       <th className="text-right pr-4">Actions</th>
                     </tr>
@@ -2434,9 +2313,10 @@ export default function Admin({
                         const unsafeCount = challenges.filter(
                           (c) => c.status === "completed" && c.isSafe === false,
                         ).length;
-                        const answeredSurveyCount = Object.values(
-                          s.answers,
-                        ).filter((a) => a.status === "answered").length;
+                        const totalSurveyQuestions = questions.length;
+                        const answeredSurveyCount = questions.filter(
+                          (q) => s.answers[q.id]?.status === "answered",
+                        ).length;
 
                         const duration = formatDuration(s.createdAt, s.submittedAt);
                         const avgRisk = completedCount
@@ -2588,15 +2468,15 @@ export default function Admin({
                               <td>
                                 <div className="flex flex-col">
                                   <span className="text-xs font-mono font-medium">
-                                    <strong>{answeredSurveyCount}</strong> / 25
+                                    <strong>{answeredSurveyCount}</strong> / {totalSurveyQuestions}
                                   </span>
                                   <span className="text-[10px] text-muted mt-0.5">
-                                    {answeredSurveyCount === 25 ? (
+                                    {answeredSurveyCount === totalSurveyQuestions ? (
                                       <span className="text-emerald">
-                                        All 25 answered
+                                        All {totalSurveyQuestions} answered
                                       </span>
                                     ) : (
-                                      `${25 - answeredSurveyCount} missing`
+                                      `${totalSurveyQuestions - answeredSurveyCount} missing`
                                     )}
                                   </span>
                                 </div>
@@ -2831,7 +2711,7 @@ export default function Admin({
                                         <FileText size={14} />
                                         <span>
                                           Baseline Survey Responses (
-                                          {answeredSurveyCount} / 25)
+                                          {answeredSurveyCount} / {totalSurveyQuestions})
                                         </span>
                                       </button>
                                     </div>
@@ -3415,8 +3295,6 @@ function ThreatAnalysisPanel({
   description,
   scenarioIds,
   attempts,
-  totalParticipants,
-  insightsText,
 }: {
   ivCode: string;
   threatName: string;
@@ -3424,8 +3302,6 @@ function ThreatAnalysisPanel({
   description: string;
   scenarioIds: readonly string[];
   attempts: Attempt[];
-  totalParticipants: number;
-  insightsText: string;
 }) {
   const attemptedOnly = attempts.filter(
     (a) => a.primaryIV === ivCode && a.selectedAction !== null,
@@ -3642,15 +3518,15 @@ function ThreatAnalysisPanel({
         </div>
       </div>
 
-      {/* Threat Qualitative Insights Box */}
+      {/* Observed Empirical Summary Box */}
       <div className="card p-4 bg-surface-subtle border">
         <h4 className="text-sm font-semibold flex items-center gap-1.5 text-cyan mb-1.5">
           <ShieldAlert size={16} aria-hidden="true" />
-          <span>Research Vulnerability Observations: {threatName}</span>
+          <span>Observed Module Summary: {threatName}</span>
         </h4>
         <p className="text-xs text-muted leading-relaxed">
           {attemptedOnly.length > 0
-            ? `${unsafeRate}% unsafe decision rate across ${attemptedOnly.length} recorded participant evaluations (mean risk score: ${meanRisk}/4). ${insightsText}`
+            ? `${unsafeRate}% unsafe decision rate (${unsafeCount} of ${attemptedOnly.length} recorded evaluations; protective rate: ${protectiveRate}%; mean privacy risk score: ${meanRisk}/4).`
             : "No participant challenge evaluations have been recorded yet for this threat module."}
         </p>
       </div>

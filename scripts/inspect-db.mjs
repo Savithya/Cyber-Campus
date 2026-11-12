@@ -31,7 +31,6 @@ async function main() {
   const files = [
     ".demo-data/submissions.json",
     ".demo-data/participant_counter.json",
-    "src/data/seed-submissions.json"
   ];
   for (const f of files) {
     try {
