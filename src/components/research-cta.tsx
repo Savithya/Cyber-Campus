@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
+import { FastLink } from "./fast-link";
 
 export function ResearchCTA() {
   return (
@@ -40,15 +41,14 @@ export function ResearchCTA() {
               <ArrowRight size={18} className="text-white shrink-0" aria-hidden="true" />
             </Link>
 
-            <Link
+            <FastLink
               href="/privacy"
-              prefetch={false}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 border border-blue-500 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-sm sm:text-base focus-visible:outline-2 focus-visible:outline-blue-500 min-h-[48px]"
               aria-label="Learn About the Study"
             >
               <BookOpen size={18} className="text-white shrink-0" aria-hidden="true" />
               <span className="text-white font-bold">Learn About the Study</span>
-            </Link>
+            </FastLink>
           </div>
 
           {/* Subtle trust tag */}

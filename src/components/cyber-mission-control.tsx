@@ -87,6 +87,26 @@ export function CyberMissionControl({
     }
   }, [moduleQuery]);
 
+  const navigatePlayModule = useCallback(
+    (mid: string | null, sIdx = 0) => {
+      setActiveMissionId(mid);
+      setActiveScenarioIndex(sIdx);
+      const url = mid ? `/play?module=${mid}` : "/play";
+      if (typeof window !== "undefined" && window.location.pathname === "/play") {
+        window.history.pushState(null, "", url);
+      } else {
+        router.push(url);
+      }
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    if (isAuthorized) {
+      router.prefetch("/survey/review");
+    }
+  }, [isAuthorized, router]);
+
   // Scroll to top on challenge change or view switch
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -366,11 +386,7 @@ export function CyberMissionControl({
         backLabel: "Back to Step 02: About You",
         onBack: () => router.push("/demographics"),
         continueLabel: "Continue to Step 04: Pretexting Detection",
-        onContinue: () => {
-          setActiveMissionId("pretexting");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=pretexting");
-        },
+        onContinue: () => navigatePlayModule("pretexting"),
       },
       pretexting: {
         stepKey: "pretexting",
@@ -379,17 +395,9 @@ export function CyberMissionControl({
         subtitle: "Examine each communication carefully and decide what you would do.",
         progress: 45,
         backLabel: "Back to Step 03: Phishing Investigation",
-        onBack: () => {
-          setActiveMissionId("phishing");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=phishing");
-        },
+        onBack: () => navigatePlayModule("phishing"),
         continueLabel: "Continue to Step 05: Impersonation Investigation",
-        onContinue: () => {
-          setActiveMissionId("impersonation");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=impersonation");
-        },
+        onContinue: () => navigatePlayModule("impersonation"),
       },
       impersonation: {
         stepKey: "impersonation",
@@ -398,17 +406,9 @@ export function CyberMissionControl({
         subtitle: "Examine each identity and message carefully and decide what you would do.",
         progress: 60,
         backLabel: "Back to Step 04: Pretexting Detection",
-        onBack: () => {
-          setActiveMissionId("pretexting");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=pretexting");
-        },
+        onBack: () => navigatePlayModule("pretexting"),
         continueLabel: "Continue to Step 06: Scam & Malicious Link Investigation",
-        onContinue: () => {
-          setActiveMissionId("links");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=links");
-        },
+        onContinue: () => navigatePlayModule("links"),
       },
       links: {
         stepKey: "links",
@@ -417,11 +417,7 @@ export function CyberMissionControl({
         subtitle: "Examine each offer and link carefully and decide what you would do.",
         progress: 75,
         backLabel: "Back to Step 05: Impersonation Investigation",
-        onBack: () => {
-          setActiveMissionId("impersonation");
-          setActiveScenarioIndex(0);
-          router.push("/play?module=impersonation");
-        },
+        onBack: () => navigatePlayModule("impersonation"),
         continueLabel: "Continue to Step 07: Review & Save",
         onContinue: () => router.push("/survey/review"),
       },
@@ -446,6 +442,7 @@ export function CyberMissionControl({
         <div className="challenge-runner-wrapper">
           <InteractiveChallengeRunner
             scenario={activeScenario}
+            allScenarios={scenarios}
             missionId={activeMissionId}
             scenarioIndex={activeScenarioIndex}
             totalInMission={missionScenarios.length}
@@ -468,17 +465,11 @@ export function CyberMissionControl({
               } else {
                 // Advance sequentially through the 7 steps:
                 if (activeMissionId === "phishing") {
-                  setActiveMissionId("pretexting");
-                  setActiveScenarioIndex(0);
-                  router.push("/play?module=pretexting");
+                  navigatePlayModule("pretexting");
                 } else if (activeMissionId === "pretexting") {
-                  setActiveMissionId("impersonation");
-                  setActiveScenarioIndex(0);
-                  router.push("/play?module=impersonation");
+                  navigatePlayModule("impersonation");
                 } else if (activeMissionId === "impersonation") {
-                  setActiveMissionId("links");
-                  setActiveScenarioIndex(0);
-                  router.push("/play?module=links");
+                  navigatePlayModule("links");
                 } else {
                   // Step 06 complete! Proceed to Step 07: Review & Save
                   router.push("/survey/review");
@@ -489,14 +480,10 @@ export function CyberMissionControl({
               setActiveScenarioIndex(idx);
             }}
             onSelectMission={(mid, sIdx = 0) => {
-              setActiveMissionId(mid);
-              setActiveScenarioIndex(sIdx);
-              router.push(`/play?module=${mid}`);
+              navigatePlayModule(mid, sIdx);
             }}
             onReturnToHub={() => {
-              setActiveMissionId(null);
-              setActiveScenarioIndex(0);
-              router.push("/play");
+              navigatePlayModule(null, 0);
             }}
           />
         </div>
@@ -816,9 +803,7 @@ export function CyberMissionControl({
                       type="button"
                       className={`button ${isMissionComplete ? "secondary" : "primary"} small module-launch-btn`}
                       onClick={() => {
-                        setActiveMissionId(mission.id);
-                        setActiveScenarioIndex(targetIndex);
-                        router.push(`/play?module=${mission.id}`);
+                        navigatePlayModule(mission.id, targetIndex);
                       }}
                       aria-label={`${isMissionComplete ? "Review" : completedInMission > 0 ? "Continue" : "Start"} ${stepNum}: ${mission.name}`}
                     >

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { FastLink } from "./fast-link";
 import {
   ShieldCheck,
   Lock,
@@ -736,15 +737,14 @@ export function ResearchParticipationPage({
                 <span>Participate in Survey</span>
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
-              <Link
+              <FastLink
                 href="/withdraw"
-                prefetch={false}
                 className="spot-purpose-link"
                 aria-label="Withdraw a previously submitted response"
               >
                 <span>Withdrawal</span>
                 <RotateCcw size={13} aria-hidden="true" />
-              </Link>
+              </FastLink>
             </div>
           </div>
         </div>

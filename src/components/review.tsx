@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { sections, questions } from "@/content/questionnaire";
 import { SCENARIO_STORIES, type ScenarioStoryItem } from "@/content/scenario-stories";
+import { computeGamePerformance, isSafeAttempt } from "@/lib/scoring";
 import { api, useSession, loadDraft, putDraft, clearDraft } from "@/lib/client";
 import type { Answers, Session, Scenario, AnswerKey, Attempt } from "@/lib/types";
 import { ResearchJourneyFrame } from "./research-journey-frame";
@@ -266,44 +267,25 @@ export default function Review() {
   };
 
   // Metrics computation from attempts
-  const attempts: Attempt[] = state.session?.attempts ?? [];
+  const attempts: Attempt[] = useMemo(
+    () => state.session?.attempts ?? [],
+    [state.session?.attempts]
+  );
   const firstAttempts = useMemo(
     () => attempts.filter((a) => a.attemptNumber === 1),
     [attempts]
   );
   const hasAttemptedScenarios = firstAttempts.length > 0;
-  const completedCount = useMemo(
-    () => firstAttempts.filter((a) => a.selectedAction !== null).length,
-    [firstAttempts]
+  const {
+    completedCount,
+    score,
+    accuracy: numericAccuracy,
+    currentStreak,
+  } = useMemo(
+    () => computeGamePerformance(attempts, serverScenarios),
+    [attempts, serverScenarios]
   );
-  const correctCount = useMemo(
-    () => firstAttempts.filter((a) => a.correct === true).length,
-    [firstAttempts]
-  );
-
-  const calculatedPoints = useMemo(() => {
-    return firstAttempts.reduce(
-      (sum, a) => sum + (a.points ?? (a.correct ? 10 : 0)),
-      0
-    );
-  }, [firstAttempts]);
-
-  // Display score: if user scored points use that, or 200 max points default for completed 20
-  const score = calculatedPoints > 0 ? calculatedPoints : completedCount === 20 ? 200 : completedCount * 10;
-  const accuracy = completedCount > 0 ? Math.round((correctCount / completedCount) * 100) : 20;
-
-  // Streak: count consecutive correct first-attempt answers from the end
-  const currentStreak = useMemo(() => {
-    let streak = 0;
-    for (let i = firstAttempts.length - 1; i >= 0; i--) {
-      if (firstAttempts[i].correct === true) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }, [firstAttempts]);
+  const accuracy = numericAccuracy ?? 0;
 
   const isSubmitted =
     submittedSuccess ||
@@ -730,7 +712,7 @@ export default function Review() {
             <div className="py-4 sm:py-0 sm:px-4">
               <Mail size={24} className="text-[#dfa658] mx-auto mb-2" aria-hidden="true" />
               <strong className="block text-3xl sm:text-4xl font-extrabold text-white mb-1">
-                20 / 20
+                {`${completedCount} / 20`}
               </strong>
               <span className="text-xs text-teal-100/80 font-medium">
                 Scenarios completed
@@ -768,8 +750,9 @@ export default function Review() {
               const debrief = serverDebriefKeys[story.id];
               const isExpanded = expandedScenarioId === story.id;
 
-              const isCorrect = attempt?.correct ?? false;
-              const pointsEarned = attempt?.points ?? (isCorrect ? 10 : 0);
+              const isCorrect = attempt
+                ? isSafeAttempt(attempt, serverScenarios)
+                : false;
 
               // Subtitle outcome logic matching Image 2
               let outcomeSubtitle = "An opportunity to pause & verify · 0 game points";
@@ -778,6 +761,8 @@ export default function Review() {
                   outcomeSubtitle = "Safely verified sender & link · 10 game points";
                 } else if (attempt?.selectedAction === "report") {
                   outcomeSubtitle = "Reported simulated threat · 10 game points";
+                } else if (attempt?.selectedAction === "ignore") {
+                  outcomeSubtitle = "Safely ignored threat · 10 game points";
                 } else {
                   outcomeSubtitle = "Recognized legitimate email · 10 game points";
                 }
@@ -892,7 +877,7 @@ export default function Review() {
                             Recommended Action:
                           </strong>
                           <span className="text-xs sm:text-sm">
-                            {debrief?.action || story.correctAction === "verify" ? "Independently verify identity or channel out-of-band" : "Report to IT security and withhold information"}
+                            {(debrief?.action || story.correctAction) === "verify" ? "Independently verify identity or channel out-of-band" : "Report to IT security and withhold information"}
                           </span>
                         </div>
 

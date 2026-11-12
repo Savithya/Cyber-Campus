@@ -15,6 +15,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { FastLink } from "./fast-link";
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -205,9 +206,8 @@ export function SiteHeader() {
 
         {/* Right: Researcher Access & Appearance Switcher */}
         <div className="desktop-header-right">
-          <Link
+          <FastLink
             href="/admin/login"
-            prefetch={false}
             className={`nav-admin nav-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 shadow-sm transition-all duration-200 ${
               isResearcherActive ? "active" : ""
             }`}
@@ -225,7 +225,7 @@ export function SiteHeader() {
               className="ml-1 text-white/80"
               aria-hidden="true"
             />
-          </Link>
+          </FastLink>
 
           <div className="header-theme-wrapper">
             <ThemeToggle variant="pill" />
@@ -298,10 +298,9 @@ export function SiteHeader() {
               aria-label="Mobile main navigation"
             >
               {/* 1. House — Home */}
-              <Link
+              <FastLink
                 href="/#home"
                 onClick={handleHomeClick}
-                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isHomeActive ? "active" : ""
                 }`}
@@ -309,13 +308,12 @@ export function SiteHeader() {
               >
                 <House size={18} strokeWidth={1.9} aria-hidden="true" />
                 <span>Home</span>
-              </Link>
+              </FastLink>
 
               {/* 2. ListChecks — Join Research */}
-              <Link
+              <FastLink
                 href={joinHref}
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isJoinActive ? "active" : ""
                 }`}
@@ -323,13 +321,12 @@ export function SiteHeader() {
               >
                 <ListChecks size={18} strokeWidth={1.9} aria-hidden="true" />
                 <span>Join Research</span>
-              </Link>
+              </FastLink>
 
               {/* 3. Lightbulb — About the Study */}
-              <Link
+              <FastLink
                 href="/privacy"
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill ${
                   isAboutActive ? "active" : ""
                 }`}
@@ -337,13 +334,12 @@ export function SiteHeader() {
               >
                 <Lightbulb size={18} strokeWidth={1.9} aria-hidden="true" />
                 <span>About the Study</span>
-              </Link>
+              </FastLink>
 
               {/* 4. KeyRound — Researcher Access */}
-              <Link
+              <FastLink
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
-                prefetch={false}
                 className={`mobile-nav-item mobile-nav-pill mobile-researcher-pill !bg-blue-600 hover:!bg-blue-700 !text-white !border-blue-700 font-bold ${
                   isResearcherActive ? "active" : ""
                 }`}
@@ -356,7 +352,7 @@ export function SiteHeader() {
                   aria-hidden="true"
                 />
                 <span className="!text-white font-bold">Researcher Access</span>
-              </Link>
+              </FastLink>
             </nav>
 
             {/* Appearance Section in Mobile Drawer */}

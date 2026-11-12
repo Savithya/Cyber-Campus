@@ -127,9 +127,8 @@ export function ResearchEthics() {
                     <span className="leading-tight break-words">{card.guarantee}</span>
                   </div>
 
-                  <Link
+                    <Link
                     href={card.linkHref}
-                    prefetch={false}
                     className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-cyan-400 hover:underline pt-1 min-h-[36px]"
                   >
                     <span>{card.linkText}</span>

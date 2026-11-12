@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { FastLink } from "./fast-link";
 import {
   FileText,
   User,
@@ -216,11 +216,11 @@ export function ResearchJourneyFrame({
                 const isCompleted = idx < activeStepIndex || normalizedKey === "review" || idx <= activeStepIndex;
 
                 return (
-                  <Link
+                  <FastLink
                     key={step.key}
                     ref={isActive ? activeStepRef : undefined}
                     href={step.href}
-                    prefetch={false}
+                    eager={idx === activeStepIndex + 1}
                     className={`journey-step-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
                     aria-current={isActive ? "step" : undefined}
                     title={`${step.kicker}: ${step.title}`}
@@ -239,7 +239,7 @@ export function ResearchJourneyFrame({
                         {isActive ? " (Current step)" : isCompleted ? " (Completed)" : " (Upcoming)"}
                       </span>
                     </div>
-                  </Link>
+                  </FastLink>
                 );
               })}
             </nav>
@@ -303,15 +303,15 @@ export function ResearchJourneyFrame({
           {!hideActionBar && (
             <div className="journey-action-bar">
               {backHref ? (
-                <Link
+                <FastLink
                   href={backHref}
-                  prefetch={false}
+                  eager
                   className="journey-back-btn"
                   aria-label={backLabel}
                 >
                   <ArrowLeft size={16} aria-hidden="true" />
                   <span>{backLabel}</span>
-                </Link>
+                </FastLink>
               ) : onBack ? (
                 <button
                   type="button"
@@ -355,15 +355,14 @@ export function ResearchJourneyFrame({
 
           {/* Bottom "Leave study" link */}
           <div className="journey-leave-wrapper">
-            <Link
+            <FastLink
               href="/withdraw"
-              prefetch={false}
               className="journey-leave-link"
               aria-label="Leave study and withdraw record"
             >
               <ArrowLeft size={14} aria-hidden="true" />
               <span>Leave study</span>
-            </Link>
+            </FastLink>
           </div>
         </main>
       </div>

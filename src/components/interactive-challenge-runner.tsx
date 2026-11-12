@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Trophy,
   Target,
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { api, useSession } from "@/lib/client";
 import { missions } from "@/content/missions";
+import { computeGamePerformance } from "@/lib/scoring";
 import type { Scenario, Attempt } from "@/lib/types";
 import {
   getScenarioEmailData,
@@ -31,6 +32,7 @@ import {
 
 export interface InteractiveChallengeRunnerProps {
   scenario: Scenario;
+  allScenarios?: Scenario[];
   missionId: string;
   scenarioIndex: number; // 0..4
   totalInMission: number; // 5
@@ -49,6 +51,7 @@ export interface InteractiveChallengeRunnerProps {
 
 export function InteractiveChallengeRunner({
   scenario,
+  allScenarios,
   missionId,
   scenarioIndex,
   totalInMission,
@@ -99,36 +102,24 @@ export function InteractiveChallengeRunner({
     missions.find((m) => m.id === missionId) ?? missions[0];
   const emailData: EmailMetadata = getScenarioEmailData(scenario);
 
+  const scenariosForScoring = useMemo(() => {
+    if (!allScenarios || allScenarios.length === 0) return [scenario];
+    return allScenarios.some((s) => s.id === scenario.id)
+      ? allScenarios
+      : [...allScenarios, scenario];
+  }, [allScenarios, scenario]);
+
   // Session Attempts & Performance Calculations
   const allAttempts = state.session?.attempts ?? [];
-  const firstAttempts = allAttempts.filter(
-    (a) => a.attemptNumber === 1 && a.selectedAction !== null,
-  );
+  const {
+    firstAnswered: firstAttempts,
+    score: performanceScore,
+    accuracy: numericAccuracy,
+    currentStreak,
+  } = computeGamePerformance(allAttempts, scenariosForScoring);
 
-  // 1. Game Performance Score
-  const performanceScore =
-    firstAttempts.filter((a) => a.correct === true || a.unsafe === false)
-      .length * 10;
-
-  // 2. Decision accuracy
-  const correctCount = firstAttempts.filter((a) => a.correct === true).length;
   const decisionAccuracy =
-    firstAttempts.length > 0
-      ? `${Math.round((correctCount / firstAttempts.length) * 100)}%`
-      : "—";
-
-  // 3. Current streak
-  let currentStreak = 0;
-  for (let i = firstAttempts.length - 1; i >= 0; i--) {
-    if (
-      firstAttempts[i].correct === true ||
-      firstAttempts[i].unsafe === false
-    ) {
-      currentStreak++;
-    } else {
-      break;
-    }
-  }
+    numericAccuracy !== null ? `${numericAccuracy}%` : "—";
 
   // 4. Scenarios saved in this mission
   const savedInMissionCount = currentMission.ids.filter((id) =>

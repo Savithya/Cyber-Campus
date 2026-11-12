@@ -1,24 +1,13 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
-import { ArrowUpRight, ArrowUp, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { FastLink } from "./fast-link";
+import { ScrollToTopButton } from "./scroll-to-top-button";
 
 export interface SiteFooterProps {
   compact?: boolean;
 }
 
 export function SiteFooter({ compact }: SiteFooterProps = {}) {
-  const scrollToTop = () => {
-    if (typeof window !== "undefined") {
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({
-        top: 0,
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-      });
-    }
-  };
-
   if (compact) {
     return (
       <footer
@@ -32,16 +21,16 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
             <span>· Academic Cybersecurity Research · Sri Lanka</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+            <FastLink href="/privacy" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
               Privacy &amp; Rights
-            </Link>
-            <Link href="/withdraw" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
+            </FastLink>
+            <FastLink href="/withdraw" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors">
               Withdrawal
-            </Link>
-            <Link href="/admin/login" prefetch={false} className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1">
+            </FastLink>
+            <FastLink href="/admin/login" className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1">
               <span>Researcher Access</span>
               <ArrowUpRight size={12} aria-hidden="true" />
-            </Link>
+            </FastLink>
           </div>
         </div>
       </footer>
@@ -162,33 +151,24 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
             </h3>
             <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link
+                <FastLink
                   href="/admin/login"
-                  prefetch={false}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   <span>Researcher Access</span>
                   <ArrowUpRight size={13} className="opacity-75" aria-hidden="true" />
-                </Link>
+                </FastLink>
               </li>
               <li>
-                <Link
+                <FastLink
                   href="/withdraw"
-                  prefetch={false}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Participant Withdrawal
-                </Link>
+                </FastLink>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={scrollToTop}
-                  className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors inline-flex items-center gap-1 cursor-pointer focus-visible:outline-2 focus-visible:outline-indigo-500 rounded text-left"
-                >
-                  <span>Back to Top</span>
-                  <ArrowUp size={13} aria-hidden="true" />
-                </button>
+                <ScrollToTopButton />
               </li>
             </ul>
           </div>

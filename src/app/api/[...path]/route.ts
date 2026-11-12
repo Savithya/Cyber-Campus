@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ZodError } from "zod";
 import {
   getConfig,
   getSession,
@@ -21,34 +20,16 @@ import {
   withdrawalSchema,
 } from "@/lib/validation";
 import { isResearch } from "@/lib/config.server";
-import { requireResearcher, supabase } from "@/lib/supabase.server";
 import {
-  checkPinRateLimit,
-  clearResearcherSession,
-  recordFailedAttempt,
-  recordSuccessfulAttempt,
-  setResearcherSession,
-  verifyPinConstantTime,
-} from "@/lib/researcher-auth.server";
+  handleApiError,
+  json,
+  parseGuardedPostBody,
+} from "@/lib/api-utils.server";
 import type { ExportKind } from "@/lib/csv";
 import type { Session, Filters } from "@/lib/types";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-const json = (value: unknown, status = 200) =>
-  NextResponse.json(value, {
-    status,
-    headers: { "Cache-Control": "no-store, private" },
-  });
 type Ctx = { params: Promise<{ path: string[] }> };
-const rate = new Map<string, { time: number; count: number }>();
-function limit(key: string) {
-  const now = Date.now(),
-    r = rate.get(key);
-  if (!r || now - r.time > 60000) rate.set(key, { time: now, count: 1 });
-  else if (++r.count > 120)
-    throw new Error("Too many requests. Please wait one minute.");
-  if (rate.size > 5000) rate.clear();
-}
 export async function GET(req: NextRequest, ctx: Ctx) {
   try {
     const path = (await ctx.params).path.join("/");
@@ -107,6 +88,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         const demoSubs = await getDemoSubmissions();
         data = demoSubs.filter((s) => s.mode !== "practice");
       } else {
+        const { requireResearcher } = await import("@/lib/supabase.server");
         const db = await requireResearcher();
         const result = await db.rpc("research_dataset");
         if (result.error)
@@ -143,6 +125,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         ),
       ) as Filters;
       if (!demo) {
+        const { requireResearcher } = await import("@/lib/supabase.server");
         const db = await requireResearcher();
         const { error } = await db.rpc("audit_export", { p_kind: kind });
         if (error)
@@ -262,81 +245,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
     );
   }
 }
-function isAllowedOrigin(origin: string | null, req: NextRequest): boolean {
-  if (!origin) return false;
-  try {
-    const originUrl = new URL(origin);
-    const hostHeader =
-      req.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
-      req.headers.get("host")?.trim();
-
-    const appOrigin = process.env.APP_ORIGIN?.trim();
-
-    // 1. Direct match with Host header (exact same-origin request)
-    if (hostHeader && originUrl.host.toLowerCase() === hostHeader.toLowerCase()) {
-      return true;
-    }
-
-    // 2. Direct match with configured APP_ORIGIN
-    if (appOrigin && origin.toLowerCase() === appOrigin.toLowerCase()) {
-      return true;
-    }
-
-    // 3. Localhost <-> 127.0.0.1 equivalence in development
-    const originHostname = originUrl.hostname.toLowerCase();
-    const isLocalOrigin = originHostname === "localhost" || originHostname === "127.0.0.1";
-
-    if (isLocalOrigin) {
-      const originPort = originUrl.port || (originUrl.protocol === "https:" ? "443" : "80");
-
-      if (hostHeader) {
-        const [hostName, hostPort = "80"] = hostHeader.toLowerCase().split(":");
-        const isLocalHost = hostName === "localhost" || hostName === "127.0.0.1";
-        if (isLocalHost && (originPort === hostPort || !originUrl.port)) {
-          return true;
-        }
-      }
-
-      if (appOrigin) {
-        try {
-          const appUrl = new URL(appOrigin);
-          const appHostname = appUrl.hostname.toLowerCase();
-          const isAppLocal = appHostname === "localhost" || appHostname === "127.0.0.1";
-          const appPort = appUrl.port || (appUrl.protocol === "https:" ? "443" : "80");
-          if (isAppLocal && originPort === appPort) {
-            return true;
-          }
-        } catch {
-          // ignore malformed appOrigin
-        }
-      }
-    }
-
-    return false;
-  } catch {
-    return false;
-  }
-}
-
 export async function POST(req: NextRequest, ctx: Ctx) {
   try {
-    const origin = req.headers.get("origin");
-    if (!isAllowedOrigin(origin, req))
-      return json({ error: "This request must come from this site." }, 403);
-    if (Number(req.headers.get("content-length") ?? 0) > 40000)
-      return json({ error: "Request too large." }, 413);
     const path = (await ctx.params).path.join("/");
-    // Best-effort per-instance limiter; PostgreSQL separately limits authenticated writes.
-    limit(
-      path +
-        ":" +
-        (req.cookies.get("cc_local")?.value.slice(-24) ??
-          req.headers.get("x-forwarded-for")?.split(",")[0] ??
-          "unknown"),
-    );
-    const raw = await req.text();
-    if (raw.length > 40000) return json({ error: "Request too large." }, 413);
-    const body = raw ? JSON.parse(raw) : {};
+    const parsedReq = await parseGuardedPostBody(req, path);
+    if ("errorResponse" in parsedReq) return parsedReq.errorResponse;
+    const body = parsedReq.body;
     if (path === "session/start") {
       const parsed = startSchema.parse(body);
       const clientLastCode =
@@ -359,6 +273,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       return json({ ok: true });
     }
     if (path === "admin/reset" || path === "admin/reset-workspace") {
+      const { requireResearcher } = await import("@/lib/supabase.server");
       await requireResearcher();
       const { resetResearchData } = await import("@/lib/repository.server");
       const res = await resetResearchData();
@@ -387,6 +302,13 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       return json({ ok: true });
     }
     if (path === "auth/login") {
+      const {
+        checkPinRateLimit,
+        recordFailedAttempt,
+        recordSuccessfulAttempt,
+        setResearcherSession,
+        verifyPinConstantTime,
+      } = await import("@/lib/researcher-auth.server");
       const pin = typeof body.pin === "string" ? body.pin.trim() : "";
       if (!pin) {
         return json(
@@ -433,9 +355,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       return json({ ok: true });
     }
     if (path === "auth/logout") {
+      const { clearResearcherSession } = await import("@/lib/researcher-auth.server");
       await clearResearcherSession();
       if (isResearch()) {
         try {
+          const { supabase } = await import("@/lib/supabase.server");
           const db = await supabase();
           await db.auth.signOut();
         } catch {
@@ -446,25 +370,6 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     }
     return json({ error: "Not found." }, 404);
   } catch (e) {
-    if (e instanceof ZodError)
-      return json(
-        {
-          error:
-            "Please check the submitted fields. Invalid or missing responses were rejected.",
-        },
-        400,
-      );
-    const message =
-      e instanceof Error
-        ? e.message
-        : "Request failed. Retry when your connection returns.";
-    return json(
-      { error: message },
-      message.includes("locked")
-        ? 409
-        : message.includes("required")
-          ? 403
-          : 400,
-    );
+    return handleApiError(e);
   }
 }

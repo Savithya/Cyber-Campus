@@ -1,16 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect, Fragment } from "react";
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
 import {
   LayoutDashboard,
   ChartNoAxesCombined,
@@ -73,6 +63,43 @@ import { GlobalResearchFilters } from "./global-research-filters";
 import dynamic from "next/dynamic";
 const StatisticalAnalysis = dynamic(() => import("./statistical-analysis"), { ssr: false });
 const UserPrivacyDVSection = dynamic(() => import("./user-privacy-dv-section"), { ssr: false });
+const AdminBarChart = dynamic(() => import("./admin-bar-chart"), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{ height: 220 }}
+      className="w-full rounded-lg border border-dashed opacity-40"
+    />
+  ),
+});
+
+function parseAdminPathFromUrl(url: string, base: string): string[] {
+  const pathname = url.split("?")[0];
+  if (!pathname.startsWith(base)) return [];
+  const rest = pathname.slice(base.length).replace(/^\/+|\/+$/g, "");
+  return rest ? rest.split("/") : [];
+}
+
+function TabLink({
+  href,
+  onNavigate,
+  onClick,
+  children,
+  ...rest
+}: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
+  href: string;
+  onNavigate: (
+    toHref: string,
+    e: React.MouseEvent<HTMLAnchorElement>,
+    extraClick?: React.MouseEventHandler<HTMLAnchorElement>,
+  ) => void;
+}) {
+  return (
+    <a href={href} onClick={(e) => onNavigate(href, e, onClick)} {...rest}>
+      {children}
+    </a>
+  );
+}
 
 interface NavItemDef {
   id: string;
@@ -220,8 +247,45 @@ export default function Admin({
   const [auditParticipantPage, setAuditParticipantPage] = useState(0);
   const [expandedAuditParticipantId, setExpandedAuditParticipantId] = useState<string | null>(null);
 
-  // Live auto-refresh when tab gains focus so completed participant missions immediately reflect
+  const [routePath, setRoutePath] = useState<string[]>(path);
+
   useEffect(() => {
+    setRoutePath(parseAdminPathFromUrl(window.location.pathname, base));
+  }, [path, base]);
+
+  useEffect(() => {
+    const syncPath = () => {
+      setRoutePath(parseAdminPathFromUrl(window.location.pathname, base));
+    };
+    window.addEventListener("popstate", syncPath);
+    return () => window.removeEventListener("popstate", syncPath);
+  }, [base]);
+
+  function navigateTab(
+    toHref: string,
+    e: React.MouseEvent<HTMLAnchorElement>,
+    extraClick?: React.MouseEventHandler<HTMLAnchorElement>,
+  ) {
+    extraClick?.(e);
+    if (
+      e.defaultPrevented ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey ||
+      e.button !== 0
+    ) {
+      return;
+    }
+    e.preventDefault();
+    window.history.pushState(null, "", toHref);
+    setRoutePath(parseAdminPathFromUrl(toHref, base));
+    window.scrollTo(0, 0);
+  }
+
+  // Refresh workspace data on mount (covers back/forward cache and SPA redirects) and window focus.
+  useEffect(() => {
+    router.refresh();
     const handleFocus = () => {
       router.refresh();
     };
@@ -236,8 +300,8 @@ export default function Admin({
 
   const filtered = filterSessions(realSessions, filters),
     all = filterSessions(realSessions, filters, false),
-    active = path[0] ?? "",
-    selected = questions.find((q) => q.id === path[1]),
+    active = routePath[0] ?? "",
+    selected = questions.find((q) => q.id === routePath[1]),
     filterText = describeFilters(filters);
 
   const isThreatSection = [
@@ -638,9 +702,10 @@ export default function Admin({
                       : item.badge;
 
                   return (
-                    <Link
+                    <TabLink
                       key={p}
                       href={href(p)}
+                      onNavigate={navigateTab}
                       className={`admin-nav-item ${isSelected ? "selected" : ""}`}
                       title={item.label}
                     >
@@ -653,7 +718,7 @@ export default function Admin({
                           {badgeText}
                         </span>
                       )}
-                    </Link>
+                    </TabLink>
                   );
                 })}
               </div>
@@ -862,48 +927,54 @@ export default function Admin({
         {/* Threat Analysis Sub-Navigation */}
         {isThreatSection && (
           <div className="stats-tab-nav" style={{ marginBottom: "1.5rem" }}>
-            <Link
+            <TabLink
               href={href("threats")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "threats" || active === "iv-analysis" ? "active" : ""}`}
             >
               <ShieldAlert size={15} />
               <span>IV1–IV4 Comparison</span>
-            </Link>
-            <Link
+            </TabLink>
+            <TabLink
               href={href("phishing")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "phishing" ? "active" : ""}`}
             >
               <Mail size={15} />
               <span>IV1: Phishing</span>
-            </Link>
-            <Link
+            </TabLink>
+            <TabLink
               href={href("pretexting")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "pretexting" ? "active" : ""}`}
             >
               <Layers size={15} />
               <span>IV2: Pretexting</span>
-            </Link>
-            <Link
+            </TabLink>
+            <TabLink
               href={href("impersonation")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "impersonation" ? "active" : ""}`}
             >
               <UserCheck size={15} />
               <span>IV3: Impersonation</span>
-            </Link>
-            <Link
+            </TabLink>
+            <TabLink
               href={href("links-analysis")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "links-analysis" ? "active" : ""}`}
             >
               <AlertTriangle size={15} />
               <span>IV4: Online Scams &amp; Links</span>
-            </Link>
-            <Link
+            </TabLink>
+            <TabLink
               href={href("links-mission")}
+              onNavigate={navigateTab}
               className={`stats-tab-btn ${active === "links-mission" ? "active" : ""}`}
             >
               <Compass size={15} />
               <span>IV4 Scenario Definitions</span>
-            </Link>
+            </TabLink>
           </div>
         )}
 
@@ -985,15 +1056,14 @@ export default function Admin({
                   </div>
                 ) : (
                   <div style={{ height: 240, width: "100%", marginTop: "1rem" }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={trendData.length ? trendData : [{ date: "Today", count: counts.totalSubmissions }]}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
-                        <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                        <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                        <Tooltip />
-                        <Bar dataKey="count" name="Submissions" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    <AdminBarChart
+                      height={240}
+                      data={trendData.length ? trendData : [{ date: "Today", count: counts.totalSubmissions }]}
+                      grid={{ vertical: false }}
+                      xAxis={{ dataKey: "date", tick: { fontSize: 11 } }}
+                      yAxis={{ tick: { fontSize: 11 }, allowDecimals: false }}
+                      bars={[{ dataKey: "count", name: "Submissions", fill: "#06b6d4", radius: [4, 4, 0, 0] }]}
+                    />
                   </div>
                 )}
               </section>
@@ -1001,9 +1071,9 @@ export default function Admin({
               <section className="card">
                 <div className="card-top">
                   <h2>Threat Drivers Snapshot</h2>
-                  <Link href={href("threats")} className="text-link">
+                  <TabLink href={href("threats")} onNavigate={navigateTab} className="text-link">
                     Compare All 4 Threats
-                  </Link>
+                  </TabLink>
                 </div>
                 <p className="small-copy">
                   Empirical simulated privacy risk across the four independent variables.
@@ -1047,17 +1117,18 @@ export default function Admin({
               <section className="card">
                 <div className="card-top">
                   <h2>Questionnaire Instrument Structure</h2>
-                  <Link className="text-link" href={href("demographics")}>
+                  <TabLink className="text-link" href={href("demographics")} onNavigate={navigateTab}>
                     View Demographics
-                  </Link>
+                  </TabLink>
                 </div>
                 <p>
                   Six research sections. Four independent variables and one
                   dependent variable. Demographics describe the Sri Lankan university sample.
                 </p>
                 {sections.map((s) => (
-                  <Link
+                  <TabLink
                     href={href(s.id === "A" ? "demographics" : "questions/" + s.questions[0])}
+                    onNavigate={navigateTab}
                     key={s.id}
                     className="section-summary"
                   >
@@ -1070,7 +1141,7 @@ export default function Admin({
                       </small>
                     </div>
                     <span className="tag">{s.role}</span>
-                  </Link>
+                  </TabLink>
                 ))}
               </section>
 
@@ -1082,12 +1153,12 @@ export default function Admin({
                   index that would obscure distinct behavioral dimensions.
                 </p>
                 <div className="mt-4 flex gap-2 flex-wrap">
-                  <Link href={href("responses")} className="button secondary small">
+                  <TabLink href={href("responses")} onNavigate={navigateTab} className="button secondary small">
                     <Database size={14} /> Original Responses
-                  </Link>
-                  <Link href={href("exports")} className="button secondary small">
+                  </TabLink>
+                  <TabLink href={href("exports")} onNavigate={navigateTab} className="button secondary small">
                     <Download size={14} /> Export Datasets
-                  </Link>
+                  </TabLink>
                 </div>
               </section>
             </div>
@@ -1144,24 +1215,17 @@ export default function Admin({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 items-center">
                         <div style={{ height: Math.max(180, agg.rows.length * 40), width: "100%" }}>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <BarChart
-                              layout="vertical"
-                              data={agg.rows}
-                              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-                            >
-                              <CartesianGrid strokeDasharray="3 3" horizontal={false} opacity={0.2} />
-                              <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11 }} />
-                              <YAxis
-                                type="category"
-                                dataKey="label"
-                                tick={{ fontSize: 11 }}
-                                width={140}
-                              />
-                              <Tooltip formatter={(v) => [Number(v).toFixed(1) + "%", "Percentage"]} />
-                              <Bar dataKey="percentage" name="Percentage" fill="#06b6d4" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                          </ResponsiveContainer>
+                          <AdminBarChart
+                            layout="vertical"
+                            height={Math.max(180, agg.rows.length * 40)}
+                            data={agg.rows}
+                            margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                            grid={{ horizontal: false }}
+                            xAxis={{ type: "number", domain: [0, 100], unit: "%", tick: { fontSize: 11 } }}
+                            yAxis={{ type: "category", dataKey: "label", tick: { fontSize: 11 }, width: 140 }}
+                            tooltipLabel="Percentage"
+                            bars={[{ dataKey: "percentage", name: "Percentage", fill: "#06b6d4", radius: [0, 4, 4, 0] }]}
+                          />
                         </div>
 
                         <div className="table-scroll">
@@ -1215,9 +1279,9 @@ export default function Admin({
                 </div>
                 <div className="flex gap-2">
                   <span className="tag">5 Challenges</span>
-                  <Link href={href("links-analysis")} className="button secondary small">
+                  <TabLink href={href("links-analysis")} onNavigate={navigateTab} className="button secondary small">
                     View Empirical Analysis →
-                  </Link>
+                  </TabLink>
                 </div>
               </div>
             </div>
@@ -2582,13 +2646,14 @@ export default function Admin({
                                     )}
                                   </button>
 
-                                  <Link
+                                  <TabLink
                                     href={
                                       href("responses") +
                                       (query
                                         ? ""
                                         : "?code=" + encodeURIComponent(s.code))
                                     }
+                                    onNavigate={navigateTab}
                                     onClick={() => {
                                       setAuditSearch(s.code);
                                       setAuditViewMode("participants");
@@ -2598,7 +2663,7 @@ export default function Admin({
                                   >
                                     <span>Responses</span>
                                     <ArrowUpRight size={11} />
-                                  </Link>
+                                  </TabLink>
                                 </div>
                               </td>
                             </tr>
@@ -3120,13 +3185,14 @@ export default function Admin({
                         {m.completedAttempts} Evaluations · Unsafe: {m.unsafeRate}%
                       </p>
                     </div>
-                    <Link
+                    <TabLink
                       href={href(targetPath)}
+                      onNavigate={navigateTab}
                       className="button secondary small w-full justify-center text-xs mt-2"
                     >
                       <span>Investigate {m.primaryIV}</span>
                       <ArrowRight size={13} />
-                    </Link>
+                    </TabLink>
                   </div>
                 );
               })}
@@ -3145,25 +3211,24 @@ export default function Admin({
                 </div>
               ) : (
                 <div style={{ height: 320, width: "100%", marginTop: "1rem" }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      layout="vertical"
-                      data={threatSummary.metrics.map((m) => ({
-                        name: m.threatName,
-                        code: m.primaryIV,
-                        riskScore: m.privacyRiskScore,
-                        unsafeRate: m.unsafeRate,
-                      }))}
-                      margin={{ top: 10, right: 30, left: 140, bottom: 20 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} horizontal={false} />
-                      <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 12 }} />
-                      <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={130} />
-                      <Tooltip />
-                      <Bar dataKey="riskScore" name="Simulated Privacy Risk Score (%)" fill="#06b6d4" radius={[0, 4, 4, 0]} />
-                      <Bar dataKey="unsafeRate" name="Unsafe Decision Rate (%)" fill="#f43f5e" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <AdminBarChart
+                    layout="vertical"
+                    height={320}
+                    data={threatSummary.metrics.map((m) => ({
+                      name: m.threatName,
+                      code: m.primaryIV,
+                      riskScore: m.privacyRiskScore,
+                      unsafeRate: m.unsafeRate,
+                    }))}
+                    margin={{ top: 10, right: 30, left: 140, bottom: 20 }}
+                    grid={{ horizontal: false }}
+                    xAxis={{ type: "number", domain: [0, 100], unit: "%", tick: { fontSize: 12 } }}
+                    yAxis={{ type: "category", dataKey: "name", tick: { fontSize: 12 }, width: 130 }}
+                    bars={[
+                      { dataKey: "riskScore", name: "Simulated Privacy Risk Score (%)", fill: "#06b6d4", radius: [0, 4, 4, 0] },
+                      { dataKey: "unsafeRate", name: "Unsafe Decision Rate (%)", fill: "#f43f5e", radius: [0, 4, 4, 0] },
+                    ]}
+                  />
                 </div>
               )}
             </div>
@@ -3218,9 +3283,9 @@ export default function Admin({
                             [{m.ciLow}, {m.ciHigh}]
                           </td>
                           <td style={{ padding: "10px 8px", textAlign: "right" }}>
-                            <Link href={href(targetPath)} className="button secondary small text-xs">
+                            <TabLink href={href(targetPath)} onNavigate={navigateTab} className="button secondary small text-xs">
                               Examine
-                            </Link>
+                            </TabLink>
                           </td>
                         </tr>
                       );
@@ -3245,9 +3310,9 @@ export default function Admin({
                   aria-label="Search questions"
                 />
               </label>
-              <Link className="button secondary" href={href("report")}>
+              <TabLink className="button secondary" href={href("report")} onNavigate={navigateTab}>
                 <Printer size={16} /> All-question report
-              </Link>
+              </TabLink>
               {active === "report" && (
                 <button
                   className="button primary"
@@ -3259,9 +3324,9 @@ export default function Admin({
             </div>
             {selected ? (
               <>
-                <Link className="text-link" href={href("questions")}>
+                <TabLink className="text-link" href={href("questions")} onNavigate={navigateTab}>
                   View all questions
-                </Link>
+                </TabLink>
                 <QuestionChart
                   q={selected}
                   sessions={filtered}
@@ -3288,9 +3353,10 @@ export default function Admin({
                           onError={setError}
                         />
                       ) : (
-                        <Link
+                        <TabLink
                           className="question-row"
                           href={href("questions/" + q.id)}
+                          onNavigate={navigateTab}
                           key={q.id}
                         >
                           <span className="question-number">{q.id}</span>
@@ -3301,7 +3367,7 @@ export default function Admin({
                           <span className="tag">
                             n = {aggregateQuestion(q, filtered).validN}
                           </span>
-                        </Link>
+                        </TabLink>
                       ),
                     )}
                 </section>
@@ -3430,23 +3496,20 @@ function ThreatAnalysisPanel({
             </div>
           ) : (
             <div style={{ height: 220, width: "100%" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    { action: "Report to IT", count: actionCounts.report, fill: "#10b981" },
-                    { action: "Verify Channel", count: actionCounts.verify, fill: "#06b6d4" },
-                    { action: "Ignore / Delete", count: actionCounts.ignore, fill: "#f59e0b" },
-                    { action: "Proceed (Unsafe)", count: actionCounts.proceed, fill: "#f43f5e" },
-                  ]}
-                  margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} vertical={false} />
-                  <XAxis dataKey="action" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar dataKey="count" name="Decisions" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <AdminBarChart
+                height={220}
+                data={[
+                  { action: "Report to IT", count: actionCounts.report, fill: "#10b981" },
+                  { action: "Verify Channel", count: actionCounts.verify, fill: "#06b6d4" },
+                  { action: "Ignore / Delete", count: actionCounts.ignore, fill: "#f59e0b" },
+                  { action: "Proceed (Unsafe)", count: actionCounts.proceed, fill: "#f43f5e" },
+                ]}
+                margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+                grid={{ vertical: false }}
+                xAxis={{ dataKey: "action", tick: { fontSize: 11 } }}
+                yAxis={{ tick: { fontSize: 11 } }}
+                bars={[{ dataKey: "count", name: "Decisions", radius: [4, 4, 0, 0] }]}
+              />
             </div>
           )}
         </div>
@@ -3671,49 +3734,25 @@ function QuestionChart({
             q.id + " response distribution; full values in the following table."
           }
         >
-          <ResponsiveContainer
-            width="100%"
-            height={Math.max(260, a.rows.length * 56)}
+          <AdminBarChart
+            layout="vertical"
             minWidth={0}
-          >
-            <BarChart
-              data={a.rows}
-              layout="vertical"
-              margin={{ top: 8, right: 30, left: 0, bottom: 15 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                horizontal={false}
-                stroke="#e5e8f0"
-              />
-              <XAxis
-                type="number"
-                domain={[0, 100]}
-                tickFormatter={(n) => n + "%"}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis
-                dataKey="label"
-                type="category"
-                width={190}
-                tick={{ fontSize: 12, fill: "#34415b" }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip
-                formatter={(value) => [
-                  Number(value).toFixed(1) + "%",
-                  "Valid responses",
-                ]}
-              />
-              <Bar
-                dataKey="percentage"
-                fill="#786bd1"
-                radius={[0, 4, 4, 0]}
-                barSize={24}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+            height={Math.max(260, a.rows.length * 56)}
+            data={a.rows}
+            margin={{ top: 8, right: 30, left: 0, bottom: 15 }}
+            grid={{ horizontal: false, stroke: "#e5e8f0" }}
+            xAxis={{ type: "number", domain: [0, 100], percentTick: true, tick: { fontSize: 12 } }}
+            yAxis={{
+              dataKey: "label",
+              type: "category",
+              width: 190,
+              tick: { fontSize: 12, fill: "#34415b" },
+              tickLine: false,
+              axisLine: false,
+            }}
+            tooltipLabel="Valid responses"
+            bars={[{ dataKey: "percentage", fill: "#786bd1", radius: [0, 4, 4, 0], barSize: 24 }]}
+          />
         </div>
       )}
       <div className="table-scroll">

@@ -28,6 +28,12 @@ export default function Survey() {
     revision = useRef(0),
     latest = useRef<Answers>({});
   useEffect(() => {
+    if (index >= sections.length - 1) {
+      router.prefetch("/survey/review");
+    }
+  }, [index, router]);
+
+  useEffect(() => {
     if (state.session) {
       if (state.session.status !== "draft") {
         router.replace("/survey/review");
@@ -51,7 +57,7 @@ export default function Survey() {
       window.removeEventListener("offline", offline);
       window.removeEventListener("online", online);
     };
-  });
+  }, []);
   async function save(a: Answers) {
     const rev = ++revision.current;
     setSaving("Saving…");

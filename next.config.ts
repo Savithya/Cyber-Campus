@@ -9,9 +9,16 @@ const config: NextConfig = {
   experimental: {
     optimizePackageImports: ["motion", "lucide-react", "recharts"],
     staleTimes: {
-      dynamic: 30,
+      // Do not serve stale cached RSC payloads on SPA navigation back to force-dynamic routes like /admin.
+      dynamic: 0,
       static: 180,
     },
+  },
+  async redirects() {
+    return [
+      { source: "/demo", destination: "/admin", permanent: false },
+      { source: "/demo/:path*", destination: "/admin/:path*", permanent: false },
+    ];
   },
   async headers() {
     return [

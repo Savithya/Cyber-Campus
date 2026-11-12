@@ -1,5 +1,9 @@
-import type { Attempt, ThreatMetric, ScenarioChoice } from "./types";
+import type { Attempt, ThreatMetric, ScenarioChoice, Scenario } from "./types";
 import { missions, getActiveMissions } from "@/content/missions";
+import { SCENARIO_STORIES } from "@/content/scenario-stories";
+
+const SAFE_ACTION_IDS = new Set(["verify", "report", "ignore"]);
+const UNSAFE_ACTION_IDS = new Set(["proceed", "reply"]);
 
 export function scoreDecision(
   action: string | null,
@@ -13,7 +17,6 @@ export function scoreDecision(
     : correctActionOrKey.action;
 
   const correct = action === null ? null : action === correctAction;
-  const points = first && action === correctAction ? 10 : 0;
 
   // Determine privacy risk score (0..4), unsafe indicator, and disclosed info category
   let privacyRiskScore = 0;
@@ -43,12 +46,99 @@ export function scoreDecision(
     disclosedInfoCategory = correct ? "None" : "Simulated Disclosure";
   }
 
+  // Educational XP is awarded for any protective (non-unsafe) first decision
+  const points = first && action !== null && !unsafe ? 10 : 0;
+
   return {
     correct,
     points,
     privacyRiskScore,
     unsafe,
     disclosedInfoCategory,
+  };
+}
+
+/**
+ * Determines whether an answered attempt reflects a safe/protective decision.
+ * Resolves against live scenario definitions first so Supabase research-mode
+ * snapshots (which omit `attempt.unsafe` and match only a single key in SQL)
+ * remain accurate alongside demo-mode attempts.
+ */
+export function isSafeAttempt(
+  attempt: Pick<Attempt, "scenarioId" | "selectedAction" | "correct"> & {
+    unsafe?: boolean;
+  },
+  scenarios?: Scenario[],
+): boolean {
+  if (attempt.selectedAction === null) {
+    return false;
+  }
+
+  const matchedScenario = scenarios?.find((s) => s.id === attempt.scenarioId);
+  const matchedChoice = matchedScenario?.choices?.find(
+    (c) =>
+      c.id === attempt.selectedAction || c.label === attempt.selectedAction,
+  );
+  if (matchedChoice) {
+    return !matchedChoice.unsafe;
+  }
+
+  const storyChoice = SCENARIO_STORIES.find(
+    (s) => s.id === attempt.scenarioId,
+  )?.choices?.find((c) => c.id === attempt.selectedAction);
+  if (storyChoice) {
+    return !storyChoice.unsafe;
+  }
+
+  if (attempt.correct === true) {
+    return true;
+  }
+
+  if (UNSAFE_ACTION_IDS.has(attempt.selectedAction)) {
+    return false;
+  }
+  if (SAFE_ACTION_IDS.has(attempt.selectedAction)) {
+    return true;
+  }
+
+  return attempt.unsafe === false;
+}
+
+/**
+ * Shared game-performance calculation used consistently in both the active
+ * challenge runner and the review/completion summary.
+ */
+export function computeGamePerformance(
+  attempts: Attempt[],
+  scenarios?: Scenario[],
+) {
+  const firstAnswered = attempts.filter(
+    (a) => a.attemptNumber === 1 && a.selectedAction !== null,
+  );
+  const completedCount = firstAnswered.length;
+  const safeCount = firstAnswered.filter((a) =>
+    isSafeAttempt(a, scenarios),
+  ).length;
+  const score = safeCount * 10;
+  const accuracy =
+    completedCount > 0 ? Math.round((safeCount / completedCount) * 100) : null;
+
+  let currentStreak = 0;
+  for (let i = firstAnswered.length - 1; i >= 0; i--) {
+    if (isSafeAttempt(firstAnswered[i], scenarios)) {
+      currentStreak++;
+    } else {
+      break;
+    }
+  }
+
+  return {
+    firstAnswered,
+    completedCount,
+    safeCount,
+    score,
+    accuracy,
+    currentStreak,
   };
 }
 

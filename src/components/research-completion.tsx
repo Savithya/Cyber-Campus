@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { FastLink } from "./fast-link";
 import {
   ShieldCheck,
   CheckCircle2,
@@ -600,16 +601,15 @@ export function ResearchCompletion() {
               )}
             </button>
 
-            <Link
+            <FastLink
               href="/admin"
-              prefetch={false}
               className="btn-workspace-open"
               title="Open Research Workspace analytics to view real-time participant charts"
             >
               <BarChart3 size={17} className="text-primary" aria-hidden="true" />
               <span>Open Research Workspace</span>
               <ExternalLink size={14} className="opacity-70" aria-hidden="true" />
-            </Link>
+            </FastLink>
 
             <Link href="/" className="button ghost large flex items-center gap-2">
               <Home size={18} aria-hidden="true" />
