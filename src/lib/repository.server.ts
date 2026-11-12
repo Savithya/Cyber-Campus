@@ -336,63 +336,76 @@ export async function saveDemoSubmission(session: Session) {
   }
 }
 
+function mergeSubmissionIntoMap(map: Map<string, Session>, s: Session, overrides?: Partial<Session>) {
+  const k = s.code || s.id;
+  const existing = map.get(k);
+  if (overrides || !existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
+    map.set(k, { ...existing, ...s, ...overrides });
+  }
+}
+
+function matchesSubmissionKey(s: Session, key: string): boolean {
+  return s.code === key || s.id === key || s.submissionId === key;
+}
+
+async function readCounterZeroState(): Promise<boolean> {
+  for (const dir of new Set([getDemoDataDir(), getCwdDataDir()])) {
+    try {
+      const raw = await readFile(path.join(dir, "participant_counter.json"), "utf-8");
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.counter === "number") {
+        return parsed.counter === 0;
+      }
+    } catch {
+      // Try next counter path
+    }
+  }
+  return false;
+}
+
 export async function getDemoSubmissions(): Promise<Session[]> {
   const mergedMap = new Map<string, Session>();
 
-  // 1. Repository cwd submissions
+  // 1. Repository cwd submissions & runtime demo data directory (/tmp in serverless lambdas)
   const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
-  for (const s of cwdList) {
-    const k = s.code || s.id;
-    const existing = mergedMap.get(k);
-    if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
-      mergedMap.set(k, { ...existing, ...s });
-    }
-  }
-
-  // 3. Runtime demo data directory (tmp in Vercel lambdas)
   const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
-  for (const s of demoList) {
-    const k = s.code || s.id;
-    const existing = mergedMap.get(k);
-    if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
-      mergedMap.set(k, { ...existing, ...s });
-    }
-  }
+  const hasStoredSubmissions = cwdList.length > 0 || demoList.length > 0;
+  const counterIsZero = await readCounterZeroState();
 
-  // 4. In-memory submissions for warm lambda processes
-  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
-    for (const [k, s] of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.entries()) {
-      const existing = mergedMap.get(k);
-      if (!existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
-        mergedMap.set(k, { ...existing, ...s });
-      }
+  // If workspace data was reset to zero and no stored submissions exist, do not resurrect stale RAM or cookie state
+  if (!hasStoredSubmissions && counterIsZero) {
+    if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+      globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
     }
-  }
-
-  // 5. Synchronize active local session from cookie if present in current request
-  try {
-    let counterIsZero = false;
+    globalThis.__CYBER_CAMPUS_COUNTER__ = 0;
+    memoryParticipantCounter = 0;
     try {
-      const raw = await readFile(path.join(getDemoDataDir(), "participant_counter.json"), "utf-8");
-      const parsed = JSON.parse(raw);
-      if (parsed?.counter === 0) counterIsZero = true;
-    } catch {}
-
-    const hasStoredSubmissions = cwdList.length > 0 || demoList.length > 0;
-
-    // Do NOT resurrect stale cookie sessions if the workspace has been reset to zero with no stored submissions
-    if (!counterIsZero || hasStoredSubmissions) {
-      const local = await readLocal();
-      if (local?.session && local.session.mode !== "practice") {
-        const active = local.session;
-        const k = active.code || active.id;
-        const existing = mergedMap.get(k);
-        const activeDemo: Session = { ...existing, ...active, mode: "demo" };
-        mergedMap.set(k, activeDemo);
-      }
-    } else {
-      // Data was reset to zero. Clean stale local cookie so ghost session is not resurrected.
       await writeLocal(null);
+    } catch {
+      // Outside request context or read-only render
+    }
+    return [];
+  }
+
+  for (const s of cwdList) {
+    mergeSubmissionIntoMap(mergedMap, s);
+  }
+  for (const s of demoList) {
+    mergeSubmissionIntoMap(mergedMap, s);
+  }
+
+  // 2. In-memory submissions for warm lambda processes
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    for (const s of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.values()) {
+      mergeSubmissionIntoMap(mergedMap, s);
+    }
+  }
+
+  // 3. Synchronize active local session from cookie if present in current request
+  try {
+    const local = await readLocal();
+    if (local?.session && local.session.mode !== "practice") {
+      mergeSubmissionIntoMap(mergedMap, local.session, { mode: "demo" });
     }
   } catch {
     // Outside request context or no cookie available
@@ -400,20 +413,18 @@ export async function getDemoSubmissions(): Promise<Session[]> {
 
   const list = Array.from(mergedMap.values());
 
-  // 6. Ensure any submitted session with attempts has its survey answers populated
-  let updatedAny = false;
+  // 4. Ensure any submitted session with attempts has its survey answers populated
   for (let i = 0; i < list.length; i++) {
     const s = list[i];
     if (s.attempts && s.attempts.length > 0) {
       const hasMissingQ6 = !s.answers?.Q6 || s.answers.Q6.value === null;
       if (hasMissingQ6) {
         s.answers = deriveSurveyAnswersFromAttempts(s.attempts, s.answers || {});
-        updatedAny = true;
       }
     }
   }
 
-  // 7. Update in-memory map & sync file
+  // 5. Update in-memory map & sync file
   if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
     for (const s of list) {
       globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
@@ -427,22 +438,41 @@ export async function getDemoSubmissions(): Promise<Session[]> {
   } catch {}
 
   // 6. Exclude practice-only runs
-  const filtered = list.filter((s: Session) => s.mode !== "practice");
-
-  return filtered;
+  return list.filter((s: Session) => s.mode !== "practice");
 }
 
 export async function removeDemoSubmission(code: string) {
-  const subPath = path.join(getDemoDataDir(), "submissions.json");
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    for (const [k, s] of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.entries()) {
+      if (k === code || matchesSubmissionKey(s, code)) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.delete(k);
+      }
+    }
+  }
+
+  for (const dir of new Set([getDemoDataDir(), getCwdDataDir()])) {
+    const subPath = path.join(dir, "submissions.json");
+    try {
+      const raw = await readFile(subPath, "utf-8");
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        const filtered = list.filter((x: Session) => !matchesSubmissionKey(x, code));
+        if (filtered.length !== list.length) {
+          await writeFile(subPath, JSON.stringify(filtered, null, 2), "utf-8");
+        }
+      }
+    } catch {
+      // silent
+    }
+  }
+
   try {
-    const raw = await readFile(subPath, "utf-8");
-    const list = JSON.parse(raw);
-    if (Array.isArray(list)) {
-      const filtered = list.filter((x: Session) => x.code !== code);
-      await writeFile(subPath, JSON.stringify(filtered, null, 2), "utf-8");
+    const local = await readLocal();
+    if (local?.session && matchesSubmissionKey(local.session, code)) {
+      await writeLocal(null);
     }
   } catch {
-    // silent
+    // Outside request context or read-only render
   }
 }
 

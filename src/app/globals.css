@@ -7182,7 +7182,8 @@ select.workspace-select,
   border-radius: 999px;
 }
 
-.admin-refresh-btn {
+.admin-refresh-btn,
+.admin-reset-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -7201,6 +7202,17 @@ select.workspace-select,
   background: var(--hover-bg, rgba(124, 108, 252, 0.1));
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.admin-reset-btn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--red, #ef4444);
+  color: var(--red, #ef4444);
+}
+
+.admin-reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .demo-card {

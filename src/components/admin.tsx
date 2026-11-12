@@ -52,6 +52,7 @@ import {
   Timer,
   Sparkles,
   ArrowUpRight,
+  Trash2,
 } from "lucide-react";
 import { questions, sections } from "@/content/questionnaire";
 import { missions, activeMissions } from "@/content/missions";
@@ -195,7 +196,8 @@ export default function Admin({
     ),
     [search, setSearch] = useState(""),
     [page, setPage] = useState(0),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [resetting, setResetting] = useState(false);
 
   // Response audit table filters
   const [auditSearch, setAuditSearch] = useState(params.get("code") || "");
@@ -722,6 +724,39 @@ export default function Admin({
               <RotateCcw size={13} />
               <span>Refresh</span>
             </button>
+            <button
+              type="button"
+              className="admin-reset-btn"
+              disabled={resetting}
+              onClick={async () => {
+                if (
+                  !window.confirm(
+                    "Reset all participant submissions and workspace counters to zero? This cannot be undone.",
+                  )
+                ) {
+                  return;
+                }
+                setResetting(true);
+                setError("");
+                try {
+                  await api("admin/reset");
+                  router.refresh();
+                } catch (err) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : "Unable to reset workspace data.",
+                  );
+                } finally {
+                  setResetting(false);
+                }
+              }}
+              title="Remove all participant submissions and reset workspace counters to zero"
+              aria-label="Reset workspace data"
+            >
+              <Trash2 size={13} />
+              <span>{resetting ? "Resetting…" : "Reset Data"}</span>
+            </button>
             {!demo && (
               <button
                 type="button"
@@ -739,6 +774,8 @@ export default function Admin({
             )}
           </div>
         </div>
+
+        {error && <ErrorBox message={error} />}
 
         <PageHeading
           label="STUDENT PRIVACY RESEARCH"
@@ -3278,8 +3315,6 @@ export default function Admin({
             )}
           </>
         )}
-
-        {error && <ErrorBox message={error} />}
       </div>
     </div>
   );
