@@ -33,6 +33,27 @@ export function DemographicsForm() {
   const [missingQuestionIds, setMissingQuestionIds] = useState<string[]>([]);
   const [resettingParticipant, setResettingParticipant] = useState(false);
 
+  // Sync participant code across tabs via storage events
+  useEffect(() => {
+    const syncHandler = () => {
+      // Force a reload of the session from server if the stored code changes
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('cc_last_participant_code');
+        if (stored && stored !== state.session?.code) {
+          // Re-fetch the current participant session
+          void api<{ session: Session }>('session/current', {}).then((res) => {
+            if (res.session) {
+              state.setSession(res.session);
+            }
+          });
+        }
+      }
+    };
+    window.addEventListener('storage', syncHandler);
+    return () => window.removeEventListener('storage', syncHandler);
+  }, []);
+
+
   const handleStartNewParticipant = async () => {
     setResettingParticipant(true);
     setError("");
