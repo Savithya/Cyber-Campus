@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const TEST_PIN = "CyberSec1234";
@@ -52,6 +52,8 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
 
   beforeEach(async () => {
     try {
+      // Ensure the .demo-data directory exists before any file operations
+      await mkdir(path.join(process.cwd(), ".demo-data"), { recursive: true });
       let cleaned: Session[] = [];
       try {
         const raw0 = await readFile(subPath, "utf-8");
@@ -99,6 +101,8 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
           globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
         }
       }
+      // Reset in-memory participant counter to match the file state
+      globalThis.__CYBER_CAMPUS_COUNTER__ = 1;
     } catch {}
   });
 

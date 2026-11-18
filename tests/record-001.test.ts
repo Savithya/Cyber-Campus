@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterAll } from "vitest";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 
 const TEST_PIN = "pR3xMfl3UUCTA2n1";
 process.env.RESEARCHER_ACCESS_PIN = TEST_PIN;
@@ -32,6 +32,8 @@ import type { Session, Attempt, Answers } from "@/lib/types";
 describe("Record 001 Integration & Visibility", () => {
   it("generates and verifies complete authentic record 001 in submissions.json", async () => {
     const subPath = ".demo-data/submissions.json";
+    // Ensure the directory exists before any file operations
+    await mkdir(".demo-data", { recursive: true });
     let list: Session[] = [];
     try {
       const raw = await readFile(subPath, "utf-8");
