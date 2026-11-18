@@ -15,7 +15,7 @@
     "format": "prettier --write src scripts tests *.ts *.mts *.mjs *.json *.md"
   },
   "engines": {
-    "node": ">=22.14.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
