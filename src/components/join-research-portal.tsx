@@ -87,20 +87,27 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
     setError("");
     try {
       const token = randomToken();
+      const lastCode = typeof window !== "undefined" ? localStorage.getItem("cc_last_participant_code") : null;
       const { session } = await api<{ session: Session }>("session/start", {
         consented: consent,
         eligible,
         priorExposure: prior,
         practice,
         token,
+        clientLastCode: lastCode,
       });
 
       if (practice) {
         if (typeof window !== "undefined") {
           localStorage.setItem("cc-practice-exposure", "yes");
         }
+        state.setSession(session);
         router.push("/play");
       } else {
+        if (typeof window !== "undefined" && session.code) {
+          localStorage.setItem("cc_last_participant_code", session.code);
+        }
+        clearParticipationStorage();
         putDraft({
           code: session.code,
           expires: session.draftExpiresAt,
@@ -108,7 +115,8 @@ export function JoinResearchPortal({ initialConfig }: JoinResearchPortalProps) {
           token,
           submitKey: crypto.randomUUID(),
         });
-        router.push("/survey");
+        state.setSession(session);
+        router.push("/demographics");
       }
     } catch (e) {
       setError((e as Error).message);

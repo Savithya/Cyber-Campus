@@ -45,6 +45,37 @@ async function readSubmissionsFromFile(filePath: string): Promise<Session[]> {
 
 let memoryParticipantCounter = 0;
 
+async function incrementGlobalParticipantCounterInSupabase(): Promise<number | null> {
+  try {
+    const { serverAdminSupabase } = await import("./supabase.server");
+    const admin = serverAdminSupabase();
+    if (!admin) return null;
+
+    // 1. Try RPC next_participant_counter
+    const { data: rpcData, error: rpcErr } = await admin.rpc("next_participant_counter");
+    if (!rpcErr && typeof rpcData === "number" && rpcData > 0) {
+      return rpcData;
+    }
+
+    // 2. Fallback to direct upsert on global_participant_counter table
+    const { data: current } = await admin
+      .from("global_participant_counter")
+      .select("counter")
+      .eq("id", 1)
+      .maybeSingle();
+    const nextVal = ((current?.counter as number) || 0) + 1;
+    const { error: upsertErr } = await admin
+      .from("global_participant_counter")
+      .upsert({ id: 1, counter: nextVal, updated_at: new Date().toISOString() });
+    if (!upsertErr) {
+      return nextVal;
+    }
+  } catch {
+    // Supabase unreachable or in test sandbox
+  }
+  return null;
+}
+
 export async function nextLocalParticipantCode(options?: {
   existingCode?: string | number | null;
   clientHintCode?: string | number | null;
@@ -72,7 +103,49 @@ export async function nextLocalParticipantCode(options?: {
         maxAge: 365 * 86400,
       });
     } catch {}
+
+    // Reset Supabase persistent counter if configured
+    try {
+      const { serverAdminSupabase } = await import("./supabase.server");
+      const admin = serverAdminSupabase();
+      if (admin) {
+        await admin.rpc("reset_participant_counter", { new_val: 1 }).catch(async () => {
+          await admin.from("global_participant_counter").upsert({ id: 1, counter: 1, updated_at: new Date().toISOString() });
+        });
+      }
+    } catch {}
+
     return "01";
+  }
+
+  // 1. Try atomic increment from Supabase global counter (synchronizes across all devices and serverless lambdas)
+  const supabaseVal = await incrementGlobalParticipantCounterInSupabase();
+  if (typeof supabaseVal === "number" && supabaseVal > 0) {
+    const nextCodeStr = String(supabaseVal).padStart(2, "0");
+    memoryParticipantCounter = supabaseVal;
+    globalThis.__CYBER_CAMPUS_COUNTER__ = supabaseVal;
+
+    const counterPayload = JSON.stringify({ counter: supabaseVal });
+    try {
+      await mkdir(getDemoDataDir(), { recursive: true });
+      await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+    } catch {}
+    try {
+      await mkdir(getCwdDataDir(), { recursive: true });
+      await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+    } catch {}
+    try {
+      const jar = await cookies();
+      jar.set("cc_last_code", nextCodeStr, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 365 * 86400,
+      });
+    } catch {}
+
+    return nextCodeStr;
   }
 
   let highestCodeFound = 0;
@@ -520,6 +593,9 @@ export async function resetResearchData(): Promise<{ ok: boolean; message: strin
         await admin.from("game_runs").delete().neq("scoring_version", "none");
         await admin.from("participant_sessions").delete().neq("mode", "none");
         await admin.from("admin_audit_events").delete().eq("event", "participant_withdrawal");
+        await admin.rpc("reset_participant_counter", { new_val: 0 }).catch(async () => {
+          await admin.from("global_participant_counter").upsert({ id: 1, counter: 0, updated_at: new Date().toISOString() });
+        });
       } catch (err) {
         console.error("Supabase reset error:", err);
       }
@@ -621,20 +697,6 @@ export async function getSession(): Promise<Session | null> {
           } catch {}
           return null;
         }
-        if (s.code !== "01") {
-          s = { ...s, code: "01" };
-          await writeLocal({ ...local, session: s });
-          try {
-            const jar = await cookies();
-            jar.set("cc_last_code", "01", {
-              httpOnly: false,
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
-              path: "/",
-              maxAge: 365 * 86400,
-            });
-          } catch {}
-        }
       } else {
         const normalized = String(num).padStart(2, "0");
         if (s.code !== normalized) {
@@ -677,32 +739,10 @@ export async function startSession(input: {
       "impersonation",
       "links",
     ];
-    const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
-    const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
-    const hasSubmissions = cwdList.length > 0 || demoList.length > 0;
-
     let nextCode: string;
-    if (!hasSubmissions && (!existing || existing.status === "draft")) {
-      nextCode = "01";
-      const counterPayload = JSON.stringify({ counter: 1 });
-      try {
-        await mkdir(getDemoDataDir(), { recursive: true });
-        await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
-      } catch {}
-      try {
-        await mkdir(getCwdDataDir(), { recursive: true });
-        await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
-      } catch {}
-      try {
-        const jar = await cookies();
-        jar.set("cc_last_code", "01", {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 365 * 86400,
-        });
-      } catch {}
+    // If the participant already has an active, unsubmitted draft session on this device, preserve their assigned code!
+    if (existing && existing.status === "draft" && !input.practice && existing.code) {
+      nextCode = existing.code;
     } else {
       nextCode = await nextLocalParticipantCode({
         existingCode: existing?.code,

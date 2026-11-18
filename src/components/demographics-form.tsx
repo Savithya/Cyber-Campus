@@ -41,17 +41,13 @@ export function DemographicsForm() {
         const stored = localStorage.getItem('cc_last_participant_code');
         if (stored && stored !== state.session?.code) {
           // Re-fetch the current participant session
-          void api<{ session: Session }>('session/current', {}).then((res) => {
-            if (res.session) {
-              state.setSession(res.session);
-            }
-          });
+          void state.reload();
         }
       }
     };
     window.addEventListener('storage', syncHandler);
     return () => window.removeEventListener('storage', syncHandler);
-  }, []);
+  }, [state]);
 
 
   const handleStartNewParticipant = async () => {
