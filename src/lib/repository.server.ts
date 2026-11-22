@@ -45,38 +45,95 @@ async function readSubmissionsFromFile(filePath: string): Promise<Session[]> {
 
 let memoryParticipantCounter = 0;
 
+/**
+ * In-process mutex that serialises counter increments within a single Node
+ * instance.  Prevents two concurrent API requests from reading the same
+ * counter row before either has written back.  Cross-instance atomicity
+ * is guaranteed by the Supabase RPC (INSERT … ON CONFLICT DO UPDATE).
+ */
+let counterMutex: Promise<void> | null = null;
+
+async function withTimeout<T>(promise: PromiseLike<T>, ms = 1500): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error("Database operation timed out")), ms);
+  });
+  return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
+}
+
 async function incrementGlobalParticipantCounterInSupabase(): Promise<number | null> {
+  // Wait for any in-flight increment on this Node instance to finish first.
+  if (counterMutex) {
+    await counterMutex;
+  }
+  let releaseMutex: () => void;
+  counterMutex = new Promise<void>((r) => { releaseMutex = r; });
+
   try {
     const { serverAdminSupabase } = await import("./supabase.server");
     const admin = serverAdminSupabase();
     if (!admin) return null;
 
-    // 1. Try RPC next_participant_counter
-    const { data: rpcData, error: rpcErr } = await admin.rpc("next_participant_counter");
-    if (!rpcErr && typeof rpcData === "number" && rpcData > 0) {
-      return rpcData;
+    // 1. Try the atomic RPC — a single INSERT … ON CONFLICT DO UPDATE that
+    //    increments and returns the new value inside one Postgres statement.
+    const rpcRes = await withTimeout(admin.rpc("next_participant_counter"));
+    if (!rpcRes.error && typeof rpcRes.data === "number" && rpcRes.data > 0) {
+      return rpcRes.data;
     }
 
-    // 2. Fallback to direct upsert on global_participant_counter table
-    const { data: current } = await admin
-      .from("global_participant_counter")
-      .select("counter")
-      .eq("id", 1)
-      .maybeSingle();
-    const nextVal = ((current?.counter as number) || 0) + 1;
-    const { error: upsertErr } = await admin
-      .from("global_participant_counter")
-      .upsert({ id: 1, counter: nextVal, updated_at: new Date().toISOString() });
-    if (!upsertErr) {
+    // 2. Fallback: read-then-write with strict timeout.
+    const currentRes = await withTimeout(
+      admin
+        .from("global_participant_counter")
+        .select("counter")
+        .eq("id", 1)
+        .maybeSingle()
+    );
+    const nextVal = ((currentRes.data?.counter as number) || 0) + 1;
+    const upsertRes = await withTimeout(
+      admin
+        .from("global_participant_counter")
+        .upsert({ id: 1, counter: nextVal, updated_at: new Date().toISOString() })
+    );
+    if (!upsertRes.error) {
       return nextVal;
     }
   } catch {
-    // Supabase unreachable or in test sandbox
+    // Supabase unreachable or timed out
+  } finally {
+    releaseMutex!();
+    counterMutex = null;
   }
   return null;
 }
 
+/**
+ * In-process mutex serialising the entire nextLocalParticipantCode function so
+ * that two concurrent requests on the same Node instance never derive the same
+ * code from the local file/memory fallback path.
+ */
+let localCodeMutex: Promise<void> | null = null;
+
 export async function nextLocalParticipantCode(options?: {
+  existingCode?: string | number | null;
+  clientHintCode?: string | number | null;
+  resetToStart?: boolean;
+}): Promise<string> {
+  // Serialise concurrent calls within this Node instance.
+  if (localCodeMutex) {
+    await localCodeMutex;
+  }
+  let releaseMutex: () => void;
+  localCodeMutex = new Promise<void>((r) => { releaseMutex = r; });
+  try {
+    return await _nextLocalParticipantCodeInner(options);
+  } finally {
+    releaseMutex!();
+    localCodeMutex = null;
+  }
+}
+
+async function _nextLocalParticipantCodeInner(options?: {
   existingCode?: string | number | null;
   clientHintCode?: string | number | null;
   resetToStart?: boolean;
@@ -372,7 +429,25 @@ export async function saveDemoSubmission(session: Session) {
     globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(key, session);
   }
 
-  // 2. Save to demo data directory
+  // 2. Synchronize highest counter in memory and files if session has a valid numeric code
+  if (session.code && /^\d+$/.test(String(session.code).trim())) {
+    const codeNum = parseInt(String(session.code).trim(), 10);
+    if (codeNum > (globalThis.__CYBER_CAMPUS_COUNTER__ || 0)) {
+      globalThis.__CYBER_CAMPUS_COUNTER__ = codeNum;
+      memoryParticipantCounter = codeNum;
+      const counterPayload = JSON.stringify({ counter: codeNum });
+      try {
+        await mkdir(getDemoDataDir(), { recursive: true });
+        await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+      try {
+        await mkdir(getCwdDataDir(), { recursive: true });
+        await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+    }
+  }
+
+  // 3. Save to demo data directory
   const dataDir = getDemoDataDir();
   const subPath = path.join(dataDir, "submissions.json");
   try {
@@ -722,6 +797,25 @@ export async function getSession(): Promise<Session | null> {
   if (!user) return null;
   return rpc<Session | null>("current_session");
 }
+async function isCodeAlreadyTaken(code: string): Promise<boolean> {
+  const norm = /^\d+$/.test(code.trim())
+    ? String(parseInt(code.trim(), 10)).padStart(2, "0")
+    : code.trim();
+  const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
+  const demoList = await readSubmissionsFromFile(path.join(getDemoDataDir(), "submissions.json"));
+  const all = [...cwdList, ...demoList];
+  if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+    all.push(...globalThis.__CYBER_CAMPUS_SUBMISSIONS__.values());
+  }
+  return all.some((s) => {
+    const sNorm =
+      s.code && /^\d+$/.test(String(s.code).trim())
+        ? String(parseInt(String(s.code).trim(), 10)).padStart(2, "0")
+        : s.code;
+    return sNorm === norm && (s.status === "submitted_complete" || s.status === "submitted_with_missing");
+  });
+}
+
 export async function startSession(input: {
   consented: boolean;
   eligible: boolean;
@@ -742,12 +836,14 @@ export async function startSession(input: {
       "links",
     ];
     let nextCode: string;
-    // If the participant already has an active, unsubmitted draft session on this device, preserve their assigned code!
-    if (existing && existing.status === "draft" && !input.practice && existing.code) {
+    // If the participant already has an active, unsubmitted draft session on this device,
+    // preserve their assigned code UNLESS another device/session has already submitted with that code!
+    const isTaken = existing?.code ? await isCodeAlreadyTaken(existing.code) : false;
+    if (existing && existing.status === "draft" && !input.practice && existing.code && !isTaken) {
       nextCode = existing.code;
     } else {
       nextCode = await nextLocalParticipantCode({
-        existingCode: existing?.code,
+        existingCode: isTaken ? undefined : existing?.code,
         clientHintCode: input.clientLastCode,
       });
     }

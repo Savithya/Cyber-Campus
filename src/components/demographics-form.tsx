@@ -141,7 +141,32 @@ export function DemographicsForm() {
 
   useEffect(() => {
     if (!state.loading && !state.session) {
-      router.replace("/consent");
+      // Auto-initialize a fresh anonymous participant session so devices landing on /demographics
+      // (e.g. opened directly on mobile or cross-device) are immediately assigned their own unique ID
+      setResettingParticipant(true);
+      const storedLastCode = typeof window !== "undefined" ? localStorage.getItem("cc_last_participant_code") : null;
+      api<{ session: Session }>("session/new-participant", { clientLastCode: storedLastCode })
+        .then((res) => {
+          if (res.session) {
+            if (typeof window !== "undefined" && res.session.code) {
+              localStorage.setItem("cc_last_participant_code", res.session.code);
+            }
+            state.setSession(res.session);
+            putDraft({
+              code: res.session.code,
+              expires: res.session.draftExpiresAt,
+              answers: res.session.answers,
+              token: randomToken(),
+              submitKey: crypto.randomUUID(),
+            });
+          }
+        })
+        .catch(() => {
+          router.replace("/consent");
+        })
+        .finally(() => {
+          setResettingParticipant(false);
+        });
       return;
     }
     if (state.session) {
@@ -157,7 +182,7 @@ export function DemographicsForm() {
         setSaveStatus("Profile validated and submitted");
       }
     }
-  }, [state.loading, state.session, router]);
+  }, [state.loading, state.session, router, state]);
 
   const handleSelect = async (questionId: string, code: number | null) => {
     const updated = { ...answers, [questionId]: code };
@@ -275,11 +300,11 @@ export function DemographicsForm() {
     }
   };
 
-  if (state.loading) {
+  if (state.loading || resettingParticipant || !state.session) {
     return <Loading />;
   }
 
-  const rawCode = state.session?.code;
+  const rawCode = state.session.code;
   const participantCode = rawCode
     ? /^\d+$/.test(rawCode.trim())
       ? String(parseInt(rawCode.trim(), 10)).padStart(2, "0")
@@ -348,7 +373,7 @@ export function DemographicsForm() {
       )}
 
       {/* Previously Completed Profile Banner */}
-      {state.session?.status !== "draft" && (
+      {Boolean(state.session && state.session.status !== "draft") && (
         <div className="completed-participant-banner mb-6" role="region" aria-label="Previously Completed Profile">
           <div className="banner-content">
             <CheckCircle2 size={18} className="text-emerald shrink-0" aria-hidden="true" />
