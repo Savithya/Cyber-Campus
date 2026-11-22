@@ -109,9 +109,10 @@ export async function nextLocalParticipantCode(options?: {
       const { serverAdminSupabase } = await import("./supabase.server");
       const admin = serverAdminSupabase();
       if (admin) {
-        await admin.rpc("reset_participant_counter", { new_val: 1 }).catch(async () => {
+        const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 1 });
+        if (rpcErr) {
           await admin.from("global_participant_counter").upsert({ id: 1, counter: 1, updated_at: new Date().toISOString() });
-        });
+        }
       }
     } catch {}
 
@@ -593,9 +594,10 @@ export async function resetResearchData(): Promise<{ ok: boolean; message: strin
         await admin.from("game_runs").delete().neq("scoring_version", "none");
         await admin.from("participant_sessions").delete().neq("mode", "none");
         await admin.from("admin_audit_events").delete().eq("event", "participant_withdrawal");
-        await admin.rpc("reset_participant_counter", { new_val: 0 }).catch(async () => {
+        const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 0 });
+        if (rpcErr) {
           await admin.from("global_participant_counter").upsert({ id: 1, counter: 0, updated_at: new Date().toISOString() });
-        });
+        }
       } catch (err) {
         console.error("Supabase reset error:", err);
       }
