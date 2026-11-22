@@ -30,6 +30,7 @@ artifacts/
 
 # TypeScript build info
 *.tsbuildinfo
+next-env.d.ts
 
 # Environment variables & secrets (keep .env.example tracked)
 .env
