@@ -172,7 +172,7 @@ export function DemographicsForm() {
     const draftAnswers: Answers = { ...state.session.answers };
     for (const [k, v] of Object.entries(updated)) {
       draftAnswers[k] = {
-        value: v,
+        value: v as number | null,
         status: v !== null ? "answered" : "not_answered",
       };
     }
@@ -238,7 +238,7 @@ export function DemographicsForm() {
       const fullAnswers: Answers = { ...state.session.answers };
       for (const [k, v] of Object.entries(answers)) {
         fullAnswers[k] = {
-          value: v,
+          value: v as number | null,
           status: v !== null ? "answered" : "not_answered",
         };
       }
