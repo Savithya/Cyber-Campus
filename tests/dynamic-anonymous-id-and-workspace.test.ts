@@ -249,4 +249,15 @@ describe("Dynamic Anonymous ID & Automatic 9-Part Research Workspace Synchroniza
     const participant3 = await startNewParticipantSession();
     expect(participant3.code).toBe("03");
   });
+
+  afterAll(async () => {
+    try {
+      await writeFile(subPath, "[]\n", "utf-8");
+      await writeFile(counterPath, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
+      globalThis.__CYBER_CAMPUS_COUNTER__ = 0;
+    } catch {}
+  });
 });

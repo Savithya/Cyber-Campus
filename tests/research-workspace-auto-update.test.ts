@@ -253,4 +253,17 @@ describe("Dynamic Anonymous ID & Automatic Research Workspace Updates", () => {
     const friedman = calculateFriedmanTest(filtered);
     expect(friedman.n).toBeGreaterThanOrEqual(1);
   });
+
+  afterAll(async () => {
+    try {
+      const subPath = path.join(process.cwd(), ".demo-data", "submissions.json");
+      const counterPath = path.join(process.cwd(), ".demo-data", "participant_counter.json");
+      await writeFile(subPath, "[]\n", "utf-8");
+      await writeFile(counterPath, JSON.stringify({ counter: 0 }) + "\n", "utf-8");
+      if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+        globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+      }
+      globalThis.__CYBER_CAMPUS_COUNTER__ = 0;
+    } catch {}
+  });
 });
