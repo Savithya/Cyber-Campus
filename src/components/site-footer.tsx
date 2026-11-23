@@ -79,6 +79,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/#home"
+                  prefetch={true}
                   className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   Home
@@ -87,6 +88,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/consent"
+                  prefetch={true}
                   className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   Join Research
@@ -95,6 +97,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/privacy"
+                  prefetch={true}
                   className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-blue-500 rounded"
                 >
                   About the Study
@@ -112,6 +115,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/privacy"
+                  prefetch={true}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Study Information
@@ -120,6 +124,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/consent"
+                  prefetch={true}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Participant Rights
@@ -128,6 +133,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/privacy"
+                  prefetch={true}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Privacy Policy
@@ -136,6 +142,7 @@ export function SiteFooter({ compact }: SiteFooterProps = {}) {
               <li>
                 <Link
                   href="/consent"
+                  prefetch={true}
                   className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-500 rounded"
                 >
                   Consent Information

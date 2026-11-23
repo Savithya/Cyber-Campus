@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { CyberMissionControl } from "@/components/cyber-mission-control";
 import { Loading } from "@/components/ui";
+import { scenarios } from "@/content/scenarios.server";
 
 export const metadata = {
   title: "Cyber Investigation Mission · Cyber Campus Research",
@@ -24,7 +25,7 @@ export default async function Page({
   const { mission } = await params;
   return (
     <Suspense fallback={<Loading />}>
-      <CyberMissionControl initialMissionId={mission} />
+      <CyberMissionControl initialMissionId={mission} initialScenarios={scenarios} />
     </Suspense>
   );
 }

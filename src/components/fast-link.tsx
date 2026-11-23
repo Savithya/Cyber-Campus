@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link, { type LinkProps } from "next/link";
 
 export type FastLinkProps = LinkProps &
@@ -10,37 +10,19 @@ export type FastLinkProps = LinkProps &
   };
 
 /**
- * Link wrapper that defers Next.js route prefetching until hover, focus, or touch,
- * unless `eager` is enabled for the immediate next/previous journey step.
+ * High-performance Link wrapper that enables Next.js background viewport prefetching
+ * by default (prefetch={true}) for instantaneous, zero-delay client-side route transitions.
  */
 export function FastLink({
   href,
-  eager = false,
-  prefetch,
-  onMouseEnter,
-  onFocus,
-  onTouchStart,
+  eager,
+  prefetch = true,
   ...rest
 }: FastLinkProps) {
-  const [active, setActive] = useState(false);
-  const resolvedPrefetch = prefetch !== undefined ? prefetch : eager || active ? null : false;
-
   return (
     <Link
       href={href}
-      prefetch={resolvedPrefetch}
-      onMouseEnter={(e) => {
-        if (!active) setActive(true);
-        onMouseEnter?.(e);
-      }}
-      onFocus={(e) => {
-        if (!active) setActive(true);
-        onFocus?.(e);
-      }}
-      onTouchStart={(e) => {
-        if (!active) setActive(true);
-        onTouchStart?.(e);
-      }}
+      prefetch={prefetch}
       {...rest}
     />
   );

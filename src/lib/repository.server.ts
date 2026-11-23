@@ -1017,7 +1017,10 @@ export async function saveDraft(answers: Answers) {
   if (isResearch() && s.mode === "research")
     return rpc<Session>("save_draft", { p_answers: answers });
   const local = (await readLocal())!;
-  local.session.answers = answers;
+  local.session.answers = {
+    ...local.session.answers,
+    ...answers,
+  };
   await writeLocal(local);
   if (local.session.mode !== "practice") {
     await saveDemoSubmission(local.session);

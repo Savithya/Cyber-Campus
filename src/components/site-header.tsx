@@ -94,6 +94,7 @@ export function SiteHeader() {
         <Link
           href="/#home"
           onClick={handleHomeClick}
+          prefetch={true}
           className="brand"
           aria-label="Cyber Campus Home - Return to Hero Section"
         >
@@ -187,6 +188,7 @@ export function SiteHeader() {
 
           <Link
             href={joinHref}
+            prefetch={true}
             className={`nav-pill ${isJoinActive ? "active" : ""}`}
             aria-current={isJoinActive ? "page" : undefined}
           >
@@ -196,6 +198,7 @@ export function SiteHeader() {
 
           <Link
             href="/privacy"
+            prefetch={true}
             className={`nav-pill ${isAboutActive ? "active" : ""}`}
             aria-current={isAboutActive ? "page" : undefined}
           >

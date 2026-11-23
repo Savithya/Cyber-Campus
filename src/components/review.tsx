@@ -32,7 +32,11 @@ import type { Answers, Session, Scenario, AnswerKey, Attempt } from "@/lib/types
 import { ResearchJourneyFrame } from "./research-journey-frame";
 import { Loading, ErrorBox } from "./ui";
 
-export default function Review() {
+export default function Review({
+  initialScenarios,
+}: {
+  initialScenarios?: Scenario[];
+} = {}) {
   const state = useSession();
   const router = useRouter();
 
@@ -52,7 +56,9 @@ export default function Review() {
   const [showDeletionToken, setShowDeletionToken] = useState(false);
 
   // Live scenario and debrief server data
-  const [serverScenarios, setServerScenarios] = useState<Scenario[]>([]);
+  const [serverScenarios, setServerScenarios] = useState<Scenario[]>(
+    () => initialScenarios ?? []
+  );
   const [serverDebriefKeys, setServerDebriefKeys] = useState<Record<string, AnswerKey>>({});
 
   useEffect(() => {
@@ -80,7 +86,9 @@ export default function Review() {
     async function loadData() {
       try {
         const [scRes, dbRes] = await Promise.all([
-          api<{ scenarios: Scenario[] }>("scenarios").catch(() => ({ scenarios: [] })),
+          initialScenarios && initialScenarios.length > 0
+            ? Promise.resolve({ scenarios: initialScenarios })
+            : api<{ scenarios: Scenario[] }>("scenarios").catch(() => ({ scenarios: [] })),
           api<{ debrief: Record<string, AnswerKey> }>("debrief").catch(() => ({ debrief: {} })),
         ]);
         if (mounted) {
@@ -99,7 +107,7 @@ export default function Review() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [initialScenarios]);
 
   const handleUpdateAnswer = async (questionId: string, value: number) => {
     const updated: Answers = {

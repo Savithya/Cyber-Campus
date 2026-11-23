@@ -46,6 +46,7 @@ export function ResearchConsentPage({ initialConfig }: ResearchConsentPageProps)
   // Load config (if not passed from server) & check practice exposure flag
   useEffect(() => {
     router.prefetch("/demographics");
+    router.prefetch("/play");
 
     if (!initialConfig) {
       api<{ config: StudyConfig; mode: string }>("config")

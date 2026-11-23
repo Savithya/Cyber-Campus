@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect, Fragment } from "react";
+import { useState, useMemo, useEffect, useCallback, Fragment } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -286,20 +286,49 @@ export default function Admin({
     window.scrollTo(0, 0);
   }
 
-  // Refresh workspace data on mount (covers back/forward cache and SPA redirects) and window focus.
+  // Real-time live sessions synchronized across client-side polling and SSR props
+  const [liveSessions, setLiveSessions] = useState<Session[]>(() =>
+    sessions.filter((s) => s.mode !== "practice")
+  );
+  const [liveRefreshing, setLiveRefreshing] = useState(false);
+
   useEffect(() => {
-    router.refresh();
+    setLiveSessions(sessions.filter((s) => s.mode !== "practice"));
+  }, [sessions]);
+
+  const fetchLatestWorkspaceData = useCallback(async () => {
+    try {
+      const endpoint = demo ? "demo/data" : "admin/data";
+      const res = await api<{ sessions: Session[] }>(endpoint).catch(() => null);
+      if (res?.sessions && Array.isArray(res.sessions)) {
+        setLiveSessions(res.sessions.filter((s) => s.mode !== "practice"));
+      }
+    } catch {
+      // fallback
+    }
+  }, [demo]);
+
+  // Refresh workspace data on mount, every 5s polling, and on window focus.
+  useEffect(() => {
+    void fetchLatestWorkspaceData();
+    const interval = setInterval(() => {
+      void fetchLatestWorkspaceData();
+    }, 5000);
     const handleFocus = () => {
+      void fetchLatestWorkspaceData();
       router.refresh();
     };
     window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [router]);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [fetchLatestWorkspaceData, router]);
 
   // Exclude practice-only sessions from research dataset views
   const realSessions = useMemo(() => {
-    return sessions.filter((s) => s.mode !== "practice");
-  }, [sessions]);
+    return liveSessions.filter((s) => s.mode !== "practice");
+  }, [liveSessions]);
 
   const filtered = filterSessions(realSessions, filters),
     all = filterSessions(realSessions, filters, false),
@@ -918,12 +947,21 @@ export default function Admin({
             <button
               type="button"
               className="admin-refresh-btn"
-              onClick={() => router.refresh()}
+              disabled={liveRefreshing || resetting}
+              onClick={async () => {
+                setLiveRefreshing(true);
+                try {
+                  await fetchLatestWorkspaceData();
+                  router.refresh();
+                } finally {
+                  setLiveRefreshing(false);
+                }
+              }}
               title="Refresh workspace parts with latest participant responses"
               aria-label="Refresh workspace data"
             >
-              <RotateCcw size={13} />
-              <span>Refresh</span>
+              <RotateCcw size={13} className={liveRefreshing ? "animate-spin" : ""} />
+              <span>{liveRefreshing ? "Refreshing…" : "Refresh"}</span>
             </button>
             <button
               type="button"
@@ -941,6 +979,7 @@ export default function Admin({
                 setError("");
                 try {
                   await api("admin/reset");
+                  setLiveSessions([]);
                   router.refresh();
                 } catch (err) {
                   setError(

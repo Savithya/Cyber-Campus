@@ -104,6 +104,8 @@ export function CyberMissionControl({
   useEffect(() => {
     if (isAuthorized) {
       router.prefetch("/survey/review");
+      router.prefetch("/demographics");
+      router.prefetch("/consent");
     }
   }, [isAuthorized, router]);
 

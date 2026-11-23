@@ -131,6 +131,8 @@ export function DemographicsForm() {
 
   useEffect(() => {
     router.prefetch("/play");
+    router.prefetch("/consent");
+    router.prefetch("/survey/review");
     if (
       state.session &&
       (state.session.mode === "practice" || state.session.status !== "draft")

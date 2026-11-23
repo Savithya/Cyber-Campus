@@ -70,9 +70,37 @@ export const startSchema = z
     "Consent and eligibility are required.",
   );
 
-export const saveSchema = z.object({ answers: answersSchema }).strict();
+export const draftAnswersSchema = z
+  .record(z.string(), answerSchema)
+  .superRefine((answers, ctx) => {
+    for (const key of Object.keys(answers)) {
+      const q = questions.find((item) => item.id === key);
+      if (!q) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Unknown question",
+          path: [key],
+        });
+        continue;
+      }
+      const a = answers[key];
+      if (
+        a.status === "answered"
+          ? a.value === null || !q.options.some((o) => o.code === a.value)
+          : a.value !== null
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Invalid answer or missing status",
+          path: [key],
+        });
+      }
+    }
+  });
 
-export const submitSchema = saveSchema.extend({ idempotencyKey: z.uuid() });
+export const saveSchema = z.object({ answers: draftAnswersSchema }).strict();
+
+export const submitSchema = z.object({ answers: answersSchema, idempotencyKey: z.string().uuid() }).strict();
 
 export const attemptSchema = z
   .object({

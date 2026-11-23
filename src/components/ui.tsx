@@ -9,12 +9,18 @@ export function Reveal({
 }) {
   return <div className={className}>{children}</div>;
 }
-export function Loading() {
+export function Loading({
+  title = "Getting things ready",
+  message = "Loading…",
+}: {
+  title?: string;
+  message?: string;
+} = {}) {
   return (
     <div className="state-box" role="status">
       <LoaderCircle size={24} className="spin" />
-      <h2>Getting things ready</h2>
-      <p>Loading your saved session.</p>
+      <h2>{title}</h2>
+      <p>{message}</p>
     </div>
   );
 }

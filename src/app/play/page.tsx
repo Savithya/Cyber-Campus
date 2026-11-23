@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { CyberMissionControl } from "@/components/cyber-mission-control";
 import { Loading } from "@/components/ui";
+import { scenarios } from "@/content/scenarios.server";
 
 export const metadata = {
   title: "Cyber Mission Control · Cyber Campus Research",
@@ -10,7 +11,7 @@ export const metadata = {
 export default function PlayPage() {
   return (
     <Suspense fallback={<Loading />}>
-      <CyberMissionControl />
+      <CyberMissionControl initialScenarios={scenarios} />
     </Suspense>
   );
 }
