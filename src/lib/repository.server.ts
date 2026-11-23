@@ -488,9 +488,37 @@ export async function saveDemoSubmission(session: Session) {
 function mergeSubmissionIntoMap(map: Map<string, Session>, s: Session, overrides?: Partial<Session>) {
   const k = s.code || s.id;
   const existing = map.get(k);
-  if (overrides || !existing || (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)) {
-    map.set(k, { ...existing, ...s, ...overrides });
+  if (!existing) {
+    map.set(k, { ...s, ...overrides });
+    return;
   }
+  const isSubmitted = (status?: string) =>
+    status === "submitted_complete" || status === "submitted_with_missing";
+  const dominantStatus = isSubmitted(s.status)
+    ? s.status
+    : isSubmitted(existing.status)
+      ? existing.status
+      : s.status;
+
+  const mergedAnswers = {
+    ...(existing.answers || {}),
+    ...(s.answers || {}),
+  };
+
+  const attemptsToUse =
+    (s.attempts?.length ?? 0) >= (existing.attempts?.length ?? 0)
+      ? s.attempts
+      : existing.attempts;
+
+  map.set(k, {
+    ...existing,
+    ...s,
+    status: dominantStatus,
+    submittedAt: existing.submittedAt || s.submittedAt,
+    answers: mergedAnswers,
+    attempts: attemptsToUse,
+    ...overrides,
+  });
 }
 
 function matchesSubmissionKey(s: Session, key: string): boolean {
@@ -1016,23 +1044,29 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
     return submitted;
   }
   const local = (await readLocal())!;
-  if (local.session.status !== "draft") {
-    return local.session;
-  }
-  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4"].every(
-    (qid) => answers[qid]?.status === "answered" && answers[qid]?.value !== null,
-  );
-  local.session.answers = answers;
+  const mergedAnswers: Answers = {
+    ...local.session.answers,
+    ...answers,
+  };
   if (local.session.attempts && local.session.attempts.length > 0) {
     local.session.answers = deriveSurveyAnswersFromAttempts(
       local.session.attempts,
-      local.session.answers,
+      mergedAnswers,
     );
+  } else {
+    local.session.answers = mergedAnswers;
   }
-  local.session.status = isProfileComplete
+
+  const anySkipped = Object.values(local.session.answers).some(
+    (a) => a.status === "skipped",
+  );
+  const isProfileComplete = ["Q1", "Q2", "Q3", "Q4"].every(
+    (qid) => local.session.answers[qid]?.status === "answered" && local.session.answers[qid]?.value !== null,
+  );
+  local.session.status = (isProfileComplete && !anySkipped)
     ? "submitted_complete"
     : "submitted_with_missing";
-  local.session.submittedAt = new Date().toISOString();
+  local.session.submittedAt = local.session.submittedAt || new Date().toISOString();
   local.session.submissionId = local.session.id;
   if (!local.session.participantId) {
     local.session.participantId = await getOrCreateParticipantId();
@@ -1043,7 +1077,7 @@ export async function submitBaseline(answers: Answers, idempotencyKey: string) {
   return local.session;
 }
 
-export async function recordSessionToWorkspace(): Promise<{
+export async function recordSessionToWorkspace(overrideAnswers?: Answers): Promise<{
   ok: boolean;
   session: Session;
   message: string;
@@ -1061,7 +1095,10 @@ export async function recordSessionToWorkspace(): Promise<{
   // (Q6–Q25 from game attempts) back to Supabase if the session is still a draft,
   // then return the live session so the completion page reflects the real state.
   if (isResearch() && s.mode === "research") {
-    let updatedAnswers = s.answers || {};
+    let updatedAnswers = {
+      ...(s.answers || {}),
+      ...(overrideAnswers || {}),
+    };
     if (s.attempts && s.attempts.length > 0) {
       updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
     }
@@ -1069,9 +1106,17 @@ export async function recordSessionToWorkspace(): Promise<{
     // Persist derived answers back to Supabase when the session is still in draft
     if (s.status === "draft") {
       try {
-        await rpc<Session>("save_draft", { p_answers: updatedAnswers });
+        const idempotencyKey = randomUUID();
+        await rpc<Session>("submit_baseline", {
+          p_answers: updatedAnswers,
+          p_key: idempotencyKey,
+        });
       } catch {
-        // save_draft may reject if the session is already submitted — that is fine.
+        try {
+          await rpc<Session>("save_draft", { p_answers: updatedAnswers });
+        } catch {
+          // save_draft may reject if the session is already submitted — that is fine.
+        }
       }
     }
 
@@ -1086,11 +1131,17 @@ export async function recordSessionToWorkspace(): Promise<{
   }
 
   // Demo / local mode: derive answers from attempts and persist to local storage.
-  let updatedAnswers = s.answers || {};
+  let updatedAnswers = {
+    ...(s.answers || {}),
+    ...(overrideAnswers || {}),
+  };
   if (s.attempts && s.attempts.length > 0) {
     updatedAnswers = deriveSurveyAnswersFromAttempts(s.attempts, updatedAnswers);
   }
 
+  const anySkipped = Object.values(updatedAnswers).some(
+    (a) => a.status === "skipped",
+  );
   const isProfileComplete = ["Q1", "Q2", "Q3", "Q4"].every(
     (qid) => updatedAnswers[qid]?.status === "answered" && updatedAnswers[qid]?.value !== null,
   );
@@ -1098,7 +1149,7 @@ export async function recordSessionToWorkspace(): Promise<{
   const updatedSession: Session = {
     ...s,
     answers: updatedAnswers,
-    status: isProfileComplete ? "submitted_complete" : "submitted_with_missing",
+    status: (isProfileComplete && !anySkipped) ? "submitted_complete" : "submitted_with_missing",
     submittedAt: s.submittedAt || new Date().toISOString(),
     submissionId: s.submissionId || s.id,
   };

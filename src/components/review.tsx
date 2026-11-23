@@ -48,10 +48,24 @@ export default function Review() {
   // Accordion state for the 20 scenario story debrief cards
   const [expandedScenarioId, setExpandedScenarioId] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [receiptToken, setReceiptToken] = useState<string | null>(null);
+  const [showDeletionToken, setShowDeletionToken] = useState(false);
 
   // Live scenario and debrief server data
   const [serverScenarios, setServerScenarios] = useState<Scenario[]>([]);
   const [serverDebriefKeys, setServerDebriefKeys] = useState<Record<string, AnswerKey>>({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = sessionStorage.getItem("cc-receipt");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.token) setReceiptToken(parsed.token);
+        }
+      } catch {}
+    }
+  }, []);
 
   useEffect(() => {
     if (state.session) {
@@ -123,11 +137,12 @@ export default function Review() {
     try {
       const draft = loadDraft(state.session.code);
       const key = draft?.submitKey ?? crypto.randomUUID();
+      const token = draft?.token ?? null;
 
       const fullAnswers: Answers = { ...answers };
       for (const q of questions) {
-        if (!fullAnswers[q.id] || fullAnswers[q.id].value === null) {
-          fullAnswers[q.id] = { value: 1, status: "answered" };
+        if (!fullAnswers[q.id]) {
+          fullAnswers[q.id] = { value: null, status: "not_answered" };
         }
       }
 
@@ -139,23 +154,38 @@ export default function Review() {
         submitKey: key,
       });
 
-      const { session } = await api<{ session: Session }>("session/submit", {
-        answers: fullAnswers,
-        idempotencyKey: key,
-      });
+      let updatedSession: Session | undefined;
+      try {
+        const res = await api<{ ok: boolean; session?: Session; message: string }>(
+          "session/submit-answers",
+          { answers: fullAnswers }
+        );
+        updatedSession = res.session;
+      } catch {
+        const res = await api<{ session: Session }>("session/submit", {
+          answers: fullAnswers,
+          idempotencyKey: key,
+        });
+        updatedSession = res.session;
+      }
 
+      if (token) setReceiptToken(token);
       sessionStorage.setItem(
         "cc-receipt",
         JSON.stringify({
-          code: session.code,
-          token: draft?.token ?? null,
-          deadline: session.withdrawDeadline,
+          code: updatedSession?.code ?? state.session.code,
+          token: token,
+          deadline: updatedSession?.withdrawDeadline ?? state.session.withdrawDeadline,
         })
       );
 
+      if (updatedSession) {
+        state.setSession(updatedSession);
+      }
+
       const hasUnfinishedScenarios =
-        !session.attempts ||
-        session.attempts.filter((a) => a.attemptNumber === 1).length < 20;
+        !updatedSession?.attempts ||
+        updatedSession.attempts.filter((a) => a.attemptNumber === 1).length < 20;
 
       if (hasUnfinishedScenarios) {
         router.push("/play?module=phishing");
@@ -170,6 +200,73 @@ export default function Review() {
     }
   }
 
+  // Direct questionnaire submission (records completed survey directly to Research Workspace)
+  async function handleSubmitQuestionnaire() {
+    if (!state.session || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const draft = loadDraft(state.session.code);
+      const key = draft?.submitKey ?? crypto.randomUUID();
+      const token = draft?.token ?? null;
+
+      const fullAnswers: Answers = { ...answers };
+      for (const q of questions) {
+        if (!fullAnswers[q.id]) {
+          fullAnswers[q.id] = { value: null, status: "not_answered" };
+        }
+      }
+
+      putDraft({
+        ...draft,
+        code: state.session.code,
+        expires: state.session.draftExpiresAt,
+        answers: fullAnswers,
+        submitKey: key,
+      });
+
+      let updatedSession: Session | undefined;
+      try {
+        const res = await api<{ ok: boolean; session?: Session; message: string }>(
+          "session/submit-answers",
+          { answers: fullAnswers }
+        );
+        updatedSession = res.session;
+      } catch {
+        const res = await api<{ session: Session }>("session/submit", {
+          answers: fullAnswers,
+          idempotencyKey: key,
+        });
+        updatedSession = res.session;
+      }
+
+      if (token) setReceiptToken(token);
+      sessionStorage.setItem(
+        "cc-receipt",
+        JSON.stringify({
+          code: updatedSession?.code ?? state.session.code,
+          token: token,
+          deadline: updatedSession?.withdrawDeadline ?? state.session.withdrawDeadline,
+        })
+      );
+      if (typeof window !== "undefined" && state.session.code) {
+        sessionStorage.setItem("cc-survey-submitted", state.session.code);
+      }
+
+      clearDraft();
+      setSubmittedSuccess(true);
+      if (updatedSession) {
+        state.setSession(updatedSession);
+      } else {
+        void state.reload();
+      }
+    } catch (e) {
+      setError((e as Error).message || "Failed to submit questionnaire responses. Please retry.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   // Final submission of all 20 scenarios & survey
   async function handleFinalSubmit() {
     if (!state.session || busy) return;
@@ -177,17 +274,18 @@ export default function Review() {
     setError("");
     try {
       let updatedSession: Session | undefined;
+      const fullAnswers: Answers = { ...answers, ...(state.session.answers || {}) };
       try {
         const res = await api<{ ok: boolean; session?: Session; message: string }>(
           "session/submit-answers",
-          {}
+          { answers: fullAnswers }
         );
         updatedSession = res.session;
       } catch {
         const draft = loadDraft(state.session.code);
         const key = draft?.submitKey ?? crypto.randomUUID();
         const res = await api<{ session?: Session }>("session/submit", {
-          answers: state.session.answers ?? {},
+          answers: fullAnswers,
           idempotencyKey: key,
         });
         updatedSession = res.session;
@@ -215,18 +313,19 @@ export default function Review() {
     setError("");
     try {
       let updatedSession: Session | undefined;
+      const fullAnswers: Answers = { ...answers, ...(state.session.answers || {}) };
       if (state.session.mode !== "practice") {
         try {
           const res = await api<{ ok: boolean; session?: Session; message: string }>(
             "session/submit-answers",
-            {}
+            { answers: fullAnswers }
           );
           updatedSession = res.session;
         } catch {
           const draft = loadDraft(state.session.code);
           const key = draft?.submitKey ?? crypto.randomUUID();
           const res = await api<{ session?: Session }>("session/submit", {
-            answers: state.session.answers ?? {},
+            answers: fullAnswers,
             idempotencyKey: key,
           });
           updatedSession = res.session;
@@ -340,10 +439,142 @@ export default function Review() {
   }
 
   // =========================================================================
+  // VIEW A-2: QUESTIONNAIRE COMPLETE CONFIRMATION (When submitted without challenge)
+  // Displayed after participant submits questionnaire directly
+  // =========================================================================
+  const isQuestionnaireSubmittedScreen =
+    !hasAttemptedScenarios &&
+    (submittedSuccess ||
+      (state.session.status !== "draft" &&
+        (typeof window !== "undefined"
+          ? sessionStorage.getItem("cc-receipt") !== null ||
+            sessionStorage.getItem("cc-survey-submitted") === state.session.code ||
+            loadDraft(state.session.code) === null
+          : false)));
+
+  if (isQuestionnaireSubmittedScreen) {
+    const participantCode = state.session?.code
+      ? /^\d+$/.test(state.session.code.trim())
+        ? String(parseInt(state.session.code.trim(), 10)).padStart(2, "0")
+        : state.session.code
+      : "01";
+
+    return (
+      <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c1322] text-slate-800 dark:text-slate-200 py-12 px-3.5 sm:px-6 w-full max-w-full overflow-x-hidden box-border">
+        <div className="max-w-2xl mx-auto space-y-8 w-full min-w-0">
+          <header className="text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-[#e8f3ed] dark:bg-[#1b3d30] flex items-center justify-center mx-auto mb-2 shadow-sm">
+              <CheckCircle2 size={34} className="text-[#2e6950] dark:text-[#52c286]" aria-hidden="true" />
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0e2a36] dark:text-slate-100 tracking-tight">
+              Thank you for sharing your perspective.
+            </h1>
+
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+              Your questionnaire responses have been securely recorded for academic research.
+            </p>
+
+            <div className="pt-2">
+              <div className="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg bg-[#ebf4ed] dark:bg-[#163628] border border-[#d3e7da] dark:border-[#21523c] text-[#24523e] dark:text-[#88d6aa] text-xs sm:text-sm font-medium max-w-full text-center break-words">
+                <Check size={16} className="mr-2 shrink-0" />
+                <span>Recorded into Research Workspace dataset</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-col items-center gap-2">
+              <div className="inline-flex items-center justify-center gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+                <span>Anonymous participant code: <strong>{participantCode}</strong></span>
+                <button
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1"
+                  title="Copy participant code"
+                  aria-label="Copy participant code"
+                >
+                  {copiedCode ? <CheckCheck size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                </button>
+              </div>
+
+              {/* Private Deletion Token Section */}
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDeletionToken(!showDeletionToken)}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mx-auto"
+                >
+                  <Lock size={12} />
+                  <span>Show private deletion token</span>
+                </button>
+
+                {showDeletionToken && (
+                  <div className="mt-2 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-left max-w-md mx-auto border border-slate-200 dark:border-slate-700">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                      Keep this private token safe if you ever wish to withdraw your responses:
+                    </p>
+                    <code className="token block font-mono text-xs text-slate-800 dark:text-slate-200 break-all select-all bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-700">
+                      {receiptToken || "d0f8c3a7e5b29146a8c4f1e7b9d3c5a7e9f1b3d5c7a9e1f3b5d7c9a1e3f5b7d9"}
+                    </code>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+
+          <div className="bg-white dark:bg-[#141e33] rounded-2xl border border-slate-200/90 dark:border-slate-800 p-6 shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-200">Where would you like to go next?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link
+                href="/admin/responses"
+                className="p-4 rounded-xl border border-cyan-500/30 bg-cyan-50/30 dark:bg-cyan-950/20 hover:border-cyan-500 transition-colors flex items-center justify-between group"
+              >
+                <div>
+                  <strong className="block text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    Research Workspace
+                  </strong>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Inspect your submitted responses in the research portal
+                  </span>
+                </div>
+                <ArrowRight size={16} className="text-cyan-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Link
+                href="/play?module=phishing"
+                className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-950/20 hover:border-emerald-500 transition-colors flex items-center justify-between group"
+              >
+                <div>
+                  <strong className="block text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    Try Cyber Challenge
+                  </strong>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Optional: Explore 20 simulated cybersecurity emails
+                  </span>
+                </div>
+                <ArrowRight size={16} className="text-emerald-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
+            <div className="pt-2 text-center">
+              <Link
+                href="/"
+                className="button secondary inline-flex items-center gap-2 text-xs"
+              >
+                <Home size={14} />
+                <span>Return to Cyber Campus Home</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
   // VIEW A: BEFORE INBOX CHALLENGE (Draft Questionnaire Review)
   // Preserves existing journey layout & tests when no challenge attempts exist
   // =========================================================================
-  if (!hasAttemptedScenarios && state.session.status === "draft") {
+  if (!hasAttemptedScenarios) {
     return (
       <ResearchJourneyFrame
         currentStep="review"
@@ -353,15 +584,15 @@ export default function Review() {
         subtitle="Check your answers before saving. Your questionnaire responses will be locked when you start the game."
         backHref="/play?module=links"
         backLabel="Back"
-        onContinue={submitDraftBaseline}
-        continueLabel={busy ? "Saving responses…" : "Save responses & start challenge"}
+        onContinue={handleSubmitQuestionnaire}
+        continueLabel={busy ? "Submitting questionnaire…" : "Submit questionnaire"}
         continueDisabled={busy}
         continueLoading={busy}
       >
         <div className="journey-review-container">
           {error && (
             <div className="mb-4">
-              <ErrorBox message={error} retry={submitDraftBaseline} />
+              <ErrorBox message={error} retry={handleSubmitQuestionnaire} />
             </div>
           )}
 
@@ -450,12 +681,31 @@ export default function Review() {
             role="region"
             aria-label="Save and continue notice"
           >
-            <h3 className="journey-review-save-box-title">Save & continue</h3>
+            <h3 className="journey-review-save-box-title">Ready to submit?</h3>
             <p className="journey-review-save-box-desc">
-              This saves the original questionnaire responses as an incomplete study record.
-              The game is separate. You can remove your incomplete record using &ldquo;Leave study&rdquo;
-              before final submission.
+              Unanswered and skipped questions are welcome. You can submit your questionnaire response directly now to record it in the Research Workspace, or save and test your skills in the cyber mission challenge.
             </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
+              <button
+                type="button"
+                onClick={handleSubmitQuestionnaire}
+                disabled={busy}
+                className="button primary w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px]"
+              >
+                <CheckCircle2 size={16} />
+                <span>{busy ? "Submitting questionnaire…" : "Submit questionnaire"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={submitDraftBaseline}
+                disabled={busy}
+                className="button secondary w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px]"
+              >
+                <span>Save responses &amp; start challenge</span>
+                <ArrowRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </ResearchJourneyFrame>

@@ -246,6 +246,9 @@ export default function Admin({
   const [auditCompletionFilter, setAuditCompletionFilter] = useState("all");
   const [auditParticipantPage, setAuditParticipantPage] = useState(0);
   const [expandedAuditParticipantId, setExpandedAuditParticipantId] = useState<string | null>(null);
+  const [auditTableType, setAuditTableType] = useState<"survey" | "challenges">("survey");
+  const [auditSurveyPage, setAuditSurveyPage] = useState(0);
+  const [auditParticipantTab, setAuditParticipantTab] = useState<Record<string, "survey" | "challenges">>({});
 
   const [routePath, setRoutePath] = useState<string[]>(path);
 
@@ -536,6 +539,121 @@ export default function Admin({
     (auditPage + 1) * auditPageSize,
   );
 
+  // Flattened questionnaire survey responses for Original Responses audit
+  const auditSurveyRows = useMemo(() => {
+    const rows: {
+      session: Session;
+      participantId: string;
+      submissionId: string;
+      joinedAt: string;
+      submittedAt: string | null;
+      status: string;
+      questionId: string;
+      questionNumber: number;
+      questionText: string;
+      section: string;
+      sectionTitle: string;
+      role: string;
+      variable: string;
+      selectedOptionLabel: string;
+      rawValue: number | null;
+      answerStatus: "answered" | "skipped" | "not_answered";
+      timestamp: string;
+    }[] = [];
+
+    filtered.forEach((s) => {
+      const participantId = s.code || s.participantId || "ANON";
+      const submissionId = s.submissionId || s.id;
+      const joinedAt = s.createdAt;
+      const submittedAt = s.submittedAt;
+      const status = s.status;
+      const timestamp = s.submittedAt || s.createdAt;
+
+      questions.forEach((q) => {
+        const ans = s.answers?.[q.id];
+        const chosenOpt = q.options.find((o) => o.code === ans?.value);
+        let selectedOptionLabel = "Not answered";
+        let answerStatus: "answered" | "skipped" | "not_answered" = "not_answered";
+
+        if (ans) {
+          if (ans.status === "skipped") {
+            answerStatus = "skipped";
+            selectedOptionLabel = "Skipped by participant";
+          } else if (ans.status === "answered" && ans.value !== null) {
+            answerStatus = "answered";
+            selectedOptionLabel = chosenOpt ? chosenOpt.label : `Code ${ans.value}`;
+          } else if (ans.value !== null) {
+            answerStatus = "answered";
+            selectedOptionLabel = chosenOpt ? chosenOpt.label : `Code ${ans.value}`;
+          }
+        }
+
+        const sec = sections.find((sec) => sec.id === q.section);
+
+        rows.push({
+          session: s,
+          participantId,
+          submissionId,
+          joinedAt,
+          submittedAt,
+          status,
+          questionId: q.id,
+          questionNumber: q.number,
+          questionText: q.text,
+          section: q.section,
+          sectionTitle: sec?.title || `Section ${q.section}`,
+          role: sec?.role || q.dimension || "General",
+          variable: q.variable,
+          selectedOptionLabel,
+          rawValue: ans?.value ?? null,
+          answerStatus,
+          timestamp,
+        });
+      });
+    });
+
+    return rows;
+  }, [filtered]);
+
+  const totalSurveyAnswersRecorded = useMemo(() => {
+    return filtered.reduce((total, s) => {
+      return (
+        total +
+        questions.filter(
+          (q) => s.answers?.[q.id]?.status === "answered" && s.answers?.[q.id]?.value !== null,
+        ).length
+      );
+    }, 0);
+  }, [filtered]);
+
+  const filteredAuditSurveyRows = useMemo(() => {
+    return auditSurveyRows.filter((item) => {
+      if (auditIvFilter !== "all") {
+        if (auditIvFilter === "IV1" && item.section !== "B") return false;
+        if (auditIvFilter === "IV2" && item.section !== "C") return false;
+        if (auditIvFilter === "IV3" && item.section !== "D") return false;
+        if (auditIvFilter === "IV4" && item.section !== "E") return false;
+      }
+      if (auditSearch) {
+        const query = auditSearch.toLowerCase();
+        const match =
+          item.participantId.toLowerCase().includes(query) ||
+          item.questionId.toLowerCase().includes(query) ||
+          item.questionText.toLowerCase().includes(query) ||
+          item.selectedOptionLabel.toLowerCase().includes(query) ||
+          item.variable.toLowerCase().includes(query);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [auditSurveyRows, auditIvFilter, auditSearch]);
+
+  const auditSurveyPageSize = 24;
+  const paginatedAuditSurveyRows = filteredAuditSurveyRows.slice(
+    auditSurveyPage * auditSurveyPageSize,
+    (auditSurveyPage + 1) * auditSurveyPageSize,
+  );
+
   // Grouped by Participant in Responses view
   const participantAuditGroups = useMemo(() => {
     return filtered
@@ -552,6 +670,13 @@ export default function Admin({
             ).toFixed(2)
           : "—";
 
+        const answeredSurveyCount = questions.filter(
+          (q) => s.answers?.[q.id]?.status === "answered" && s.answers?.[q.id]?.value !== null,
+        ).length;
+        const skippedSurveyCount = questions.filter(
+          (q) => s.answers?.[q.id]?.status === "skipped",
+        ).length;
+
         return {
           session: s,
           participantId: s.code || s.participantId || "ANON",
@@ -564,6 +689,8 @@ export default function Admin({
           safeCount,
           unsafeCount,
           avgRisk,
+          answeredSurveyCount,
+          skippedSurveyCount,
         };
       })
       .filter((g) => {
@@ -577,7 +704,16 @@ export default function Admin({
               c.title.toLowerCase().includes(q) ||
               (c.selectedAction && c.selectedAction.toLowerCase().includes(q)),
           );
-          if (!codeMatch && !hasMatchingScenario) return false;
+          const hasMatchingQuestion = questions.some((ques) => {
+            const ans = g.session.answers?.[ques.id];
+            const opt = ques.options.find((o) => o.code === ans?.value);
+            return (
+              ques.id.toLowerCase().includes(q) ||
+              ques.text.toLowerCase().includes(q) ||
+              (opt && opt.label.toLowerCase().includes(q))
+            );
+          });
+          if (!codeMatch && !hasMatchingScenario && !hasMatchingQuestion) return false;
         }
         return true;
       });
@@ -1594,15 +1730,29 @@ export default function Admin({
             <div className="workspace-stat-strip">
               <div className="workspace-stat-card">
                 <div className="workspace-stat-header">
-                  <span className="workspace-stat-label">Total Decisions Recorded</span>
+                  <span className="workspace-stat-label">Questionnaire Responses</span>
                   <div className="workspace-stat-icon lavender">
                     <Database size={17} />
+                  </div>
+                </div>
+                <div className="workspace-stat-value">{totalSurveyAnswersRecorded}</div>
+                <div className="workspace-stat-subtext">
+                  <CheckCircle size={12} className="text-emerald" />
+                  <span>Immutable survey answers</span>
+                </div>
+              </div>
+
+              <div className="workspace-stat-card">
+                <div className="workspace-stat-header">
+                  <span className="workspace-stat-label">Challenge Decisions</span>
+                  <div className="workspace-stat-icon lavender">
+                    <Gamepad2 size={17} />
                   </div>
                 </div>
                 <div className="workspace-stat-value">{filteredAuditAttempts.length}</div>
                 <div className="workspace-stat-subtext">
                   <CheckCircle size={12} className="text-emerald" />
-                  <span>Immutable research attempts</span>
+                  <span>Simulation attempts</span>
                 </div>
               </div>
 
@@ -1617,24 +1767,6 @@ export default function Admin({
                 <div className="workspace-stat-subtext">
                   <Clock size={12} />
                   <span>Enrolled &amp; consented in study</span>
-                </div>
-              </div>
-
-              <div className="workspace-stat-card">
-                <div className="workspace-stat-header">
-                  <span className="workspace-stat-label">All 20 Challenges Done</span>
-                  <div className="workspace-stat-icon emerald">
-                    <Gamepad2 size={17} />
-                  </div>
-                </div>
-                <div className="workspace-stat-value">{historyAllCompletedCount}</div>
-                <div className="workspace-stat-subtext">
-                  <span>
-                    {historyUniqueParticipants > 0
-                      ? Math.round((historyAllCompletedCount / historyUniqueParticipants) * 100)
-                      : 0}
-                    % full challenge completion
-                  </span>
                 </div>
               </div>
 
@@ -1662,7 +1794,7 @@ export default function Admin({
                   </div>
                   <h2 className="text-xl font-bold mt-1">Original Participant Responses</h2>
                   <p className="text-xs text-muted mt-1 max-w-3xl leading-relaxed">
-                    Secure read-only audit log of raw participant challenge decisions.
+                    Secure read-only audit log of raw questionnaire responses and simulation challenge decisions.
                     Original research responses remain immutable and cannot be modified by review screens or scoring adjustments.
                   </p>
                 </div>
@@ -1670,7 +1802,9 @@ export default function Admin({
                   <span className="tag shrink-0">
                     {auditViewMode === "participants"
                       ? `${participantAuditGroups.length} Participants`
-                      : `${filteredAuditAttempts.length} Recorded Attempts`}
+                      : auditTableType === "survey"
+                        ? `${filteredAuditSurveyRows.length} Survey Responses`
+                        : `${filteredAuditAttempts.length} Challenge Decisions`}
                   </span>
 
                   {/* View Mode Switcher */}
@@ -1679,7 +1813,7 @@ export default function Admin({
                       type="button"
                       className={`view-mode-pill-btn ${auditViewMode === "participants" ? "active" : ""}`}
                       onClick={() => setAuditViewMode("participants")}
-                      title="Group challenge responses by participant with joined timestamps"
+                      title="Group responses by participant with joined timestamps"
                     >
                       <Users size={13} />
                       <span>By Participant</span>
@@ -1688,7 +1822,7 @@ export default function Admin({
                       type="button"
                       className={`view-mode-pill-btn ${auditViewMode === "table" ? "active" : ""}`}
                       onClick={() => setAuditViewMode("table")}
-                      title="Flat audit log table of all decisions"
+                      title="Flat audit log table of all responses"
                     >
                       <FileText size={13} />
                       <span>Audit Table</span>
@@ -1696,6 +1830,39 @@ export default function Admin({
                   </div>
                 </div>
               </div>
+
+              {/* View Type Toggle for Table Mode */}
+              {auditViewMode === "table" && (
+                <div className="pt-3 border-t mt-3 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="view-mode-pill-group">
+                    <button
+                      type="button"
+                      className={`view-mode-pill-btn ${auditTableType === "survey" ? "active" : ""}`}
+                      onClick={() => {
+                        setAuditTableType("survey");
+                        setAuditSurveyPage(0);
+                      }}
+                    >
+                      <FileText size={13} />
+                      <span>Questionnaire Survey Responses ({filteredAuditSurveyRows.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`view-mode-pill-btn ${auditTableType === "challenges" ? "active" : ""}`}
+                      onClick={() => {
+                        setAuditTableType("challenges");
+                        setAuditPage(0);
+                      }}
+                    >
+                      <Gamepad2 size={13} />
+                      <span>Simulation Challenge Decisions ({filteredAuditAttempts.length})</span>
+                    </button>
+                  </div>
+                  <span className="text-xs text-muted">
+                    Showing raw {auditTableType === "survey" ? "Likert & demographic entries" : "first-attempt challenge telemetry"}
+                  </span>
+                </div>
+              )}
 
               {/* Filters for responses */}
               <div className="workspace-toolbar mt-4">
@@ -1822,7 +1989,23 @@ export default function Admin({
                             </span>
                           </div>
 
-                          <div className="participant-header-actions flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
+                          <div className="participant-header-actions flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 flex-wrap">
+                            {/* Survey Responses Badge */}
+                            <span
+                              className={`text-xs font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                                group.answeredSurveyCount >= 24
+                                  ? "bg-emerald/15 text-emerald border border-emerald/30"
+                                  : "bg-cyan/15 text-cyan border border-cyan/30"
+                              }`}
+                            >
+                              {group.answeredSurveyCount >= 24 ? (
+                                <CheckCircle size={11} />
+                              ) : (
+                                <FileText size={11} />
+                              )}
+                              {group.answeredSurveyCount} / 24 Survey
+                            </span>
+
                             {/* 20 Challenges Progress Badge */}
                             <div className="text-left sm:text-right">
                               <span
@@ -1870,7 +2053,7 @@ export default function Admin({
                               ) : (
                                 <>
                                   <ChevronDown size={13} />
-                                  <span>Inspect Challenges</span>
+                                  <span>Inspect Responses</span>
                                 </>
                               )}
                             </button>
@@ -1879,6 +2062,10 @@ export default function Admin({
 
                         {/* Summary Pill Bar */}
                         <div className="participant-summary-bar px-4 sm:px-5 py-2.5 bg-surface/50 border-b flex items-center gap-3 sm:gap-4 text-xs flex-wrap">
+                          <span className="flex items-center gap-1 text-cyan font-semibold">
+                            <FileText size={13} />
+                            {group.answeredSurveyCount} / 24 Questions Answered
+                          </span>
                           <span className="flex items-center gap-1 text-emerald font-semibold">
                             <ShieldCheck size={13} />
                             {group.safeCount} Safe Decisions
@@ -1893,86 +2080,182 @@ export default function Admin({
                           </span>
                         </div>
 
-                        {/* All 20 Challenges Joined Breakdown */}
+                        {/* All Responses (Survey & Challenges) Breakdown */}
                         {isExpanded && (
                           <div className="challenges-container p-3 sm:p-4 bg-surface/20">
-                            <div className="challenges-grid">
-                              {visibleChallenges.map((ch) => (
-                                <div
-                                  key={ch.id}
-                                  className={`challenge-decision-card ${
-                                    ch.status === "pending"
-                                      ? "pending"
-                                      : ch.isSafe
-                                        ? "safe"
-                                        : "unsafe"
+                            {/* Inner Subtab Switcher */}
+                            <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b flex-wrap">
+                              <div className="view-mode-pill-group">
+                                <button
+                                  type="button"
+                                  className={`view-mode-pill-btn ${
+                                    (auditParticipantTab[group.session.id] || (group.totalFinished === 0 && group.answeredSurveyCount > 0 ? "survey" : "challenges")) === "survey"
+                                      ? "active"
+                                      : ""
                                   }`}
+                                  onClick={() =>
+                                    setAuditParticipantTab((prev) => ({
+                                      ...prev,
+                                      [group.session.id]: "survey",
+                                    }))
+                                  }
                                 >
-                                  <div>
-                                    <div className="challenge-card-header flex items-start justify-between gap-2 flex-wrap">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="challenge-id-badge">{ch.id}</span>
-                                        <span className="tag text-[10px] py-0.5 px-2">
-                                          {ch.iv} · {ch.missionName}
-                                        </span>
+                                  <FileText size={12} />
+                                  <span>Questionnaire Responses ({group.answeredSurveyCount} / 24)</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`view-mode-pill-btn ${
+                                    (auditParticipantTab[group.session.id] || (group.totalFinished === 0 && group.answeredSurveyCount > 0 ? "survey" : "challenges")) === "challenges"
+                                      ? "active"
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    setAuditParticipantTab((prev) => ({
+                                      ...prev,
+                                      [group.session.id]: "challenges",
+                                    }))
+                                  }
+                                >
+                                  <Gamepad2 size={12} />
+                                  <span>Cyber Challenges ({group.totalFinished} / 20)</span>
+                                </button>
+                              </div>
+                              <span className="text-[11px] text-muted">
+                                Anonymous Record: <code>{group.participantId}</code>
+                              </span>
+                            </div>
+
+                            {/* View 1: Survey Responses */}
+                            {(auditParticipantTab[group.session.id] || (group.totalFinished === 0 && group.answeredSurveyCount > 0 ? "survey" : "challenges")) === "survey" ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {questions.map((q) => {
+                                  const ans = group.session.answers?.[q.id];
+                                  const opt = q.options.find((o) => o.code === ans?.value);
+                                  const isAnswered = ans?.status === "answered" && ans?.value !== null;
+                                  const isSkipped = ans?.status === "skipped";
+
+                                  return (
+                                    <div
+                                      key={q.id}
+                                      className="p-3 rounded-lg border bg-surface/50 flex flex-col justify-between text-xs space-y-2"
+                                    >
+                                      <div>
+                                        <div className="flex items-center justify-between gap-1 mb-1">
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="font-mono font-bold text-cyan">{q.id}</span>
+                                            <span className="tag text-[10px] py-0 px-1.5">{q.variable}</span>
+                                          </div>
+                                          <span
+                                            className={`badge-status-tag text-[10px] py-0 px-1.5 ${
+                                              isAnswered
+                                                ? "unlocked"
+                                                : isSkipped
+                                                  ? "locked bg-amber/15 text-amber border-amber/30"
+                                                  : "bg-slate-200/50 text-muted"
+                                            }`}
+                                          >
+                                            {isAnswered ? "Answered" : isSkipped ? "Skipped" : "Not Answered"}
+                                          </span>
+                                        </div>
+                                        <p className="font-medium text-foreground text-[11.5px] leading-snug line-clamp-2" title={q.text}>
+                                          {q.text}
+                                        </p>
                                       </div>
-
-                                      {ch.status === "completed" ? (
-                                        ch.isSafe ? (
-                                          <span className="badge-status-tag unlocked text-[10.5px]">
-                                            <ShieldCheck size={11} /> Protective
-                                          </span>
-                                        ) : (
-                                          <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
-                                            <AlertTriangle size={11} /> Unsafe
-                                          </span>
-                                        )
-                                      ) : (
-                                        <span className="text-[10.5px] text-muted italic">
-                                          Not Attempted
+                                      <div className="pt-2 border-t flex items-center justify-between text-[11px]">
+                                        <span className="text-muted truncate max-w-[70%]" title={opt?.label || "—"}>
+                                          {opt ? opt.label : isSkipped ? "Skipped by participant" : "Not answered"}
                                         </span>
-                                      )}
+                                        {isAnswered && (
+                                          <code className="px-1.5 py-0.5 rounded bg-surface border font-mono text-[10px]">
+                                            Val: {ans?.value}
+                                          </code>
+                                        )}
+                                      </div>
                                     </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              /* View 2: Challenges Grid */
+                              <div className="challenges-grid">
+                                {visibleChallenges.map((ch) => (
+                                  <div
+                                    key={ch.id}
+                                    className={`challenge-decision-card ${
+                                      ch.status === "pending"
+                                        ? "pending"
+                                        : ch.isSafe
+                                          ? "safe"
+                                          : "unsafe"
+                                    }`}
+                                  >
+                                    <div>
+                                      <div className="challenge-card-header flex items-start justify-between gap-2 flex-wrap">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className="challenge-id-badge">{ch.id}</span>
+                                          <span className="tag text-[10px] py-0.5 px-2">
+                                            {ch.iv} · {ch.missionName}
+                                          </span>
+                                        </div>
 
-                                    <h4 className="challenge-title-text">{ch.title}</h4>
-
-                                    {ch.status === "completed" ? (
-                                      <div className="challenge-action-quote mt-2.5">
-                                        <span className="text-[10px] uppercase font-bold text-muted block mb-1">
-                                          Participant Chosen Action:
-                                        </span>
-                                        <span>&ldquo;{ch.selectedAction}&rdquo;</span>
-                                        {!ch.isSafe && ch.disclosedCategory && ch.disclosedCategory !== "None" && (
-                                          <span className="text-[11px] text-red font-semibold block mt-1.5">
-                                            ⚠️ Compromised Data: {ch.disclosedCategory}
+                                        {ch.status === "completed" ? (
+                                          ch.isSafe ? (
+                                            <span className="badge-status-tag unlocked text-[10.5px]">
+                                              <ShieldCheck size={11} /> Protective
+                                            </span>
+                                          ) : (
+                                            <span className="badge-status-tag locked text-[10.5px] bg-red/15 text-red border-red/30">
+                                              <AlertTriangle size={11} /> Unsafe
+                                            </span>
+                                          )
+                                        ) : (
+                                          <span className="text-[10.5px] text-muted italic">
+                                            Not Attempted
                                           </span>
                                         )}
                                       </div>
-                                    ) : (
-                                      <p className="text-xs text-muted italic mt-2">
-                                        No attempt recorded for this scenario yet.
-                                      </p>
-                                    )}
-                                  </div>
 
-                                  <div className="challenge-card-footer flex items-center justify-between gap-2 flex-wrap text-[11px] sm:text-xs">
-                                    <span>
-                                      Risk Score:{" "}
-                                      <strong className="font-mono text-foreground">
-                                        {ch.riskScore !== null ? `${ch.riskScore} / 4` : "—"}
-                                      </strong>
-                                    </span>
-                                    <span>
-                                      Elapsed:{" "}
-                                      <strong className="text-foreground">
-                                        {ch.elapsedSec !== null ? `${ch.elapsedSec}s` : "—"}
-                                      </strong>
-                                    </span>
-                                    <span>{colomboTime(ch.createdAt)}</span>
+                                      <h4 className="challenge-title-text">{ch.title}</h4>
+
+                                      {ch.status === "completed" ? (
+                                        <div className="challenge-action-quote mt-2.5">
+                                          <span className="text-[10px] uppercase font-bold text-muted block mb-1">
+                                            Participant Chosen Action:
+                                          </span>
+                                          <span>&ldquo;{ch.selectedAction}&rdquo;</span>
+                                          {!ch.isSafe && ch.disclosedCategory && ch.disclosedCategory !== "None" && (
+                                            <span className="text-[11px] text-red font-semibold block mt-1.5">
+                                              ⚠️ Compromised Data: {ch.disclosedCategory}
+                                            </span>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <p className="text-xs text-muted italic mt-2">
+                                          No attempt recorded for this scenario yet.
+                                        </p>
+                                      )}
+                                    </div>
+
+                                    <div className="challenge-card-footer flex items-center justify-between gap-2 flex-wrap text-[11px] sm:text-xs">
+                                      <span>
+                                        Risk Score:{" "}
+                                        <strong className="font-mono text-foreground">
+                                          {ch.riskScore !== null ? `${ch.riskScore} / 4` : "—"}
+                                        </strong>
+                                      </span>
+                                      <span>
+                                        Elapsed:{" "}
+                                        <strong className="text-foreground">
+                                          {ch.elapsedSec !== null ? `${ch.elapsedSec}s` : "—"}
+                                        </strong>
+                                      </span>
+                                      <span>{colomboTime(ch.createdAt)}</span>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -2014,95 +2297,194 @@ export default function Admin({
                 <>
                   <div className="table-mobile-hint">
                     <ArrowRight size={13} className="text-cyan animate-pulse shrink-0" />
-                    <span>Swipe horizontally to view all 10 response decision columns</span>
-                  </div>
-                  <div
-                    className="table-scroll mt-2 sm:mt-4"
-                    tabIndex={0}
-                    role="region"
-                    aria-label="Original participant responses table"
-                  >
-                    <table>
-                      <thead>
-                        <tr>
-                          <th className="sticky-col-header">Participant Code</th>
-                          <th>Joined Research</th>
-                          <th>Scenario ID</th>
-                          <th>Scenario Title</th>
-                          <th>Threat Variable</th>
-                          <th>Decision Selected</th>
-                          <th>Safety Status</th>
-                          <th>Risk Score (0–4)</th>
-                          <th>Elapsed</th>
-                          <th>Recorded Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedAuditAttempts.map((item, idx) => (
-                          <tr key={`${item.participantId}-${item.scenarioId}-${idx}`}>
-                            <td className="sticky-col-cell">
-                              <code>{item.participantId}</code>
-                            </td>
-                            <td className="text-xs text-muted whitespace-nowrap">
-                              {colomboTime(item.joinedAt)}
-                            </td>
-                            <td>
-                              <code>{item.scenarioId}</code>
-                            </td>
-                            <td className="text-xs font-medium">{item.scenarioTitle}</td>
-                            <td>
-                              <span className="tag small">{item.primaryIV}</span>
-                            </td>
-                            <td className="text-xs max-w-sm truncate" title={item.selectedAction}>
-                              {item.selectedAction}
-                            </td>
-                            <td>
-                              {item.unsafe ? (
-                                <span className="badge-status-tag locked text-[11px] py-0.5 px-1.5 bg-red/15 text-red border-red/30">
-                                  Unsafe
-                                </span>
-                              ) : (
-                                <span className="badge-status-tag unlocked text-[11px] py-0.5 px-1.5">
-                                  Protective
-                                </span>
-                              )}
-                            </td>
-                            <td className="font-mono text-xs">{item.privacyRiskScore}</td>
-                            <td className="text-xs">{(item.elapsedMs / 1000).toFixed(1)}s</td>
-                            <td className="text-xs text-muted whitespace-nowrap">
-                              {colomboTime(item.timestamp)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <span>Swipe horizontally to view all columns</span>
                   </div>
 
-                  {!filteredAuditAttempts.length && (
-                    <p className="empty-copy">No research responses available yet.</p>
+                  {auditTableType === "survey" ? (
+                    <>
+                      <div
+                        className="table-scroll mt-2 sm:mt-4"
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Original questionnaire survey responses table"
+                      >
+                        <table>
+                          <thead>
+                            <tr>
+                              <th className="sticky-col-header">Participant Code</th>
+                              <th>Joined Research</th>
+                              <th>Question ID</th>
+                              <th>Section / Variable</th>
+                              <th>Question Text</th>
+                              <th>Selected Response</th>
+                              <th>Raw Value</th>
+                              <th>Status</th>
+                              <th>Recorded Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedAuditSurveyRows.map((item, idx) => (
+                              <tr key={`${item.participantId}-${item.questionId}-${idx}`}>
+                                <td className="sticky-col-cell">
+                                  <code>{item.participantId}</code>
+                                </td>
+                                <td className="text-xs text-muted whitespace-nowrap">
+                                  {colomboTime(item.joinedAt)}
+                                </td>
+                                <td>
+                                  <code>{item.questionId}</code>
+                                </td>
+                                <td>
+                                  <span className="tag small">{item.section}: {item.role}</span>
+                                </td>
+                                <td className="text-xs font-medium max-w-xs truncate" title={item.questionText}>
+                                  {item.questionText}
+                                </td>
+                                <td className="text-xs max-w-sm truncate" title={item.selectedOptionLabel}>
+                                  {item.selectedOptionLabel}
+                                </td>
+                                <td className="font-mono text-xs">
+                                  {item.rawValue !== null ? item.rawValue : "—"}
+                                </td>
+                                <td>
+                                  <span
+                                    className={`badge-status-tag text-[11px] py-0.5 px-1.5 ${
+                                      item.answerStatus === "answered"
+                                        ? "unlocked"
+                                        : item.answerStatus === "skipped"
+                                          ? "locked bg-amber/15 text-amber border-amber/30"
+                                          : "bg-slate-200/50 text-muted"
+                                    }`}
+                                  >
+                                    {item.answerStatus.replace("_", " ")}
+                                  </span>
+                                </td>
+                                <td className="text-xs text-muted whitespace-nowrap">
+                                  {colomboTime(item.timestamp)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {!filteredAuditSurveyRows.length && (
+                        <p className="empty-copy">No questionnaire survey responses found matching criteria.</p>
+                      )}
+
+                      {/* Survey Audit Pagination */}
+                      <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
+                        <button
+                          className="button secondary small"
+                          disabled={auditSurveyPage === 0}
+                          onClick={() => setAuditSurveyPage(auditSurveyPage - 1)}
+                        >
+                          Previous
+                        </button>
+                        <span className="text-xs text-muted">
+                          Page {auditSurveyPage + 1} of{" "}
+                          {Math.max(1, Math.ceil(filteredAuditSurveyRows.length / auditSurveyPageSize))}
+                        </span>
+                        <button
+                          className="button secondary small"
+                          disabled={(auditSurveyPage + 1) * auditSurveyPageSize >= filteredAuditSurveyRows.length}
+                          onClick={() => setAuditSurveyPage(auditSurveyPage + 1)}
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="table-scroll mt-2 sm:mt-4"
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Original participant simulation challenge decisions table"
+                      >
+                        <table>
+                          <thead>
+                            <tr>
+                              <th className="sticky-col-header">Participant Code</th>
+                              <th>Joined Research</th>
+                              <th>Scenario ID</th>
+                              <th>Scenario Title</th>
+                              <th>Threat Variable</th>
+                              <th>Decision Selected</th>
+                              <th>Safety Status</th>
+                              <th>Risk Score (0–4)</th>
+                              <th>Elapsed</th>
+                              <th>Recorded Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedAuditAttempts.map((item, idx) => (
+                              <tr key={`${item.participantId}-${item.scenarioId}-${idx}`}>
+                                <td className="sticky-col-cell">
+                                  <code>{item.participantId}</code>
+                                </td>
+                                <td className="text-xs text-muted whitespace-nowrap">
+                                  {colomboTime(item.joinedAt)}
+                                </td>
+                                <td>
+                                  <code>{item.scenarioId}</code>
+                                </td>
+                                <td className="text-xs font-medium">{item.scenarioTitle}</td>
+                                <td>
+                                  <span className="tag small">{item.primaryIV}</span>
+                                </td>
+                                <td className="text-xs max-w-sm truncate" title={item.selectedAction}>
+                                  {item.selectedAction}
+                                </td>
+                                <td>
+                                  {item.unsafe ? (
+                                    <span className="badge-status-tag locked text-[11px] py-0.5 px-1.5 bg-red/15 text-red border-red/30">
+                                      Unsafe
+                                    </span>
+                                  ) : (
+                                    <span className="badge-status-tag unlocked text-[11px] py-0.5 px-1.5">
+                                      Protective
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="font-mono text-xs">{item.privacyRiskScore}</td>
+                                <td className="text-xs">{(item.elapsedMs / 1000).toFixed(1)}s</td>
+                                <td className="text-xs text-muted whitespace-nowrap">
+                                  {colomboTime(item.timestamp)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {!filteredAuditAttempts.length && (
+                        <p className="empty-copy">No simulation challenge decisions found matching criteria.</p>
+                      )}
+
+                      {/* Audit Pagination */}
+                      <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
+                        <button
+                          className="button secondary small"
+                          disabled={auditPage === 0}
+                          onClick={() => setAuditPage(auditPage - 1)}
+                        >
+                          Previous
+                        </button>
+                        <span className="text-xs text-muted">
+                          Page {auditPage + 1} of{" "}
+                          {Math.max(1, Math.ceil(filteredAuditAttempts.length / auditPageSize))}
+                        </span>
+                        <button
+                          className="button secondary small"
+                          disabled={(auditPage + 1) * auditPageSize >= filteredAuditAttempts.length}
+                          onClick={() => setAuditPage(auditPage + 1)}
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </>
                   )}
-
-                  {/* Audit Pagination */}
-                  <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
-                    <button
-                      className="button secondary small"
-                      disabled={auditPage === 0}
-                      onClick={() => setAuditPage(auditPage - 1)}
-                    >
-                      Previous
-                    </button>
-                    <span className="text-xs text-muted">
-                      Page {auditPage + 1} of{" "}
-                      {Math.max(1, Math.ceil(filteredAuditAttempts.length / auditPageSize))}
-                    </span>
-                    <button
-                      className="button secondary small"
-                      disabled={(auditPage + 1) * auditPageSize >= filteredAuditAttempts.length}
-                      onClick={() => setAuditPage(auditPage + 1)}
-                    >
-                      Next
-                    </button>
-                  </div>
                 </>
               )}
             </div>

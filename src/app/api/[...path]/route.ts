@@ -26,7 +26,7 @@ import {
   parseGuardedPostBody,
 } from "@/lib/api-utils.server";
 import type { ExportKind } from "@/lib/csv";
-import type { Session, Filters } from "@/lib/types";
+import type { Session, Filters, Answers } from "@/lib/types";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 type Ctx = { params: Promise<{ path: string[] }> };
@@ -292,7 +292,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       return json({ ok: true });
     }
     if (path === "session/submit-answers" || path === "session/record-workspace") {
-      return json(await recordSessionToWorkspace());
+      const answers = body?.answers && typeof body.answers === "object" ? (body.answers as Answers) : undefined;
+      return json(await recordSessionToWorkspace(answers));
     }
     if (path === "game/attempt")
       return json(await recordAttempt(attemptSchema.parse(body)));
