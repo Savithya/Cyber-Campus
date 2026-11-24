@@ -756,9 +756,10 @@ export default function Admin({
         return true;
       })
       .sort((a, b) => {
-        const timeA = new Date(a.submittedAt || a.joinedAt).getTime() || 0;
-        const timeB = new Date(b.submittedAt || b.joinedAt).getTime() || 0;
-        return timeB - timeA;
+        const numA = parseInt(String(a.participantId || "0"), 10);
+        const numB = parseInt(String(b.participantId || "0"), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
+        return String(a.participantId || "").localeCompare(String(b.participantId || ""));
       });
   }, [all, auditCompletionFilter, auditSearch, getParticipantChallenges, scenarioMap]);
 
@@ -796,13 +797,10 @@ export default function Admin({
         return true;
       })
       .sort((a, b) => {
-        const timeA = new Date(a.submittedAt || a.createdAt).getTime() || 0;
-        const timeB = new Date(b.submittedAt || b.createdAt).getTime() || 0;
-        if (timeB !== timeA) return timeB - timeA;
-        const numA = parseInt(String(a.code || 0), 10);
-        const numB = parseInt(String(b.code || 0), 10);
-        if (!isNaN(numA) && !isNaN(numB)) return numB - numA;
-        return String(b.code || "").localeCompare(String(a.code || ""));
+        const numA = parseInt(String(a.code || "0"), 10);
+        const numB = parseInt(String(b.code || "0"), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
+        return String(a.code || "").localeCompare(String(b.code || ""));
       });
   }, [realSessions, historyStatusFilter, historyChallengeFilter, historySearch]);
 
