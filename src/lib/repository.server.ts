@@ -61,7 +61,51 @@ async function withTimeout<T>(promise: PromiseLike<T>, ms = 1500): Promise<T> {
   return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
 }
 
+function shouldUseSupabaseCounter(): boolean {
+  if (process.env.VITEST || process.env.NODE_ENV === "test") {
+    return false;
+  }
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      (process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY),
+  );
+}
+
+async function getCounterSupabaseClient() {
+  const { serverAdminSupabase } = await import("./supabase.server");
+  const admin = serverAdminSupabase();
+  if (admin) return admin;
+  try {
+    return await supabase();
+  } catch {
+    return null;
+  }
+}
+
+async function resetSupabaseParticipantCounter(newVal: number): Promise<void> {
+  if (!shouldUseSupabaseCounter()) return;
+  try {
+    const client = await getCounterSupabaseClient();
+    if (!client) return;
+    const { error: rpcErr } = await withTimeout(
+      client.rpc("reset_participant_counter", { new_val: newVal }),
+    );
+    if (rpcErr) {
+      await withTimeout(
+        client
+          .from("global_participant_counter")
+          .upsert({ id: 1, counter: newVal, updated_at: new Date().toISOString() }),
+      );
+    }
+  } catch {
+    // Supabase unreachable or timed out
+  }
+}
+
 async function incrementGlobalParticipantCounterInSupabase(): Promise<number | null> {
+  if (!shouldUseSupabaseCounter()) return null;
+
   // Wait for any in-flight increment on this Node instance to finish first.
   if (counterMutex) {
     await counterMutex;
@@ -70,20 +114,19 @@ async function incrementGlobalParticipantCounterInSupabase(): Promise<number | n
   counterMutex = new Promise<void>((r) => { releaseMutex = r; });
 
   try {
-    const { serverAdminSupabase } = await import("./supabase.server");
-    const admin = serverAdminSupabase();
-    if (!admin) return null;
+    const client = await getCounterSupabaseClient();
+    if (!client) return null;
 
     // 1. Try the atomic RPC — a single INSERT … ON CONFLICT DO UPDATE that
     //    increments and returns the new value inside one Postgres statement.
-    const rpcRes = await withTimeout(admin.rpc("next_participant_counter"));
+    const rpcRes = await withTimeout(client.rpc("next_participant_counter"));
     if (!rpcRes.error && typeof rpcRes.data === "number" && rpcRes.data > 0) {
       return rpcRes.data;
     }
 
     // 2. Fallback: read-then-write with strict timeout.
     const currentRes = await withTimeout(
-      admin
+      client
         .from("global_participant_counter")
         .select("counter")
         .eq("id", 1)
@@ -91,7 +134,7 @@ async function incrementGlobalParticipantCounterInSupabase(): Promise<number | n
     );
     const nextVal = ((currentRes.data?.counter as number) || 0) + 1;
     const upsertRes = await withTimeout(
-      admin
+      client
         .from("global_participant_counter")
         .upsert({ id: 1, counter: nextVal, updated_at: new Date().toISOString() })
     );
@@ -118,6 +161,7 @@ export async function nextLocalParticipantCode(options?: {
   existingCode?: string | number | null;
   clientHintCode?: string | number | null;
   resetToStart?: boolean;
+  skipGlobalCounter?: boolean;
 }): Promise<string> {
   // Serialise concurrent calls within this Node instance.
   if (localCodeMutex) {
@@ -137,6 +181,7 @@ async function _nextLocalParticipantCodeInner(options?: {
   existingCode?: string | number | null;
   clientHintCode?: string | number | null;
   resetToStart?: boolean;
+  skipGlobalCounter?: boolean;
 }): Promise<string> {
   if (options?.resetToStart) {
     memoryParticipantCounter = 1;
@@ -169,25 +214,15 @@ async function _nextLocalParticipantCodeInner(options?: {
       });
     } catch {}
 
-    // Reset Supabase persistent counter if configured and in research mode
-    if (isResearch()) {
-      try {
-        const { serverAdminSupabase } = await import("./supabase.server");
-        const admin = serverAdminSupabase();
-        if (admin) {
-          const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 1 });
-          if (rpcErr) {
-            await admin.from("global_participant_counter").upsert({ id: 1, counter: 1, updated_at: new Date().toISOString() });
-          }
-        }
-      } catch {}
-    }
+    // Reset Supabase persistent counter whenever configured so all devices stay in sync
+    await resetSupabaseParticipantCounter(1);
 
     return "01";
   }
 
-  // 1. Try atomic increment from Supabase global counter ONLY in research mode
-  if (isResearch()) {
+  // 1. Try atomic increment from Supabase global counter whenever configured
+  //    (both research and demo modes) so all devices receive unique sequential IDs.
+  if (!options?.skipGlobalCounter) {
     const supabaseVal = await incrementGlobalParticipantCounterInSupabase();
     if (typeof supabaseVal === "number" && supabaseVal > 0) {
       const nextCodeStr = String(supabaseVal).padStart(2, "0");
@@ -706,7 +741,10 @@ export async function resetResearchData(): Promise<{ ok: boolean; message: strin
     jar.delete("cc_pid");
   } catch {}
 
-  // 4. In research mode, clear remote Supabase participant tables if configured
+  // 4. Reset remote Supabase participant counter if configured (in both demo and research modes)
+  await resetSupabaseParticipantCounter(0);
+
+  // 5. In research mode, clear remote Supabase participant tables if configured
   if (isResearch()) {
     const { serverAdminSupabase } = await import("./supabase.server");
     const admin = serverAdminSupabase();
@@ -718,10 +756,6 @@ export async function resetResearchData(): Promise<{ ok: boolean; message: strin
         await admin.from("game_runs").delete().neq("scoring_version", "none");
         await admin.from("participant_sessions").delete().neq("mode", "none");
         await admin.from("admin_audit_events").delete().eq("event", "participant_withdrawal");
-        const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 0 });
-        if (rpcErr) {
-          await admin.from("global_participant_counter").upsert({ id: 1, counter: 0, updated_at: new Date().toISOString() });
-        }
       } catch (err) {
         console.error("Supabase reset error:", err);
       }
@@ -866,6 +900,30 @@ async function isCodeAlreadyTaken(code: string, currentSessionId?: string): Prom
   });
 }
 
+async function ensureSequentialResearchCode(session: Session | null | undefined): Promise<void> {
+  if (!session || !session.code || !session.code.startsWith("CC-")) return;
+  const nextVal = await incrementGlobalParticipantCounterInSupabase();
+  if (typeof nextVal !== "number" || nextVal <= 0) return;
+  const nextCodeStr = String(nextVal).padStart(2, "0");
+  try {
+    const { serverAdminSupabase } = await import("./supabase.server");
+    const admin = serverAdminSupabase();
+    if (admin) {
+      const { error } = await withTimeout(
+        admin
+          .from("participant_sessions")
+          .update({ participant_code: nextCodeStr })
+          .eq("id", session.id),
+      );
+      if (!error) {
+        session.code = nextCodeStr;
+      }
+    }
+  } catch {
+    // Keep existing code if update fails
+  }
+}
+
 export async function startSession(input: {
   consented: boolean;
   eligible: boolean;
@@ -895,6 +953,7 @@ export async function startSession(input: {
       nextCode = await nextLocalParticipantCode({
         existingCode: isTaken ? undefined : existing?.code,
         clientHintCode: input.clientLastCode,
+        skipGlobalCounter: input.practice,
       });
     }
     if (existing && existing.mode !== "practice" && (existing.status !== "draft" || isTaken)) {
@@ -953,6 +1012,7 @@ export async function startSession(input: {
     p_eligible: true,
   });
   if (session) {
+    await ensureSequentialResearchCode(session);
     session.participantId = pid;
     session.submissionId = session.id;
   }
@@ -978,6 +1038,9 @@ export async function startNewParticipantSession(input?: {
         "Research collection is not open. The researcher must configure contact, retention, and database settings first.",
       );
     }
+    if (input?.resetToStart) {
+      await resetSupabaseParticipantCounter(0);
+    }
     const db = await supabase();
     await db.auth.signOut().catch(() => {});
     const { error } = await db.auth.signInAnonymously();
@@ -994,6 +1057,7 @@ export async function startNewParticipantSession(input?: {
       p_eligible: true,
     });
     if (session) {
+      await ensureSequentialResearchCode(session);
       session.participantId = pid;
       session.submissionId = session.id;
     }
@@ -1013,26 +1077,14 @@ export async function startNewParticipantSession(input?: {
     "links",
   ];
 
-  // Preserve the existing session's code when the participant already has an
-  // active draft on this device — identical to the logic in startSession() —
-  // so the same Anonymous ID stays consistent across devices / reloads.
-  let nextCode: string;
+  // Starting a new participant always assigns the next sequential Anonymous ID
+  // (or resets to 01 when resetToStart is true).
   const isTaken = existing?.code ? await isCodeAlreadyTaken(existing.code, existing.id) : false;
-  if (
-    !input?.resetToStart &&
-    existing &&
-    existing.status === "draft" &&
-    existing.code &&
-    !isTaken
-  ) {
-    nextCode = existing.code;
-  } else {
-    nextCode = await nextLocalParticipantCode({
-      existingCode: input?.resetToStart ? undefined : (isTaken ? undefined : existing?.code),
-      clientHintCode: input?.resetToStart ? undefined : input?.clientLastCode,
-      resetToStart: input?.resetToStart,
-    });
-  }
+  const nextCode = await nextLocalParticipantCode({
+    existingCode: input?.resetToStart ? undefined : (isTaken ? undefined : existing?.code),
+    clientHintCode: input?.resetToStart ? undefined : input?.clientLastCode,
+    resetToStart: input?.resetToStart,
+  });
   const session: Session = {
     id: sessionId,
     submissionId: sessionId,
