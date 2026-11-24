@@ -143,32 +143,12 @@ export function DemographicsForm() {
 
   useEffect(() => {
     if (!state.loading && !state.session) {
-      // Auto-initialize a fresh anonymous participant session so devices landing on /demographics
-      // (e.g. opened directly on mobile or cross-device) are immediately assigned their own unique ID
-      setResettingParticipant(true);
-      const storedLastCode = typeof window !== "undefined" ? localStorage.getItem("cc_last_participant_code") : null;
-      api<{ session: Session }>("session/new-participant", { clientLastCode: storedLastCode })
-        .then((res) => {
-          if (res.session) {
-            if (typeof window !== "undefined" && res.session.code) {
-              localStorage.setItem("cc_last_participant_code", res.session.code);
-            }
-            state.setSession(res.session);
-            putDraft({
-              code: res.session.code,
-              expires: res.session.draftExpiresAt,
-              answers: res.session.answers,
-              token: randomToken(),
-              submitKey: crypto.randomUUID(),
-            });
-          }
-        })
-        .catch(() => {
-          router.replace("/consent");
-        })
-        .finally(() => {
-          setResettingParticipant(false);
-        });
+      // No active session on this device — redirect to the consent flow so each
+      // device goes through proper enrollment rather than silently creating a
+      // duplicate Anonymous ID.  Previously this auto-created a new participant
+      // session, which caused different devices to show different codes for the
+      // same person.
+      router.replace("/consent");
       return;
     }
     if (state.session) {

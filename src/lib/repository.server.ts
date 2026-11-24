@@ -1012,11 +1012,27 @@ export async function startNewParticipantSession(input?: {
     "impersonation",
     "links",
   ];
-  const nextCode = await nextLocalParticipantCode({
-    existingCode: input?.resetToStart ? undefined : existing?.code,
-    clientHintCode: input?.resetToStart ? undefined : input?.clientLastCode,
-    resetToStart: input?.resetToStart,
-  });
+
+  // Preserve the existing session's code when the participant already has an
+  // active draft on this device — identical to the logic in startSession() —
+  // so the same Anonymous ID stays consistent across devices / reloads.
+  let nextCode: string;
+  const isTaken = existing?.code ? await isCodeAlreadyTaken(existing.code, existing.id) : false;
+  if (
+    !input?.resetToStart &&
+    existing &&
+    existing.status === "draft" &&
+    existing.code &&
+    !isTaken
+  ) {
+    nextCode = existing.code;
+  } else {
+    nextCode = await nextLocalParticipantCode({
+      existingCode: input?.resetToStart ? undefined : (isTaken ? undefined : existing?.code),
+      clientHintCode: input?.resetToStart ? undefined : input?.clientLastCode,
+      resetToStart: input?.resetToStart,
+    });
+  }
   const session: Session = {
     id: sessionId,
     submissionId: sessionId,
