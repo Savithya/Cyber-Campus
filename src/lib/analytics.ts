@@ -24,8 +24,8 @@ export function filterSessions(
     // Participant code or submission ID search
     if (f.code && f.code.trim()) {
       const q = f.code.trim().toLowerCase();
-      const codeMatch = s.code.toLowerCase().includes(q);
-      const subIdMatch = (s.submissionId ?? s.id).toLowerCase().includes(q);
+      const codeMatch = (s.code ?? "").toLowerCase().includes(q);
+      const subIdMatch = (s.submissionId ?? s.id ?? "").toLowerCase().includes(q);
       const partIdMatch = (s.participantId ?? "").toLowerCase().includes(q);
       if (!codeMatch && !subIdMatch && !partIdMatch) return false;
     }

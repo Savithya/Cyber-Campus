@@ -141,14 +141,22 @@ async function _nextLocalParticipantCodeInner(options?: {
   if (options?.resetToStart) {
     memoryParticipantCounter = 1;
     globalThis.__CYBER_CAMPUS_COUNTER__ = 1;
-    const counterPayload = JSON.stringify({ counter: 1 });
+    const counterPayload = JSON.stringify({ counter: 1 }, null, 2) + "\n";
+    const emptySubmissions = "[]\n";
+
+    if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
+      globalThis.__CYBER_CAMPUS_SUBMISSIONS__.clear();
+    }
+
     try {
       await mkdir(getDemoDataDir(), { recursive: true });
       await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      await writeFile(path.join(getDemoDataDir(), "submissions.json"), emptySubmissions, "utf-8").catch(() => {});
     } catch {}
     try {
       await mkdir(getCwdDataDir(), { recursive: true });
       await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      await writeFile(path.join(getCwdDataDir(), "submissions.json"), emptySubmissions, "utf-8").catch(() => {});
     } catch {}
     try {
       const jar = await cookies();
@@ -161,61 +169,69 @@ async function _nextLocalParticipantCodeInner(options?: {
       });
     } catch {}
 
-    // Reset Supabase persistent counter if configured
-    try {
-      const { serverAdminSupabase } = await import("./supabase.server");
-      const admin = serverAdminSupabase();
-      if (admin) {
-        const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 1 });
-        if (rpcErr) {
-          await admin.from("global_participant_counter").upsert({ id: 1, counter: 1, updated_at: new Date().toISOString() });
+    // Reset Supabase persistent counter if configured and in research mode
+    if (isResearch()) {
+      try {
+        const { serverAdminSupabase } = await import("./supabase.server");
+        const admin = serverAdminSupabase();
+        if (admin) {
+          const { error: rpcErr } = await admin.rpc("reset_participant_counter", { new_val: 1 });
+          if (rpcErr) {
+            await admin.from("global_participant_counter").upsert({ id: 1, counter: 1, updated_at: new Date().toISOString() });
+          }
         }
-      }
-    } catch {}
+      } catch {}
+    }
 
     return "01";
   }
 
-  // 1. Try atomic increment from Supabase global counter (synchronizes across all devices and serverless lambdas)
-  const supabaseVal = await incrementGlobalParticipantCounterInSupabase();
-  if (typeof supabaseVal === "number" && supabaseVal > 0) {
-    const nextCodeStr = String(supabaseVal).padStart(2, "0");
-    memoryParticipantCounter = supabaseVal;
-    globalThis.__CYBER_CAMPUS_COUNTER__ = supabaseVal;
+  // 1. Try atomic increment from Supabase global counter ONLY in research mode
+  if (isResearch()) {
+    const supabaseVal = await incrementGlobalParticipantCounterInSupabase();
+    if (typeof supabaseVal === "number" && supabaseVal > 0) {
+      const nextCodeStr = String(supabaseVal).padStart(2, "0");
+      memoryParticipantCounter = supabaseVal;
+      globalThis.__CYBER_CAMPUS_COUNTER__ = supabaseVal;
 
-    const counterPayload = JSON.stringify({ counter: supabaseVal });
-    try {
-      await mkdir(getDemoDataDir(), { recursive: true });
-      await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
-    } catch {}
-    try {
-      await mkdir(getCwdDataDir(), { recursive: true });
-      await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
-    } catch {}
-    try {
-      const jar = await cookies();
-      jar.set("cc_last_code", nextCodeStr, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 365 * 86400,
-      });
-    } catch {}
+      const counterPayload = JSON.stringify({ counter: supabaseVal }, null, 2) + "\n";
+      try {
+        await mkdir(getDemoDataDir(), { recursive: true });
+        await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+      try {
+        await mkdir(getCwdDataDir(), { recursive: true });
+        await writeFile(path.join(getCwdDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
+      } catch {}
+      try {
+        const jar = await cookies();
+        jar.set("cc_last_code", nextCodeStr, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 365 * 86400,
+        });
+      } catch {}
 
-    return nextCodeStr;
+      return nextCodeStr;
+    }
   }
 
   let highestCodeFound = 0;
   let hasRealSubmissions = false;
+  const allKnownNumericCodes = new Set<number>();
 
   // 1. Scan cwd submissions (repository baseline)
   const cwdList = await readSubmissionsFromFile(path.join(getCwdDataDir(), "submissions.json"));
   for (const s of cwdList) {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const n = parseInt(String(s.code).trim(), 10);
-      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
-      hasRealSubmissions = true;
+      if (n < 100000) {
+        allKnownNumericCodes.add(n);
+        if (n > highestCodeFound) highestCodeFound = n;
+        hasRealSubmissions = true;
+      }
     }
   }
 
@@ -224,8 +240,11 @@ async function _nextLocalParticipantCodeInner(options?: {
   for (const s of demoList) {
     if (s.code && /^\d+$/.test(String(s.code).trim())) {
       const n = parseInt(String(s.code).trim(), 10);
-      if (n > highestCodeFound && n < 100000) highestCodeFound = n;
-      hasRealSubmissions = true;
+      if (n < 100000) {
+        allKnownNumericCodes.add(n);
+        if (n > highestCodeFound) highestCodeFound = n;
+        hasRealSubmissions = true;
+      }
     }
   }
 
@@ -234,8 +253,11 @@ async function _nextLocalParticipantCodeInner(options?: {
     for (const s of globalThis.__CYBER_CAMPUS_SUBMISSIONS__.values()) {
       if (s.code && /^\d+$/.test(String(s.code).trim())) {
         const n = parseInt(String(s.code).trim(), 10);
-        if (n > highestCodeFound && n < 100000) highestCodeFound = n;
-        hasRealSubmissions = true;
+        if (n < 100000) {
+          allKnownNumericCodes.add(n);
+          if (n > highestCodeFound) highestCodeFound = n;
+          hasRealSubmissions = true;
+        }
       }
     }
   }
@@ -303,14 +325,17 @@ async function _nextLocalParticipantCodeInner(options?: {
     } catch {}
   }
 
-  const nextVal = highestCodeFound + 1;
+  let nextVal = highestCodeFound + 1;
+  while (allKnownNumericCodes.has(nextVal)) {
+    nextVal++;
+  }
   memoryParticipantCounter = nextVal;
   globalThis.__CYBER_CAMPUS_COUNTER__ = nextVal;
 
   const nextCodeStr = String(nextVal).padStart(2, "0");
 
   // Persist counter to files
-  const counterPayload = JSON.stringify({ counter: nextVal });
+  const counterPayload = JSON.stringify({ counter: nextVal }, null, 2) + "\n";
   try {
     await mkdir(getDemoDataDir(), { recursive: true });
     await writeFile(path.join(getDemoDataDir(), "participant_counter.json"), counterPayload, "utf-8").catch(() => {});
@@ -424,7 +449,7 @@ export async function saveDemoSubmission(session: Session) {
   if (session.mode === "practice") return;
 
   // 1. Update in-memory store
-  const key = session.code || session.id;
+  const key = session.id || session.code;
   if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
     globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(key, session);
   }
@@ -453,9 +478,7 @@ export async function saveDemoSubmission(session: Session) {
   try {
     await mkdir(dataDir, { recursive: true });
     const list = await readSubmissionsFromFile(subPath);
-    const idx = list.findIndex(
-      (x) => x.id === session.id || (session.code && x.code === session.code),
-    );
+    const idx = list.findIndex((x) => x.id === session.id);
     if (idx >= 0) {
       list[idx] = { ...list[idx], ...session };
     } else {
@@ -472,9 +495,7 @@ export async function saveDemoSubmission(session: Session) {
     try {
       await mkdir(getCwdDataDir(), { recursive: true });
       const cwdList = await readSubmissionsFromFile(cwdPath);
-      const idx = cwdList.findIndex(
-        (x) => x.id === session.id || (session.code && x.code === session.code),
-      );
+      const idx = cwdList.findIndex((x) => x.id === session.id);
       if (idx >= 0) {
         cwdList[idx] = { ...cwdList[idx], ...session };
       } else {
@@ -486,7 +507,7 @@ export async function saveDemoSubmission(session: Session) {
 }
 
 function mergeSubmissionIntoMap(map: Map<string, Session>, s: Session, overrides?: Partial<Session>) {
-  const k = s.code || s.id;
+  const k = s.id || s.submissionId || s.code;
   const existing = map.get(k);
   if (!existing) {
     map.set(k, { ...s, ...overrides });
@@ -604,7 +625,7 @@ export async function getDemoSubmissions(): Promise<Session[]> {
   // 5. Update in-memory map & sync file
   if (globalThis.__CYBER_CAMPUS_SUBMISSIONS__) {
     for (const s of list) {
-      globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.code || s.id, s);
+      globalThis.__CYBER_CAMPUS_SUBMISSIONS__.set(s.id || s.code, s);
     }
   }
 
@@ -825,7 +846,7 @@ export async function getSession(): Promise<Session | null> {
   if (!user) return null;
   return rpc<Session | null>("current_session");
 }
-async function isCodeAlreadyTaken(code: string): Promise<boolean> {
+async function isCodeAlreadyTaken(code: string, currentSessionId?: string): Promise<boolean> {
   const norm = /^\d+$/.test(code.trim())
     ? String(parseInt(code.trim(), 10)).padStart(2, "0")
     : code.trim();
@@ -836,11 +857,12 @@ async function isCodeAlreadyTaken(code: string): Promise<boolean> {
     all.push(...globalThis.__CYBER_CAMPUS_SUBMISSIONS__.values());
   }
   return all.some((s) => {
+    if (currentSessionId && s.id === currentSessionId) return false;
     const sNorm =
       s.code && /^\d+$/.test(String(s.code).trim())
         ? String(parseInt(String(s.code).trim(), 10)).padStart(2, "0")
         : s.code;
-    return sNorm === norm && (s.status === "submitted_complete" || s.status === "submitted_with_missing");
+    return sNorm === norm;
   });
 }
 
@@ -865,8 +887,8 @@ export async function startSession(input: {
     ];
     let nextCode: string;
     // If the participant already has an active, unsubmitted draft session on this device,
-    // preserve their assigned code UNLESS another device/session has already submitted with that code!
-    const isTaken = existing?.code ? await isCodeAlreadyTaken(existing.code) : false;
+    // preserve their assigned code UNLESS another device/session has already taken that code!
+    const isTaken = existing?.code ? await isCodeAlreadyTaken(existing.code, existing.id) : false;
     if (existing && existing.status === "draft" && !input.practice && existing.code && !isTaken) {
       nextCode = existing.code;
     } else {
@@ -874,6 +896,9 @@ export async function startSession(input: {
         existingCode: isTaken ? undefined : existing?.code,
         clientHintCode: input.clientLastCode,
       });
+    }
+    if (existing && existing.mode !== "practice" && (existing.status !== "draft" || isTaken)) {
+      await saveDemoSubmission(existing);
     }
     const session: Session = {
       id: sessionId,
@@ -973,6 +998,10 @@ export async function startNewParticipantSession(input?: {
       session.submissionId = session.id;
     }
     return session;
+  }
+
+  if (existing && existing.mode !== "practice") {
+    await saveDemoSubmission(existing);
   }
 
   const now = new Date();

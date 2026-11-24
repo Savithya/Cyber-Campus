@@ -350,8 +350,15 @@ export default function Admin({
     Object.entries(filters).filter(([, v]) => v) as [string, string][],
   ).toString();
 
-  const href = (p: string) =>
-    base + (p ? "/" + p : "") + (query ? "?" + query : "");
+  const href = (p: string) => {
+    const activeParams = Object.entries(filters).filter(([k, v]) => {
+      if (!v) return false;
+      if (p === "history" && k === "code") return false;
+      return true;
+    }) as [string, string][];
+    const q = new URLSearchParams(activeParams).toString();
+    return base + (p ? "/" + p : "") + (q ? "?" + q : "");
+  };
 
   const submitted = all.filter(
     (s) =>
@@ -359,7 +366,7 @@ export default function Admin({
   );
   const totalSubmissions = submitted.length;
   const uniqueParticipants = new Set(
-    submitted.map((s) => s.participantId || s.code),
+    all.map((s) => s.participantId || s.code || s.id),
   ).size;
 
   const counts = {
@@ -489,7 +496,7 @@ export default function Admin({
 
   // Flattened responses for Original Responses audit table
   const auditAttempts = useMemo(() => {
-    return filtered.flatMap((s) => {
+    return all.flatMap((s) => {
       const participantId = s.code || s.participantId || "ANON";
       const status = s.status;
       const joinedAt = s.createdAt;
@@ -539,7 +546,7 @@ export default function Admin({
           };
         });
     });
-  }, [filtered, scenarioMap]);
+  }, [all, scenarioMap]);
 
   // Filtered audit attempts
   const filteredAuditAttempts = useMemo(() => {
@@ -590,7 +597,7 @@ export default function Admin({
       timestamp: string;
     }[] = [];
 
-    filtered.forEach((s) => {
+    all.forEach((s) => {
       const participantId = s.code || s.participantId || "ANON";
       const submissionId = s.submissionId || s.id;
       const joinedAt = s.createdAt;
@@ -642,7 +649,7 @@ export default function Admin({
     });
 
     return rows;
-  }, [filtered]);
+  }, [all]);
 
   const totalSurveyAnswersRecorded = useMemo(() => {
     return filtered.reduce((total, s) => {
@@ -685,7 +692,7 @@ export default function Admin({
 
   // Grouped by Participant in Responses view
   const participantAuditGroups = useMemo(() => {
-    return filtered
+    return all
       .map((s) => {
         const challenges = getParticipantChallenges(s);
         const summary = scoreSummary(s.attempts);
@@ -727,7 +734,9 @@ export default function Admin({
         if (auditCompletionFilter === "partial" && g.totalFinished >= 20) return false;
         if (auditSearch.trim()) {
           const q = auditSearch.trim().toLowerCase();
-          const codeMatch = g.participantId.toLowerCase().includes(q);
+          const codeMatch =
+            g.participantId.toLowerCase().includes(q) ||
+            (g.session.submissionId || g.session.id || "").toLowerCase().includes(q);
           const hasMatchingScenario = g.challenges.some(
             (c) =>
               c.title.toLowerCase().includes(q) ||
@@ -745,8 +754,13 @@ export default function Admin({
           if (!codeMatch && !hasMatchingScenario && !hasMatchingQuestion) return false;
         }
         return true;
+      })
+      .sort((a, b) => {
+        const timeA = new Date(a.submittedAt || a.joinedAt).getTime() || 0;
+        const timeB = new Date(b.submittedAt || b.joinedAt).getTime() || 0;
+        return timeB - timeA;
       });
-  }, [filtered, auditCompletionFilter, auditSearch, scenarioMap]);
+  }, [all, auditCompletionFilter, auditSearch, getParticipantChallenges, scenarioMap]);
 
   const participantPageSize = 5;
   const paginatedParticipantGroups = participantAuditGroups.slice(
@@ -756,47 +770,62 @@ export default function Admin({
 
   const historyPageSize = 10;
   const historySessions = useMemo(() => {
-    return all.filter((s) => {
-      if (historyStatusFilter === "completed" && s.status === "draft") return false;
-      if (historyStatusFilter === "draft" && s.status !== "draft") return false;
-      if (historyStatusFilter !== "all" && historyStatusFilter !== "completed" && historyStatusFilter !== "draft") {
-        if (s.status !== historyStatusFilter) return false;
-      }
-      if (historyChallengeFilter === "completed_all") {
-        if (scoreSummary(s.attempts).completed < 20) return false;
-      } else if (historyChallengeFilter === "partial") {
-        if (scoreSummary(s.attempts).completed >= 20) return false;
-      }
-      if (historySearch.trim()) {
-        const q = historySearch.trim().toLowerCase();
-        const codeMatch = s.code?.toLowerCase().includes(q);
-        const subMatch = (s.submissionId || s.id)?.toLowerCase().includes(q);
-        if (!codeMatch && !subMatch) return false;
-      }
-      return true;
-    });
-  }, [all, historyStatusFilter, historyChallengeFilter, historySearch]);
+    return realSessions
+      .filter((s) => {
+        if (historyStatusFilter === "completed" && s.status === "draft") return false;
+        if (historyStatusFilter === "draft" && s.status !== "draft") return false;
+        if (historyStatusFilter !== "all" && historyStatusFilter !== "completed" && historyStatusFilter !== "draft") {
+          if (s.status !== historyStatusFilter) return false;
+        }
+        if (historyChallengeFilter === "completed_all") {
+          if (scoreSummary(s.attempts).completed < 20) return false;
+        } else if (historyChallengeFilter === "partial") {
+          if (scoreSummary(s.attempts).completed >= 20) return false;
+        }
+        if (historySearch.trim()) {
+          const q = historySearch.trim().toLowerCase();
+          const cleanCode = (s.code ?? "").trim();
+          const numericCode = /^\d+$/.test(cleanCode) ? String(parseInt(cleanCode, 10)) : "";
+          const codeMatch =
+            cleanCode.toLowerCase().includes(q) ||
+            (numericCode !== "" && numericCode.includes(q));
+          const subMatch = (s.submissionId || s.id)?.toLowerCase().includes(q);
+          const partMatch = (s.participantId ?? "").toLowerCase().includes(q);
+          if (!codeMatch && !subMatch && !partMatch) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const timeA = new Date(a.submittedAt || a.createdAt).getTime() || 0;
+        const timeB = new Date(b.submittedAt || b.createdAt).getTime() || 0;
+        if (timeB !== timeA) return timeB - timeA;
+        const numA = parseInt(String(a.code || 0), 10);
+        const numB = parseInt(String(b.code || 0), 10);
+        if (!isNaN(numA) && !isNaN(numB)) return numB - numA;
+        return String(b.code || "").localeCompare(String(a.code || ""));
+      });
+  }, [realSessions, historyStatusFilter, historyChallengeFilter, historySearch]);
 
   const historySubmitted = useMemo(() => {
-    return all.filter(
+    return realSessions.filter(
       (s) =>
         s.status === "submitted_complete" ||
         s.status === "submitted_with_missing",
     );
-  }, [all]);
+  }, [realSessions]);
 
   const historyUniqueParticipants = useMemo(() => {
     return new Set(
-      all.map((s) => s.participantId || s.code),
+      realSessions.map((s) => s.participantId || s.code),
     ).size;
-  }, [all]);
+  }, [realSessions]);
 
   const historyAllCompletedCount = useMemo(() => {
-    return all.filter((s) => scoreSummary(s.attempts).completed >= 20).length;
-  }, [all]);
+    return realSessions.filter((s) => scoreSummary(s.attempts).completed >= 20).length;
+  }, [realSessions]);
 
   const historyAvgDurationStr = useMemo(() => {
-    const durations = all
+    const durations = realSessions
       .filter((s) => s.submittedAt && s.createdAt)
       .map((s) => {
         const start = new Date(s.createdAt).getTime();
@@ -809,16 +838,16 @@ export default function Admin({
     const m = Math.floor(avgSec / 60);
     const s = avgSec % 60;
     return `${m}m ${s}s`;
-  }, [all]);
+  }, [realSessions]);
 
   const historySafeDecisionRate = useMemo(() => {
-    const attempts = all
+    const attempts = realSessions
       .flatMap((s) => s.attempts || [])
       .filter((a) => a.attemptNumber === 1 && a.selectedAction !== null);
     if (!attempts.length) return 0;
     const safeCount = attempts.filter((a) => !a.unsafe).length;
     return Math.round((safeCount / attempts.length) * 100);
-  }, [all]);
+  }, [realSessions]);
 
   const paginatedHistorySessions = useMemo(() => {
     return historySessions.slice(
@@ -1337,6 +1366,151 @@ export default function Admin({
                 </div>
               </section>
             </div>
+
+            {/* Recent Participant Submissions */}
+            <section className="card">
+              <div className="card-top">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="eyebrow text-cyan font-bold flex items-center gap-1">
+                      <Users size={13} /> PARTICIPANT ROSTER
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold mt-1">Recent Participant Submissions</h2>
+                  <p className="text-xs text-muted mt-1">
+                    Direct access to the most recent participant sessions recorded in this research study.
+                  </p>
+                </div>
+                <TabLink
+                  href={href("history")}
+                  onNavigate={navigateTab}
+                  className="button secondary small text-xs"
+                >
+                  <History size={13} />
+                  <span>View All Submissions</span>
+                </TabLink>
+              </div>
+
+              {historySessions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 border border-dashed rounded-lg text-muted text-xs mt-3">
+                  <Users size={28} className="mb-2 opacity-40 text-cyan" />
+                  <p className="font-semibold text-foreground text-sm">No research participants enrolled yet</p>
+                  <p className="text-[11px] text-muted mt-1">Participants will appear here automatically when they join and record mission responses.</p>
+                </div>
+              ) : (
+                <div className="table-scroll mt-3" tabIndex={0} role="region" aria-label="Recent participants table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th className="sticky-col-header">Participant</th>
+                        <th>Status</th>
+                        <th>Joined &amp; Submitted</th>
+                        <th>Challenges (20)</th>
+                        <th>Survey ({questions.length})</th>
+                        <th>Risk Score</th>
+                        <th className="text-right pr-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historySessions.slice(0, 5).map((s) => {
+                        const challenges = getParticipantChallenges(s);
+                        const completedCount = challenges.filter((c) => c.status === "completed").length;
+                        const answeredSurveyCount = questions.filter(
+                          (q) => s.answers?.[q.id]?.status === "answered" && s.answers?.[q.id]?.value !== null,
+                        ).length;
+                        const duration = formatDuration(s.createdAt, s.submittedAt);
+                        const avgRisk = completedCount
+                          ? (
+                              challenges
+                                .filter((c) => c.status === "completed")
+                                .reduce((sum, c) => sum + (c.riskScore ?? 0), 0) / completedCount
+                            ).toFixed(2)
+                          : "—";
+
+                        return (
+                          <tr key={s.submissionId || s.id} className="hover:bg-surface/50">
+                            <td className="sticky-col-cell">
+                              <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-surface border border-border/70 text-foreground">
+                                {s.code || s.participantId || s.id.slice(0, 8)}
+                              </span>
+                            </td>
+                            <td>
+                              {s.status === "submitted_complete" ? (
+                                <span className="tag text-[11px] border-emerald/30 text-emerald bg-emerald/5 inline-flex items-center gap-1">
+                                  <CheckCircle size={11} /> Completed
+                                </span>
+                              ) : s.status === "submitted_with_missing" ? (
+                                <span className="tag text-[11px] border-amber/30 text-amber bg-amber/5 inline-flex items-center gap-1">
+                                  <AlertTriangle size={11} /> Missing Items
+                                </span>
+                              ) : (
+                                <span className="tag text-[11px] border-cyan/30 text-cyan bg-cyan/5 inline-flex items-center gap-1">
+                                  <Clock size={11} /> In Progress
+                                </span>
+                              )}
+                            </td>
+                            <td className="whitespace-nowrap text-xs">
+                              <strong className="text-foreground font-mono">
+                                {s.submittedAt ? colomboTime(s.submittedAt) : "In Progress"}
+                              </strong>
+                              <span className="text-[11px] text-muted block">
+                                Joined {colomboTime(s.createdAt)} · {duration}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`text-xs font-bold ${completedCount >= 20 ? "text-emerald" : "text-cyan"}`}>
+                                {completedCount} / 20
+                              </span>
+                            </td>
+                            <td>
+                              <span className="text-xs font-mono">
+                                <strong>{answeredSurveyCount}</strong> / {questions.length}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="font-mono text-xs font-semibold text-foreground">
+                                {avgRisk} <span className="text-[10px] text-muted">/ 4</span>
+                              </span>
+                            </td>
+                            <td className="whitespace-nowrap text-right pr-4">
+                              <div className="flex items-center justify-end gap-2">
+                                <TabLink
+                                  href={href("history")}
+                                  onNavigate={navigateTab}
+                                  onClick={() => {
+                                    setHistorySearch(s.code || s.participantId || "");
+                                    setExpandedParticipantId(s.submissionId || s.id);
+                                  }}
+                                  className="button secondary small text-xs flex items-center gap-1 py-1 px-2.5"
+                                  title="Inspect participant dossier in Submission History"
+                                >
+                                  <Eye size={12} />
+                                  <span>Dossier</span>
+                                </TabLink>
+                                <TabLink
+                                  href={href("responses")}
+                                  onNavigate={navigateTab}
+                                  onClick={() => {
+                                    setAuditSearch(s.code || s.participantId || "");
+                                    setAuditViewMode("participants");
+                                    setExpandedAuditParticipantId(s.id);
+                                  }}
+                                  className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
+                                  title="View raw responses and decisions in audit log"
+                                >
+                                  <span>Responses</span>
+                                  <ArrowUpRight size={11} />
+                                </TabLink>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
           </div>
         )}
 
@@ -1984,7 +2158,7 @@ export default function Admin({
               {auditViewMode === "participants" && (
                 <div className="space-y-5 mt-4">
                   {paginatedParticipantGroups.map((group) => {
-                    const isExpanded = expandedAuditParticipantId === group.session.id || expandedAuditParticipantId === null;
+                    const isExpanded = expandedAuditParticipantId === group.session.id;
                     const visibleChallenges = group.challenges.filter((c) => {
                       if (auditIvFilter !== "all" && c.iv !== auditIvFilter) return false;
                       if (auditSafetyFilter === "safe" && c.isSafe !== true) return false;
@@ -2075,16 +2249,16 @@ export default function Admin({
 
                             <button
                               type="button"
-                              className="button secondary small text-xs shrink-0"
+                              className={`button small text-xs shrink-0 flex items-center gap-1.5 transition-colors ${
+                                isExpanded ? "primary" : "secondary"
+                              }`}
                               onClick={() =>
                                 setExpandedAuditParticipantId(
-                                  expandedAuditParticipantId === group.session.id
-                                    ? "none"
-                                    : group.session.id,
+                                  isExpanded ? null : group.session.id,
                                 )
                               }
                             >
-                              {expandedAuditParticipantId === group.session.id ? (
+                              {isExpanded ? (
                                 <>
                                   <ChevronUp size={13} />
                                   <span>Collapse</span>
@@ -2302,24 +2476,57 @@ export default function Admin({
                   })}
 
                   {!participantAuditGroups.length && (
-                    <p className="empty-copy">No participant challenge responses found matching criteria.</p>
+                    <div className="card text-center p-8 border-dashed mt-4">
+                      <Users size={32} className="mx-auto text-cyan mb-2 opacity-50" />
+                      <p className="font-semibold text-foreground text-sm">No participant responses match the selected criteria</p>
+                      <p className="text-xs text-muted mt-1 max-w-sm mx-auto">
+                        Try adjusting your filters or search terms to inspect previous participants.
+                      </p>
+                      {(auditSearch || auditCompletionFilter !== "all" || auditIvFilter !== "all" || auditSafetyFilter !== "all") && (
+                        <button
+                          type="button"
+                          className="button secondary small text-xs mt-3 mx-auto"
+                          onClick={() => {
+                            setAuditSearch("");
+                            setAuditCompletionFilter("all");
+                            setAuditIvFilter("all");
+                            setAuditSafetyFilter("all");
+                            setAuditPage(0);
+                            setAuditParticipantPage(0);
+                          }}
+                        >
+                          Reset All Filters
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {/* Pagination for Participants view */}
                   <div className="pagination flex items-center justify-between gap-2 mt-4 flex-wrap">
                     <button
-                      className="button secondary small"
+                      className="button secondary small text-xs"
                       disabled={auditParticipantPage === 0}
                       onClick={() => setAuditParticipantPage(auditParticipantPage - 1)}
                     >
                       Previous
                     </button>
                     <span className="text-xs text-muted">
-                      Page {auditParticipantPage + 1} of{" "}
-                      {Math.max(1, Math.ceil(participantAuditGroups.length / participantPageSize))}
+                      Page <strong>{auditParticipantPage + 1}</strong> of{" "}
+                      <strong>{Math.max(1, Math.ceil(participantAuditGroups.length / participantPageSize))}</strong>
+                      {participantAuditGroups.length > 0 && (
+                        <>
+                          <span className="mx-2 opacity-40">·</span>
+                          Showing {auditParticipantPage * participantPageSize + 1}–
+                          {Math.min(
+                            participantAuditGroups.length,
+                            (auditParticipantPage + 1) * participantPageSize,
+                          )}{" "}
+                          of {participantAuditGroups.length} participants
+                        </>
+                      )}
                     </span>
                     <button
-                      className="button secondary small"
+                      className="button secondary small text-xs"
                       disabled={(auditParticipantPage + 1) * participantPageSize >= participantAuditGroups.length}
                       onClick={() => setAuditParticipantPage(auditParticipantPage + 1)}
                     >
@@ -2837,7 +3044,7 @@ export default function Admin({
                         ).length;
                         const totalSurveyQuestions = questions.length;
                         const answeredSurveyCount = questions.filter(
-                          (q) => s.answers[q.id]?.status === "answered",
+                          (q) => s.answers?.[q.id]?.status === "answered" && s.answers?.[q.id]?.value !== null,
                         ).length;
 
                         const duration = formatDuration(s.createdAt, s.submittedAt);
@@ -2899,7 +3106,7 @@ export default function Admin({
                                     )}
                                   </button>
                                   <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-surface border border-border/70 text-foreground">
-                                    {s.code}
+                                    {s.code || s.participantId || s.id.slice(0, 8)}
                                   </span>
                                 </div>
                               </td>
@@ -3068,16 +3275,12 @@ export default function Admin({
                                   </button>
 
                                   <TabLink
-                                    href={
-                                      href("responses") +
-                                      (query
-                                        ? ""
-                                        : "?code=" + encodeURIComponent(s.code))
-                                    }
+                                    href={href("responses")}
                                     onNavigate={navigateTab}
                                     onClick={() => {
-                                      setAuditSearch(s.code);
+                                      setAuditSearch(s.code || s.participantId || "");
                                       setAuditViewMode("participants");
+                                      setExpandedAuditParticipantId(s.id);
                                     }}
                                     className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
                                     title="View raw responses and decisions in audit log"
@@ -3105,7 +3308,7 @@ export default function Admin({
                                             <h3 className="font-bold text-sm text-foreground">
                                               Participant Dossier:{" "}
                                               <span className="font-mono text-cyan">
-                                                {s.code}
+                                                {s.code || s.participantId || s.id}
                                               </span>
                                             </h3>
                                             <span

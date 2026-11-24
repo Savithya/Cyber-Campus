@@ -19,9 +19,22 @@ export function limit(key: string) {
 }
 
 export function isAllowedOrigin(origin: string | null, req: NextRequest): boolean {
-  if (!origin) return false;
+  let effectiveOrigin = origin;
+  if (!effectiveOrigin) {
+    const referer = req.headers.get("referer");
+    if (referer) {
+      try {
+        effectiveOrigin = new URL(referer).origin;
+      } catch {}
+    }
+  }
+  const secFetchSite = req.headers.get("sec-fetch-site");
+  if (!effectiveOrigin && (secFetchSite === "same-origin" || secFetchSite === "same-site")) {
+    return true;
+  }
+  if (!effectiveOrigin) return false;
   try {
-    const originUrl = new URL(origin);
+    const originUrl = new URL(effectiveOrigin);
     const hostHeader =
       req.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
       req.headers.get("host")?.trim();
@@ -33,8 +46,16 @@ export function isAllowedOrigin(origin: string | null, req: NextRequest): boolea
       return true;
     }
 
+    // 1b. Hostname match ignoring port in local/LAN networks
+    if (hostHeader) {
+      const [hostName] = hostHeader.toLowerCase().split(":");
+      if (originUrl.hostname.toLowerCase() === hostName) {
+        return true;
+      }
+    }
+
     // 2. Direct match with configured APP_ORIGIN
-    if (appOrigin && origin.toLowerCase() === appOrigin.toLowerCase()) {
+    if (appOrigin && effectiveOrigin.toLowerCase() === appOrigin.toLowerCase()) {
       return true;
     }
 
