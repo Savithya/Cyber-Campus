@@ -117,25 +117,15 @@ const navSections: NavSectionDef[] = [
   {
     heading: "Core Workspace",
     items: [
-      { id: "", label: "Overview", icon: LayoutDashboard },
-      { id: "responses", label: "Responses", icon: Database, badge: "count" },
-      { id: "demographics", label: "Demographics", icon: Users, badge: "Q1–Q4" },
-    ],
-  },
-  {
-    heading: "Research Variables",
-    items: [
-      { id: "threats", label: "Threat Analysis (IV1–IV4)", icon: ShieldAlert, badge: "4 IVs" },
-      { id: "supplementary", label: "User Privacy (DV)", icon: ShieldCheck, badge: "DV" },
+      { id: "history", label: "Submission History", icon: History },
+      { id: "demographics", label: "Participant Demographics", icon: Users, badge: "Q1–Q4" },
     ],
   },
   {
     heading: "Analytics & Data",
     items: [
-      { id: "statistics", label: "Statistical Analysis", icon: Calculator, badge: "Stats" },
-      { id: "performance", label: "Game Performance", icon: Gamepad2 },
+      { id: "performance", label: "Cyber Investigation Performance Analytics", icon: Gamepad2 },
       { id: "exports", label: "Data Export", icon: Download },
-      { id: "history", label: "Submission History", icon: History },
     ],
   },
 ];
@@ -330,10 +320,18 @@ export default function Admin({
     return liveSessions.filter((s) => s.mode !== "practice");
   }, [liveSessions]);
 
+  const rawActive = routePath[0] ?? "";
+  const allowedTabs = new Set([
+    "history",
+    "exports",
+    "demographics",
+    "performance",
+    "game-analytics",
+  ]);
   const filtered = filterSessions(realSessions, filters),
     all = filterSessions(realSessions, filters, false),
-    active = routePath[0] ?? "",
-    selected = questions.find((q) => q.id === routePath[1]),
+    active = allowedTabs.has(rawActive) ? rawActive : "history";
+  const selected = active === "questions" ? questions.find((q) => q.id === routePath[1]) : undefined,
     filterText = describeFilters(filters);
 
   const isThreatSection = [
@@ -3271,21 +3269,6 @@ export default function Admin({
                                       </>
                                     )}
                                   </button>
-
-                                  <TabLink
-                                    href={href("responses")}
-                                    onNavigate={navigateTab}
-                                    onClick={() => {
-                                      setAuditSearch(s.code || s.participantId || "");
-                                      setAuditViewMode("participants");
-                                      setExpandedAuditParticipantId(s.id);
-                                    }}
-                                    className="button secondary small text-xs flex items-center gap-1 py-1 px-2 text-cyan hover:text-cyan"
-                                    title="View raw responses and decisions in audit log"
-                                  >
-                                    <span>Responses</span>
-                                    <ArrowUpRight size={11} />
-                                  </TabLink>
                                 </div>
                               </td>
                             </tr>
