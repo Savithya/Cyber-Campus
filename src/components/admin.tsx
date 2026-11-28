@@ -795,10 +795,14 @@ export default function Admin({
         return true;
       })
       .sort((a, b) => {
-        const numA = parseInt(String(a.code || "0"), 10);
-        const numB = parseInt(String(b.code || "0"), 10);
-        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numB - numA;
-        return String(b.code || "").localeCompare(String(a.code || ""));
+        const codeA = String(a.code || a.participantId || a.id || "").trim();
+        const codeB = String(b.code || b.participantId || b.id || "").trim();
+        const numA = /^\d+$/.test(codeA) ? parseInt(codeA, 10) : NaN;
+        const numB = /^\d+$/.test(codeB) ? parseInt(codeB, 10) : NaN;
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
+        if (!isNaN(numA) && isNaN(numB)) return -1;
+        if (isNaN(numA) && !isNaN(numB)) return 1;
+        return codeA.localeCompare(codeB, undefined, { numeric: true, sensitivity: "base" });
       });
   }, [realSessions, historyStatusFilter, historyChallengeFilter, historySearch]);
 
