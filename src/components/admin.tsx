@@ -767,7 +767,7 @@ export default function Admin({
     (auditParticipantPage + 1) * participantPageSize,
   );
 
-  const historyPageSize = 10;
+  const historyPageSize = 50;
   const historySessions = useMemo(() => {
     return realSessions
       .filter((s) => {
@@ -1412,7 +1412,7 @@ export default function Admin({
                       </tr>
                     </thead>
                     <tbody>
-                      {historySessions.slice(0, 5).map((s) => {
+                      {[...historySessions].reverse().slice(0, 5).map((s) => {
                         const challenges = getParticipantChallenges(s);
                         const completedCount = challenges.filter((c) => c.status === "completed").length;
                         const answeredSurveyCount = questions.filter(
