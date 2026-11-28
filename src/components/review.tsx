@@ -1019,9 +1019,9 @@ export default function Review({
           <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
             <Link
               href="/"
-              className="button secondary w-full sm:w-auto justify-center min-h-[44px]"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors w-full sm:w-auto"
             >
-              <Home size={16} />
+              <Home size={16} aria-hidden="true" />
               <span>Return to Cyber Campus Home</span>
             </Link>
 
@@ -1029,26 +1029,31 @@ export default function Review({
               type="button"
               onClick={handleSubmitResponsesAndGoHome}
               disabled={busy || submitState === "success"}
-              className="button primary w-full sm:w-auto justify-center inline-flex items-center gap-2 min-h-[44px] px-6 disabled:opacity-60 disabled:cursor-not-allowed transition-all font-semibold shadow-sm hover:shadow"
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 min-h-[48px] px-7 rounded-xl text-sm sm:text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] shadow-md shadow-emerald-600/20 hover:shadow-lg hover:shadow-emerald-600/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#141e33] disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 transition-all cursor-pointer"
               aria-live="polite"
             >
               {submitState === "saving" ? (
                 <>
                   <span
-                    className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                    className="animate-spin inline-block w-4 h-4 border-2 border-white/80 border-t-transparent rounded-full"
                     aria-hidden="true"
                   />
                   <span>Saving responses…</span>
                 </>
               ) : submitState === "success" ? (
                 <>
-                  <CheckCircle2 size={16} className="text-emerald-300" aria-hidden="true" />
+                  <CheckCircle2 size={18} className="text-emerald-100" aria-hidden="true" />
                   <span>Responses saved! Returning home…</span>
                 </>
               ) : (
                 <>
-                  <CheckCheck size={16} aria-hidden="true" />
+                  <CheckCircle2 size={18} aria-hidden="true" />
                   <span>Submit Responses</span>
+                  <ArrowRight
+                    size={16}
+                    className="opacity-85 group-hover:translate-x-0.5 transition-transform"
+                    aria-hidden="true"
+                  />
                 </>
               )}
             </button>
@@ -1235,52 +1240,6 @@ export default function Review({
             })}
           </div>
         </section>
-
-        {/* Error Banner if final submission fails */}
-        {error && (
-          <div className="pt-2">
-            <ErrorBox message={error} retry={handleSubmitResponsesAndGoHome} />
-          </div>
-        )}
-
-        {/* Footer Navigation Actions */}
-        <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-          <Link
-            href="/"
-            className="button secondary w-full sm:w-auto justify-center min-h-[44px]"
-          >
-            <Home size={16} />
-            <span>Return to Cyber Campus Home</span>
-          </Link>
-
-          <button
-            type="button"
-            onClick={handleSubmitResponsesAndGoHome}
-            disabled={busy || submitState === "success"}
-            className="button primary w-full sm:w-auto justify-center inline-flex items-center gap-2 min-h-[44px] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-            aria-live="polite"
-          >
-            {submitState === "saving" ? (
-              <>
-                <span
-                  className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                  aria-hidden="true"
-                />
-                <span>Saving responses…</span>
-              </>
-            ) : submitState === "success" ? (
-              <>
-                <CheckCircle2 size={16} className="text-emerald-300" aria-hidden="true" />
-                <span>Responses saved! Returning home…</span>
-              </>
-            ) : (
-              <>
-                <CheckCheck size={16} aria-hidden="true" />
-                <span>Submit Responses</span>
-              </>
-            )}
-          </button>
-        </footer>
       </div>
     </div>
   );
