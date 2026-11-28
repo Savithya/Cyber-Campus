@@ -995,61 +995,63 @@ export default function Review({
 
         {/* ===================================================================
             TOP ACTION CARD: "Submit Responses" & Navigation
-            Prominently moved to top of page for instant, user-friendly submission
+            Clean, spacious two-row layout for effortless reading and clear CTA hierarchy
             =================================================================== */}
         <section
-          className="bg-white dark:bg-[#141e33] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm"
+          className="bg-white dark:bg-[#141e33] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5"
           role="region"
           aria-label="Submit responses and navigation"
         >
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            <div className="space-y-1 text-center sm:text-left">
-              <h2 className="text-base sm:text-lg font-bold text-[#0e2a36] dark:text-slate-100 flex items-center justify-center sm:justify-start gap-2">
-                <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />
-                <span>Ready to Submit &amp; Finish?</span>
+          <div className="flex items-start gap-3.5 text-left">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/70 dark:border-emerald-800/60 flex items-center justify-center shrink-0 mt-0.5">
+              <CheckCircle2 size={20} className="text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            </div>
+            <div className="space-y-1 min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-bold text-[#0e2a36] dark:text-slate-100 leading-snug">
+                Ready to Submit &amp; Finish?
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-lg">
-                Submit your responses to complete the research study and return home, or scroll down to explore the 20 scenario debriefs below.
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Click <strong className="font-semibold text-slate-800 dark:text-slate-200">Submit Responses</strong> to finalize your study participation and return home, or scroll down first to explore the 20 scenario debriefs below.
               </p>
             </div>
+          </div>
 
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-              <Link
-                href="/"
-                className="button secondary w-full sm:w-auto justify-center min-h-[44px]"
-              >
-                <Home size={16} />
-                <span>Return to Cyber Campus Home</span>
-              </Link>
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+            <Link
+              href="/"
+              className="button secondary w-full sm:w-auto justify-center min-h-[44px]"
+            >
+              <Home size={16} />
+              <span>Return to Cyber Campus Home</span>
+            </Link>
 
-              <button
-                type="button"
-                onClick={handleSubmitResponsesAndGoHome}
-                disabled={busy || submitState === "success"}
-                className="button primary w-full sm:w-auto justify-center inline-flex items-center gap-2 min-h-[44px] disabled:opacity-60 disabled:cursor-not-allowed transition-all font-semibold shadow-sm hover:shadow"
-                aria-live="polite"
-              >
-                {submitState === "saving" ? (
-                  <>
-                    <span
-                      className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                      aria-hidden="true"
-                    />
-                    <span>Saving responses…</span>
-                  </>
-                ) : submitState === "success" ? (
-                  <>
-                    <CheckCircle2 size={16} className="text-emerald-300" aria-hidden="true" />
-                    <span>Responses saved! Returning home…</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCheck size={16} aria-hidden="true" />
-                    <span>Submit Responses</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleSubmitResponsesAndGoHome}
+              disabled={busy || submitState === "success"}
+              className="button primary w-full sm:w-auto justify-center inline-flex items-center gap-2 min-h-[44px] px-6 disabled:opacity-60 disabled:cursor-not-allowed transition-all font-semibold shadow-sm hover:shadow"
+              aria-live="polite"
+            >
+              {submitState === "saving" ? (
+                <>
+                  <span
+                    className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                    aria-hidden="true"
+                  />
+                  <span>Saving responses…</span>
+                </>
+              ) : submitState === "success" ? (
+                <>
+                  <CheckCircle2 size={16} className="text-emerald-300" aria-hidden="true" />
+                  <span>Responses saved! Returning home…</span>
+                </>
+              ) : (
+                <>
+                  <CheckCheck size={16} aria-hidden="true" />
+                  <span>Submit Responses</span>
+                </>
+              )}
+            </button>
           </div>
         </section>
 
