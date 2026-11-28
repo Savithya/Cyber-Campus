@@ -797,8 +797,8 @@ export default function Admin({
       .sort((a, b) => {
         const numA = parseInt(String(a.code || "0"), 10);
         const numB = parseInt(String(b.code || "0"), 10);
-        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
-        return String(a.code || "").localeCompare(String(b.code || ""));
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numB - numA;
+        return String(b.code || "").localeCompare(String(a.code || ""));
       });
   }, [realSessions, historyStatusFilter, historyChallengeFilter, historySearch]);
 
